@@ -11,8 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { mockSessions } from "@/lib/mockData";
-import { getClientName } from "@/lib/mockData";
+import { mockSessions, getClientName } from "@/lib/mockData";
 import { Session } from "@/lib/types";
 import { CalendarDays, Clock, User, DollarSign, FileText } from "lucide-react";
 
