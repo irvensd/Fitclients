@@ -71,20 +71,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = React.useCallback(async (email: string, password: string) => {
     setAuthError(null);
     try {
+      // Always allow demo account to work regardless of Firebase configuration
+      if (email === "trainer@demo.com" && password === "demo123") {
+        const mockUser = { email, displayName: "Demo Trainer" };
+        setDevUser(mockUser);
+        setUser({ email } as User);
+        localStorage.setItem("devUser", JSON.stringify(mockUser));
+        return; // Exit early for demo account
+      }
+
+      // Firebase authentication for real accounts
       if (isFirebaseConfigured && auth) {
         await signInWithEmailAndPassword(auth, email, password);
       } else {
-        // Development mode - simulate login
-        if (email === "trainer@demo.com" && password === "demo123") {
-          const mockUser = { email, displayName: "Demo Trainer" };
-          setDevUser(mockUser);
-          setUser({ email } as User);
-          localStorage.setItem("devUser", JSON.stringify(mockUser));
-        } else {
-          throw new Error(
-            "Invalid credentials. Use trainer@demo.com / demo123 for development mode.",
-          );
-        }
+        // Development mode fallback
+        throw new Error(
+          "Invalid credentials. Use trainer@demo.com / demo123 for demo access.",
+        );
       }
     } catch (error: any) {
       console.error("Login error:", error);
@@ -95,7 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         error.code === "auth/user-not-found"
       ) {
         setAuthError(
-          "No account found with these credentials. Please check your email and password, or create a new account.",
+          "No account found with these credentials. Please check your email and password, create a new account, or use the demo account (trainer@demo.com / demo123).",
         );
       } else if (error.code === "auth/wrong-password") {
         setAuthError("Incorrect password. Please try again.");
