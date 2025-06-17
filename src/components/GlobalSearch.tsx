@@ -19,12 +19,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {
-  mockClients,
-  mockSessions,
-  mockPayments,
-  getClientName,
-} from "@/lib/mockData";
+import { useData } from "@/contexts/DataContext";
 
 type SearchResult = {
   id: string;
@@ -39,6 +34,7 @@ type SearchResult = {
 export const GlobalSearch = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const { clients, sessions, payments, getClientName } = useData();
 
   // Keyboard shortcut to open search
   useEffect(() => {
@@ -58,7 +54,7 @@ export const GlobalSearch = () => {
     const results: SearchResult[] = [];
 
     // Add clients
-    mockClients.forEach((client) => {
+    clients.forEach((client) => {
       results.push({
         id: `client-${client.id}`,
         title: client.name,
@@ -74,7 +70,7 @@ export const GlobalSearch = () => {
     });
 
     // Add sessions
-    mockSessions.forEach((session) => {
+    sessions.forEach((session) => {
       const clientName = getClientName(session.clientId);
       const sessionDate = new Date(session.date).toLocaleDateString();
       results.push({
@@ -92,7 +88,7 @@ export const GlobalSearch = () => {
     });
 
     // Add payments
-    mockPayments.forEach((payment) => {
+    payments.forEach((payment) => {
       const clientName = getClientName(payment.clientId);
       const paymentDate = new Date(payment.date).toLocaleDateString();
       results.push({
@@ -110,7 +106,7 @@ export const GlobalSearch = () => {
     });
 
     return results;
-  }, [navigate]);
+  }, [clients, sessions, payments, getClientName, navigate]);
 
   const getBadgeVariant = (type: string, badge?: string) => {
     if (type === "session") {
