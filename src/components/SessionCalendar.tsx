@@ -162,24 +162,34 @@ export const SessionCalendar = () => {
         </CardHeader>
         <CardContent className="h-[600px]">
           <div className="h-full">
-            <Calendar
-              localizer={localizer}
-              events={events}
-              startAccessor="start"
-              endAccessor="end"
-              view={view}
-              onView={setView}
-              onSelectEvent={handleSelectEvent}
-              eventPropGetter={eventStyleGetter}
-              components={{
-                event: EventComponent,
-              }}
-              style={{ height: "100%" }}
-              step={30}
-              timeslots={2}
-              min={new Date(0, 0, 0, 6, 0, 0)} // Start at 6 AM
-              max={new Date(0, 0, 0, 22, 0, 0)} // End at 10 PM
-            />
+            {sessions.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <CalendarDays className="h-16 w-16 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No Sessions Yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Schedule your first session to see it on the calendar
+                </p>
+              </div>
+            ) : (
+              <Calendar
+                localizer={localizer}
+                events={events}
+                startAccessor="start"
+                endAccessor="end"
+                view={view}
+                onView={setView}
+                onSelectEvent={handleSelectEvent}
+                eventPropGetter={eventStyleGetter}
+                components={{
+                  event: EventComponent,
+                }}
+                style={{ height: "100%" }}
+                step={30}
+                timeslots={2}
+                min={new Date(0, 0, 0, 6, 0, 0)} // Start at 6 AM
+                max={new Date(0, 0, 0, 22, 0, 0)} // End at 10 PM
+              />
+            )}
           </div>
         </CardContent>
       </Card>
