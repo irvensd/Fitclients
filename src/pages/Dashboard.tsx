@@ -23,6 +23,7 @@ import {
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { AdminSummary } from "@/components/AdminSummary";
 import { NavigationButton } from "@/components/NavigationButton";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   RevenueChart,
   ClientGrowthChart,
