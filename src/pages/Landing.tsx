@@ -10,6 +10,9 @@ import {
   Check,
   Star,
   ArrowRight,
+  Crown,
+  Sparkles,
+  Shield,
 } from "lucide-react";
 
 const Landing = () => {
