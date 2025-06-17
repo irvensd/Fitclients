@@ -18,6 +18,7 @@ import Progress from "./pages/Progress";
 import Settings from "./pages/Settings";
 import ClientPortal from "./pages/ClientPortal";
 import ClientPortalManager from "./pages/ClientPortalManager";
+import AIRecommendations from "./pages/AIRecommendations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -124,6 +125,17 @@ const App = () => (
                 <ProtectedRoute>
                   <Layout>
                     <ClientPortalManager />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/ai-recommendations"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <AIRecommendations />
                   </Layout>
                 </ProtectedRoute>
               }

@@ -15,6 +15,7 @@ import {
   Settings,
   LogOut,
   Share2,
+  Brain,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -57,6 +58,11 @@ const navigation = [
     name: "Client Portals",
     href: "/client-portals",
     icon: Share2,
+  },
+  {
+    name: "AI Coach",
+    href: "/ai-recommendations",
+    icon: Brain,
   },
 ];
 
