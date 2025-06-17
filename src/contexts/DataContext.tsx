@@ -221,17 +221,26 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Session actions (offline mode)
+  // Session actions
   const addSession = async (session: Omit<Session, "id">) => {
     if (!user?.email) throw new Error("User not authenticated");
 
-    // OFFLINE MODE: Add to local state
-    const newSession: Session = {
-      ...session,
-      id: Date.now().toString(),
-    };
-    setSessions((prev) => [newSession, ...prev]);
-    console.log("Added session in offline mode:", newSession);
+    // Demo account: use offline mode
+    if (user.email === "trainer@demo.com") {
+      const newSession: Session = {
+        ...session,
+        id: Date.now().toString(),
+      };
+      setSessions((prev) => [newSession, ...prev]);
+      return;
+    }
+
+    try {
+      await sessionsService.addSession(user.email, session);
+    } catch (err) {
+      setError("Failed to add session");
+      throw err;
+    }
   };
 
   const updateSession = async (
@@ -240,34 +249,61 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   ) => {
     if (!user?.email) throw new Error("User not authenticated");
 
-    // OFFLINE MODE: Update local state
-    setSessions((prev) =>
-      prev.map((session) =>
-        session.id === sessionId ? { ...session, ...updates } : session,
-      ),
-    );
-    console.log("Updated session in offline mode:", sessionId, updates);
+    // Demo account: use offline mode
+    if (user.email === "trainer@demo.com") {
+      setSessions((prev) =>
+        prev.map((session) =>
+          session.id === sessionId ? { ...session, ...updates } : session,
+        ),
+      );
+      return;
+    }
+
+    try {
+      await sessionsService.updateSession(user.email, sessionId, updates);
+    } catch (err) {
+      setError("Failed to update session");
+      throw err;
+    }
   };
 
   const deleteSession = async (sessionId: string) => {
     if (!user?.email) throw new Error("User not authenticated");
 
-    // OFFLINE MODE: Remove from local state
-    setSessions((prev) => prev.filter((session) => session.id !== sessionId));
-    console.log("Deleted session in offline mode:", sessionId);
+    // Demo account: use offline mode
+    if (user.email === "trainer@demo.com") {
+      setSessions((prev) => prev.filter((session) => session.id !== sessionId));
+      return;
+    }
+
+    try {
+      await sessionsService.deleteSession(user.email, sessionId);
+    } catch (err) {
+      setError("Failed to delete session");
+      throw err;
+    }
   };
 
-  // Payment actions (offline mode)
+  // Payment actions
   const addPayment = async (payment: Omit<Payment, "id">) => {
     if (!user?.email) throw new Error("User not authenticated");
 
-    // OFFLINE MODE: Add to local state
-    const newPayment: Payment = {
-      ...payment,
-      id: Date.now().toString(),
-    };
-    setPayments((prev) => [newPayment, ...prev]);
-    console.log("Added payment in offline mode:", newPayment);
+    // Demo account: use offline mode
+    if (user.email === "trainer@demo.com") {
+      const newPayment: Payment = {
+        ...payment,
+        id: Date.now().toString(),
+      };
+      setPayments((prev) => [newPayment, ...prev]);
+      return;
+    }
+
+    try {
+      await paymentsService.addPayment(user.email, payment);
+    } catch (err) {
+      setError("Failed to add payment");
+      throw err;
+    }
   };
 
   const updatePayment = async (
@@ -276,13 +312,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   ) => {
     if (!user?.email) throw new Error("User not authenticated");
 
-    // OFFLINE MODE: Update local state
-    setPayments((prev) =>
-      prev.map((payment) =>
-        payment.id === paymentId ? { ...payment, ...updates } : payment,
-      ),
-    );
-    console.log("Updated payment in offline mode:", paymentId, updates);
+    // Demo account: use offline mode
+    if (user.email === "trainer@demo.com") {
+      setPayments((prev) =>
+        prev.map((payment) =>
+          payment.id === paymentId ? { ...payment, ...updates } : payment,
+        ),
+      );
+      return;
+    }
+
+    try {
+      await paymentsService.updatePayment(user.email, paymentId, updates);
+    } catch (err) {
+      setError("Failed to update payment");
+      throw err;
+    }
   };
 
   const deletePayment = async (paymentId: string) => {
