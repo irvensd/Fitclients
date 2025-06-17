@@ -40,6 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = React.useState<User | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [devUser, setDevUser] = React.useState<any>(null);
+  const [authError, setAuthError] = React.useState<string | null>(null);
 
   const isDevMode = !isFirebaseConfigured;
 
