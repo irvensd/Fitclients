@@ -39,59 +39,75 @@ import {
   getPriorityColor,
   getTypeIcon,
 } from "@/lib/recommendations";
-
-// Mock clients data
-const mockClients = [
-  {
-    id: "1",
-    name: "Sarah Johnson",
-    email: "sarah.johnson@email.com",
-    phone: "(555) 123-4567",
-    dateJoined: "2024-01-15",
-    fitnessLevel: "intermediate" as const,
-    goals: "Weight loss and strength building",
-    avatar: "",
-  },
-  {
-    id: "2",
-    name: "Mike Chen",
-    email: "mike.chen@email.com",
-    phone: "(555) 234-5678",
-    dateJoined: "2024-02-03",
-    fitnessLevel: "beginner" as const,
-    goals: "Build muscle mass and improve endurance",
-    avatar: "",
-  },
-  {
-    id: "3",
-    name: "Emily Davis",
-    email: "emily.davis@email.com",
-    phone: "(555) 345-6789",
-    dateJoined: "2024-01-28",
-    fitnessLevel: "advanced" as const,
-    goals: "Marathon training and performance optimization",
-    avatar: "",
-  },
-  {
-    id: "4",
-    name: "James Wilson",
-    email: "james.wilson@email.com",
-    phone: "(555) 456-7890",
-    dateJoined: "2024-02-10",
-    fitnessLevel: "intermediate" as const,
-    goals: "Functional fitness and injury prevention",
-    avatar: "",
-  },
-];
+import { useData } from "@/contexts/DataContext";
 
 const AIRecommendations = () => {
+  const { clients, sessions, payments, loading } = useData();
   const [searchTerm, setSearchTerm] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
 
-  // Generate analyses for all clients
-  const clientAnalyses = mockClients.map((client) =>
-    generateRecommendations(client, [], []),
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-2 text-muted-foreground">Loading AI analysis...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state for new accounts
+  if (clients.length === 0) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-3xl font-bold text-foreground">
+                AI Coach Dashboard
+              </h1>
+              <Badge className="bg-purple-100 text-purple-800">
+                <Sparkles className="h-3 w-3 mr-1" />
+                AI Powered
+              </Badge>
+            </div>
+            <p className="text-muted-foreground">
+              Smart recommendations and insights to help you coach more
+              effectively.
+            </p>
+          </div>
+        </div>
+
+        <Card className="text-center py-12">
+          <CardContent>
+            <Brain className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">
+              No Client Data Available
+            </h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Add some clients and their session data to see AI-powered
+              recommendations and insights.
+            </p>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>• Add clients to your roster</p>
+              <p>• Schedule and complete training sessions</p>
+              <p>• Track client progress and payments</p>
+              <p>• Get personalized AI recommendations</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Generate analyses for all clients using real data
+  const clientAnalyses = clients.map((client) =>
+    generateRecommendations(client, sessions, payments),
   );
 
   // Get all recommendations across clients
