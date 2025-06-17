@@ -122,6 +122,9 @@ const AddClientDialog = () => {
     fitnessLevel: "",
     goals: "",
     notes: "",
+    weight: "",
+    height: "",
+    bodyFat: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
