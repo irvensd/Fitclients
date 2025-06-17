@@ -22,11 +22,9 @@ import {
 // Mock data for demonstration
 const stats = {
   totalClients: 24,
-  sessionsToday: 6,
-  sessionsThisWeek: 18,
+  upcomingSessions: 8,
+  unpaidInvoices: 3,
   monthlyRevenue: 4850,
-  activeWorkoutPlans: 19,
-  pendingPayments: 3,
 };
 
 const recentSessions = [
@@ -123,15 +121,13 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Sessions Today
+              Upcoming Sessions
             </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.sessionsToday}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats.sessionsThisWeek} this week
-            </p>
+            <div className="text-2xl font-bold">{stats.upcomingSessions}</div>
+            <p className="text-xs text-muted-foreground">Next 7 days</p>
           </CardContent>
         </Card>
 
@@ -153,12 +149,12 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Pending Payments
+              Unpaid Invoices
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.pendingPayments}</div>
+            <div className="text-2xl font-bold">{stats.unpaidInvoices}</div>
             <p className="text-xs text-muted-foreground">
               $450 total outstanding
             </p>
