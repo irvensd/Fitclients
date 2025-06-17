@@ -112,9 +112,6 @@ const Sidebar = ({ className }: { className?: string }) => {
             FitClient
           </span>
         </div>
-        <div className="hidden lg:block w-60">
-          <GlobalSearch />
-        </div>
       </div>
 
       <nav className="flex-1 space-y-1 p-4">
