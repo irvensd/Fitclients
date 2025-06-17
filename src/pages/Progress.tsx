@@ -30,117 +30,95 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+} from "recharts";
+import {
   Plus,
   Search,
   TrendingUp,
-  Camera,
   Scale,
   Ruler,
-  Calendar,
+  Camera,
   Target,
-  Activity,
+  Award,
+  Calendar,
+  User,
 } from "lucide-react";
-import { ProgressEntry } from "@/lib/types";
+import { ProgressEntry, Client } from "@/lib/types";
+import { useData } from "@/contexts/DataContext";
 import { GamificationDashboard } from "@/components/GamificationDashboard";
 import { SmartRecommendations } from "@/components/SmartRecommendations";
 
-// Mock progress data
-const mockProgress: ProgressEntry[] = [
-  {
-    id: "1",
-    clientId: "1",
-    date: "2024-03-15",
-    weight: 165,
-    bodyFat: 18.5,
-    measurements: {
-      chest: 38,
-      waist: 32,
-      hips: 36,
-      arms: 13,
-      thighs: 22,
-    },
-    notes:
-      "Great progress this month! Down 3 lbs and muscle definition improving.",
-  },
-  {
-    id: "2",
-    clientId: "1",
-    date: "2024-03-01",
-    weight: 168,
-    bodyFat: 19.2,
-    measurements: {
-      chest: 38.5,
-      waist: 33,
-      hips: 36.5,
-      arms: 12.5,
-      thighs: 22.5,
-    },
-    notes: "Starting to see changes in muscle tone.",
-  },
-  {
-    id: "3",
-    clientId: "2",
-    date: "2024-03-14",
-    weight: 185,
-    bodyFat: 15.8,
-    measurements: {
-      chest: 42,
-      waist: 34,
-      hips: 38,
-      arms: 15,
-      thighs: 24,
-    },
-    notes: "Strength gains continue. Added 10 lbs to bench press.",
-  },
-];
-
-const clients = [
-  { id: "1", name: "Sarah Johnson" },
-  { id: "2", name: "Mike Chen" },
-  { id: "3", name: "Emily Davis" },
-  { id: "4", name: "James Wilson" },
-];
-
-const getClientName = (clientId: string) => {
-  return clients.find((c) => c.id === clientId)?.name || "Unknown Client";
-};
-
-const LogProgressDialog = () => {
+const AddProgressDialog = () => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { clients } = useData();
   const [formData, setFormData] = useState({
     clientId: "",
-    date: new Date().toISOString().split("T")[0],
     weight: "",
     bodyFat: "",
-    measurements: {
-      chest: "",
-      waist: "",
-      hips: "",
-      arms: "",
-      thighs: "",
-    },
+    chest: "",
+    waist: "",
+    hips: "",
+    arms: "",
+    thighs: "",
     notes: "",
+    date: new Date().toISOString().split("T")[0],
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Logging progress:", formData);
-    alert(`Progress logged for ${getClientName(formData.clientId)}!`);
-    setOpen(false);
-    setFormData({
-      clientId: "",
-      date: new Date().toISOString().split("T")[0],
-      weight: "",
-      bodyFat: "",
-      measurements: {
+    setLoading(true);
+
+    try {
+      // In offline mode, just log the progress entry
+      const progressEntry = {
+        clientId: formData.clientId,
+        date: formData.date,
+        weight: formData.weight ? parseFloat(formData.weight) : undefined,
+        bodyFat: formData.bodyFat ? parseFloat(formData.bodyFat) : undefined,
+        measurements: {
+          chest: formData.chest ? parseFloat(formData.chest) : undefined,
+          waist: formData.waist ? parseFloat(formData.waist) : undefined,
+          hips: formData.hips ? parseFloat(formData.hips) : undefined,
+          arms: formData.arms ? parseFloat(formData.arms) : undefined,
+          thighs: formData.thighs ? parseFloat(formData.thighs) : undefined,
+        },
+        notes: formData.notes,
+      };
+
+      console.log("Progress entry recorded:", progressEntry);
+      alert("Progress entry recorded successfully!");
+
+      // Reset form and close dialog
+      setFormData({
+        clientId: "",
+        weight: "",
+        bodyFat: "",
         chest: "",
         waist: "",
         hips: "",
         arms: "",
         thighs: "",
-      },
-      notes: "",
-    });
+        notes: "",
+        date: new Date().toISOString().split("T")[0],
+      });
+      setOpen(false);
+    } catch (error) {
+      console.error("Error recording progress:", error);
+      alert("Failed to record progress. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -148,21 +126,21 @@ const LogProgressDialog = () => {
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          Log Progress
+          Record Progress
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Log Client Progress</DialogTitle>
+          <DialogTitle>Record Progress Entry</DialogTitle>
           <DialogDescription>
-            Record measurements, weight, and progress photos for a client.
+            Track your client's progress with measurements and notes
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-6 py-4">
+          <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="progress-client">Client</Label>
+                <Label htmlFor="client">Client</Label>
                 <Select
                   value={formData.clientId}
                   onValueChange={(value) =>
@@ -182,9 +160,9 @@ const LogProgressDialog = () => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="progress-date">Date</Label>
+                <Label htmlFor="date">Date</Label>
                 <Input
-                  id="progress-date"
+                  id="date"
                   type="date"
                   value={formData.date}
                   onChange={(e) =>
@@ -197,55 +175,47 @@ const LogProgressDialog = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="progress-weight">Weight (lbs)</Label>
+                <Label htmlFor="weight">Weight (lbs)</Label>
                 <Input
-                  id="progress-weight"
+                  id="weight"
                   type="number"
                   step="0.1"
-                  placeholder="165.5"
                   value={formData.weight}
                   onChange={(e) =>
                     setFormData({ ...formData, weight: e.target.value })
                   }
+                  placeholder="150.5"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="progress-bodyfat">Body Fat (%)</Label>
+                <Label htmlFor="bodyFat">Body Fat (%)</Label>
                 <Input
-                  id="progress-bodyfat"
+                  id="bodyFat"
                   type="number"
                   step="0.1"
-                  placeholder="18.5"
                   value={formData.bodyFat}
                   onChange={(e) =>
                     setFormData({ ...formData, bodyFat: e.target.value })
                   }
+                  placeholder="15.2"
                 />
               </div>
             </div>
 
-            <div className="space-y-4">
-              <Label className="text-base font-medium">
-                Body Measurements (inches)
-              </Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="space-y-4 border-t pt-4">
+              <h4 className="font-medium">Body Measurements (inches)</h4>
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="chest">Chest</Label>
                   <Input
                     id="chest"
                     type="number"
                     step="0.1"
-                    placeholder="38.0"
-                    value={formData.measurements.chest}
+                    value={formData.chest}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        measurements: {
-                          ...formData.measurements,
-                          chest: e.target.value,
-                        },
-                      })
+                      setFormData({ ...formData, chest: e.target.value })
                     }
+                    placeholder="40.0"
                   />
                 </div>
                 <div className="space-y-2">
@@ -254,36 +224,26 @@ const LogProgressDialog = () => {
                     id="waist"
                     type="number"
                     step="0.1"
-                    placeholder="32.0"
-                    value={formData.measurements.waist}
+                    value={formData.waist}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        measurements: {
-                          ...formData.measurements,
-                          waist: e.target.value,
-                        },
-                      })
+                      setFormData({ ...formData, waist: e.target.value })
                     }
+                    placeholder="32.0"
                   />
                 </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="hips">Hips</Label>
                   <Input
                     id="hips"
                     type="number"
                     step="0.1"
-                    placeholder="36.0"
-                    value={formData.measurements.hips}
+                    value={formData.hips}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        measurements: {
-                          ...formData.measurements,
-                          hips: e.target.value,
-                        },
-                      })
+                      setFormData({ ...formData, hips: e.target.value })
                     }
+                    placeholder="38.0"
                   />
                 </div>
                 <div className="space-y-2">
@@ -292,17 +252,11 @@ const LogProgressDialog = () => {
                     id="arms"
                     type="number"
                     step="0.1"
-                    placeholder="13.0"
-                    value={formData.measurements.arms}
+                    value={formData.arms}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        measurements: {
-                          ...formData.measurements,
-                          arms: e.target.value,
-                        },
-                      })
+                      setFormData({ ...formData, arms: e.target.value })
                     }
+                    placeholder="14.0"
                   />
                 </div>
                 <div className="space-y-2">
@@ -311,57 +265,36 @@ const LogProgressDialog = () => {
                     id="thighs"
                     type="number"
                     step="0.1"
-                    placeholder="22.0"
-                    value={formData.measurements.thighs}
+                    value={formData.thighs}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        measurements: {
-                          ...formData.measurements,
-                          thighs: e.target.value,
-                        },
-                      })
+                      setFormData({ ...formData, thighs: e.target.value })
                     }
+                    placeholder="22.0"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <Label className="text-base font-medium">Progress Photos</Label>
-              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                <Camera className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">
-                  Drag and drop photos here, or click to select
-                </p>
-                <Button variant="outline" size="sm" className="mt-2">
-                  Choose Files
-                </Button>
-              </div>
-            </div>
-
             <div className="space-y-2">
-              <Label htmlFor="progress-notes">Progress Notes</Label>
+              <Label htmlFor="notes">Notes</Label>
               <Textarea
-                id="progress-notes"
-                placeholder="Record observations, improvements, goals achieved..."
-                className="min-h-[80px]"
+                id="notes"
                 value={formData.notes}
                 onChange={(e) =>
                   setFormData({ ...formData, notes: e.target.value })
                 }
+                placeholder="How the client is feeling, observations, achievements..."
+                className="min-h-[80px]"
               />
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit">Log Progress</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Recording..." : "Record Progress"}
+            </Button>
           </div>
         </form>
       </DialogContent>
@@ -369,351 +302,243 @@ const LogProgressDialog = () => {
   );
 };
 
-const ViewProgressDialog = ({ progress }: { progress: ProgressEntry }) => {
-  const [open, setOpen] = useState(false);
+const ClientProgressCard = ({ client }: { client: Client }) => {
+  // Mock progress data for demonstration
+  const progressData = [
+    { date: "Week 1", weight: 160, bodyFat: 18 },
+    { date: "Week 2", weight: 158, bodyFat: 17.5 },
+    { date: "Week 3", weight: 157, bodyFat: 17 },
+    { date: "Week 4", weight: 155, bodyFat: 16.5 },
+  ];
+
+  const latestProgress = progressData[progressData.length - 1];
+  const firstProgress = progressData[0];
+  const weightLoss = firstProgress.weight - latestProgress.weight;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          View Details
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Progress Details</DialogTitle>
-          <DialogDescription>
-            {getClientName(progress.clientId)} -{" "}
-            {new Date(progress.date).toLocaleDateString()}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Weight</Label>
-              <div className="flex items-center gap-2">
-                <Scale className="h-4 w-4 text-muted-foreground" />
-                <span className="text-lg font-semibold">
-                  {progress.weight} lbs
-                </span>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Avatar>
+              <AvatarFallback>
+                {client.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className="text-lg">{client.name}</CardTitle>
+              <CardDescription>{client.goals}</CardDescription>
+            </div>
+          </div>
+          <Badge
+            variant={
+              client.fitnessLevel === "beginner"
+                ? "secondary"
+                : client.fitnessLevel === "intermediate"
+                  ? "default"
+                  : "outline"
+            }
+          >
+            {client.fitnessLevel.charAt(0).toUpperCase() +
+              client.fitnessLevel.slice(1)}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-green-600">
+                -{weightLoss}
+              </div>
+              <div className="text-sm text-muted-foreground">lbs lost</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{latestProgress.weight}</div>
+              <div className="text-sm text-muted-foreground">
+                current weight
               </div>
             </div>
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Body Fat</Label>
-              <div className="flex items-center gap-2">
-                <Activity className="h-4 w-4 text-muted-foreground" />
-                <span className="text-lg font-semibold">
-                  {progress.bodyFat}%
-                </span>
+            <div>
+              <div className="text-2xl font-bold">
+                {latestProgress.bodyFat}%
               </div>
+              <div className="text-sm text-muted-foreground">body fat</div>
             </div>
           </div>
 
-          {progress.measurements && (
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">
-                Measurements (inches)
-              </Label>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="flex justify-between">
-                  <span>Chest:</span>
-                  <span className="font-medium">
-                    {progress.measurements.chest}"
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Waist:</span>
-                  <span className="font-medium">
-                    {progress.measurements.waist}"
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Hips:</span>
-                  <span className="font-medium">
-                    {progress.measurements.hips}"
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Arms:</span>
-                  <span className="font-medium">
-                    {progress.measurements.arms}"
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Thighs:</span>
-                  <span className="font-medium">
-                    {progress.measurements.thighs}"
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="h-32">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={progressData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" fontSize={12} />
+                <YAxis fontSize={12} />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="weight"
+                  stroke="#16a34a"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
 
-          {progress.notes && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Notes</Label>
-              <p className="text-sm text-muted-foreground p-3 bg-muted rounded-lg">
-                {progress.notes}
-              </p>
-            </div>
-          )}
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="flex-1">
+              <Camera className="h-4 w-4 mr-2" />
+              Photos
+            </Button>
+            <Button variant="outline" size="sm" className="flex-1">
+              <Ruler className="h-4 w-4 mr-2" />
+              Measurements
+            </Button>
+          </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </CardContent>
+    </Card>
   );
 };
 
-const ProgressPage = () => {
+const Progress = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [clientFilter, setClientFilter] = useState<string>("all");
+  const { clients, loading } = useData();
 
-  const filteredProgress = mockProgress.filter((entry) => {
-    const clientName = getClientName(entry.clientId).toLowerCase();
-    const matchesSearch = clientName.includes(searchTerm.toLowerCase());
-    const matchesClient =
-      clientFilter === "all" || entry.clientId === clientFilter;
-    return matchesSearch && matchesClient;
-  });
+  const filteredClients = clients.filter((client) =>
+    client.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            Progress Tracking
-          </h1>
+          <h1 className="text-3xl font-bold text-foreground">Progress</h1>
           <p className="text-muted-foreground">
-            Monitor client progress with measurements, photos, and performance
-            metrics.
+            Track your clients' fitness journey and achievements.
           </p>
         </div>
-        <div className="flex gap-2">
-          <LogProgressDialog />
-          <Button variant="outline">
-            <Camera className="h-4 w-4 mr-2" />
-            Upload Photos
-          </Button>
-        </div>
+        <AddProgressDialog />
       </div>
 
-      {/* Gamification Dashboard */}
-      <GamificationDashboard
-        client={{
-          id: "1",
-          name: "Sarah Johnson",
-          email: "sarah.johnson@email.com",
-          phone: "(555) 123-4567",
-          dateJoined: "2024-01-15",
-          fitnessLevel: "intermediate",
-          goals: "Weight loss and strength building",
-        }}
-        variant="widget"
-        showCelebrations={true}
-        onSendCelebration={(message) => {
-          console.log("Sending celebration SMS:", message);
-          alert(`SMS sent: ${message}`);
-        }}
-      />
-
-      {/* AI Recommendations */}
-      <SmartRecommendations
-        client={{
-          id: "1",
-          name: "Sarah Johnson",
-          email: "sarah.johnson@email.com",
-          phone: "(555) 123-4567",
-          dateJoined: "2024-01-15",
-          fitnessLevel: "intermediate",
-          goals: "Weight loss and strength building",
-        }}
-        variant="widget"
-      />
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{mockProgress.length}</div>
-            <p className="text-sm text-muted-foreground">Total Entries</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">
-              {new Set(mockProgress.map((p) => p.clientId)).size}
+      {/* Empty State */}
+      {clients.length === 0 && (
+        <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
+              <TrendingUp className="h-10 w-10 text-muted-foreground" />
             </div>
-            <p className="text-sm text-muted-foreground">Clients Tracked</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">-12</div>
-            <p className="text-sm text-muted-foreground">
-              Avg Weight Loss (lbs)
+            <h3 className="text-lg font-semibold mb-2">No Progress Data Yet</h3>
+            <p className="text-muted-foreground text-center mb-6 max-w-md">
+              Start tracking your clients' progress with measurements, photos,
+              and achievement milestones.
             </p>
+            <AddProgressDialog />
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">85%</div>
-            <p className="text-sm text-muted-foreground">Goals Achieved</p>
-          </CardContent>
-        </Card>
-      </div>
+      )}
 
-      <Tabs defaultValue="entries" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="entries">Progress Entries</TabsTrigger>
-          <TabsTrigger value="trends">Trends & Analytics</TabsTrigger>
-          <TabsTrigger value="photos">Progress Photos</TabsTrigger>
-        </TabsList>
+      {clients.length > 0 && (
+        <>
+          {/* Overview Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold">{clients.length}</div>
+                <p className="text-sm text-muted-foreground">Total Clients</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold">0</div>
+                <p className="text-sm text-muted-foreground">
+                  Progress Entries
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold">0</div>
+                <p className="text-sm text-muted-foreground">Goals Achieved</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold">0</div>
+                <p className="text-sm text-muted-foreground">Photos Uploaded</p>
+              </CardContent>
+            </Card>
+          </div>
 
-        <TabsContent value="entries" className="space-y-4">
-          {/* Filters */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by client name..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Select value={clientFilter} onValueChange={setClientFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="All Clients" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Clients</SelectItem>
-                    {clients.map((client) => (
-                      <SelectItem key={client.id} value={client.id}>
-                        {client.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="overview">Progress Overview</TabsTrigger>
+              <TabsTrigger value="gamification">Achievements</TabsTrigger>
+              <TabsTrigger value="insights">AI Insights</TabsTrigger>
+            </TabsList>
 
-          {/* Progress Entries */}
-          <div className="space-y-4">
-            {filteredProgress.map((entry) => (
-              <Card
-                key={entry.id}
-                className="hover:shadow-md transition-shadow"
-              >
+            <TabsContent value="overview" className="space-y-6">
+              {/* Search */}
+              <Card>
                 <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Avatar>
-                        <AvatarFallback>
-                          {getClientName(entry.clientId)
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-semibold">
-                          {getClientName(entry.clientId)}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(entry.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-6">
-                      {entry.weight && (
-                        <div className="flex items-center gap-2">
-                          <Scale className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">
-                            {entry.weight} lbs
-                          </span>
-                        </div>
-                      )}
-                      {entry.bodyFat && (
-                        <div className="flex items-center gap-2">
-                          <Activity className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">
-                            {entry.bodyFat}% BF
-                          </span>
-                        </div>
-                      )}
-                      <ViewProgressDialog progress={entry} />
-                    </div>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search clients by name..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
                   </div>
-
-                  {entry.notes && (
-                    <div className="mt-4 p-3 bg-muted rounded-lg">
-                      <p className="text-sm">{entry.notes}</p>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        </TabsContent>
 
-        <TabsContent value="trends" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Progress Analytics</CardTitle>
-              <CardDescription>
-                Visual trends and progress metrics for your clients
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="p-4">
-                    <h4 className="font-medium mb-2">Weight Trends</h4>
-                    <div className="h-32 bg-muted rounded flex items-center justify-center">
-                      <p className="text-sm text-muted-foreground">
-                        Chart visualization coming soon
-                      </p>
-                    </div>
-                  </Card>
-                  <Card className="p-4">
-                    <h4 className="font-medium mb-2">Body Fat Trends</h4>
-                    <div className="h-32 bg-muted rounded flex items-center justify-center">
-                      <p className="text-sm text-muted-foreground">
-                        Chart visualization coming soon
-                      </p>
-                    </div>
-                  </Card>
-                </div>
+              {/* Client Progress Cards */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {filteredClients.map((client) => (
+                  <ClientProgressCard key={client.id} client={client} />
+                ))}
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
-        <TabsContent value="photos" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Progress Photos</CardTitle>
-              <CardDescription>
-                Before and after photos to track visual progress
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <Camera className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground">
-                  Photo management features coming soon
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              {filteredClients.length === 0 && (
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <h3 className="text-lg font-semibold mb-2">
+                      No clients found
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Try adjusting your search term.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+
+            <TabsContent value="gamification" className="space-y-6">
+              <GamificationDashboard />
+            </TabsContent>
+
+            <TabsContent value="insights" className="space-y-6">
+              <SmartRecommendations />
+            </TabsContent>
+          </Tabs>
+        </>
+      )}
     </div>
   );
 };
 
-export default ProgressPage;
+export default Progress;
