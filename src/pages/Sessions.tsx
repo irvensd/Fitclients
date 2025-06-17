@@ -591,7 +591,32 @@ const Sessions = () => {
                         </span>
                       </div>
                       <div className="text-sm font-medium">${session.cost}</div>
-                      <EditSessionDialog session={session} />
+
+                      {/* Session Actions */}
+                      <div className="flex items-center gap-2">
+                        {session.status === "completed" && !session.recap && (
+                          <SessionRecapForm
+                            session={session}
+                            client={
+                              clients.find((c) => c.id === session.clientId)!
+                            }
+                            onRecapGenerated={handleRecapGenerated}
+                          />
+                        )}
+
+                        {session.recap && (
+                          <SessionRecapViewer
+                            recap={session.recap}
+                            client={
+                              clients.find((c) => c.id === session.clientId)!
+                            }
+                            sessionDate={session.date}
+                            onUpdateRecap={handleRecapUpdated}
+                          />
+                        )}
+
+                        <EditSessionDialog session={session} />
+                      </div>
                     </div>
                   </div>
 
