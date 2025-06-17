@@ -19,6 +19,7 @@ import {
   Target,
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
+import { AdminSummary } from "@/components/AdminSummary";
 
 // Mock data for demonstration
 const stats = {
@@ -90,9 +91,17 @@ const Dashboard = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          <div className="flex items-center gap-2 mb-2">
+            <h1 className="text-3xl font-bold text-foreground">
+              Admin Dashboard
+            </h1>
+            <Badge className="bg-primary/10 text-primary border-primary/20">
+              Trainer Portal
+            </Badge>
+          </div>
           <p className="text-muted-foreground">
-            Welcome back! Here's what's happening with your clients today.
+            Manage your personal training business - clients, sessions, and
+            payments all in one place.
           </p>
         </div>
         <div className="flex gap-2">
@@ -107,62 +116,13 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalClients}</div>
-            <p className="text-xs text-muted-foreground">+3 from last month</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Upcoming Sessions
-            </CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.upcomingSessions}</div>
-            <p className="text-xs text-muted-foreground">Next 7 days</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Monthly Revenue
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${stats.monthlyRevenue}</div>
-            <p className="text-xs text-muted-foreground">
-              +12% from last month
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Unpaid Invoices
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.unpaidInvoices}</div>
-            <p className="text-xs text-muted-foreground">
-              $450 total outstanding
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Admin Stats - Key Metrics */}
+      <AdminSummary
+        totalClients={stats.totalClients}
+        upcomingSessions={stats.upcomingSessions}
+        unpaidInvoices={stats.unpaidInvoices}
+        monthlyRevenue={stats.monthlyRevenue}
+      />
 
       {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
