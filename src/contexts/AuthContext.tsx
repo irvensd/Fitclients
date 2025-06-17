@@ -149,6 +149,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const logout = React.useCallback(async () => {
+    setAuthError(null);
     if (isFirebaseConfigured && auth) {
       await signOut(auth);
     } else {
@@ -157,6 +158,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(null);
       localStorage.removeItem("devUser");
     }
+  }, []);
+
+  const clearError = React.useCallback(() => {
+    setAuthError(null);
   }, []);
 
   const value = React.useMemo(
@@ -168,10 +173,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         : user,
       loading,
       login,
+      register,
       logout,
       isDevMode,
+      authError,
+      clearError,
     }),
-    [user, loading, login, logout, isDevMode, devUser],
+    [
+      user,
+      loading,
+      login,
+      register,
+      logout,
+      isDevMode,
+      devUser,
+      authError,
+      clearError,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
