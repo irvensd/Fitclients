@@ -51,12 +51,12 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/sessions" element={
-            <Route path="/clients" element={
               <ProtectedRoute>
                 <Layout>
-                  <Clients />
+                  <Sessions />
                 </Layout>
               </ProtectedRoute>
+            } />
             } />
 
             <Route path="/sessions" element={
