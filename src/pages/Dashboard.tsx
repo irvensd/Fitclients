@@ -114,6 +114,63 @@ const Dashboard = () => {
   return (
     <div className="p-6 space-y-6">
       <DevModeNotice />
+
+      {/* Test Client Portal Links */}
+      <Card className="border-blue-200 bg-blue-50">
+        <CardHeader>
+          <CardTitle className="text-blue-800">
+            🧪 Test Client Portal Links
+          </CardTitle>
+          <CardDescription className="text-blue-700">
+            Quick links to test client portal cancellation functionality
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <a
+                href="/client-portal/sarah-johnson"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Sarah's Portal
+              </a>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a
+                href="/client-portal/mike-chen"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Mike's Portal
+              </a>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a
+                href="/client-portal/emily-davis"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Emily's Portal
+              </a>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a
+                href="/client-portal/james-wilson"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                James's Portal
+              </a>
+            </Button>
+          </div>
+          <p className="text-xs text-blue-600 mt-2">
+            Click any link above → Go to "Sessions" tab → Try cancelling a
+            scheduled session
+          </p>
+        </CardContent>
+      </Card>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
