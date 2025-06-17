@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Calendar, DollarSign, AlertTriangle } from "lucide-react";
+import { useData } from "@/contexts/DataContext";
 import { getOutstandingAmount } from "@/lib/dashboardMetrics";
 
 interface AdminSummaryProps {
@@ -16,7 +17,8 @@ export const AdminSummary = ({
   unpaidInvoices,
   monthlyRevenue,
 }: AdminSummaryProps) => {
-  const outstandingAmount = getOutstandingAmount();
+  const { payments } = useData();
+  const outstandingAmount = getOutstandingAmount(payments);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Total Clients */}
