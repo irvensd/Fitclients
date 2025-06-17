@@ -631,18 +631,28 @@ const ClientPortal = () => {
           <TabsContent value="sessions" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Your Upcoming Sessions</CardTitle>
+                <CardTitle>Your Sessions</CardTitle>
                 <CardDescription>
-                  All your scheduled training sessions
+                  All your training sessions - upcoming, completed, and
+                  cancelled
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {upcomingSessions.map((session: any) => (
                     <Card key={session.id} className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <h4 className="font-semibold">{session.type}</h4>
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center gap-3">
+                            <h4 className="font-semibold">{session.type}</h4>
+                            <Badge className={getStatusColor(session.status)}>
+                              {getStatusIcon(session.status)}
+                              <span className="ml-1 capitalize">
+                                {session.status}
+                              </span>
+                            </Badge>
+                          </div>
+
                           <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
@@ -652,20 +662,58 @@ const ClientPortal = () => {
                               <Clock className="h-4 w-4" />
                               {session.startTime} - {session.endTime}
                             </div>
+                            <div className="flex items-center gap-1">
+                              <DollarSign className="h-4 w-4" />${session.cost}
+                            </div>
                           </div>
+
                           <p className="text-sm">📍 {session.location}</p>
+
+                          {session.status === "cancelled" && (
+                            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                              <p className="text-sm text-red-800">
+                                <strong>Cancelled:</strong>{" "}
+                                {session.cancellationReason}
+                              </p>
+                              {session.cancelledAt && (
+                                <p className="text-xs text-red-600 mt-1">
+                                  Cancelled on{" "}
+                                  {new Date(
+                                    session.cancelledAt,
+                                  ).toLocaleString()}
+                                </p>
+                              )}
+                            </div>
+                          )}
                         </div>
-                        <Badge>Scheduled</Badge>
+
+                        <div className="ml-4">
+                          <CancelSessionDialog
+                            session={session}
+                            onCancel={handleCancelSession}
+                          />
+                        </div>
                       </div>
-                      {session.notes && (
+
+                      {session.notes && session.status !== "cancelled" && (
                         <div className="mt-3 p-3 bg-muted rounded-lg">
                           <p className="text-sm">
-                            <strong>Notes:</strong> {session.notes}
+                            <strong>Session Notes:</strong> {session.notes}
                           </p>
                         </div>
                       )}
                     </Card>
                   ))}
+
+                  {upcomingSessions.length === 0 && (
+                    <div className="text-center py-8">
+                      <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">
+                        No sessions scheduled yet. Your trainer will schedule
+                        sessions for you.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
