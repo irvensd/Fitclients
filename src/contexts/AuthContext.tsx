@@ -69,22 +69,84 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const login = React.useCallback(async (email: string, password: string) => {
-    if (isFirebaseConfigured && auth) {
-      await signInWithEmailAndPassword(auth, email, password);
-    } else {
-      // Development mode - simulate login
-      if (email === "trainer@demo.com" && password === "demo123") {
-        const mockUser = { email, displayName: "Demo Trainer" };
-        setDevUser(mockUser);
-        setUser({ email } as User);
-        localStorage.setItem("devUser", JSON.stringify(mockUser));
+    setAuthError(null);
+    try {
+      if (isFirebaseConfigured && auth) {
+        await signInWithEmailAndPassword(auth, email, password);
       } else {
-        throw new Error(
-          "Invalid credentials. Use trainer@demo.com / demo123 for development mode.",
-        );
+        // Development mode - simulate login
+        if (email === "trainer@demo.com" && password === "demo123") {
+          const mockUser = { email, displayName: "Demo Trainer" };
+          setDevUser(mockUser);
+          setUser({ email } as User);
+          localStorage.setItem("devUser", JSON.stringify(mockUser));
+        } else {
+          throw new Error(
+            "Invalid credentials. Use trainer@demo.com / demo123 for development mode.",
+          );
+        }
       }
+    } catch (error: any) {
+      console.error("Login error:", error);
+
+      // Provide user-friendly error messages
+      if (
+        error.code === "auth/invalid-login-credentials" ||
+        error.code === "auth/user-not-found"
+      ) {
+        setAuthError(
+          "No account found with these credentials. Please check your email and password, or create a new account.",
+        );
+      } else if (error.code === "auth/wrong-password") {
+        setAuthError("Incorrect password. Please try again.");
+      } else if (error.code === "auth/invalid-email") {
+        setAuthError("Invalid email address format.");
+      } else if (error.code === "auth/too-many-requests") {
+        setAuthError("Too many failed attempts. Please try again later.");
+      } else {
+        setAuthError(error.message || "Login failed. Please try again.");
+      }
+      throw error;
     }
   }, []);
+
+  const register = React.useCallback(
+    async (email: string, password: string, displayName: string) => {
+      setAuthError(null);
+      try {
+        if (isFirebaseConfigured && auth) {
+          const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password,
+          );
+          if (userCredential.user) {
+            await updateProfile(userCredential.user, { displayName });
+          }
+        } else {
+          throw new Error("Registration not available in development mode.");
+        }
+      } catch (error: any) {
+        console.error("Registration error:", error);
+
+        if (error.code === "auth/email-already-in-use") {
+          setAuthError(
+            "An account with this email already exists. Please sign in instead.",
+          );
+        } else if (error.code === "auth/weak-password") {
+          setAuthError("Password should be at least 6 characters long.");
+        } else if (error.code === "auth/invalid-email") {
+          setAuthError("Invalid email address format.");
+        } else {
+          setAuthError(
+            error.message || "Registration failed. Please try again.",
+          );
+        }
+        throw error;
+      }
+    },
+    [],
+  );
 
   const logout = React.useCallback(async () => {
     if (isFirebaseConfigured && auth) {
