@@ -39,6 +39,7 @@ import {
   Mail,
   MessageSquare,
 } from "lucide-react";
+import { useData } from "@/contexts/DataContext";
 
 // Mock clients data
 const mockClients = [
