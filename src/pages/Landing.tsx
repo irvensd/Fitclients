@@ -223,6 +223,261 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section className="py-20 px-4 bg-muted/30">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
+              <DollarSign className="h-4 w-4" />
+              Simple, Transparent Pricing
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Choose Your Perfect Plan
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Start free, then grow with plans designed for trainers at every
+              stage of their business.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Starter Plan */}
+            <Card className="border-2 hover:border-primary/20 transition-all duration-300">
+              <CardContent className="p-8">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-bold mb-2">Starter</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Perfect for new trainers
+                  </p>
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="text-3xl font-bold">Free</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">Forever</p>
+                </div>
+
+                <div className="space-y-3 mb-8">
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Up to 5 clients</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Basic session scheduling</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Payment tracking</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Progress photos</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Email support</span>
+                  </div>
+                </div>
+
+                <Link to="/login" className="block">
+                  <Button variant="outline" className="w-full">
+                    Start Free
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Professional Plan - Most Popular */}
+            <Card className="border-2 border-primary shadow-lg transform hover:scale-105 transition-all duration-300 relative">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <div className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                  <Star className="h-3 w-3" />
+                  Most Popular
+                </div>
+              </div>
+              <CardContent className="p-8">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-bold mb-2">Professional</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    For growing training businesses
+                  </p>
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="text-sm text-muted-foreground">$</span>
+                    <span className="text-3xl font-bold">29</span>
+                    <span className="text-muted-foreground">/month</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Billed monthly
+                  </p>
+                </div>
+
+                <div className="space-y-3 mb-8">
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Up to 50 clients</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">
+                      Advanced scheduling & calendar
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">
+                      Automated reminders (SMS/Email)
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Client progress reports</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Workout plan builder</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Client portal links</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="h-4 w-4 text-purple-600" />
+                    <span className="text-sm font-medium">
+                      AI Session Recaps
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Priority support</span>
+                  </div>
+                </div>
+
+                <Link to="/login" className="block">
+                  <Button className="w-full">Start 14-Day Free Trial</Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Enterprise Plan */}
+            <Card className="border-2 hover:border-primary/20 transition-all duration-300">
+              <CardContent className="p-8">
+                <div className="text-center mb-6">
+                  <div className="flex items-center justify-center gap-1 mb-2">
+                    <Crown className="h-5 w-5 text-yellow-600" />
+                    <h3 className="text-xl font-bold">Enterprise</h3>
+                  </div>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    For established fitness businesses
+                  </p>
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="text-sm text-muted-foreground">$</span>
+                    <span className="text-3xl font-bold">79</span>
+                    <span className="text-muted-foreground">/month</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Billed monthly
+                  </p>
+                </div>
+
+                <div className="space-y-3 mb-8">
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Unlimited clients</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Multi-trainer management</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">
+                      Advanced analytics & reporting
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">White-label client portals</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">API access</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="h-4 w-4 text-purple-600" />
+                    <span className="text-sm font-medium">
+                      Advanced AI features
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">Custom integrations</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Shield className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm font-medium">
+                      Dedicated support
+                    </span>
+                  </div>
+                </div>
+
+                <Link to="/login" className="block">
+                  <Button variant="outline" className="w-full">
+                    Contact Sales
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Pricing FAQ/Features */}
+          <div className="mt-16 text-center">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              <div className="flex flex-col items-center">
+                <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                  <Check className="h-6 w-6 text-green-600" />
+                </div>
+                <h4 className="font-semibold mb-2">14-Day Free Trial</h4>
+                <p className="text-sm text-muted-foreground">
+                  Try all Pro features risk-free. No credit card required.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center">
+                <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                  <Shield className="h-6 w-6 text-blue-600" />
+                </div>
+                <h4 className="font-semibold mb-2">Cancel Anytime</h4>
+                <p className="text-sm text-muted-foreground">
+                  No long-term contracts. Upgrade, downgrade, or cancel with one
+                  click.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center">
+                <div className="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                  <Sparkles className="h-6 w-6 text-purple-600" />
+                </div>
+                <h4 className="font-semibold mb-2">Data Migration</h4>
+                <p className="text-sm text-muted-foreground">
+                  Moving from another platform? We'll help migrate your data for
+                  free.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-12 p-6 bg-gradient-to-r from-primary/10 to-blue/10 rounded-lg border">
+              <h4 className="font-semibold mb-2">Questions about pricing?</h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                Need a custom plan or have specific requirements? We're here to
+                help.
+              </p>
+              <Button variant="outline" size="sm">
+                Contact Our Team
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 px-4 bg-primary text-primary-foreground">
         <div className="container mx-auto text-center max-w-3xl">
