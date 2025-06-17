@@ -559,14 +559,27 @@ const ClientPortal = () => {
                       key={session.id}
                       className="flex items-center justify-between p-3 border rounded-lg"
                     >
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium">{session.type}</p>
                         <p className="text-sm text-muted-foreground">
                           {new Date(session.date).toLocaleDateString()} at{" "}
                           {session.startTime}
                         </p>
+                        {session.status === "cancelled" &&
+                          session.cancellationReason && (
+                            <p className="text-xs text-red-600 mt-1">
+                              Cancelled: {session.cancellationReason}
+                            </p>
+                          )}
                       </div>
-                      <Badge variant="outline">Scheduled</Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge className={getStatusColor(session.status)}>
+                          {getStatusIcon(session.status)}
+                          <span className="ml-1 capitalize">
+                            {session.status}
+                          </span>
+                        </Badge>
+                      </div>
                     </div>
                   ))}
                   {upcomingSessions.length === 0 && (
