@@ -321,6 +321,31 @@ const ClientPortal = () => {
     }, 500);
   }, [clientId]);
 
+  const handleCancelSession = (sessionId: string, reason: string) => {
+    if (!clientData) return;
+
+    const updatedSessions = clientData.upcomingSessions.map((session: any) => {
+      if (session.id === sessionId) {
+        return {
+          ...session,
+          status: "cancelled",
+          cancellationReason: reason,
+          cancelledAt: new Date().toISOString(),
+          cancelledBy: "client",
+        };
+      }
+      return session;
+    });
+
+    setClientData({
+      ...clientData,
+      upcomingSessions: updatedSessions,
+    });
+
+    // Show success message
+    alert("Session cancelled successfully! Your trainer has been notified.");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted">
