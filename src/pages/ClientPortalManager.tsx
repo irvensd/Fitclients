@@ -327,6 +327,13 @@ const ClientPortalManager = () => {
     ...client,
     portalActive: true, // All clients have portal access in demo
     lastPortalAccess: client.dateJoined, // Use join date as last access for demo
+    portalSettings: {
+      showProgress: true,
+      showSessions: true,
+      showWorkouts: true,
+      showPayments: false,
+      customMessage: "Welcome to your personal fitness portal!",
+    },
   }));
 
   const filteredClients = clientsWithPortalData.filter((client) =>
