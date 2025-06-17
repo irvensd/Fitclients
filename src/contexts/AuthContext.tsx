@@ -47,8 +47,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   React.useEffect(() => {
     // Set a timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
+      console.log("Auth timeout - setting loading to false");
       setLoading(false);
-    }, 3000);
+    }, 1000); // Reduced timeout to 1 second
 
     if (isFirebaseConfigured && auth) {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
