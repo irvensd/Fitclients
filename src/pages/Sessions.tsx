@@ -713,7 +713,7 @@ const Sessions = () => {
 
         {/* Schedule New Session Tab */}
         <TabsContent value="schedule" className="space-y-6">
-          <AddSessionDialog />
+          <ScheduleSessionDialog />
         </TabsContent>
       </Tabs>
     </div>
