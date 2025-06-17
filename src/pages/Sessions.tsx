@@ -96,6 +96,19 @@ const mockSessions: Session[] = [
     notes: "Client cancelled due to illness",
     cost: 75,
   },
+  {
+    id: "6",
+    clientId: "1",
+    date: "2024-03-22",
+    startTime: "10:00",
+    endTime: "11:00",
+    type: "personal-training",
+    status: "cancelled",
+    notes: "Client cancelled via portal: Schedule conflict - have to work late",
+    cost: 75,
+    cancelledBy: "client",
+    cancelledAt: "2024-03-17T10:30:00Z",
+  },
 ];
 
 const clients = [
