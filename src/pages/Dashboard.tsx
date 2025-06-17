@@ -168,6 +168,17 @@ const Dashboard = () => {
             Click any link above → Go to "Sessions" tab → Try cancelling a
             scheduled session
           </p>
+          <div className="mt-3 pt-3 border-t border-blue-200">
+            <Button asChild>
+              <a
+                href="/client-portal/sarah-johnson"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                🚀 Quick Test: Open Sarah's Portal
+              </a>
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
