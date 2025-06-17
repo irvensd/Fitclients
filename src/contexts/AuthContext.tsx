@@ -153,13 +153,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = React.useCallback(async () => {
     setAuthError(null);
-    if (isFirebaseConfigured && auth) {
-      await signOut(auth);
-    } else {
-      // Development mode - clear local storage
+    try {
+      if (isFirebaseConfigured && auth) {
+        await signOut(auth);
+      }
+      // Always clear local storage and state for both Firebase and dev mode
       setDevUser(null);
       setUser(null);
       localStorage.removeItem("devUser");
+
+      // Force redirect to login page
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Even if Firebase logout fails, clear local state
+      setDevUser(null);
+      setUser(null);
+      localStorage.removeItem("devUser");
+      window.location.href = "/login";
     }
   }, []);
 
