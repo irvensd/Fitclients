@@ -24,6 +24,12 @@ import { DevModeNotice } from "@/components/DevModeNotice";
 import { AdminSummary } from "@/components/AdminSummary";
 import { NavigationButton } from "@/components/NavigationButton";
 import {
+  RevenueChart,
+  ClientGrowthChart,
+  SessionTypeChart,
+  WeeklyActivityChart,
+} from "@/components/DashboardCharts";
+import {
   calculateDashboardStats,
   getRecentCancellations,
   getTodaysSessions,
@@ -289,6 +295,28 @@ const Dashboard = () => {
             ))}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Analytics Charts */}
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground mb-4">
+            Analytics Dashboard
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Track your business performance and growth metrics
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <RevenueChart />
+          <ClientGrowthChart />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <SessionTypeChart />
+          <WeeklyActivityChart />
+        </div>
       </div>
 
       {/* Quick Actions */}
