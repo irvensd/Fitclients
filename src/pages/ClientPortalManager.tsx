@@ -319,10 +319,26 @@ const PortalSettingsDialog = ({ client }: { client: any }) => {
 
 const ClientPortalManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { clients, loading } = useData();
 
-  const filteredClients = mockClients.filter((client) =>
+  // Add portal-specific properties for mock purposes
+  const clientsWithPortalData = clients.map((client) => ({
+    ...client,
+    portalActive: true, // All clients have portal access in demo
+    lastPortalAccess: client.dateJoined, // Use join date as last access for demo
+  }));
+
+  const filteredClients = clientsWithPortalData.filter((client) =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -341,21 +357,24 @@ const ClientPortalManager = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {mockClients.filter((c) => c.portalActive).length}
+              {clientsWithPortalData.filter((c) => c.portalActive).length}
             </div>
             <p className="text-sm text-muted-foreground">Active Portals</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{mockClients.length}</div>
+            <div className="text-2xl font-bold">{clients.length}</div>
             <p className="text-sm text-muted-foreground">Total Clients</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {mockClients.filter((c) => c.lastPortalAccess !== null).length}
+              {
+                clientsWithPortalData.filter((c) => c.lastPortalAccess !== null)
+                  .length
+              }
             </div>
             <p className="text-sm text-muted-foreground">Recently Accessed</p>
           </CardContent>
