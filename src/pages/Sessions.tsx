@@ -409,6 +409,26 @@ const Sessions = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("all");
+  const [sessions, setSessions] = useState<Session[]>(mockSessions);
+  const [recaps, setRecaps] = useState<SessionRecap[]>([]);
+
+  const handleRecapGenerated = (recap: SessionRecap) => {
+    setRecaps([...recaps, recap]);
+    // Update session to include recap
+    setSessions(
+      sessions.map((session) =>
+        session.id === recap.sessionId ? { ...session, recap } : session,
+      ),
+    );
+  };
+
+  const handleRecapUpdated = (updatedRecap: SessionRecap) => {
+    setRecaps(
+      recaps.map((recap) =>
+        recap.id === updatedRecap.id ? updatedRecap : recap,
+      ),
+    );
+  };
 
   const filteredSessions = mockSessions.filter((session) => {
     const clientName = getClientName(session.clientId).toLowerCase();
