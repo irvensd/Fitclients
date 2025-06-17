@@ -20,6 +20,37 @@ export interface Session {
   status: "scheduled" | "completed" | "cancelled" | "no-show";
   notes?: string;
   cost: number;
+  recap?: SessionRecap;
+  cancelledBy?: "trainer" | "client";
+  cancelledAt?: string;
+}
+
+export interface SessionRecap {
+  id: string;
+  sessionId: string;
+  clientId: string;
+  createdAt: string;
+  trainerForm: {
+    workoutFocus: string;
+    exercisesCompleted: string[];
+    clientPerformance: "excellent" | "good" | "average" | "needs-improvement";
+    clientMood: "energetic" | "motivated" | "neutral" | "tired" | "stressed";
+    achievementsToday: string;
+    challengesFaced: string;
+    notesForNextSession: string;
+    progressObservations: string;
+  };
+  aiGeneratedContent: {
+    workoutSummary: string;
+    personalizedEncouragement: string;
+    nextStepsRecommendations: string;
+    keyAchievements: string[];
+    motivationalQuote: string;
+    progressHighlight: string;
+  };
+  sharedWithClient: boolean;
+  clientViewed: boolean;
+  clientViewedAt?: string;
 }
 
 export interface WorkoutPlan {
