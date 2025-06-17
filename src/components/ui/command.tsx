@@ -28,9 +28,10 @@ const CommandDialog = ({
   open,
   onOpenChange,
   ...props
-}: DialogProps & {
+}: {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  children: React.ReactNode;
 }) => {
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -52,11 +53,11 @@ const CommandDialog = ({
 
   if (!open) return null;
 
-  return (
-    <DialogPrimitive.Portal>
+  return createPortal(
+    <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black/80"
+        className="fixed inset-0 bg-black/80 animate-in fade-in-0"
         style={{
           zIndex: 999999,
           position: "fixed",
@@ -70,7 +71,7 @@ const CommandDialog = ({
 
       {/* Content */}
       <div
-        className="fixed w-full max-w-lg bg-background border rounded-lg shadow-2xl overflow-hidden"
+        className="fixed w-full max-w-lg bg-background border rounded-lg shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95"
         style={{
           zIndex: 1000000,
           position: "fixed",
@@ -85,7 +86,8 @@ const CommandDialog = ({
           {children}
         </Command>
       </div>
-    </DialogPrimitive.Portal>
+    </>,
+    document.body,
   );
 };
 
