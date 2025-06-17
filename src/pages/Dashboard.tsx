@@ -128,8 +128,9 @@ const Dashboard = () => {
       client.fitnessLevel.slice(1),
     progress: Math.floor(Math.random() * 80) + 20, // Random progress for demo
   }));
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <DevModeNotice />
 
       {/* Header */}
