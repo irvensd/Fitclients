@@ -696,66 +696,8 @@ const Sessions = () => {
 
         {/* Schedule New Session Tab */}
         <TabsContent value="schedule" className="space-y-6">
-            <CardHeader>
-              <CardTitle>Calendar View</CardTitle>
-              <CardDescription>
-                Visual calendar showing all scheduled sessions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-7 gap-2 mb-4">
-                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                  (day) => (
-                    <div
-                      key={day}
-                      className="p-3 text-center font-medium text-muted-foreground"
-                    >
-                      {day}
-                    </div>
-                  ),
-                )}
-              </div>
-              <div className="grid grid-cols-7 gap-2">
-                {Array.from({ length: 35 }, (_, i) => {
-                  const dayNumber = i - 10; // Approximate calendar layout
-                  const isToday = dayNumber === 15;
-                  const hasSessions =
-                    dayNumber === 15 || dayNumber === 16 || dayNumber === 17;
-
-                  return (
-                    <div
-                      key={i}
-                      className={`p-3 min-h-[80px] border rounded-lg ${
-                        isToday
-                          ? "bg-primary/10 border-primary"
-                          : "border-border"
-                      } ${dayNumber <= 0 || dayNumber > 31 ? "bg-muted" : ""}`}
-                    >
-                      {dayNumber > 0 && dayNumber <= 31 && (
-                        <>
-                          <div className="font-medium mb-1">{dayNumber}</div>
-                          {hasSessions && (
-                            <div className="space-y-1">
-                              {dayNumber === 15 && (
-                                <>
-                                  <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                                    9:00 Sarah
-                                  </div>
-                                  <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                    2:00 Emily
-                                  </div>
-                                </>
-                              )}
-                              {dayNumber === 16 && (
-                                <div className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
-                                  9:00 Sarah (C)
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
+          <AddSessionDialog />
+        </TabsContent>
                   );
                 })}
               </div>
