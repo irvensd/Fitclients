@@ -13,6 +13,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Zap, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
