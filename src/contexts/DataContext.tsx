@@ -93,37 +93,72 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     // Initialize trainer profile if needed
     analyticsService
       .initializeTrainerProfile(userId, user.email)
-      .catch(console.error);
+      .catch((error) => {
+        console.error("Failed to initialize trainer profile:", error);
+        // Don't fail completely if this doesn't work
+      });
 
-    // Subscribe to real-time data updates
-    const unsubscribeClients = clientsService.subscribeToClients(
-      userId,
-      (newClients) => {
-        setClients(newClients);
-      },
-    );
+    try {
+      // Subscribe to real-time data updates with error handling
+      const unsubscribeClients = clientsService.subscribeToClients(
+        userId,
+        (newClients) => {
+          setClients(newClients);
+          setError(null); // Clear error on successful data load
+        },
+        (error) => {
+          console.error("Error subscribing to clients:", error);
+          setError("Unable to connect to database. Using offline mode.");
+          setClients([]); // Set empty data for new accounts
+        },
+      );
 
-    const unsubscribeSessions = sessionsService.subscribeToSessions(
-      userId,
-      (newSessions) => {
-        setSessions(newSessions);
-      },
-    );
+      const unsubscribeSessions = sessionsService.subscribeToSessions(
+        userId,
+        (newSessions) => {
+          setSessions(newSessions);
+          setError(null);
+        },
+        (error) => {
+          console.error("Error subscribing to sessions:", error);
+          setError("Unable to connect to database. Using offline mode.");
+          setSessions([]);
+        },
+      );
 
-    const unsubscribePayments = paymentsService.subscribeToPayments(
-      userId,
-      (newPayments) => {
-        setPayments(newPayments);
-        setLoading(false);
-      },
-    );
+      const unsubscribePayments = paymentsService.subscribeToPayments(
+        userId,
+        (newPayments) => {
+          setPayments(newPayments);
+          setLoading(false);
+          setError(null);
+        },
+        (error) => {
+          console.error("Error subscribing to payments:", error);
+          setError("Unable to connect to database. Using offline mode.");
+          setPayments([]);
+          setLoading(false);
+        },
+      );
 
-    // Cleanup subscriptions
-    return () => {
-      unsubscribeClients();
-      unsubscribeSessions();
-      unsubscribePayments();
-    };
+      // Cleanup subscriptions
+      return () => {
+        try {
+          unsubscribeClients();
+          unsubscribeSessions();
+          unsubscribePayments();
+        } catch (error) {
+          console.error("Error unsubscribing:", error);
+        }
+      };
+    } catch (error) {
+      console.error("Error setting up Firebase subscriptions:", error);
+      setError("Unable to connect to database. Using offline mode.");
+      setClients([]);
+      setSessions([]);
+      setPayments([]);
+      setLoading(false);
+    }
   }, [user]);
 
   // Client actions
