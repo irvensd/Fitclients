@@ -444,7 +444,7 @@ const AIRecommendations = () => {
                     variant="card"
                     onRecommendationApplied={(id) => {
                       console.log(
-                        `Applied recommendation ${id} for ${client.name}`,
+                        `Applied recommendation ${id} for ${client?.name}`,
                       );
                     }}
                   />
