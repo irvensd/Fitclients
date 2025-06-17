@@ -333,9 +333,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   const deletePayment = async (paymentId: string) => {
     if (!user?.email) throw new Error("User not authenticated");
 
-    // OFFLINE MODE: Remove from local state
-    setPayments((prev) => prev.filter((payment) => payment.id !== paymentId));
-    console.log("Deleted payment in offline mode:", paymentId);
+    // Demo account: use offline mode
+    if (user.email === "trainer@demo.com") {
+      setPayments((prev) => prev.filter((payment) => payment.id !== paymentId));
+      return;
+    }
+
+    try {
+      await paymentsService.deletePayment(user.email, paymentId);
+    } catch (err) {
+      setError("Failed to delete payment");
+      throw err;
+    }
   };
 
   const refreshData = () => {
