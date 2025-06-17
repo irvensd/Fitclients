@@ -34,7 +34,7 @@ const CommandDialog = ({
   open,
   onOpenChange,
   ...props
-}: DialogDialogProps & {
+}: DialogProps & {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) => {
