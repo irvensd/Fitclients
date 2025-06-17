@@ -832,6 +832,28 @@ const ClientPortal = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="achievements" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-yellow-600" />
+                  Your Achievements & Streaks
+                </CardTitle>
+                <CardDescription>
+                  Track your fitness milestones, badges, and consistency streaks
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <GamificationDashboard
+                  client={client}
+                  variant="full"
+                  showCelebrations={false}
+                  isClientView={true}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="payments" className="space-y-4">
             <Card>
               <CardHeader>
