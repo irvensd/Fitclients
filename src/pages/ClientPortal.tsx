@@ -181,6 +181,132 @@ const getClientData = (clientId: string) => {
   return clientData[clientId as keyof typeof clientData] || null;
 };
 
+const CancelSessionDialog = ({
+  session,
+  onCancel,
+}: {
+  session: any;
+  onCancel: (sessionId: string, reason: string) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleCancel = async () => {
+    if (!reason.trim()) {
+      alert("Please provide a reason for cancellation");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    onCancel(session.id, reason);
+    setOpen(false);
+    setReason("");
+    setIsSubmitting(false);
+  };
+
+  const isWithin24Hours = () => {
+    const sessionDateTime = new Date(`${session.date}T${session.startTime}`);
+    const now = new Date();
+    const hoursUntilSession =
+      (sessionDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+    return hoursUntilSession <= 24;
+  };
+
+  // Don't show cancel button for sessions in the past or already cancelled
+  const sessionDateTime = new Date(`${session.date}T${session.startTime}`);
+  const now = new Date();
+  const isPastSession = sessionDateTime < now;
+  const isCancelled = session.status === "cancelled";
+
+  if (isPastSession || isCancelled) {
+    return null;
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-red-600 border-red-200 hover:bg-red-50"
+        >
+          <XCircle className="h-4 w-4 mr-1" />
+          Cancel Session
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <XCircle className="h-5 w-5 text-red-600" />
+            Cancel Session
+          </DialogTitle>
+          <DialogDescription>
+            Cancel your {session.type} session on{" "}
+            {new Date(session.date).toLocaleDateString()} at {session.startTime}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {isWithin24Hours() && (
+            <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-orange-800">
+                    Late Cancellation Notice
+                  </p>
+                  <p className="text-orange-700 mt-1">
+                    This session is within 24 hours. Cancellation policies may
+                    apply. Please contact your trainer if this is an emergency.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="reason">Reason for cancellation</Label>
+            <Textarea
+              id="reason"
+              placeholder="Please let your trainer know why you need to cancel..."
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="min-h-[100px]"
+              required
+            />
+          </div>
+
+          <div className="text-sm text-muted-foreground">
+            Your trainer will be notified immediately about this cancellation.
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2 pt-4">
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={isSubmitting}
+          >
+            Keep Session
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleCancel}
+            disabled={isSubmitting || !reason.trim()}
+          >
+            {isSubmitting ? "Cancelling..." : "Cancel Session"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const ClientPortal = () => {
   const { clientId } = useParams();
   const [clientData, setClientData] = useState<any>(null);
