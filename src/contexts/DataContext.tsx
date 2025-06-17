@@ -77,6 +77,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
+    // For ALL accounts, use empty data until Firebase rules are fixed
+    // This prevents permission errors and shows proper new account experience
+    console.log("Using offline mode - Firebase rules need to be deployed");
+    setClients([]);
+    setSessions([]);
+    setPayments([]);
+    setLoading(false);
+    setError(null);
+    return;
+
+    // COMMENTED OUT - Will be re-enabled after Firebase rules are deployed
+    /*
     // For demo account, use empty data to simulate new account
     if (user.email === "trainer@demo.com") {
       setClients([]);
@@ -86,6 +98,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
+    // TEMPORARILY DISABLED - Firebase rules need to be deployed first
+    /*
     const userId = user.email; // Using email as userId for simplicity
     setLoading(true);
     setError(null);
@@ -110,7 +124,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           console.error("Error subscribing to clients:", error);
           setError("Unable to connect to database. Using offline mode.");
           setClients([]); // Set empty data for new accounts
-        },
+        }
       );
 
       const unsubscribeSessions = sessionsService.subscribeToSessions(
@@ -123,7 +137,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           console.error("Error subscribing to sessions:", error);
           setError("Unable to connect to database. Using offline mode.");
           setSessions([]);
-        },
+        }
       );
 
       const unsubscribePayments = paymentsService.subscribeToPayments(
@@ -138,7 +152,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           setError("Unable to connect to database. Using offline mode.");
           setPayments([]);
           setLoading(false);
-        },
+        }
       );
 
       // Cleanup subscriptions
@@ -159,6 +173,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       setPayments([]);
       setLoading(false);
     }
+    */
   }, [user]);
 
   // Client actions
