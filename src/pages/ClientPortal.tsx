@@ -469,6 +469,20 @@ const CancelSessionDialog = ({
   const isPastSession = sessionDateTime < now;
   const isCancelled = session.status === "cancelled";
 
+  // Debug logging
+  console.log(
+    "Session:",
+    session.id,
+    "Date:",
+    session.date,
+    "Status:",
+    session.status,
+  );
+  console.log("Session DateTime:", sessionDateTime);
+  console.log("Current Time:", now);
+  console.log("Is Past Session:", isPastSession);
+  console.log("Is Cancelled:", isCancelled);
+
   if (isPastSession || isCancelled) {
     return null;
   }
