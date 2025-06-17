@@ -45,6 +45,7 @@ import { Session, SessionRecap } from "@/lib/types";
 import { SessionRecapForm } from "@/components/SessionRecapForm";
 import { SessionRecapViewer } from "@/components/SessionRecapViewer";
 import { SessionCalendar } from "@/components/SessionCalendar";
+import { useData } from "@/contexts/DataContext";
 
 // Mock data for sessions
 const mockSessions: Session[] = [
@@ -116,44 +117,7 @@ const mockSessions: Session[] = [
   },
 ];
 
-const clients = [
-  {
-    id: "1",
-    name: "Sarah Johnson",
-    email: "sarah.johnson@email.com",
-    phone: "(555) 123-4567",
-    dateJoined: "2024-01-15",
-    fitnessLevel: "intermediate" as const,
-    goals: "Weight loss and strength building",
-  },
-  {
-    id: "2",
-    name: "Mike Chen",
-    email: "mike.chen@email.com",
-    phone: "(555) 234-5678",
-    dateJoined: "2024-02-03",
-    fitnessLevel: "beginner" as const,
-    goals: "Build muscle mass and improve endurance",
-  },
-  {
-    id: "3",
-    name: "Emily Davis",
-    email: "emily.davis@email.com",
-    phone: "(555) 345-6789",
-    dateJoined: "2024-01-28",
-    fitnessLevel: "advanced" as const,
-    goals: "Marathon training and performance optimization",
-  },
-  {
-    id: "4",
-    name: "James Wilson",
-    email: "james.wilson@email.com",
-    phone: "(555) 456-7890",
-    dateJoined: "2024-02-10",
-    fitnessLevel: "intermediate" as const,
-    goals: "Functional fitness and injury prevention",
-  },
-];
+// Client data now comes from DataContext
 
 const getClientName = (clientId: string) => {
   return clients.find((c) => c.id === clientId)?.name || "Unknown Client";
@@ -191,6 +155,7 @@ const getStatusIcon = (status: Session["status"]) => {
 
 const ScheduleSessionDialog = () => {
   const [open, setOpen] = useState(false);
+  const { clients } = useData();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -440,59 +405,66 @@ const EditSessionDialog = ({ session }: { session: Session }) => {
 
 const Sessions = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [dateFilter, setDateFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("all");
+  const { sessions, loading, getClientName } = useData();
   const [sessions, setSessions] = useState<Session[]>(mockSessions);
   const [recaps, setRecaps] = useState<SessionRecap[]>([]);
 
   const handleRecapGenerated = (recap: SessionRecap) => {
     setRecaps([...recaps, recap]);
     // Update session to include recap
-    setSessions(
-      sessions.map((session) =>
-        session.id === recap.sessionId ? { ...session, recap } : session,
-      ),
-    );
+    setSessions(sessions.map(session =>
+      session.id === recap.sessionId
+        ? { ...session, recap }
+        : session
+    ));
   };
 
   const handleRecapUpdated = (updatedRecap: SessionRecap) => {
-    setRecaps(
-      recaps.map((recap) =>
-        recap.id === updatedRecap.id ? updatedRecap : recap,
-      ),
-    );
+    setRecaps(recaps.map(recap =>
+      recap.id === updatedRecap.id ? updatedRecap : recap
+    ));
   };
 
   const filteredSessions = sessions.filter((session) => {
-    const clientName = getClientName(session.clientId).toLowerCase();
-    const matchesSearch = clientName.includes(searchTerm.toLowerCase());
+    const clientName = getClientName(session.clientId);
+    const matchesSearch = clientName
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     const matchesStatus =
       statusFilter === "all" || session.status === statusFilter;
 
     let matchesDate = true;
-    if (dateFilter === "today") {
-      matchesDate = session.date === "2024-03-15";
-    } else if (dateFilter === "week") {
-      // This week logic would be more complex in real app
-      matchesDate = true;
+    if (dateFilter !== "all") {
+      const sessionDate = new Date(session.date);
+      const today = new Date();
+
+      switch (dateFilter) {
+        case "today":
+          matchesDate = sessionDate.toDateString() === today.toDateString();
+          break;
+        case "week":
+          const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+          matchesDate = sessionDate >= weekAgo && sessionDate <= today;
+          break;
+        case "month":
+          const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+          matchesDate = sessionDate >= monthAgo && sessionDate <= today;
+          break;
+      }
     }
 
     return matchesSearch && matchesStatus && matchesDate;
   });
 
-  const todaySessions = sessions.filter((s) => s.date === "2024-03-15");
-  const upcomingSessions = sessions.filter((s) => s.status === "scheduled");
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Sessions</h1>
-          <p className="text-muted-foreground">
-            Schedule and manage your training sessions with clients.
-          </p>
-        </div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
         <div className="flex gap-2">
           <ScheduleSessionDialog />
         </div>
@@ -644,9 +616,7 @@ const Sessions = () => {
                         {session.status === "completed" && !session.recap && (
                           <SessionRecapForm
                             session={session}
-                            client={
-                              clients.find((c) => c.id === session.clientId)!
-                            }
+                            client={clients.find(c => c.id === session.clientId)!}
                             onRecapGenerated={handleRecapGenerated}
                           />
                         )}
@@ -654,9 +624,7 @@ const Sessions = () => {
                         {session.recap && (
                           <SessionRecapViewer
                             recap={session.recap}
-                            client={
-                              clients.find((c) => c.id === session.clientId)!
-                            }
+                            client={clients.find(c => c.id === session.clientId)!}
                             sessionDate={session.date}
                             onUpdateRecap={handleRecapUpdated}
                           />
@@ -668,36 +636,26 @@ const Sessions = () => {
                   </div>
 
                   {session.notes && (
-                    <div
-                      className={`mt-4 p-3 rounded-lg ${
-                        session.status === "cancelled" &&
-                        session.cancelledBy === "client"
-                          ? "bg-red-50 border border-red-200"
-                          : "bg-muted"
-                      }`}
-                    >
-                      <p
-                        className={`text-sm ${
-                          session.status === "cancelled" &&
-                          session.cancelledBy === "client"
-                            ? "text-red-800"
-                            : ""
-                        }`}
-                      >
-                        {session.cancelledBy === "client" && (
-                          <span className="font-medium">
-                            🔔 Client Cancellation:{" "}
-                          </span>
+                    <div className={`mt-4 p-3 rounded-lg ${
+                      session.status === 'cancelled' && session.cancelledBy === 'client'
+                        ? 'bg-red-50 border border-red-200'
+                        : 'bg-muted'
+                    }`}>
+                      <p className={`text-sm ${
+                        session.status === 'cancelled' && session.cancelledBy === 'client'
+                          ? 'text-red-800'
+                          : ''
+                      }`}>
+                        {session.cancelledBy === 'client' && (
+                          <span className="font-medium">🔔 Client Cancellation: </span>
                         )}
                         {session.notes}
                       </p>
-                      {session.cancelledAt &&
-                        session.cancelledBy === "client" && (
-                          <p className="text-xs text-red-600 mt-1">
-                            Cancelled:{" "}
-                            {new Date(session.cancelledAt).toLocaleString()}
-                          </p>
-                        )}
+                      {session.cancelledAt && session.cancelledBy === 'client' && (
+                        <p className="text-xs text-red-600 mt-1">
+                          Cancelled: {new Date(session.cancelledAt).toLocaleString()}
+                        </p>
+                      )}
                     </div>
                   )}
                 </CardContent>
