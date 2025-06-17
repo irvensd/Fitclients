@@ -13,7 +13,9 @@ import {
   Menu,
   Zap,
   Settings,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -52,6 +54,30 @@ const navigation = [
   },
 ];
 
+const LogoutButton = () => {
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleLogout}
+      className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+    >
+      <LogOut className="h-4 w-4" />
+      Logout
+    </Button>
+  );
+};
+
 const Sidebar = ({ className }: { className?: string }) => {
   const location = useLocation();
 
@@ -89,7 +115,7 @@ const Sidebar = ({ className }: { className?: string }) => {
         })}
       </nav>
 
-      <div className="border-t border-sidebar-border p-4">
+      <div className="border-t border-sidebar-border p-4 space-y-2">
         <Button
           variant="ghost"
           size="sm"
@@ -98,6 +124,7 @@ const Sidebar = ({ className }: { className?: string }) => {
           <Settings className="h-4 w-4" />
           Settings
         </Button>
+        <LogoutButton />
       </div>
     </div>
   );

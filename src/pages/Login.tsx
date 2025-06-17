@@ -1,0 +1,162 @@
+import { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Zap, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const { login, user } = useAuth();
+
+  // Redirect if already logged in
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      await login(email, password);
+    } catch (err: any) {
+      setError(
+        err.message || "Failed to login. Please check your credentials.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to home
+          </Link>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Zap className="h-6 w-6" />
+            </div>
+            <span className="text-2xl font-bold">FitClient</span>
+          </div>
+          <h1 className="text-2xl font-bold">Trainer Login</h1>
+          <p className="text-muted-foreground">
+            Access your personal training dashboard
+          </p>
+        </div>
+
+        {/* Login Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Welcome Back</CardTitle>
+            <CardDescription>
+              Sign in to manage your clients and sessions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="trainer@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Signing in..." : "Sign In"}
+              </Button>
+            </form>
+
+            {/* Demo Credentials */}
+            <div className="mt-6 p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">Demo Credentials:</p>
+              <p className="text-sm text-muted-foreground">
+                Email: trainer@demo.com
+                <br />
+                Password: demo123
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2 w-full"
+                onClick={() => {
+                  setEmail("trainer@demo.com");
+                  setPassword("demo123");
+                }}
+              >
+                Use Demo Account
+              </Button>
+            </div>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{" "}
+                <Link to="/" className="text-primary hover:underline">
+                  Start your free trial
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Features Preview */}
+        <div className="mt-8 grid grid-cols-2 gap-4 text-center">
+          <div className="p-4">
+            <div className="text-2xl font-bold text-primary">24/7</div>
+            <p className="text-sm text-muted-foreground">Access Anywhere</p>
+          </div>
+          <div className="p-4">
+            <div className="text-2xl font-bold text-primary">5min</div>
+            <p className="text-sm text-muted-foreground">Quick Setup</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
