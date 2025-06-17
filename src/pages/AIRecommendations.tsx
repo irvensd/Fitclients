@@ -420,9 +420,7 @@ const AIRecommendations = () => {
         <TabsContent value="clients" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {clientAnalyses.map((analysis) => {
-              const client = mockClients.find(
-                (c) => c.id === analysis.clientId,
-              )!;
+              const client = clients.find((c) => c.id === analysis.clientId);
               return (
                 <div key={analysis.clientId}>
                   <SmartRecommendations
