@@ -303,13 +303,78 @@ const AddProgressDialog = () => {
 };
 
 const ClientProgressCard = ({ client }: { client: Client }) => {
-  // Mock progress data for demonstration
-  const progressData = [
-    { date: "Week 1", weight: 160, bodyFat: 18 },
-    { date: "Week 2", weight: 158, bodyFat: 17.5 },
-    { date: "Week 3", weight: 157, bodyFat: 17 },
-    { date: "Week 4", weight: 155, bodyFat: 16.5 },
-  ];
+  // Check for stored progress data (in a real app, this would come from the database)
+  const storedProgress = JSON.parse(
+    localStorage.getItem("progressEntries") || "[]",
+  );
+  const clientProgress = storedProgress.filter(
+    (entry: any) => entry.clientId === client.id,
+  );
+
+  // If no progress data exists, show empty state
+  if (clientProgress.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Avatar>
+                <AvatarFallback>
+                  {client.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <CardTitle className="text-lg">{client.name}</CardTitle>
+                <CardDescription>{client.goals}</CardDescription>
+              </div>
+            </div>
+            <Badge
+              variant={
+                client.fitnessLevel === "beginner"
+                  ? "secondary"
+                  : client.fitnessLevel === "intermediate"
+                    ? "default"
+                    : "outline"
+              }
+            >
+              {client.fitnessLevel.charAt(0).toUpperCase() +
+                client.fitnessLevel.slice(1)}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <Scale className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No Progress Data Yet</h3>
+            <p className="text-muted-foreground mb-4">
+              Start tracking {client.name.split(" ")[0]}'s progress by recording
+              their first measurements.
+            </p>
+            <div className="text-sm text-muted-foreground">
+              <p>• Weight and body composition</p>
+              <p>• Body measurements</p>
+              <p>• Progress photos</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Use real progress data if available, otherwise fall back to mock data for demo
+  const progressData =
+    clientProgress.length > 0
+      ? clientProgress
+      : [
+          { date: "Week 1", weight: 160, bodyFat: 18 },
+          { date: "Week 2", weight: 158, bodyFat: 17.5 },
+          { date: "Week 3", weight: 157, bodyFat: 17 },
+          { date: "Week 4", weight: 155, bodyFat: 16.5 },
+        ];
 
   const latestProgress = progressData[progressData.length - 1];
   const firstProgress = progressData[0];
