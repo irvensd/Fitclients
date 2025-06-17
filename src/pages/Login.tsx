@@ -164,32 +164,35 @@ const Login = () => {
               </Button>
             </form>
 
-            {/* Development Mode / Demo Credentials */}
-            <div className="mt-6 p-4 bg-muted rounded-lg">
-              {isDevMode && (
-                <div className="mb-3 p-2 bg-yellow-100 border border-yellow-300 rounded text-yellow-800 text-xs">
-                  🔧 <strong>Development Mode</strong> - Firebase not configured
-                </div>
-              )}
-              <p className="text-sm font-medium mb-2">
-                {isDevMode ? "Development Login:" : "Demo Credentials:"}
+            {/* Demo Credentials - Always Available */}
+            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <p className="text-sm font-medium text-blue-800">
+                  Demo Account Always Available
+                </p>
+              </div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Try FitClient instantly with our demo account:
               </p>
-              <p className="text-sm text-muted-foreground">
-                Email: trainer@demo.com
-                <br />
-                Password: demo123
-              </p>
+              <div className="bg-white p-3 rounded border text-sm font-mono">
+                <div>Email: trainer@demo.com</div>
+                <div>Password: demo123</div>
+              </div>
               <Button
                 variant="outline"
                 size="sm"
-                className="mt-2 w-full"
+                className="mt-3 w-full border-blue-300 text-blue-700 hover:bg-blue-50"
                 onClick={() => {
                   setEmail("trainer@demo.com");
                   setPassword("demo123");
                 }}
               >
-                {isDevMode ? "Use Dev Account" : "Use Demo Account"}
+                🚀 Use Demo Account
               </Button>
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Works regardless of Firebase configuration
+              </p>
             </div>
 
             {/* Mode Switching */}
