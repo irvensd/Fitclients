@@ -1,37 +1,32 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
 
-// Check if we have valid Firebase environment variables
-const hasValidFirebaseConfig =
-  import.meta.env.VITE_FIREBASE_API_KEY &&
-  import.meta.env.VITE_FIREBASE_AUTH_DOMAIN &&
-  import.meta.env.VITE_FIREBASE_PROJECT_ID &&
-  !import.meta.env.VITE_FIREBASE_API_KEY.includes("demo") &&
-  !import.meta.env.VITE_FIREBASE_API_KEY.includes("your_");
-
-export const isFirebaseConfigured = hasValidFirebaseConfig;
-
+// Production Firebase configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "",
+  apiKey: "AIzaSyB6YfS9EqFjpgbjzfBLGR90uTwt5-lJ8j4",
+  authDomain: "fitclients-4c5f2.firebaseapp.com",
+  projectId: "fitclients-4c5f2",
+  storageBucket: "fitclients-4c5f2.firebasestorage.app",
+  messagingSenderId: "407177727116",
+  appId: "1:407177727116:web:1f537948f3fd4b1e18ffa9",
+  measurementId: "G-BEWLBZ55RR",
 };
 
-// Only initialize Firebase if we have valid configuration
-let app;
-let auth;
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
-if (isFirebaseConfigured) {
-  try {
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-  } catch (error) {
-    console.error("Failed to initialize Firebase:", error);
-  }
+// Initialize Firebase services
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+
+// Initialize Analytics (only in production)
+let analytics;
+if (typeof window !== "undefined") {
+  analytics = getAnalytics(app);
 }
 
-export { auth };
+export { analytics };
+export const isFirebaseConfigured = true;
 export default app;
