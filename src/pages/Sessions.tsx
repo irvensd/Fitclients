@@ -447,17 +447,19 @@ const Sessions = () => {
   const handleRecapGenerated = (recap: SessionRecap) => {
     setRecaps([...recaps, recap]);
     // Update session to include recap
-    setSessions(sessions.map(session =>
-      session.id === recap.sessionId
-        ? { ...session, recap }
-        : session
-    ));
+    setSessions(
+      sessions.map((session) =>
+        session.id === recap.sessionId ? { ...session, recap } : session,
+      ),
+    );
   };
 
   const handleRecapUpdated = (updatedRecap: SessionRecap) => {
-    setRecaps(recaps.map(recap =>
-      recap.id === updatedRecap.id ? updatedRecap : recap
-    ));
+    setRecaps(
+      recaps.map((recap) =>
+        recap.id === updatedRecap.id ? updatedRecap : recap,
+      ),
+    );
   };
 
   const filteredSessions = sessions.filter((session) => {
@@ -641,7 +643,9 @@ const Sessions = () => {
                         {session.status === "completed" && !session.recap && (
                           <SessionRecapForm
                             session={session}
-                            client={clients.find(c => c.id === session.clientId)!}
+                            client={
+                              clients.find((c) => c.id === session.clientId)!
+                            }
                             onRecapGenerated={handleRecapGenerated}
                           />
                         )}
@@ -649,7 +653,9 @@ const Sessions = () => {
                         {session.recap && (
                           <SessionRecapViewer
                             recap={session.recap}
-                            client={clients.find(c => c.id === session.clientId)!}
+                            client={
+                              clients.find((c) => c.id === session.clientId)!
+                            }
                             sessionDate={session.date}
                             onUpdateRecap={handleRecapUpdated}
                           />
@@ -661,26 +667,36 @@ const Sessions = () => {
                   </div>
 
                   {session.notes && (
-                    <div className={`mt-4 p-3 rounded-lg ${
-                      session.status === 'cancelled' && session.cancelledBy === 'client'
-                        ? 'bg-red-50 border border-red-200'
-                        : 'bg-muted'
-                    }`}>
-                      <p className={`text-sm ${
-                        session.status === 'cancelled' && session.cancelledBy === 'client'
-                          ? 'text-red-800'
-                          : ''
-                      }`}>
-                        {session.cancelledBy === 'client' && (
-                          <span className="font-medium">🔔 Client Cancellation: </span>
+                    <div
+                      className={`mt-4 p-3 rounded-lg ${
+                        session.status === "cancelled" &&
+                        session.cancelledBy === "client"
+                          ? "bg-red-50 border border-red-200"
+                          : "bg-muted"
+                      }`}
+                    >
+                      <p
+                        className={`text-sm ${
+                          session.status === "cancelled" &&
+                          session.cancelledBy === "client"
+                            ? "text-red-800"
+                            : ""
+                        }`}
+                      >
+                        {session.cancelledBy === "client" && (
+                          <span className="font-medium">
+                            🔔 Client Cancellation:{" "}
+                          </span>
                         )}
                         {session.notes}
                       </p>
-                      {session.cancelledAt && session.cancelledBy === 'client' && (
-                        <p className="text-xs text-red-600 mt-1">
-                          Cancelled: {new Date(session.cancelledAt).toLocaleString()}
-                        </p>
-                      )}
+                      {session.cancelledAt &&
+                        session.cancelledBy === "client" && (
+                          <p className="text-xs text-red-600 mt-1">
+                            Cancelled:{" "}
+                            {new Date(session.cancelledAt).toLocaleString()}
+                          </p>
+                        )}
                     </div>
                   )}
                 </CardContent>
@@ -697,12 +713,6 @@ const Sessions = () => {
         {/* Schedule New Session Tab */}
         <TabsContent value="schedule" className="space-y-6">
           <AddSessionDialog />
-        </TabsContent>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>
