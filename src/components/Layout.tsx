@@ -72,9 +72,13 @@ const LogoutButton = () => {
 
   const handleLogout = async () => {
     try {
+      console.log("Logout button clicked");
       await logout();
+      console.log("Logout completed");
     } catch (error) {
       console.error("Failed to logout:", error);
+      // Force logout even if there's an error
+      window.location.href = "/login";
     }
   };
 
