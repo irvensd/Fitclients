@@ -2,21 +2,22 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Allow authenticated trainers to access their own data
+    // Using email as the document ID for trainers
     match /trainers/{trainerId} {
-      allow read, write: if request.auth != null &&
+      allow read, write, create: if request.auth != null &&
         (request.auth.token.email == trainerId || request.auth.uid == trainerId);
 
       // Allow access to subcollections (clients, sessions, payments)
+      // Only the owner trainer can access their subcollections
       match /{collection}/{document} {
-        allow read, write: if request.auth != null &&
+        allow read, write, create, delete: if request.auth != null &&
           (request.auth.token.email == trainerId || request.auth.uid == trainerId);
       }
     }
 
-    // Allow users to create their trainer profile
-    match /trainers/{trainerId} {
-      allow create: if request.auth != null &&
-        (request.auth.token.email == trainerId || request.auth.uid == trainerId);
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
