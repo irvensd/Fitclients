@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   User,
   signInWithEmailAndPassword,
@@ -25,14 +25,16 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [devUser, setDevUser] = useState<any>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = React.useState<User | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [devUser, setDevUser] = React.useState<any>(null);
 
   const isDevMode = !isFirebaseConfigured;
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isFirebaseConfigured && auth) {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         setUser(user);
@@ -41,16 +43,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return unsubscribe;
     } else {
       // Development mode - check for stored dev session
-      const storedUser = localStorage.getItem("devUser");
-      if (storedUser) {
-        setDevUser(JSON.parse(storedUser));
-        setUser({ email: JSON.parse(storedUser).email } as User);
+      try {
+        const storedUser = localStorage.getItem("devUser");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setDevUser(parsedUser);
+          setUser({ email: parsedUser.email } as User);
+        }
+      } catch (error) {
+        console.error("Error parsing stored user:", error);
+        localStorage.removeItem("devUser");
       }
       setLoading(false);
     }
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = React.useCallback(async (email: string, password: string) => {
     if (isFirebaseConfigured && auth) {
       await signInWithEmailAndPassword(auth, email, password);
     } else {
@@ -66,9 +74,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         );
       }
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = React.useCallback(async () => {
     if (isFirebaseConfigured && auth) {
       await signOut(auth);
     } else {
@@ -77,19 +85,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
       localStorage.removeItem("devUser");
     }
-  };
+  }, []);
 
-  const value = {
-    user: isDevMode
-      ? devUser
-        ? ({ email: devUser.email } as User)
-        : null
-      : user,
-    loading,
-    login,
-    logout,
-    isDevMode,
-  };
+  const value = React.useMemo(
+    () => ({
+      user: isDevMode
+        ? devUser
+          ? ({ email: devUser.email } as User)
+          : null
+        : user,
+      loading,
+      login,
+      logout,
+      isDevMode,
+    }),
+    [user, loading, login, logout, isDevMode, devUser],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
