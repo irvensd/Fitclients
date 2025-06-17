@@ -250,6 +250,55 @@ const AddClientDialog = () => {
                 className="min-h-[80px]"
               />
             </div>
+
+            {/* Initial Measurements Section */}
+            <div className="space-y-4 border-t pt-4">
+              <h4 className="text-sm font-medium text-foreground">
+                Initial Measurements (Optional)
+              </h4>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="weight">Weight (lbs)</Label>
+                  <Input
+                    id="weight"
+                    type="number"
+                    step="0.1"
+                    value={formData.weight}
+                    onChange={(e) =>
+                      setFormData({ ...formData, weight: e.target.value })
+                    }
+                    placeholder="160"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="height">Height (in)</Label>
+                  <Input
+                    id="height"
+                    type="number"
+                    step="0.1"
+                    value={formData.height}
+                    onChange={(e) =>
+                      setFormData({ ...formData, height: e.target.value })
+                    }
+                    placeholder="70"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bodyFat">Body Fat %</Label>
+                  <Input
+                    id="bodyFat"
+                    type="number"
+                    step="0.1"
+                    value={formData.bodyFat}
+                    onChange={(e) =>
+                      setFormData({ ...formData, bodyFat: e.target.value })
+                    }
+                    placeholder="18"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="notes">Notes (Optional)</Label>
               <Textarea
