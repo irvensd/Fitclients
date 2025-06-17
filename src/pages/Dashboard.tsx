@@ -148,35 +148,37 @@ const Dashboard = () => {
     <div className="space-y-6">
       <DevModeNotice />
 
-      {/* Offline Mode Notice */}
-      <Card className="border-blue-200 bg-blue-50">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Users className="h-5 w-5 text-blue-600" />
-            <h3 className="font-semibold text-blue-800">Demo Mode Active</h3>
-          </div>
-          <p className="text-blue-700 mb-4">
-            You're currently in demo/offline mode. All data is stored locally
-            and will reset when you refresh. This gives you the perfect
-            experience of a new account starting from zero!
-          </p>
-          <p className="text-sm text-blue-600 mb-4">
-            <strong>Try it out:</strong> Add clients, schedule sessions, record
-            payments - everything works and updates in real-time. Charts and
-            metrics will populate as you add data.
-          </p>
-          <div className="flex gap-3">
-            <NavigationButton to="/clients">
-              <Plus className="h-4 w-4 mr-2" />
-              Add First Client
-            </NavigationButton>
-            <NavigationButton to="/sessions" variant="outline">
-              <Calendar className="h-4 w-4 mr-2" />
-              Schedule Session
-            </NavigationButton>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Demo Mode Notice - Only for demo account */}
+      {user?.email === "trainer@demo.com" && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Users className="h-5 w-5 text-blue-600" />
+              <h3 className="font-semibold text-blue-800">Demo Mode Active</h3>
+            </div>
+            <p className="text-blue-700 mb-4">
+              You're currently in demo/offline mode. All data is stored locally
+              and will reset when you refresh. This gives you the perfect
+              experience of a new account starting from zero!
+            </p>
+            <p className="text-sm text-blue-600 mb-4">
+              <strong>Try it out:</strong> Add clients, schedule sessions,
+              record payments - everything works and updates in real-time.
+              Charts and metrics will populate as you add data.
+            </p>
+            <div className="flex gap-3">
+              <NavigationButton to="/clients">
+                <Plus className="h-4 w-4 mr-2" />
+                Add First Client
+              </NavigationButton>
+              <NavigationButton to="/sessions" variant="outline">
+                <Calendar className="h-4 w-4 mr-2" />
+                Schedule Session
+              </NavigationButton>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Empty State for New Accounts */}
       {clients.length === 0 &&
