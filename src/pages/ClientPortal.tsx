@@ -689,7 +689,7 @@ const ClientPortal = () => {
               <div className="flex-1">
                 <h2 className="text-2xl font-bold">Welcome, {client.name}!</h2>
                 <p className="text-muted-foreground">
-                  Trainer: {client.trainerName} ��� Member since{" "}
+                  Trainer: {client.trainerName} • Member since{" "}
                   {new Date(client.dateJoined).toLocaleDateString()}
                 </p>
                 <div className="flex items-center gap-2 mt-2">
@@ -791,8 +791,50 @@ const ClientPortal = () => {
               </Card>
             </div>
 
+            {/* Recent Achievements */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-yellow-600" />
+                  Recent Achievements
+                </CardTitle>
+                <CardDescription>
+                  Your latest fitness milestones and badges
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <GamificationDashboard
+                  client={client}
+                  variant="widget"
+                  showCelebrations={false}
+                  isClientView={true}
+                />
+                <div className="pt-3">
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href="#achievements"
+                      onClick={() => {
+                        const tabs = document
+                          .querySelector(
+                            '[data-state="active"][value="overview"]',
+                          )
+                          ?.closest('[role="tablist"]');
+                        const achievementsTab = tabs?.querySelector(
+                          '[value="achievements"]',
+                        ) as HTMLElement;
+                        achievementsTab?.click();
+                      }}
+                    >
+                      <Star className="h-4 w-4 mr-2" />
+                      View All Achievements
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Recent Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
