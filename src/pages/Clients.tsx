@@ -36,6 +36,8 @@ import {
   Target,
   Edit,
   MoreVertical,
+  Share2,
+  ExternalLink,
 } from "lucide-react";
 import { Client } from "@/lib/types";
 
@@ -503,6 +505,41 @@ const ScheduleSessionDialog = ({ clientName }: { clientName: string }) => {
   );
 };
 
+const SharePortalButton = ({ client }: { client: Client }) => {
+  const portalId = client.name.toLowerCase().replace(/\s+/g, "-");
+  const portalUrl = `${window.location.origin}/client-portal/${portalId}`;
+
+  const handleShare = () => {
+    const subject = "Your Personal Fitness Portal";
+    const body = `Hi ${client.name},
+
+I've created a personal fitness portal just for you! You can access it anytime to view your progress, upcoming sessions, workout plans, and payment information.
+
+Access your portal here: ${portalUrl}
+
+This link is secure and personalized just for you. Bookmark it for easy access!
+
+Best regards,
+Your Personal Trainer`;
+
+    window.open(
+      `mailto:${client.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+    );
+  };
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleShare}
+      className="w-full"
+    >
+      <Share2 className="h-4 w-4 mr-2" />
+      Share Portal
+    </Button>
+  );
+};
+
 const Clients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterLevel, setFilterLevel] = useState<string>("all");
@@ -670,6 +707,9 @@ const Clients = () => {
               <div className="flex gap-2 pt-2">
                 <EditClientDialog client={client} />
                 <ScheduleSessionDialog clientName={client.name} />
+              </div>
+              <div className="pt-2">
+                <SharePortalButton client={client} />
               </div>
             </CardContent>
           </Card>
