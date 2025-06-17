@@ -160,49 +160,65 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [user]);
 
-  // Client actions (offline mode)
+  // Client actions
   const addClient = async (client: Omit<Client, "id">) => {
     if (!user?.email) throw new Error("User not authenticated");
 
-    // OFFLINE MODE: Add to local state with generated ID
-    const newClient: Client = {
-      ...client,
-      id: Date.now().toString(), // Simple ID generation
-      dateJoined: new Date().toISOString().split("T")[0],
-    };
-    setClients((prev) => [newClient, ...prev]);
+    // Demo account: use offline mode
+    if (user.email === "trainer@demo.com") {
+      const newClient: Client = {
+        ...client,
+        id: Date.now().toString(),
+        dateJoined: new Date().toISOString().split("T")[0],
+      };
+      setClients((prev) => [newClient, ...prev]);
+      return;
+    }
 
-    console.log("Added client in offline mode:", newClient);
-
-    // TODO: When Firebase is working, uncomment this:
-    /*
     try {
       await clientsService.addClient(user.email, client);
     } catch (err) {
       setError("Failed to add client");
       throw err;
     }
-    */
   };
 
   const updateClient = async (clientId: string, updates: Partial<Client>) => {
     if (!user?.email) throw new Error("User not authenticated");
 
-    // OFFLINE MODE: Update local state
-    setClients((prev) =>
-      prev.map((client) =>
-        client.id === clientId ? { ...client, ...updates } : client,
-      ),
-    );
-    console.log("Updated client in offline mode:", clientId, updates);
+    // Demo account: use offline mode
+    if (user.email === "trainer@demo.com") {
+      setClients((prev) =>
+        prev.map((client) =>
+          client.id === clientId ? { ...client, ...updates } : client,
+        ),
+      );
+      return;
+    }
+
+    try {
+      await clientsService.updateClient(user.email, clientId, updates);
+    } catch (err) {
+      setError("Failed to update client");
+      throw err;
+    }
   };
 
   const deleteClient = async (clientId: string) => {
     if (!user?.email) throw new Error("User not authenticated");
 
-    // OFFLINE MODE: Remove from local state
-    setClients((prev) => prev.filter((client) => client.id !== clientId));
-    console.log("Deleted client in offline mode:", clientId);
+    // Demo account: use offline mode
+    if (user.email === "trainer@demo.com") {
+      setClients((prev) => prev.filter((client) => client.id !== clientId));
+      return;
+    }
+
+    try {
+      await clientsService.deleteClient(user.email, clientId);
+    } catch (err) {
+      setError("Failed to delete client");
+      throw err;
+    }
   };
 
   // Session actions (offline mode)
