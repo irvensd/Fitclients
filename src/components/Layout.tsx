@@ -19,6 +19,9 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { GlobalSearch } from "@/components/GlobalSearch";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
+import { QuickActions } from "@/components/QuickActions";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -100,7 +103,7 @@ const Sidebar = ({ className }: { className?: string }) => {
 
   return (
     <div className={cn("flex h-full w-64 flex-col", className)}>
-      <div className="flex h-16 items-center px-6 border-b border-sidebar-border">
+      <div className="flex h-16 items-center justify-between px-6 border-b border-sidebar-border">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Zap className="h-5 w-5" />
@@ -108,6 +111,9 @@ const Sidebar = ({ className }: { className?: string }) => {
           <span className="text-lg font-bold text-sidebar-foreground">
             FitClient
           </span>
+        </div>
+        <div className="hidden lg:block">
+          <GlobalSearch />
         </div>
       </div>
 
@@ -186,9 +192,27 @@ export const Layout = ({ children }: LayoutProps) => {
 
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Top bar with mobile search */}
+        <div className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-14 items-center justify-between px-4 lg:px-6">
+            <div className="lg:hidden">
+              <GlobalSearch />
+            </div>
+            <div className="flex items-center gap-2 ml-auto lg:ml-0">
+              <ThemeToggle />
+            </div>
+          </div>
+        </div>
+
         <main className="flex-1 overflow-y-auto">
-          <div className="h-full">{children}</div>
+          <div className="p-6">
+            <BreadcrumbNav />
+            {children}
+          </div>
         </main>
+
+        {/* Quick Actions FAB */}
+        <QuickActions />
       </div>
     </div>
   );
