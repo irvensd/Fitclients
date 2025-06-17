@@ -803,31 +803,37 @@ const ClientPortal = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <GamificationDashboard
-                  client={client}
-                  variant="widget"
-                  showCelebrations={false}
-                  isClientView={true}
-                />
-                <div className="pt-3">
-                  <Button variant="outline" size="sm" asChild>
-                    <a
-                      href="#achievements"
-                      onClick={() => {
-                        const tabs = document
-                          .querySelector(
-                            '[data-state="active"][value="overview"]',
-                          )
-                          ?.closest('[role="tablist"]');
-                        const achievementsTab = tabs?.querySelector(
-                          '[value="achievements"]',
-                        ) as HTMLElement;
-                        achievementsTab?.click();
-                      }}
-                    >
-                      <Star className="h-4 w-4 mr-2" />
-                      View All Achievements
-                    </a>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="text-2xl font-bold text-yellow-700">
+                        🏆
+                      </div>
+                      <p className="text-sm font-medium">5 Badges</p>
+                      <p className="text-xs text-muted-foreground">Earned</p>
+                    </div>
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-700">🔥</div>
+                      <p className="text-sm font-medium">7 Days</p>
+                      <p className="text-xs text-muted-foreground">
+                        Current Streak
+                      </p>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="text-lg">🎯</div>
+                      <p className="text-sm font-medium">Latest Achievement</p>
+                    </div>
+                    <p className="text-sm text-green-800">
+                      Week Warrior - 7 consecutive days!
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-3 border-t">
+                  <Button variant="outline" size="sm" className="w-full">
+                    <Star className="h-4 w-4 mr-2" />
+                    View All Achievements
                   </Button>
                 </div>
               </CardContent>
