@@ -5,6 +5,56 @@
 /* React Big Calendar Styles */
 @import "react-big-calendar/lib/css/react-big-calendar.css";
 
+/* Custom Calendar Theme */
+.rbc-calendar {
+  @apply bg-background text-foreground;
+}
+
+.rbc-header {
+  @apply bg-muted/50 text-foreground font-medium border-b border-border;
+}
+
+.rbc-month-view {
+  @apply border border-border rounded-lg overflow-hidden;
+}
+
+.rbc-day-bg {
+  @apply bg-background border-r border-b border-border;
+}
+
+.rbc-today {
+  @apply bg-primary/10;
+}
+
+.rbc-event {
+  @apply text-xs rounded shadow-sm;
+}
+
+.rbc-toolbar {
+  @apply mb-4 flex items-center justify-between;
+}
+
+.rbc-toolbar button {
+  @apply px-3 py-1 border border-border rounded bg-background text-foreground hover:bg-muted;
+}
+
+.rbc-toolbar button.rbc-active {
+  @apply bg-primary text-primary-foreground border-primary;
+}
+
+.rbc-time-view .rbc-time-gutter,
+.rbc-time-view .rbc-time-content {
+  @apply border-border;
+}
+
+.rbc-time-slot {
+  @apply border-b border-border/50;
+}
+
+.rbc-timeslot-group {
+  @apply border-b border-border;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
