@@ -38,8 +38,12 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  Sparkles,
+  FileText,
 } from "lucide-react";
-import { Session } from "@/lib/types";
+import { Session, SessionRecap } from "@/lib/types";
+import { SessionRecapForm } from "@/components/SessionRecapForm";
+import { SessionRecapViewer } from "@/components/SessionRecapViewer";
 
 // Mock data for sessions
 const mockSessions: Session[] = [
