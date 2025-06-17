@@ -18,6 +18,7 @@ import {
   Activity,
   Target,
 } from "lucide-react";
+import { DevModeNotice } from "@/components/DevModeNotice";
 
 // Mock data for demonstration
 const stats = {
@@ -85,6 +86,7 @@ const recentClients = [
 const Dashboard = () => {
   return (
     <div className="p-6 space-y-6">
+      <DevModeNotice />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

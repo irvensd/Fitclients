@@ -20,7 +20,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { login, user } = useAuth();
+  const { login, user, isDevMode } = useAuth();
 
   // Redirect if already logged in
   if (user) {
@@ -111,9 +111,16 @@ const Login = () => {
               </Button>
             </form>
 
-            {/* Demo Credentials */}
+            {/* Development Mode / Demo Credentials */}
             <div className="mt-6 p-4 bg-muted rounded-lg">
-              <p className="text-sm font-medium mb-2">Demo Credentials:</p>
+              {isDevMode && (
+                <div className="mb-3 p-2 bg-yellow-100 border border-yellow-300 rounded text-yellow-800 text-xs">
+                  🔧 <strong>Development Mode</strong> - Firebase not configured
+                </div>
+              )}
+              <p className="text-sm font-medium mb-2">
+                {isDevMode ? "Development Login:" : "Demo Credentials:"}
+              </p>
               <p className="text-sm text-muted-foreground">
                 Email: trainer@demo.com
                 <br />
@@ -128,7 +135,7 @@ const Login = () => {
                   setPassword("demo123");
                 }}
               >
-                Use Demo Account
+                {isDevMode ? "Use Dev Account" : "Use Demo Account"}
               </Button>
             </div>
 
