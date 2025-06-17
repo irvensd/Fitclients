@@ -69,9 +69,13 @@ const Login = () => {
             </div>
             <span className="text-2xl font-bold">FitClient</span>
           </div>
-          <h1 className="text-2xl font-bold">Trainer Login</h1>
+          <h1 className="text-2xl font-bold">
+            {mode === "login" ? "Trainer Login" : "Create Trainer Account"}
+          </h1>
           <p className="text-muted-foreground">
-            Access your personal training dashboard
+            {mode === "login"
+              ? "Access your personal training dashboard"
+              : "Set up your FitClient trainer account"}
           </p>
         </div>
 
