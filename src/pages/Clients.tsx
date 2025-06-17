@@ -56,12 +56,39 @@ const SharePortalButton = ({ client }: { client: Client }) => {
 
   const handleShare = async () => {
     const portalUrl = `${window.location.origin}/client-portal/${client.id}`;
+
     try {
-      await navigator.clipboard.writeText(portalUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      // Try modern Clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(portalUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        return;
+      }
+
+      // Fallback to legacy method
+      const textArea = document.createElement("textarea");
+      textArea.value = portalUrl;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textArea);
+
+      if (successful) {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        throw new Error("Copy command failed");
+      }
     } catch (err) {
       console.error("Failed to copy: ", err);
+      // Show user feedback for failed copy
+      alert(`Copy failed. Please manually copy this URL: ${portalUrl}`);
     }
   };
 
