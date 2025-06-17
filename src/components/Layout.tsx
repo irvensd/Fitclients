@@ -14,6 +14,7 @@ import {
   Zap,
   Settings,
   LogOut,
+  Share2,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -51,6 +52,11 @@ const navigation = [
     name: "Progress",
     href: "/progress",
     icon: TrendingUp,
+  },
+  {
+    name: "Client Portals",
+    href: "/client-portals",
+    icon: Share2,
   },
 ];
 

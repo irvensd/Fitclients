@@ -16,6 +16,8 @@ import Workouts from "./pages/Workouts";
 import Payments from "./pages/Payments";
 import Progress from "./pages/Progress";
 import Settings from "./pages/Settings";
+import ClientPortal from "./pages/ClientPortal";
+import ClientPortalManager from "./pages/ClientPortalManager";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,9 @@ const App = () => (
             {/* Public Routes */}
             <Route path="/landing" element={<Landing />} />
             <Route path="/login" element={<Login />} />
+
+            {/* Public Client Portal - No Authentication Required */}
+            <Route path="/client-portal/:clientId" element={<ClientPortal />} />
 
             {/* Protected Admin Routes */}
             <Route
@@ -108,6 +113,17 @@ const App = () => (
                 <ProtectedRoute>
                   <Layout>
                     <Settings />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/client-portals"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <ClientPortalManager />
                   </Layout>
                 </ProtectedRoute>
               }
