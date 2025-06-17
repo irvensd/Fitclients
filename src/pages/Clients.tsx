@@ -54,21 +54,10 @@ import { useData } from "@/contexts/DataContext";
 const SharePortalButton = ({ client }: { client: Client }) => {
   const [copied, setCopied] = useState(false);
 
-  const handleShare = async () => {
-    const portalUrl = `${window.location.origin}/client-portal/${client.id}`;
-
+  const copyToClipboardFallback = (text: string): boolean => {
     try {
-      // Try modern Clipboard API first
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(portalUrl);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        return;
-      }
-
-      // Fallback to legacy method
       const textArea = document.createElement("textarea");
-      textArea.value = portalUrl;
+      textArea.value = text;
       textArea.style.position = "fixed";
       textArea.style.left = "-999999px";
       textArea.style.top = "-999999px";
@@ -78,15 +67,38 @@ const SharePortalButton = ({ client }: { client: Client }) => {
 
       const successful = document.execCommand("copy");
       document.body.removeChild(textArea);
-
-      if (successful) {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } else {
-        throw new Error("Copy command failed");
-      }
+      return successful;
     } catch (err) {
-      console.error("Failed to copy: ", err);
+      console.error("Fallback copy failed:", err);
+      return false;
+    }
+  };
+
+  const handleShare = async () => {
+    const portalUrl = `${window.location.origin}/client-portal/${client.id}`;
+
+    let copySuccessful = false;
+
+    // Try modern Clipboard API first, but catch any errors
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(portalUrl);
+        copySuccessful = true;
+      } catch (err) {
+        console.warn("Modern clipboard API failed, trying fallback:", err);
+        // Don't throw here, try fallback instead
+      }
+    }
+
+    // If modern API failed or isn't available, try fallback
+    if (!copySuccessful) {
+      copySuccessful = copyToClipboardFallback(portalUrl);
+    }
+
+    if (copySuccessful) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } else {
       // Show user feedback for failed copy
       alert(`Copy failed. Please manually copy this URL: ${portalUrl}`);
     }
