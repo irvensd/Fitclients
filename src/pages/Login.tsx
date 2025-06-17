@@ -17,10 +17,11 @@ import { useAuth } from "@/contexts/AuthContext";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [mode, setMode] = useState<"login" | "register">("login");
 
-  const { login, user, isDevMode } = useAuth();
+  const { login, register, user, isDevMode, authError, clearError } = useAuth();
 
   // Redirect if already logged in
   if (user) {
