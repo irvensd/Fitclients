@@ -44,6 +44,8 @@ import {
   Star,
 } from "lucide-react";
 import { Client } from "@/lib/types";
+import { SmartRecommendations } from "@/components/SmartRecommendations";
+import { GamificationDashboard } from "@/components/GamificationDashboard";
 
 // Mock data for demonstration
 const mockClients: Client[] = [
