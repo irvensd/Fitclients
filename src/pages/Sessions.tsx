@@ -530,6 +530,17 @@ const Sessions = () => {
             <p className="text-sm text-muted-foreground">Revenue</p>
           </CardContent>
         </Card>
+        <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-blue-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-4 w-4 text-purple-600" />
+              <div className="text-2xl font-bold text-purple-700">
+                {recaps.length}
+              </div>
+            </div>
+            <p className="text-sm text-purple-600">AI Recaps Generated</p>
+          </CardContent>
+        </Card>
       </div>
 
       <Tabs defaultValue="list" className="space-y-4">
