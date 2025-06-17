@@ -132,7 +132,7 @@ const AddClientDialog = () => {
     setLoading(true);
 
     try {
-      await addClient({
+      const newClient = await addClient({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -144,6 +144,28 @@ const AddClientDialog = () => {
         notes: formData.notes,
         dateJoined: new Date().toISOString().split("T")[0], // Will be overridden in DataContext
       });
+
+      // If initial measurements were provided, store them for the Progress page
+      if (formData.weight || formData.height || formData.bodyFat) {
+        const initialMeasurements = {
+          clientId: Date.now().toString(), // Temporary ID - will need to be updated with real client ID
+          date: new Date().toISOString().split("T")[0],
+          weight: formData.weight ? parseFloat(formData.weight) : undefined,
+          height: formData.height ? parseFloat(formData.height) : undefined,
+          bodyFat: formData.bodyFat ? parseFloat(formData.bodyFat) : undefined,
+          notes: "Initial measurements",
+        };
+
+        // Store in localStorage for now (in a real app, this would go to the database)
+        const existingMeasurements = JSON.parse(
+          localStorage.getItem("progressEntries") || "[]",
+        );
+        existingMeasurements.push(initialMeasurements);
+        localStorage.setItem(
+          "progressEntries",
+          JSON.stringify(existingMeasurements),
+        );
+      }
 
       // Reset form and close dialog
       setFormData({
