@@ -61,6 +61,29 @@ const recentSessions = [
   },
 ];
 
+const recentCancellations = [
+  {
+    id: "1",
+    clientName: "Sarah Johnson",
+    sessionDate: "March 22",
+    sessionTime: "10:00 AM",
+    type: "Personal Training",
+    reason: "Schedule conflict - have to work late",
+    cancelledAt: "Today, 10:30 AM",
+    cancelledBy: "client",
+  },
+  {
+    id: "2",
+    clientName: "Mike Chen",
+    sessionDate: "March 20",
+    sessionTime: "2:00 PM",
+    type: "Assessment",
+    reason: "Feeling unwell",
+    cancelledAt: "Yesterday, 3:15 PM",
+    cancelledBy: "client",
+  },
+];
+
 const recentClients = [
   {
     id: "1",
