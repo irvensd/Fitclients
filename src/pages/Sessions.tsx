@@ -572,8 +572,36 @@ const Sessions = () => {
                   </div>
 
                   {session.notes && (
-                    <div className="mt-4 p-3 bg-muted rounded-lg">
-                      <p className="text-sm">{session.notes}</p>
+                    <div
+                      className={`mt-4 p-3 rounded-lg ${
+                        session.status === "cancelled" &&
+                        session.cancelledBy === "client"
+                          ? "bg-red-50 border border-red-200"
+                          : "bg-muted"
+                      }`}
+                    >
+                      <p
+                        className={`text-sm ${
+                          session.status === "cancelled" &&
+                          session.cancelledBy === "client"
+                            ? "text-red-800"
+                            : ""
+                        }`}
+                      >
+                        {session.cancelledBy === "client" && (
+                          <span className="font-medium">
+                            🔔 Client Cancellation:{" "}
+                          </span>
+                        )}
+                        {session.notes}
+                      </p>
+                      {session.cancelledAt &&
+                        session.cancelledBy === "client" && (
+                          <p className="text-xs text-red-600 mt-1">
+                            Cancelled:{" "}
+                            {new Date(session.cancelledAt).toLocaleString()}
+                          </p>
+                        )}
                     </div>
                   )}
                 </CardContent>
