@@ -93,6 +93,59 @@ const getClientData = (clientId: string) => {
           cancelledAt: "2024-03-17T10:30:00Z",
           cancelledBy: "client",
         },
+        {
+          id: "4",
+          date: "2024-03-15",
+          startTime: "09:00",
+          endTime: "10:00",
+          type: "Personal Training",
+          location: "FitGym Downtown",
+          notes: "Great session on upper body!",
+          status: "completed",
+          cost: 75,
+          recap: {
+            id: "recap-1",
+            sessionId: "4",
+            clientId: "1",
+            createdAt: "2024-03-15T11:00:00Z",
+            trainerForm: {
+              workoutFocus: "Upper body strength",
+              exercisesCompleted: [
+                "Push-ups",
+                "Bench Press",
+                "Pull-ups",
+                "Shoulder Press",
+              ],
+              clientPerformance: "excellent",
+              clientMood: "energetic",
+              achievementsToday: "First unassisted pull-up!",
+              challengesFaced: "",
+              notesForNextSession: "Ready to increase weights",
+              progressObservations:
+                "Significant improvement in upper body strength",
+            },
+            aiGeneratedContent: {
+              workoutSummary:
+                "Today's personal training session focused on upper body strength. Sarah completed push-ups, bench press, pull-ups, and shoulder press with excellent form and technique. Significant improvement in upper body strength was observed.",
+              personalizedEncouragement:
+                "Sarah, your energy today was contagious! 🔋 You're really hitting your stride. The progress is undeniable! Your consistency is paying off, and today's achievements of \"First unassisted pull-up!\" prove you're on the right track toward your goal of weight loss and strength building.",
+              nextStepsRecommendations:
+                "For next session: Ready to increase weights; Continue building on today's momentum with consistent progression.",
+              keyAchievements: [
+                "First unassisted pull-up!",
+                "Completed 4 exercises",
+                "Excellent performance rating",
+              ],
+              motivationalQuote:
+                "\"Strength doesn't come from what you can do. It comes from overcoming the things you once thought you couldn't.\" - Rikki Rogers",
+              progressHighlight:
+                "Sarah is showing consistent improvement in upper body strength",
+            },
+            sharedWithClient: true,
+            clientViewed: true,
+            clientViewedAt: "2024-03-15T15:30:00Z",
+          },
+        },
       ],
       workoutPlan: {
         id: "1",
