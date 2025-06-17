@@ -85,12 +85,45 @@ const formatCancellationTime = (cancelledAt: string) => {
 };
 
 const Dashboard = () => {
-  const { clients, sessions, payments, loading, getClientName } = useData();
+  const { clients, sessions, payments, loading, error, getClientName } =
+    useData();
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Show error message if there are Firebase permission issues
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <DevModeNotice />
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              <h3 className="font-semibold text-amber-800">
+                Database Connection Issue
+              </h3>
+            </div>
+            <p className="text-amber-700 mb-4">{error}</p>
+            <p className="text-sm text-amber-600 mb-4">
+              This is a demo environment. The Firebase database may need proper
+              configuration and security rules deployment. For now, you can use
+              the demo account (trainer@demo.com / demo123) which works in
+              offline mode.
+            </p>
+            <div className="flex gap-3">
+              <NavigationButton to="/clients">
+                <Plus className="h-4 w-4 mr-2" />
+                Continue Anyway
+              </NavigationButton>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
