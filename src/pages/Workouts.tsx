@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Plus,
   Search,
@@ -42,156 +41,130 @@ import {
   MoreVertical,
 } from "lucide-react";
 import { WorkoutPlan, Exercise } from "@/lib/types";
+import { useData } from "@/contexts/DataContext";
 
-// Mock exercise library
+// Exercise library (this can stay static as it's a template library)
 const exerciseLibrary = [
   {
     id: "1",
     name: "Push-ups",
     category: "Chest",
-    equipment: "Bodyweight",
-    difficulty: "Beginner",
+    description: "Basic bodyweight exercise for chest and arms",
   },
   {
     id: "2",
     name: "Squats",
     category: "Legs",
-    equipment: "Bodyweight",
-    difficulty: "Beginner",
+    description: "Fundamental lower body exercise",
   },
   {
     id: "3",
-    name: "Bench Press",
-    category: "Chest",
-    equipment: "Barbell",
-    difficulty: "Intermediate",
+    name: "Planks",
+    category: "Core",
+    description: "Core stability exercise",
   },
   {
     id: "4",
-    name: "Deadlift",
-    category: "Back",
-    equipment: "Barbell",
-    difficulty: "Advanced",
+    name: "Lunges",
+    category: "Legs",
+    description: "Single-leg strength exercise",
   },
   {
     id: "5",
-    name: "Plank",
-    category: "Core",
-    equipment: "Bodyweight",
-    difficulty: "Beginner",
-  },
-];
-
-// Mock workout plans
-const mockWorkoutPlans: WorkoutPlan[] = [
-  {
-    id: "1",
-    clientId: "1",
-    name: "Sarah's Weight Loss Program",
-    description: "12-week program focused on fat loss and toning",
-    exercises: [
-      {
-        id: "1",
-        name: "Push-ups",
-        sets: 3,
-        reps: "12-15",
-        notes: "Modify on knees if needed",
-      },
-      {
-        id: "2",
-        name: "Squats",
-        sets: 3,
-        reps: "15-20",
-        notes: "Focus on proper form",
-      },
-      {
-        id: "3",
-        name: "Plank",
-        sets: 3,
-        reps: "30-60 seconds",
-        notes: "Hold steady, don't let hips drop",
-      },
-    ],
-    createdDate: "2024-03-01",
-    isActive: true,
+    name: "Pull-ups",
+    category: "Back",
+    description: "Upper body pulling exercise",
   },
   {
-    id: "2",
-    clientId: "2",
-    name: "Mike's Strength Building",
-    description: "Beginner strength training program",
-    exercises: [
-      {
-        id: "1",
-        name: "Bench Press",
-        sets: 4,
-        reps: "8-10",
-        weight: "135 lbs",
-        notes: "Start light, focus on form",
-      },
-      {
-        id: "2",
-        name: "Deadlift",
-        sets: 3,
-        reps: "5-8",
-        weight: "185 lbs",
-        notes: "Keep back straight",
-      },
-    ],
-    createdDate: "2024-03-05",
-    isActive: true,
+    id: "6",
+    name: "Deadlifts",
+    category: "Full Body",
+    description: "Compound strength exercise",
   },
   {
-    id: "3",
-    clientId: "3",
-    name: "Emily's Marathon Training",
-    description: "Endurance and conditioning program",
-    exercises: [
-      {
-        id: "1",
-        name: "Running",
-        sets: 1,
-        reps: "5K",
-        duration: "25-30 minutes",
-        notes: "Maintain steady pace",
-      },
-      {
-        id: "2",
-        name: "Squats",
-        sets: 4,
-        reps: "20",
-        notes: "High rep for endurance",
-      },
-    ],
-    createdDate: "2024-02-28",
-    isActive: true,
+    id: "7",
+    name: "Burpees",
+    category: "Cardio",
+    description: "Full body cardio exercise",
+  },
+  {
+    id: "8",
+    name: "Mountain Climbers",
+    category: "Cardio",
+    description: "Dynamic core and cardio exercise",
   },
 ];
-
-const clients = [
-  { id: "1", name: "Sarah Johnson" },
-  { id: "2", name: "Mike Chen" },
-  { id: "3", name: "Emily Davis" },
-  { id: "4", name: "James Wilson" },
-];
-
-const getClientName = (clientId: string) => {
-  return clients.find((c) => c.id === clientId)?.name || "Unassigned";
-};
 
 const CreateWorkoutDialog = () => {
   const [open, setOpen] = useState(false);
-  const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { clients } = useData();
+  const [workoutData, setWorkoutData] = useState({
+    clientId: "",
+    name: "",
+    description: "",
+    exercises: [] as Exercise[],
+  });
+  const [currentExercise, setCurrentExercise] = useState({
+    name: "",
+    sets: "",
+    reps: "",
+    weight: "",
+    duration: "",
+    notes: "",
+  });
 
-  const addExercise = (exercise: any) => {
+  const handleAddExercise = () => {
+    if (!currentExercise.name) return;
+
     const newExercise: Exercise = {
       id: Date.now().toString(),
-      name: exercise.name,
-      sets: 3,
-      reps: "10-12",
-      notes: "",
+      name: currentExercise.name,
+      sets: parseInt(currentExercise.sets) || 0,
+      reps: currentExercise.reps,
+      weight: currentExercise.weight,
+      duration: currentExercise.duration,
+      notes: currentExercise.notes,
     };
-    setSelectedExercises([...selectedExercises, newExercise]);
+
+    setWorkoutData({
+      ...workoutData,
+      exercises: [...workoutData.exercises, newExercise],
+    });
+
+    setCurrentExercise({
+      name: "",
+      sets: "",
+      reps: "",
+      weight: "",
+      duration: "",
+      notes: "",
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // In offline mode, just log the workout plan
+      console.log("Created workout plan:", workoutData);
+      alert(`Workout plan "${workoutData.name}" created successfully!`);
+
+      // Reset form and close dialog
+      setWorkoutData({
+        clientId: "",
+        name: "",
+        description: "",
+        exercises: [],
+      });
+      setOpen(false);
+    } catch (error) {
+      console.error("Error creating workout:", error);
+      alert("Failed to create workout plan. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -199,467 +172,31 @@ const CreateWorkoutDialog = () => {
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          Create Plan
+          Create Workout
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Workout Plan</DialogTitle>
+          <DialogTitle>Create New Workout Plan</DialogTitle>
           <DialogDescription>
             Design a custom workout plan for your client
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-6">
-          {/* Basic Info */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="plan-name">Plan Name</Label>
-              <Input id="plan-name" placeholder="e.g., Upper Body Strength" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="client">Assign to Client</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select client" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map((client) => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe the goals and focus of this workout plan..."
-            />
-          </div>
-
-          {/* Exercise Selection */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Add Exercises</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {exerciseLibrary.map((exercise) => (
-                <Card key={exercise.id} className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">{exercise.name}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {exercise.category} • {exercise.equipment}
-                      </p>
-                      <Badge
-                        variant="outline"
-                        className="text-xs mt-1"
-                        size="sm"
-                      >
-                        {exercise.difficulty}
-                      </Badge>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={() => addExercise(exercise)}
-                      variant="outline"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Selected Exercises */}
-          {selectedExercises.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">
-                Selected Exercises ({selectedExercises.length})
-              </h3>
-              <div className="space-y-3">
-                {selectedExercises.map((exercise, index) => (
-                  <Card key={exercise.id} className="p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                      <div>
-                        <Label className="text-sm font-medium">
-                          {exercise.name}
-                        </Label>
-                      </div>
-                      <div>
-                        <Label htmlFor={`sets-${index}`} className="text-xs">
-                          Sets
-                        </Label>
-                        <Input
-                          id={`sets-${index}`}
-                          type="number"
-                          defaultValue={exercise.sets}
-                          className="h-8"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor={`reps-${index}`} className="text-xs">
-                          Reps
-                        </Label>
-                        <Input
-                          id={`reps-${index}`}
-                          defaultValue={exercise.reps}
-                          className="h-8"
-                          placeholder="10-12"
-                        />
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() =>
-                          setSelectedExercises(
-                            selectedExercises.filter((_, i) => i !== index),
-                          )
-                        }
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="mt-2">
-                      <Label htmlFor={`notes-${index}`} className="text-xs">
-                        Notes
-                      </Label>
-                      <Input
-                        id={`notes-${index}`}
-                        placeholder="Exercise notes..."
-                        className="h-8"
-                      />
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="flex justify-end gap-2 pt-4">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={() => setOpen(false)}>Create Workout Plan</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-const EditWorkoutDialog = ({ plan }: { plan: WorkoutPlan }) => {
-  const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: plan.name,
-    description: plan.description,
-    clientId: plan.clientId,
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Updating workout plan:", formData);
-    alert(`Workout plan "${formData.name}" updated successfully!`);
-    setOpen(false);
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="flex-1">
-          <Edit className="h-4 w-4 mr-2" />
-          Edit
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Edit Workout Plan</DialogTitle>
-          <DialogDescription>
-            Update the workout plan details and exercises.
-          </DialogDescription>
-        </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-plan-name">Plan Name</Label>
-              <Input
-                id="edit-plan-name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-client">Assigned Client</Label>
-              <Select
-                value={formData.clientId}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, clientId: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map((client) => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-description">Description</Label>
-              <Textarea
-                id="edit-description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                rows={3}
-              />
-            </div>
-            <div className="space-y-3">
-              <Label>Current Exercises</Label>
-              <div className="space-y-2 max-h-32 overflow-y-auto">
-                {plan.exercises.map((exercise, index) => (
-                  <div
-                    key={exercise.id}
-                    className="flex items-center justify-between p-2 border rounded"
-                  >
-                    <span className="text-sm font-medium">{exercise.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {exercise.sets} sets × {exercise.reps}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <Button variant="outline" size="sm" type="button">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Exercise
-              </Button>
-            </div>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit">Update Plan</Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-const ExerciseLibraryDialog = () => {
-  const [open, setOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-
-  const filteredExercises = exerciseLibrary.filter((exercise) => {
-    const matchesSearch = exercise.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      categoryFilter === "all" || exercise.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
-
-  const categories = Array.from(
-    new Set(exerciseLibrary.map((ex) => ex.category)),
-  );
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <Dumbbell className="h-4 w-4 mr-2" />
-          Exercise Library
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh]">
-        <DialogHeader>
-          <DialogTitle>Exercise Library</DialogTitle>
-          <DialogDescription>
-            Browse and manage your exercise database
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4">
-          {/* Search and Filter */}
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search exercises..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Exercise Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
-            {filteredExercises.map((exercise) => (
-              <Card key={exercise.id} className="p-3">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-medium">{exercise.name}</h4>
-                    <Button size="sm" variant="outline">
-                      <Plus className="h-3 w-3" />
-                    </Button>
-                  </div>
-                  <div className="flex gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      {exercise.category}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {exercise.equipment}
-                    </Badge>
-                  </div>
-                  <Badge
-                    className={`text-xs ${
-                      exercise.difficulty === "Beginner"
-                        ? "bg-green-100 text-green-800"
-                        : exercise.difficulty === "Intermediate"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {exercise.difficulty}
-                  </Badge>
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          <div className="flex justify-between items-center pt-4 border-t">
-            <Button variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
-              Add New Exercise
-            </Button>
-            <div className="text-sm text-muted-foreground">
-              {filteredExercises.length} exercises found
-            </div>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-const Workouts = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [clientFilter, setClientFilter] = useState<string>("all");
-
-  const filteredPlans = mockWorkoutPlans.filter((plan) => {
-    const matchesSearch = plan.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesClient =
-      clientFilter === "all" || plan.clientId === clientFilter;
-    return matchesSearch && matchesClient;
-  });
-
-  return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Workout Plans</h1>
-          <p className="text-muted-foreground">
-            Create and manage custom workout plans for your clients.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <CreateWorkoutDialog />
-          <ExerciseLibraryDialog />
-        </div>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{mockWorkoutPlans.length}</div>
-            <p className="text-sm text-muted-foreground">Total Plans</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">
-              {mockWorkoutPlans.filter((p) => p.isActive).length}
-            </div>
-            <p className="text-sm text-muted-foreground">Active Plans</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{exerciseLibrary.length}</div>
-            <p className="text-sm text-muted-foreground">Exercises Available</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">
-              {new Set(mockWorkoutPlans.map((p) => p.clientId)).size}
-            </div>
-            <p className="text-sm text-muted-foreground">Clients with Plans</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="plans" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="plans">Workout Plans</TabsTrigger>
-          <TabsTrigger value="library">Exercise Library</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="plans" className="space-y-4">
-          {/* Filters */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search workout plans..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Select value={clientFilter} onValueChange={setClientFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="All Clients" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="client">Client</Label>
+                <Select
+                  value={workoutData.clientId}
+                  onValueChange={(value) =>
+                    setWorkoutData({ ...workoutData, clientId: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select client" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Clients</SelectItem>
                     {clients.map((client) => (
                       <SelectItem key={client.id} value={client.id}>
                         {client.name}
@@ -668,188 +205,299 @@ const Workouts = () => {
                   </SelectContent>
                 </Select>
               </div>
-            </CardContent>
-          </Card>
+              <div className="space-y-2">
+                <Label htmlFor="name">Workout Name</Label>
+                <Input
+                  id="name"
+                  value={workoutData.name}
+                  onChange={(e) =>
+                    setWorkoutData({ ...workoutData, name: e.target.value })
+                  }
+                  placeholder="e.g., Upper Body Strength"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={workoutData.description}
+                onChange={(e) =>
+                  setWorkoutData({
+                    ...workoutData,
+                    description: e.target.value,
+                  })
+                }
+                placeholder="Brief description of the workout plan..."
+                className="min-h-[80px]"
+              />
+            </div>
 
-          {/* Workout Plans Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPlans.map((plan) => (
-              <Card key={plan.id} className="hover:shadow-md transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">{plan.name}</CardTitle>
-                      <CardDescription className="mt-1">
-                        {plan.description}
-                      </CardDescription>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarFallback className="text-xs">
-                        {getClientName(plan.clientId)
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-medium">
-                      {getClientName(plan.clientId)}
-                    </span>
-                    {plan.isActive && (
-                      <Badge className="ml-auto" size="sm">
-                        Active
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Dumbbell className="h-4 w-4 text-muted-foreground" />
-                      <span>{plan.exercises.length} exercises</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span>
-                        Created{" "}
-                        {new Date(plan.createdDate).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Exercises:</h4>
-                    <div className="space-y-1">
-                      {plan.exercises.slice(0, 3).map((exercise) => (
-                        <div
-                          key={exercise.id}
-                          className="text-xs bg-muted rounded p-2"
-                        >
-                          <span className="font-medium">{exercise.name}</span>
-                          <span className="text-muted-foreground ml-2">
-                            {exercise.sets} sets × {exercise.reps}
-                          </span>
-                        </div>
+            {/* Exercise Builder */}
+            <div className="space-y-4 border-t pt-4">
+              <h4 className="font-medium">Add Exercises</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="exercise-name">Exercise</Label>
+                  <Select
+                    value={currentExercise.name}
+                    onValueChange={(value) =>
+                      setCurrentExercise({ ...currentExercise, name: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select exercise" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {exerciseLibrary.map((exercise) => (
+                        <SelectItem key={exercise.id} value={exercise.name}>
+                          {exercise.name} ({exercise.category})
+                        </SelectItem>
                       ))}
-                      {plan.exercises.length > 3 && (
-                        <p className="text-xs text-muted-foreground">
-                          +{plan.exercises.length - 3} more exercises
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="sets">Sets</Label>
+                  <Input
+                    id="sets"
+                    type="number"
+                    value={currentExercise.sets}
+                    onChange={(e) =>
+                      setCurrentExercise({
+                        ...currentExercise,
+                        sets: e.target.value,
+                      })
+                    }
+                    placeholder="3"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reps">Reps</Label>
+                  <Input
+                    id="reps"
+                    value={currentExercise.reps}
+                    onChange={(e) =>
+                      setCurrentExercise({
+                        ...currentExercise,
+                        reps: e.target.value,
+                      })
+                    }
+                    placeholder="10-12"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="weight">Weight</Label>
+                  <Input
+                    id="weight"
+                    value={currentExercise.weight}
+                    onChange={(e) =>
+                      setCurrentExercise({
+                        ...currentExercise,
+                        weight: e.target.value,
+                      })
+                    }
+                    placeholder="50 lbs"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="duration">Duration</Label>
+                  <Input
+                    id="duration"
+                    value={currentExercise.duration}
+                    onChange={(e) =>
+                      setCurrentExercise({
+                        ...currentExercise,
+                        duration: e.target.value,
+                      })
+                    }
+                    placeholder="30 sec"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="exercise-notes">Exercise Notes</Label>
+                <Input
+                  id="exercise-notes"
+                  value={currentExercise.notes}
+                  onChange={(e) =>
+                    setCurrentExercise({
+                      ...currentExercise,
+                      notes: e.target.value,
+                    })
+                  }
+                  placeholder="Focus on form, rest 60 seconds between sets..."
+                />
+              </div>
+              <Button
+                type="button"
+                onClick={handleAddExercise}
+                variant="outline"
+              >
+                Add Exercise
+              </Button>
+            </div>
 
-                  <div className="flex gap-2 pt-2">
-                    <EditWorkoutDialog plan={plan} />
-                    <Button size="sm" variant="outline">
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      <Play className="h-4 w-4" />
-                    </Button>
+            {/* Exercise List */}
+            {workoutData.exercises.length > 0 && (
+              <div className="space-y-2 border-t pt-4">
+                <h4 className="font-medium">
+                  Exercises ({workoutData.exercises.length})
+                </h4>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {workoutData.exercises.map((exercise, index) => (
+                    <div
+                      key={exercise.id}
+                      className="flex items-center justify-between p-2 bg-muted rounded"
+                    >
+                      <div className="text-sm">
+                        <span className="font-medium">{exercise.name}</span>
+                        <span className="text-muted-foreground ml-2">
+                          {exercise.sets} sets × {exercise.reps}
+                          {exercise.weight && ` @ ${exercise.weight}`}
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          setWorkoutData({
+                            ...workoutData,
+                            exercises: workoutData.exercises.filter(
+                              (_, i) => i !== index,
+                            ),
+                          })
+                        }
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Creating..." : "Create Workout"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const Workouts = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const { clients, loading } = useData();
+
+  // Since we don't have workout plans in the data structure yet,
+  // we'll show an empty state and let users create workout plans
+  const workoutPlans: WorkoutPlan[] = [];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Workout Plans</h1>
+          <p className="text-muted-foreground">
+            Create and manage custom workout plans for your clients.
+          </p>
+        </div>
+        <CreateWorkoutDialog />
+      </div>
+
+      {/* Empty State */}
+      {workoutPlans.length === 0 && (
+        <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
+              <Dumbbell className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No Workout Plans Yet</h3>
+            <p className="text-muted-foreground text-center mb-6 max-w-md">
+              Start creating custom workout plans for your clients. Design
+              targeted routines to help them achieve their fitness goals.
+            </p>
+            <CreateWorkoutDialog />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Exercise Library */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            Exercise Library
+          </CardTitle>
+          <CardDescription>
+            Browse available exercises to add to your workout plans
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {exerciseLibrary.map((exercise) => (
+              <Card key={exercise.id} className="border-muted">
+                <CardContent className="pt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium">{exercise.name}</h4>
+                    <Badge variant="secondary">{exercise.category}</Badge>
                   </div>
+                  <p className="text-sm text-muted-foreground">
+                    {exercise.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </TabsContent>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="library" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Exercise Library</CardTitle>
-              <CardDescription>
-                Browse and manage your exercise database
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {exerciseLibrary.map((exercise) => (
-                  <Card key={exercise.id} className="p-4">
-                    <div className="space-y-2">
-                      <h4 className="font-medium">{exercise.name}</h4>
-                      <div className="flex gap-2">
-                        <Badge variant="outline" size="sm">
-                          {exercise.category}
-                        </Badge>
-                        <Badge variant="outline" size="sm">
-                          {exercise.equipment}
-                        </Badge>
-                      </div>
-                      <Badge
-                        className={`text-xs ${
-                          exercise.difficulty === "Beginner"
-                            ? "bg-green-100 text-green-800"
-                            : exercise.difficulty === "Intermediate"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {exercise.difficulty}
-                      </Badge>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="templates" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Workout Templates</CardTitle>
-              <CardDescription>
-                Pre-built workout templates to get started quickly
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Beginner Full Body</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Perfect for clients just starting their fitness journey
-                  </p>
-                  <div className="flex gap-2">
-                    <Badge variant="outline" size="sm">
-                      3 days/week
-                    </Badge>
-                    <Badge variant="outline" size="sm">
-                      45 min
-                    </Badge>
-                  </div>
-                  <Button className="w-full mt-3" size="sm">
-                    Use Template
-                  </Button>
-                </Card>
-
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Strength Building</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Focus on building muscle mass and strength
-                  </p>
-                  <div className="flex gap-2">
-                    <Badge variant="outline" size="sm">
-                      4 days/week
-                    </Badge>
-                    <Badge variant="outline" size="sm">
-                      60 min
-                    </Badge>
-                  </div>
-                  <Button className="w-full mt-3" size="sm">
-                    Use Template
-                  </Button>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold">{workoutPlans.length}</div>
+            <p className="text-sm text-muted-foreground">Total Plans</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold">{clients.length}</div>
+            <p className="text-sm text-muted-foreground">Clients</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold">{exerciseLibrary.length}</div>
+            <p className="text-sm text-muted-foreground">Available Exercises</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-sm text-muted-foreground">Active Plans</p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
