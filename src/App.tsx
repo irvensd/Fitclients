@@ -15,6 +15,7 @@ import Sessions from "./pages/Sessions";
 import Workouts from "./pages/Workouts";
 import Payments from "./pages/Payments";
 import Progress from "./pages/Progress";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -91,6 +92,16 @@ const App = () => (
                 <ProtectedRoute>
                   <Layout>
                     <Progress />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Settings />
                   </Layout>
                 </ProtectedRoute>
               }

@@ -70,7 +70,7 @@ const LogoutButton = () => {
       variant="ghost"
       size="sm"
       onClick={handleLogout}
-      className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+      className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 hover:translate-x-1"
     >
       <LogOut className="h-4 w-4" />
       Logout
@@ -102,10 +102,10 @@ const Sidebar = ({ className }: { className?: string }) => {
               key={item.name}
               to={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1",
               )}
             >
               <item.icon className="h-4 w-4" />
@@ -116,14 +116,18 @@ const Sidebar = ({ className }: { className?: string }) => {
       </nav>
 
       <div className="border-t border-sidebar-border p-4 space-y-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        <Link
+          to="/settings"
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+            location.pathname === "/settings"
+              ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1",
+          )}
         >
           <Settings className="h-4 w-4" />
           Settings
-        </Button>
+        </Link>
         <LogoutButton />
       </div>
     </div>
