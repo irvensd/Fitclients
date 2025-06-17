@@ -44,6 +44,7 @@ import {
 import { Session, SessionRecap } from "@/lib/types";
 import { SessionRecapForm } from "@/components/SessionRecapForm";
 import { SessionRecapViewer } from "@/components/SessionRecapViewer";
+import { SessionCalendar } from "@/components/SessionCalendar";
 
 // Mock data for sessions
 const mockSessions: Session[] = [
