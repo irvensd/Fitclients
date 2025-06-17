@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { LandingRedirect } from "./components/LandingRedirect";
 import { Layout } from "./components/Layout";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
@@ -26,13 +27,16 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Home route - shows landing or redirects to admin if authenticated */}
+            <Route path="/" element={<LandingRedirect />} />
+
             {/* Public Routes */}
             <Route path="/landing" element={<Landing />} />
             <Route path="/login" element={<Login />} />
 
             {/* Protected Admin Routes */}
             <Route
-              path="/"
+              path="/admin"
               element={
                 <ProtectedRoute>
                   <Layout>
