@@ -86,9 +86,9 @@ const formatCancellationTime = (cancelledAt: string) => {
 };
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const { clients, sessions, payments, loading, error, getClientName } =
     useData();
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
