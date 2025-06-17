@@ -176,46 +176,62 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     */
   }, [user]);
 
-  // Client actions
+  // Client actions (offline mode)
   const addClient = async (client: Omit<Client, "id">) => {
     if (!user?.email) throw new Error("User not authenticated");
+
+    // OFFLINE MODE: Add to local state with generated ID
+    const newClient: Client = {
+      ...client,
+      id: Date.now().toString(), // Simple ID generation
+      dateJoined: new Date().toISOString().split("T")[0],
+    };
+    setClients((prev) => [newClient, ...prev]);
+
+    console.log("Added client in offline mode:", newClient);
+
+    // TODO: When Firebase is working, uncomment this:
+    /*
     try {
       await clientsService.addClient(user.email, client);
     } catch (err) {
       setError("Failed to add client");
       throw err;
     }
+    */
   };
 
   const updateClient = async (clientId: string, updates: Partial<Client>) => {
     if (!user?.email) throw new Error("User not authenticated");
-    try {
-      await clientsService.updateClient(user.email, clientId, updates);
-    } catch (err) {
-      setError("Failed to update client");
-      throw err;
-    }
+
+    // OFFLINE MODE: Update local state
+    setClients((prev) =>
+      prev.map((client) =>
+        client.id === clientId ? { ...client, ...updates } : client,
+      ),
+    );
+    console.log("Updated client in offline mode:", clientId, updates);
   };
 
   const deleteClient = async (clientId: string) => {
     if (!user?.email) throw new Error("User not authenticated");
-    try {
-      await clientsService.deleteClient(user.email, clientId);
-    } catch (err) {
-      setError("Failed to delete client");
-      throw err;
-    }
+
+    // OFFLINE MODE: Remove from local state
+    setClients((prev) => prev.filter((client) => client.id !== clientId));
+    console.log("Deleted client in offline mode:", clientId);
   };
 
-  // Session actions
+  // Session actions (offline mode)
   const addSession = async (session: Omit<Session, "id">) => {
     if (!user?.email) throw new Error("User not authenticated");
-    try {
-      await sessionsService.addSession(user.email, session);
-    } catch (err) {
-      setError("Failed to add session");
-      throw err;
-    }
+
+    // OFFLINE MODE: Add to local state
+    const newSession: Session = {
+      ...session,
+      id: Date.now().toString(),
+    };
+    setSessions((prev) => [newSession, ...prev]);
+    console.log("Added session in offline mode:", newSession);
   };
 
   const updateSession = async (
@@ -223,33 +239,35 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     updates: Partial<Session>,
   ) => {
     if (!user?.email) throw new Error("User not authenticated");
-    try {
-      await sessionsService.updateSession(user.email, sessionId, updates);
-    } catch (err) {
-      setError("Failed to update session");
-      throw err;
-    }
+
+    // OFFLINE MODE: Update local state
+    setSessions((prev) =>
+      prev.map((session) =>
+        session.id === sessionId ? { ...session, ...updates } : session,
+      ),
+    );
+    console.log("Updated session in offline mode:", sessionId, updates);
   };
 
   const deleteSession = async (sessionId: string) => {
     if (!user?.email) throw new Error("User not authenticated");
-    try {
-      await sessionsService.deleteSession(user.email, sessionId);
-    } catch (err) {
-      setError("Failed to delete session");
-      throw err;
-    }
+
+    // OFFLINE MODE: Remove from local state
+    setSessions((prev) => prev.filter((session) => session.id !== sessionId));
+    console.log("Deleted session in offline mode:", sessionId);
   };
 
-  // Payment actions
+  // Payment actions (offline mode)
   const addPayment = async (payment: Omit<Payment, "id">) => {
     if (!user?.email) throw new Error("User not authenticated");
-    try {
-      await paymentsService.addPayment(user.email, payment);
-    } catch (err) {
-      setError("Failed to add payment");
-      throw err;
-    }
+
+    // OFFLINE MODE: Add to local state
+    const newPayment: Payment = {
+      ...payment,
+      id: Date.now().toString(),
+    };
+    setPayments((prev) => [newPayment, ...prev]);
+    console.log("Added payment in offline mode:", newPayment);
   };
 
   const updatePayment = async (
@@ -257,22 +275,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     updates: Partial<Payment>,
   ) => {
     if (!user?.email) throw new Error("User not authenticated");
-    try {
-      await paymentsService.updatePayment(user.email, paymentId, updates);
-    } catch (err) {
-      setError("Failed to update payment");
-      throw err;
-    }
+
+    // OFFLINE MODE: Update local state
+    setPayments((prev) =>
+      prev.map((payment) =>
+        payment.id === paymentId ? { ...payment, ...updates } : payment,
+      ),
+    );
+    console.log("Updated payment in offline mode:", paymentId, updates);
   };
 
   const deletePayment = async (paymentId: string) => {
     if (!user?.email) throw new Error("User not authenticated");
-    try {
-      await paymentsService.deletePayment(user.email, paymentId);
-    } catch (err) {
-      setError("Failed to delete payment");
-      throw err;
-    }
+
+    // OFFLINE MODE: Remove from local state
+    setPayments((prev) => prev.filter((payment) => payment.id !== paymentId));
+    console.log("Deleted payment in offline mode:", paymentId);
   };
 
   const refreshData = () => {
