@@ -482,7 +482,7 @@ const Sessions = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {mockSessions.filter((s) => s.status === "completed").length}
+              {sessions.filter((s) => s.status === "completed").length}
             </div>
             <p className="text-sm text-muted-foreground">Completed</p>
           </CardContent>
@@ -491,7 +491,7 @@ const Sessions = () => {
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
               $
-              {mockSessions
+              {sessions
                 .filter((s) => s.status === "completed")
                 .reduce((sum, s) => sum + s.cost, 0)}
             </div>
