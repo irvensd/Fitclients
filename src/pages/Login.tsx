@@ -82,17 +82,44 @@ const Login = () => {
         {/* Login Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Welcome Back</CardTitle>
+            <CardTitle>
+              {mode === "login" ? "Welcome Back" : "Create Your Account"}
+            </CardTitle>
             <CardDescription>
-              Sign in to manage your clients and sessions
+              {mode === "login"
+                ? "Sign in to manage your clients and sessions"
+                : "Join FitClient and start managing your training business"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
+              {authError && (
                 <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>{authError}</AlertDescription>
                 </Alert>
+              )}
+
+              {!isFirebaseConfigured && mode === "register" && (
+                <Alert>
+                  <AlertDescription>
+                    🔧 Account creation requires Firebase configuration. Contact
+                    support for assistance.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {mode === "register" && (
+                <div className="space-y-2">
+                  <Label htmlFor="displayName">Full Name</Label>
+                  <Input
+                    id="displayName"
+                    type="text"
+                    placeholder="Your full name"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    required
+                  />
+                </div>
               )}
 
               <div className="space-y-2">
@@ -112,14 +139,27 @@ const Login = () => {
                 <Input
                   id="password"
                   type="password"
+                  placeholder={mode === "register" ? "Min. 6 characters" : ""}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Signing in..." : "Sign In"}
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={
+                  loading || (!isFirebaseConfigured && mode === "register")
+                }
+              >
+                {loading
+                  ? mode === "login"
+                    ? "Signing in..."
+                    : "Creating account..."
+                  : mode === "login"
+                    ? "Sign In"
+                    : "Create Account"}
               </Button>
             </form>
 
