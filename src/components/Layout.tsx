@@ -193,7 +193,6 @@ export const Layout = ({ children }: LayoutProps) => {
               <div className="w-64">
                 <GlobalSearch />
               </div>
-              <ThemeToggle />
             </div>
           </div>
         </div>
