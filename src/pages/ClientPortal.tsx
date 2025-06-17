@@ -38,6 +38,7 @@ import {
   XCircle,
   Trophy,
   Star,
+  Sparkles,
 } from "lucide-react";
 import { GamificationDashboard } from "@/components/GamificationDashboard";
 
