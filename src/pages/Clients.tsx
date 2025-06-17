@@ -40,6 +40,8 @@ import {
   ExternalLink,
   Brain,
   Sparkles,
+  Trophy,
+  Star,
 } from "lucide-react";
 import { Client } from "@/lib/types";
 
@@ -583,6 +585,49 @@ const AIRecommendationsDialog = ({ client }: { client: Client }) => {
   );
 };
 
+const GamificationDialog = ({ client }: { client: Client }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 border-yellow-200"
+        >
+          <Trophy className="h-4 w-4 mr-1" />
+          Achievements
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Trophy className="h-6 w-6 text-yellow-600" />
+            {client.name}'s Achievements & Streaks
+          </DialogTitle>
+          <DialogDescription>
+            Gamification dashboard with streaks, badges, and milestones
+          </DialogDescription>
+        </DialogHeader>
+        <div className="py-4">
+          <GamificationDashboard
+            client={client}
+            variant="full"
+            showCelebrations={true}
+            onSendCelebration={(message) => {
+              console.log(`Sending celebration to ${client.name}:`, message);
+              alert(
+                `🎉 Celebration SMS sent to ${client.name}!\n\n"${message}"`,
+              );
+            }}
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const Clients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterLevel, setFilterLevel] = useState<string>("all");
@@ -753,7 +798,10 @@ const Clients = () => {
               </div>
               <div className="space-y-2 pt-2">
                 <SharePortalButton client={client} />
-                <AIRecommendationsDialog client={client} />
+                <div className="grid grid-cols-2 gap-1">
+                  <AIRecommendationsDialog client={client} />
+                  <GamificationDialog client={client} />
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -495,6 +495,25 @@ const ProgressPage = () => {
         </div>
       </div>
 
+      {/* Gamification Dashboard */}
+      <GamificationDashboard
+        client={{
+          id: "1",
+          name: "Sarah Johnson",
+          email: "sarah.johnson@email.com",
+          phone: "(555) 123-4567",
+          dateJoined: "2024-01-15",
+          fitnessLevel: "intermediate",
+          goals: "Weight loss and strength building",
+        }}
+        variant="widget"
+        showCelebrations={true}
+        onSendCelebration={(message) => {
+          console.log("Sending celebration SMS:", message);
+          alert(`SMS sent: ${message}`);
+        }}
+      />
+
       {/* AI Recommendations */}
       <SmartRecommendations
         client={{
