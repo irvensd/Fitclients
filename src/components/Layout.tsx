@@ -139,22 +139,19 @@ const Sidebar = ({ className }: { className?: string }) => {
       </nav>
 
       <div className="border-t border-sidebar-border p-4 space-y-2">
-        <div className="flex items-center justify-between mb-2">
-          <Link
-            to="/settings"
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 flex-1",
-              location.pathname === "/settings" ||
-                location.pathname === "/admin/settings"
-                ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1",
-            )}
-          >
-            <Settings className="h-4 w-4" />
-            Settings
-          </Link>
-          <ThemeToggle />
-        </div>
+        <Link
+          to="/settings"
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+            location.pathname === "/settings" ||
+              location.pathname === "/admin/settings"
+              ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1",
+          )}
+        >
+          <Settings className="h-4 w-4" />
+          Settings
+        </Link>
         <LogoutButton />
       </div>
     </div>
