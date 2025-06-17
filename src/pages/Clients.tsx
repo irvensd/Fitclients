@@ -279,11 +279,11 @@ const AddClientDialog = () => {
             {/* Initial Measurements Section */}
             <div className="space-y-4 border-t pt-4">
               <h4 className="text-sm font-medium text-foreground">
-                Initial Measurements (Optional)
+                Initial Measurements
               </h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="weight">Weight (lbs)</Label>
+                  <Label htmlFor="weight">Weight (lbs) *</Label>
                   <Input
                     id="weight"
                     type="number"
@@ -293,6 +293,7 @@ const AddClientDialog = () => {
                       setFormData({ ...formData, weight: e.target.value })
                     }
                     placeholder="160"
+                    required
                   />
                 </div>
                 <div className="space-y-2">
