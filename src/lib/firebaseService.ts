@@ -55,22 +55,30 @@ export const clientsService = {
   subscribeToClients: (
     userId: string,
     callback: (clients: Client[]) => void,
+    errorCallback?: (error: Error) => void,
   ) => {
     const q = query(
       getUserCollection(userId, "clients"),
       orderBy("dateJoined", "desc"),
     );
-    return onSnapshot(q, (snapshot) => {
-      const clients = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        // Convert timestamp to string
-        dateJoined:
-          doc.data().dateJoined?.toDate?.()?.toISOString()?.split("T")[0] ||
-          new Date().toISOString().split("T")[0],
-      })) as Client[];
-      callback(clients);
-    });
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const clients = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          // Convert timestamp to string
+          dateJoined:
+            doc.data().dateJoined?.toDate?.()?.toISOString()?.split("T")[0] ||
+            new Date().toISOString().split("T")[0],
+        })) as Client[];
+        callback(clients);
+      },
+      (error) => {
+        console.error("Firestore clients subscription error:", error);
+        if (errorCallback) errorCallback(error);
+      },
+    );
   },
 };
 
@@ -109,18 +117,26 @@ export const sessionsService = {
   subscribeToSessions: (
     userId: string,
     callback: (sessions: Session[]) => void,
+    errorCallback?: (error: Error) => void,
   ) => {
     const q = query(
       getUserCollection(userId, "sessions"),
       orderBy("date", "desc"),
     );
-    return onSnapshot(q, (snapshot) => {
-      const sessions = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Session[];
-      callback(sessions);
-    });
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const sessions = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Session[];
+        callback(sessions);
+      },
+      (error) => {
+        console.error("Firestore sessions subscription error:", error);
+        if (errorCallback) errorCallback(error);
+      },
+    );
   },
 };
 
@@ -159,18 +175,26 @@ export const paymentsService = {
   subscribeToPayments: (
     userId: string,
     callback: (payments: Payment[]) => void,
+    errorCallback?: (error: Error) => void,
   ) => {
     const q = query(
       getUserCollection(userId, "payments"),
       orderBy("date", "desc"),
     );
-    return onSnapshot(q, (snapshot) => {
-      const payments = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Payment[];
-      callback(payments);
-    });
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const payments = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Payment[];
+        callback(payments);
+      },
+      (error) => {
+        console.error("Firestore payments subscription error:", error);
+        if (errorCallback) errorCallback(error);
+      },
+    );
   },
 };
 
