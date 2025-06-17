@@ -23,94 +23,105 @@ import {
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { AdminSummary } from "@/components/AdminSummary";
 import { NavigationButton } from "@/components/NavigationButton";
+import {
+  calculateDashboardStats,
+  getRecentCancellations,
+  getTodaysSessions,
+  getRecentClients,
+} from "@/lib/dashboardMetrics";
+import { getClientName } from "@/lib/mockData";
 
-// Mock data for demonstration
-const stats = {
-  totalClients: 24,
-  upcomingSessions: 8,
-  unpaidInvoices: 3,
-  monthlyRevenue: 4850,
+const formatTime = (time: string) => {
+  const [hours, minutes] = time.split(":");
+  const hour = parseInt(hours);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+  return `${displayHour}:${minutes} ${ampm}`;
 };
 
-const recentSessions = [
-  {
-    id: "1",
-    clientName: "Sarah Johnson",
-    time: "9:00 AM",
-    type: "Personal Training",
-    status: "completed" as const,
-  },
-  {
-    id: "2",
-    clientName: "Mike Chen",
-    time: "10:30 AM",
-    type: "Assessment",
-    status: "completed" as const,
-  },
-  {
-    id: "3",
-    clientName: "Emily Davis",
-    time: "2:00 PM",
-    type: "Personal Training",
-    status: "scheduled" as const,
-  },
-  {
-    id: "4",
-    clientName: "James Wilson",
-    time: "3:30 PM",
-    type: "Consultation",
-    status: "scheduled" as const,
-  },
-];
+const formatSessionType = (type: string) => {
+  switch (type) {
+    case "personal-training":
+      return "Personal Training";
+    case "assessment":
+      return "Assessment";
+    case "consultation":
+      return "Consultation";
+    default:
+      return type;
+  }
+};
 
-const recentCancellations = [
-  {
-    id: "1",
-    clientName: "Sarah Johnson",
-    sessionDate: "March 22",
-    sessionTime: "10:00 AM",
-    type: "Personal Training",
-    reason: "Schedule conflict - have to work late",
-    cancelledAt: "Today, 10:30 AM",
-    cancelledBy: "client",
-  },
-  {
-    id: "2",
-    clientName: "Mike Chen",
-    sessionDate: "March 20",
-    sessionTime: "2:00 PM",
-    type: "Assessment",
-    reason: "Feeling unwell",
-    cancelledAt: "Yesterday, 3:15 PM",
-    cancelledBy: "client",
-  },
-];
+const getTimeAgo = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - date.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-const recentClients = [
-  {
-    id: "1",
-    name: "Alex Thompson",
-    joinDate: "2 days ago",
-    level: "Beginner",
-    progress: 15,
-  },
-  {
-    id: "2",
-    name: "Maria Rodriguez",
-    joinDate: "1 week ago",
-    level: "Intermediate",
-    progress: 65,
-  },
-  {
-    id: "3",
-    name: "David Kim",
-    joinDate: "2 weeks ago",
-    level: "Advanced",
-    progress: 85,
-  },
-];
+  if (diffDays === 1) return "yesterday";
+  if (diffDays <= 7) return `${diffDays} days ago`;
+  if (diffDays <= 14) return "1 week ago";
+  if (diffDays <= 21) return "2 weeks ago";
+  return `${Math.floor(diffDays / 7)} weeks ago`;
+};
+
+const formatCancellationTime = (cancelledAt: string) => {
+  const date = new Date(cancelledAt);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - date.getTime());
+  const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffHours < 1) return "Just now";
+  if (diffHours < 24) return `${diffHours} hours ago`;
+  if (diffDays === 1) return "Yesterday";
+  return `${diffDays} days ago`;
+};
 
 const Dashboard = () => {
+  // Calculate dynamic stats
+  const stats = calculateDashboardStats();
+  const dashboardStats = {
+    totalClients: stats.totalClients,
+    upcomingSessions: stats.sessionsThisWeek,
+    unpaidInvoices: stats.pendingPayments,
+    monthlyRevenue: stats.monthlyRevenue,
+  };
+
+  // Get dynamic data
+  const recentCancellations = getRecentCancellations().map((session) => ({
+    id: session.id,
+    clientName: getClientName(session.clientId),
+    sessionDate: new Date(session.date).toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+    }),
+    sessionTime: formatTime(session.startTime),
+    type: formatSessionType(session.type),
+    reason:
+      session.notes?.replace("Client cancelled via portal: ", "") ||
+      "No reason provided",
+    cancelledAt: formatCancellationTime(session.cancelledAt!),
+    cancelledBy: session.cancelledBy,
+  }));
+
+  const recentSessions = getTodaysSessions().map((session) => ({
+    id: session.id,
+    clientName: getClientName(session.clientId),
+    time: formatTime(session.startTime),
+    type: formatSessionType(session.type),
+    status: session.status,
+  }));
+
+  const recentClients = getRecentClients().map((client) => ({
+    id: client.id,
+    name: client.name,
+    joinDate: getTimeAgo(client.dateJoined),
+    level:
+      client.fitnessLevel.charAt(0).toUpperCase() +
+      client.fitnessLevel.slice(1),
+    progress: Math.floor(Math.random() * 80) + 20, // Random progress for demo
+  }));
   return (
     <div className="p-6 space-y-6">
       <DevModeNotice />
@@ -143,7 +154,12 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Summary */}
-      <AdminSummary stats={stats} />
+      <AdminSummary
+        totalClients={dashboardStats.totalClients}
+        upcomingSessions={dashboardStats.upcomingSessions}
+        unpaidInvoices={dashboardStats.unpaidInvoices}
+        monthlyRevenue={dashboardStats.monthlyRevenue}
+      />
 
       {/* Client Cancellations Alert */}
       {recentCancellations.length > 0 && (
