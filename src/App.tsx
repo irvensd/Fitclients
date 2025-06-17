@@ -36,69 +36,90 @@ const App = () => (
             <Route path="/login" element={<Login />} />
 
             {/* Protected Admin Routes */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            <Route path="/clients" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Clients />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            <Route path="/sessions" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Sessions />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            } />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
 
-            <Route path="/sessions" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Sessions />
-                </Layout>
-              </ProtectedRoute>
-            } />
+            <Route
+              path="/clients"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Clients />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
 
-            <Route path="/workouts" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Workouts />
-                </Layout>
-              </ProtectedRoute>
-            } />
+            <Route
+              path="/sessions"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Sessions />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
 
-            <Route path="/payments" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Payments />
-                </Layout>
-              </ProtectedRoute>
-            } />
+            <Route
+              path="/workouts"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Workouts />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
 
-            <Route path="/progress" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Progress />
-                </Layout>
-              </ProtectedRoute>
-            } />
+            <Route
+              path="/payments"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Payments />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
 
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Settings />
-                </Layout>
-              </ProtectedRoute>
-            } />
+            <Route
+              path="/progress"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Progress />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Catch all route */}
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Settings />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Catch all route - must be last */}
             <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
+
 export default App;
