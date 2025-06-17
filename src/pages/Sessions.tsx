@@ -674,6 +674,8 @@ const Sessions = () => {
           <ScheduleSessionDialog />
         </TabsContent>
       </Tabs>
+        </>
+      )}
     </div>
   );
 };
