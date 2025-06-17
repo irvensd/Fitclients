@@ -112,7 +112,7 @@ const Sidebar = ({ className }: { className?: string }) => {
             FitClient
           </span>
         </div>
-        <div className="hidden lg:block">
+        <div className="hidden lg:block w-60">
           <GlobalSearch />
         </div>
       </div>
