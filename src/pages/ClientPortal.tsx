@@ -179,6 +179,249 @@ const getClientData = (clientId: string) => {
         },
       ],
     },
+    "mike-chen": {
+      client: {
+        id: "2",
+        name: "Mike Chen",
+        email: "mike.chen@email.com",
+        phone: "(555) 234-5678",
+        dateJoined: "2024-02-03",
+        fitnessLevel: "beginner",
+        goals: "Build muscle mass and improve endurance",
+        trainerName: "Alex Johnson",
+        avatar: "",
+      },
+      upcomingSessions: [
+        {
+          id: "1",
+          date: "2024-03-19",
+          startTime: "14:00",
+          endTime: "15:00",
+          type: "Personal Training",
+          location: "FitGym Downtown",
+          notes: "Focus on compound movements",
+          status: "scheduled",
+          cost: 75,
+        },
+      ],
+      workoutPlan: {
+        id: "2",
+        name: "Mike's Muscle Building Program",
+        description: "8-week beginner muscle building program",
+        exercises: [
+          {
+            id: "1",
+            name: "Bench Press",
+            sets: 3,
+            reps: "8-10",
+            notes: "Start light, focus on form",
+          },
+          {
+            id: "2",
+            name: "Deadlifts",
+            sets: 3,
+            reps: "5-8",
+            notes: "Keep back straight",
+          },
+          {
+            id: "3",
+            name: "Squats",
+            sets: 3,
+            reps: "10-12",
+            notes: "Full range of motion",
+          },
+        ],
+        createdDate: "2024-02-03",
+      },
+      progress: [
+        {
+          id: "1",
+          date: "2024-03-15",
+          weight: 180,
+          bodyFat: 15.2,
+          measurements: {
+            chest: 42,
+            waist: 34,
+            hips: 38,
+            arms: 15,
+            thighs: 24,
+          },
+          notes: "Good progress on strength gains!",
+        },
+      ],
+      payments: [
+        {
+          id: "1",
+          date: "2024-03-15",
+          amount: 300,
+          description: "4-Session Package",
+          status: "paid",
+          dueDate: "2024-03-15",
+        },
+      ],
+    },
+    "emily-davis": {
+      client: {
+        id: "3",
+        name: "Emily Davis",
+        email: "emily.davis@email.com",
+        phone: "(555) 345-6789",
+        dateJoined: "2024-01-28",
+        fitnessLevel: "advanced",
+        goals: "Marathon training and performance optimization",
+        trainerName: "Alex Johnson",
+        avatar: "",
+      },
+      upcomingSessions: [
+        {
+          id: "1",
+          date: "2024-03-21",
+          startTime: "07:00",
+          endTime: "08:00",
+          type: "Personal Training",
+          location: "Track Field",
+          notes: "Speed work and intervals",
+          status: "scheduled",
+          cost: 75,
+        },
+      ],
+      workoutPlan: {
+        id: "3",
+        name: "Emily's Marathon Training",
+        description: "16-week marathon training program",
+        exercises: [
+          {
+            id: "1",
+            name: "Long Run",
+            sets: 1,
+            reps: "60-90 min",
+            notes: "Conversational pace",
+          },
+          {
+            id: "2",
+            name: "Tempo Run",
+            sets: 1,
+            reps: "30 min",
+            notes: "Comfortably hard effort",
+          },
+          {
+            id: "3",
+            name: "Core Strengthening",
+            sets: 3,
+            reps: "15 each",
+            notes: "Focus on stability",
+          },
+        ],
+        createdDate: "2024-01-28",
+      },
+      progress: [
+        {
+          id: "1",
+          date: "2024-03-15",
+          weight: 125,
+          bodyFat: 12.8,
+          measurements: {
+            chest: 34,
+            waist: 26,
+            hips: 36,
+            arms: 11,
+            thighs: 20,
+          },
+          notes: "Excellent endurance improvements!",
+        },
+      ],
+      payments: [
+        {
+          id: "1",
+          date: "2024-03-15",
+          amount: 400,
+          description: "8-Session Package",
+          status: "paid",
+          dueDate: "2024-03-15",
+        },
+      ],
+    },
+    "james-wilson": {
+      client: {
+        id: "4",
+        name: "James Wilson",
+        email: "james.wilson@email.com",
+        phone: "(555) 456-7890",
+        dateJoined: "2024-02-10",
+        fitnessLevel: "intermediate",
+        goals: "Functional fitness and injury prevention",
+        trainerName: "Alex Johnson",
+        avatar: "",
+      },
+      upcomingSessions: [
+        {
+          id: "1",
+          date: "2024-03-20",
+          startTime: "15:30",
+          endTime: "16:30",
+          type: "Consultation",
+          location: "FitGym Downtown",
+          notes: "Discuss injury prevention strategies",
+          status: "scheduled",
+          cost: 60,
+        },
+      ],
+      workoutPlan: {
+        id: "4",
+        name: "James's Functional Fitness",
+        description: "12-week functional movement program",
+        exercises: [
+          {
+            id: "1",
+            name: "Turkish Get-ups",
+            sets: 3,
+            reps: "5 each side",
+            notes: "Slow and controlled",
+          },
+          {
+            id: "2",
+            name: "Farmer's Walks",
+            sets: 3,
+            reps: "40 yards",
+            notes: "Heavy weight, good posture",
+          },
+          {
+            id: "3",
+            name: "Single Leg RDL",
+            sets: 3,
+            reps: "10 each leg",
+            notes: "Focus on balance",
+          },
+        ],
+        createdDate: "2024-02-10",
+      },
+      progress: [
+        {
+          id: "1",
+          date: "2024-03-15",
+          weight: 195,
+          bodyFat: 18.5,
+          measurements: {
+            chest: 44,
+            waist: 36,
+            hips: 40,
+            arms: 16,
+            thighs: 26,
+          },
+          notes: "Great improvement in mobility and stability!",
+        },
+      ],
+      payments: [
+        {
+          id: "1",
+          date: "2024-03-15",
+          amount: 250,
+          description: "Individual Sessions",
+          status: "pending",
+          dueDate: "2024-03-20",
+        },
+      ],
+    },
   };
 
   return clientData[clientId as keyof typeof clientData] || null;
@@ -446,7 +689,7 @@ const ClientPortal = () => {
               <div className="flex-1">
                 <h2 className="text-2xl font-bold">Welcome, {client.name}!</h2>
                 <p className="text-muted-foreground">
-                  Trainer: {client.trainerName} • Member since{" "}
+                  Trainer: {client.trainerName} ��� Member since{" "}
                   {new Date(client.dateJoined).toLocaleDateString()}
                 </p>
                 <div className="flex items-center gap-2 mt-2">
