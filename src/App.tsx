@@ -47,11 +47,11 @@ const App = () => (
               }
             />
             <Route
-              path="/clients"
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Layout>
-                    <Clients />
+                    <Dashboard />
                   </Layout>
                 </ProtectedRoute>
               }

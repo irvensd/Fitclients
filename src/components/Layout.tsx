@@ -24,7 +24,7 @@ interface LayoutProps {
 const navigation = [
   {
     name: "Dashboard",
-    href: "/",
+    href: "/admin",
     icon: LayoutDashboard,
   },
   {
@@ -120,7 +120,8 @@ const Sidebar = ({ className }: { className?: string }) => {
           to="/settings"
           className={cn(
             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
-            location.pathname === "/settings"
+            location.pathname === "/settings" ||
+              location.pathname === "/admin/settings"
               ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
               : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1",
           )}

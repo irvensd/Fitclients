@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { AdminSummary } from "@/components/AdminSummary";
+import { NavigationButton } from "@/components/NavigationButton";
 
 // Mock data for demonstration
 const stats = {
@@ -105,17 +106,14 @@ const Dashboard = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => alert("Redirecting to Add Client...")}>
+          <NavigationButton to="/clients">
             <Plus className="h-4 w-4 mr-2" />
             Add Client
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => alert("Redirecting to Schedule Session...")}
-          >
+          </NavigationButton>
+          <NavigationButton to="/sessions" variant="outline">
             <Calendar className="h-4 w-4 mr-2" />
             Schedule Session
-          </Button>
+          </NavigationButton>
         </div>
       </div>
 
@@ -213,38 +211,38 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button
+            <NavigationButton
+              to="/clients"
               variant="outline"
               className="h-24 flex-col gap-2"
-              onClick={() => alert("Opening Add Client dialog...")}
             >
               <Users className="h-6 w-6" />
               Add New Client
-            </Button>
-            <Button
+            </NavigationButton>
+            <NavigationButton
+              to="/sessions"
               variant="outline"
               className="h-24 flex-col gap-2"
-              onClick={() => alert("Opening Schedule Session dialog...")}
             >
               <Calendar className="h-6 w-6" />
               Schedule Session
-            </Button>
-            <Button
+            </NavigationButton>
+            <NavigationButton
+              to="/workouts"
               variant="outline"
               className="h-24 flex-col gap-2"
-              onClick={() => alert("Opening Create Workout dialog...")}
             >
               <Target className="h-6 w-6" />
               Create Workout
-            </Button>
-            <Button
+            </NavigationButton>
+            <NavigationButton
+              to="/payments"
               variant="outline"
               className="h-24 flex-col gap-2"
-              onClick={() => alert("Opening Record Payment dialog...")}
             >
               <DollarSign className="h-6 w-6" />
               Record Payment
-            </Button>
+            </NavigationButton>
           </div>
         </CardContent>
       </Card>
