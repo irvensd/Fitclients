@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { mockSessions, getClientName } from "@/lib/mockData";
+import { useData } from "@/contexts/DataContext";
 import { Session } from "@/lib/types";
 import { CalendarDays, Clock, User, DollarSign, FileText } from "lucide-react";
 
@@ -54,10 +54,11 @@ export const SessionCalendar = () => {
     null,
   );
   const [view, setView] = useState<View>("week");
+  const { sessions, getClientName } = useData();
 
   // Convert sessions to calendar events
   const events: CalendarEvent[] = useMemo(() => {
-    return mockSessions.map((session) => {
+    return sessions.map((session) => {
       const startDateTime = new Date(`${session.date}T${session.startTime}`);
       const endDateTime = new Date(`${session.date}T${session.endTime}`);
 
@@ -69,7 +70,7 @@ export const SessionCalendar = () => {
         resource: session,
       };
     });
-  }, []);
+  }, [sessions, getClientName]);
 
   // Custom event component
   const EventComponent = ({ event }: { event: CalendarEvent }) => {
