@@ -1064,6 +1064,72 @@ const ClientPortal = () => {
                           </p>
                         </div>
                       )}
+
+                      {/* Session Recap for completed sessions */}
+                      {session.status === "completed" && session.recap && (
+                        <div className="mt-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Sparkles className="h-5 w-5 text-purple-600" />
+                            <h4 className="font-semibold text-purple-800">
+                              Your Personal Session Recap
+                            </h4>
+                          </div>
+
+                          <div className="space-y-3">
+                            <div>
+                              <h5 className="font-medium text-sm mb-1">
+                                💪 How You Did
+                              </h5>
+                              <p className="text-sm text-gray-700">
+                                {
+                                  session.recap.aiGeneratedContent
+                                    .personalizedEncouragement
+                                }
+                              </p>
+                            </div>
+
+                            <div>
+                              <h5 className="font-medium text-sm mb-1">
+                                🏆 Today's Wins
+                              </h5>
+                              <ul className="text-sm space-y-1">
+                                {session.recap.aiGeneratedContent.keyAchievements.map(
+                                  (achievement, idx) => (
+                                    <li
+                                      key={idx}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <CheckCircle className="h-3 w-3 text-green-600" />
+                                      {achievement}
+                                    </li>
+                                  ),
+                                )}
+                              </ul>
+                            </div>
+
+                            <div>
+                              <h5 className="font-medium text-sm mb-1">
+                                🎯 What's Next
+                              </h5>
+                              <p className="text-sm text-gray-700">
+                                {
+                                  session.recap.aiGeneratedContent
+                                    .nextStepsRecommendations
+                                }
+                              </p>
+                            </div>
+
+                            <div className="pt-2 border-t border-purple-200">
+                              <p className="text-xs italic text-purple-700">
+                                {
+                                  session.recap.aiGeneratedContent
+                                    .motivationalQuote
+                                }
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </Card>
                   ))}
 
