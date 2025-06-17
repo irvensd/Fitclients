@@ -153,6 +153,9 @@ const AddClientDialog = () => {
         fitnessLevel: "",
         goals: "",
         notes: "",
+        weight: "",
+        height: "",
+        bodyFat: "",
       });
       setOpen(false);
     } catch (error) {
