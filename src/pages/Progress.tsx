@@ -495,6 +495,20 @@ const ProgressPage = () => {
         </div>
       </div>
 
+      {/* AI Recommendations */}
+      <SmartRecommendations
+        client={{
+          id: "1",
+          name: "Sarah Johnson",
+          email: "sarah.johnson@email.com",
+          phone: "(555) 123-4567",
+          dateJoined: "2024-01-15",
+          fitnessLevel: "intermediate",
+          goals: "Weight loss and strength building",
+        }}
+        variant="widget"
+      />
+
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>

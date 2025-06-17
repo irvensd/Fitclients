@@ -38,6 +38,8 @@ import {
   MoreVertical,
   Share2,
   ExternalLink,
+  Brain,
+  Sparkles,
 } from "lucide-react";
 import { Client } from "@/lib/types";
 
@@ -540,6 +542,47 @@ Your Personal Trainer`;
   );
 };
 
+const AIRecommendationsDialog = ({ client }: { client: Client }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full bg-gradient-to-r from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 border-purple-200"
+        >
+          <Brain className="h-4 w-4 mr-2" />
+          AI Coach
+          <Sparkles className="h-3 w-3 ml-1" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Brain className="h-6 w-6 text-purple-600" />
+            AI Coach Recommendations for {client.name}
+          </DialogTitle>
+          <DialogDescription>
+            Smart insights and training recommendations powered by AI analysis
+          </DialogDescription>
+        </DialogHeader>
+        <div className="py-4">
+          <SmartRecommendations
+            client={client}
+            variant="full"
+            onRecommendationApplied={(id) => {
+              console.log(`Applied recommendation ${id} for ${client.name}`);
+              // Here you would typically update the client's program
+            }}
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const Clients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterLevel, setFilterLevel] = useState<string>("all");
@@ -708,8 +751,9 @@ const Clients = () => {
                 <EditClientDialog client={client} />
                 <ScheduleSessionDialog clientName={client.name} />
               </div>
-              <div className="pt-2">
+              <div className="space-y-2 pt-2">
                 <SharePortalButton client={client} />
+                <AIRecommendationsDialog client={client} />
               </div>
             </CardContent>
           </Card>
