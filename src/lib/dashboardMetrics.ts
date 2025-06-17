@@ -1,28 +1,31 @@
-import { mockClients, mockSessions, mockPayments } from "./mockData";
-import { DashboardStats } from "./types";
+import { Client, Session, Payment, DashboardStats } from "./types";
 
 /**
  * Calculate dynamic dashboard metrics from current data
  */
-export const calculateDashboardStats = (): DashboardStats => {
+export const calculateDashboardStats = (
+  clients: Client[],
+  sessions: Session[],
+  payments: Payment[],
+): DashboardStats => {
   const today = new Date();
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
   const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
   // Total clients
-  const totalClients = mockClients.length;
+  const totalClients = clients.length;
 
   // Sessions today
   const todayString = today.toISOString().split("T")[0];
-  const sessionsToday = mockSessions.filter(
+  const sessionsToday = sessions.filter(
     (session) =>
       session.date === todayString &&
       (session.status === "scheduled" || session.status === "completed"),
   ).length;
 
   // Upcoming sessions in the next 7 days
-  const upcomingSessions = mockSessions.filter((session) => {
+  const upcomingSessions = sessions.filter((session) => {
     const sessionDate = new Date(session.date);
     return (
       sessionDate >= today &&
@@ -32,7 +35,7 @@ export const calculateDashboardStats = (): DashboardStats => {
   }).length;
 
   // Monthly revenue (completed payments this month)
-  const monthlyRevenue = mockPayments
+  const monthlyRevenue = payments
     .filter((payment) => {
       const paymentDate = new Date(payment.date);
       return (
@@ -44,10 +47,10 @@ export const calculateDashboardStats = (): DashboardStats => {
     .reduce((total, payment) => total + payment.amount, 0);
 
   // Active workout plans (for now, assume each client has 1 active plan)
-  const activeWorkoutPlans = mockClients.length;
+  const activeWorkoutPlans = clients.length;
 
   // Pending payments (unpaid invoices)
-  const pendingPayments = mockPayments.filter(
+  const pendingPayments = payments.filter(
     (payment) => payment.status === "pending",
   ).length;
 
@@ -64,11 +67,11 @@ export const calculateDashboardStats = (): DashboardStats => {
 /**
  * Get upcoming sessions for the next 7 days
  */
-export const getUpcomingSessions = () => {
+export const getUpcomingSessions = (sessions: Session[]) => {
   const today = new Date();
   const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-  return mockSessions.filter((session) => {
+  return sessions.filter((session) => {
     const sessionDate = new Date(session.date);
     return (
       sessionDate >= today &&
@@ -81,11 +84,11 @@ export const getUpcomingSessions = () => {
 /**
  * Get recent client cancellations
  */
-export const getRecentCancellations = () => {
+export const getRecentCancellations = (sessions: Session[]) => {
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-  return mockSessions.filter((session) => {
+  return sessions.filter((session) => {
     if (session.status !== "cancelled" || !session.cancelledAt) return false;
 
     const cancelledDate = new Date(session.cancelledAt);
@@ -96,20 +99,20 @@ export const getRecentCancellations = () => {
 /**
  * Get today's sessions
  */
-export const getTodaysSessions = () => {
+export const getTodaysSessions = (sessions: Session[]) => {
   const today = new Date().toISOString().split("T")[0];
 
-  return mockSessions.filter((session) => session.date === today);
+  return sessions.filter((session) => session.date === today);
 };
 
 /**
  * Get recent clients (joined in the last 30 days)
  */
-export const getRecentClients = () => {
+export const getRecentClients = (clients: Client[]) => {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  return mockClients
+  return clients
     .filter((client) => {
       const joinDate = new Date(client.dateJoined);
       return joinDate >= thirtyDaysAgo;
@@ -124,8 +127,8 @@ export const getRecentClients = () => {
 /**
  * Calculate outstanding amount from unpaid invoices
  */
-export const getOutstandingAmount = (): number => {
-  return mockPayments
+export const getOutstandingAmount = (payments: Payment[]): number => {
+  return payments
     .filter((payment) => payment.status === "pending")
     .reduce((total, payment) => total + payment.amount, 0);
 };
