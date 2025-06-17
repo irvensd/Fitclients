@@ -533,16 +533,31 @@ Your Personal Trainer`;
     );
   };
 
+  const handleTestPortal = () => {
+    window.open(`/client-portal/${portalId}`, "_blank");
+  };
+
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleShare}
-      className="w-full"
-    >
-      <Share2 className="h-4 w-4 mr-2" />
-      Share Portal
-    </Button>
+    <div className="space-y-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleShare}
+        className="w-full"
+      >
+        <Share2 className="h-4 w-4 mr-2" />
+        Share Portal
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleTestPortal}
+        className="w-full text-xs"
+      >
+        <ExternalLink className="h-3 w-3 mr-1" />
+        Test Portal
+      </Button>
+    </div>
   );
 };
 
