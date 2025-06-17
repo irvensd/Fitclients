@@ -77,18 +77,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
-    // For ALL accounts, use empty data until Firebase rules are fixed
-    // This prevents permission errors and shows proper new account experience
-    console.log("Using offline mode - Firebase rules need to be deployed");
-    setClients([]);
-    setSessions([]);
-    setPayments([]);
-    setLoading(false);
-    setError(null);
-    return;
-
-    // COMMENTED OUT - Will be re-enabled after Firebase rules are deployed
-    /*
     // For demo account, use empty data to simulate new account
     if (user.email === "trainer@demo.com") {
       setClients([]);
@@ -97,9 +85,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false);
       return;
     }
-
-    // TEMPORARILY DISABLED - Firebase rules need to be deployed first
-    /*
     const userId = user.email; // Using email as userId for simplicity
     setLoading(true);
     setError(null);
@@ -186,7 +171,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       id: Date.now().toString(), // Simple ID generation
       dateJoined: new Date().toISOString().split("T")[0],
     };
-    setClients((prev) => [newClient, ...prev]);
+    setClients(prev => [newClient, ...prev]);
 
     console.log("Added client in offline mode:", newClient);
 
@@ -205,11 +190,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user?.email) throw new Error("User not authenticated");
 
     // OFFLINE MODE: Update local state
-    setClients((prev) =>
-      prev.map((client) =>
-        client.id === clientId ? { ...client, ...updates } : client,
-      ),
-    );
+    setClients(prev => prev.map(client =>
+      client.id === clientId ? { ...client, ...updates } : client
+    ));
     console.log("Updated client in offline mode:", clientId, updates);
   };
 
@@ -217,7 +200,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user?.email) throw new Error("User not authenticated");
 
     // OFFLINE MODE: Remove from local state
-    setClients((prev) => prev.filter((client) => client.id !== clientId));
+    setClients(prev => prev.filter(client => client.id !== clientId));
     console.log("Deleted client in offline mode:", clientId);
   };
 
@@ -230,7 +213,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       ...session,
       id: Date.now().toString(),
     };
-    setSessions((prev) => [newSession, ...prev]);
+    setSessions(prev => [newSession, ...prev]);
     console.log("Added session in offline mode:", newSession);
   };
 
@@ -241,11 +224,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user?.email) throw new Error("User not authenticated");
 
     // OFFLINE MODE: Update local state
-    setSessions((prev) =>
-      prev.map((session) =>
-        session.id === sessionId ? { ...session, ...updates } : session,
-      ),
-    );
+    setSessions(prev => prev.map(session =>
+      session.id === sessionId ? { ...session, ...updates } : session
+    ));
     console.log("Updated session in offline mode:", sessionId, updates);
   };
 
@@ -253,7 +234,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user?.email) throw new Error("User not authenticated");
 
     // OFFLINE MODE: Remove from local state
-    setSessions((prev) => prev.filter((session) => session.id !== sessionId));
+    setSessions(prev => prev.filter(session => session.id !== sessionId));
     console.log("Deleted session in offline mode:", sessionId);
   };
 
@@ -266,7 +247,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       ...payment,
       id: Date.now().toString(),
     };
-    setPayments((prev) => [newPayment, ...prev]);
+    setPayments(prev => [newPayment, ...prev]);
     console.log("Added payment in offline mode:", newPayment);
   };
 
@@ -277,11 +258,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user?.email) throw new Error("User not authenticated");
 
     // OFFLINE MODE: Update local state
-    setPayments((prev) =>
-      prev.map((payment) =>
-        payment.id === paymentId ? { ...payment, ...updates } : payment,
-      ),
-    );
+    setPayments(prev => prev.map(payment =>
+      payment.id === paymentId ? { ...payment, ...updates } : payment
+    ));
     console.log("Updated payment in offline mode:", paymentId, updates);
   };
 
@@ -289,7 +268,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user?.email) throw new Error("User not authenticated");
 
     // OFFLINE MODE: Remove from local state
-    setPayments((prev) => prev.filter((payment) => payment.id !== paymentId));
+    setPayments(prev => prev.filter(payment => payment.id !== paymentId));
     console.log("Deleted payment in offline mode:", paymentId);
   };
 
