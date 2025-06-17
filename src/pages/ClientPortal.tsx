@@ -409,7 +409,7 @@ const getClientData = (clientId: string) => {
       upcomingSessions: [
         {
           id: "1",
-          date: "2024-12-29",
+          date: "2025-01-24",
           startTime: "15:30",
           endTime: "16:30",
           type: "Consultation",
