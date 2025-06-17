@@ -191,12 +191,19 @@ const Login = () => {
               </Button>
             </div>
 
+            {/* Mode Switching */}
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
-                <Link to="/" className="text-primary hover:underline">
-                  Start your free trial
-                </Link>
+                {mode === "login"
+                  ? "Don't have an account? "
+                  : "Already have an account? "}
+                <button
+                  type="button"
+                  onClick={switchMode}
+                  className="text-primary hover:underline font-medium"
+                >
+                  {mode === "login" ? "Create one here" : "Sign in instead"}
+                </button>
               </p>
             </div>
           </CardContent>
