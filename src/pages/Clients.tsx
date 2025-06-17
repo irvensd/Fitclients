@@ -91,6 +91,8 @@ const mockClients: Client[] = [
 
 const AddClientDialog = () => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { addClient } = useData();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -100,20 +102,38 @@ const AddClientDialog = () => {
     notes: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically save the client data
-    console.log("Creating client:", formData);
-    alert(`Client "${formData.name}" created successfully!`);
-    setOpen(false);
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      fitnessLevel: "",
-      goals: "",
-      notes: "",
-    });
+    setLoading(true);
+
+    try {
+      await addClient({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        fitnessLevel: formData.fitnessLevel as "beginner" | "intermediate" | "advanced",
+        goals: formData.goals,
+        notes: formData.notes,
+        dateJoined: new Date().toISOString().split("T")[0], // Will be overridden in DataContext
+      });
+
+      // Reset form and close dialog
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        fitnessLevel: "",
+        goals: "",
+        notes: "",
+      });
+      setOpen(false);
+    } catch (error) {
+      console.error("Error adding client:", error);
+      alert("Failed to add client. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
   };
 
   return (
@@ -226,7 +246,9 @@ const AddClientDialog = () => {
             >
               Cancel
             </Button>
-            <Button type="submit">Create Client</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Adding..." : "Add Client"}
+          </Button>
           </div>
         </form>
       </DialogContent>
@@ -378,9 +400,7 @@ const ScheduleSessionDialog = ({ clientName }: { clientName: string }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Scheduling session for:", clientName, formData);
-    alert(
-      `Session scheduled for ${clientName} on ${formData.date} at ${formData.startTime}!`,
-    );
+    alert(`Session scheduled for ${clientName} on ${formData.date} at ${formData.startTime}!`);
     setOpen(false);
     setFormData({
       date: "",
@@ -512,7 +532,7 @@ const ScheduleSessionDialog = ({ clientName }: { clientName: string }) => {
 };
 
 const SharePortalButton = ({ client }: { client: Client }) => {
-  const portalId = client.name.toLowerCase().replace(/\s+/g, "-");
+  const portalId = client.name.toLowerCase().replace(/\s+/g, '-');
   const portalUrl = `${window.location.origin}/client-portal/${portalId}`;
 
   const handleShare = () => {
@@ -534,7 +554,7 @@ Your Personal Trainer`;
   };
 
   const handleTestPortal = () => {
-    window.open(`/client-portal/${portalId}`, "_blank");
+    window.open(`/client-portal/${portalId}`, '_blank');
   };
 
   return (
@@ -634,9 +654,7 @@ const GamificationDialog = ({ client }: { client: Client }) => {
             showCelebrations={true}
             onSendCelebration={(message) => {
               console.log(`Sending celebration to ${client.name}:`, message);
-              alert(
-                `🎉 Celebration SMS sent to ${client.name}!\n\n"${message}"`,
-              );
+              alert(`🎉 Celebration SMS sent to ${client.name}!\n\n"${message}"`);
             }}
           />
         </div>
@@ -647,17 +665,26 @@ const GamificationDialog = ({ client }: { client: Client }) => {
 
 const Clients = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterLevel, setFilterLevel] = useState<string>("all");
+  const [fitnessLevelFilter, setFitnessLevelFilter] = useState("all");
+  const { clients, loading } = useData();
 
-  const filteredClients = mockClients.filter((client) => {
+  const filteredClients = clients.filter((client) => {
     const matchesSearch =
       client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLevel =
-      filterLevel === "all" || client.fitnessLevel === filterLevel;
-    return matchesSearch && matchesLevel;
+    const matchesFitnessLevel =
+      fitnessLevelFilter === "all" ||
+      client.fitnessLevel === fitnessLevelFilter;
+    return matchesSearch && matchesFitnessLevel;
   });
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
   const getFitnessLevelColor = (level: string) => {
     switch (level) {
       case "beginner":
@@ -716,49 +743,49 @@ const Clients = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{mockClients.length}</div>
+            <div className="text-2xl font-bold">{clients.length}</div>
             <p className="text-sm text-muted-foreground">Total Clients</p>
           </CardContent>
         </Card>
         <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Beginners</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {mockClients.filter((c) => c.fitnessLevel === "beginner").length}
+              {clients.filter((c) => c.fitnessLevel === "beginner").length}
             </div>
-            <p className="text-sm text-muted-foreground">Beginners</p>
+            <p className="text-sm text-muted-foreground">New to fitness</p>
           </CardContent>
         </Card>
         <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Intermediate</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
               {
-                mockClients.filter((c) => c.fitnessLevel === "intermediate")
+                clients.filter((c) => c.fitnessLevel === "intermediate")
                   .length
               }
             </div>
-            <p className="text-sm text-muted-foreground">Intermediate</p>
+            <p className="text-sm text-muted-foreground">Building strength</p>
           </CardContent>
         </Card>
         <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Advanced</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {mockClients.filter((c) => c.fitnessLevel === "advanced").length}
+              {clients.filter((c) => c.fitnessLevel === "advanced").length}
             </div>
-            <p className="text-sm text-muted-foreground">Advanced</p>
+            <p className="text-sm text-muted-foreground">Peak performance</p>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Client Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredClients.map((client) => (
-          <Card key={client.id} className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarImage src={client.avatar} alt={client.name} />
-                    <AvatarFallback>
                       {client.name
                         .split(" ")
                         .map((n) => n[0])
@@ -809,17 +836,17 @@ const Clients = () => {
                 </p>
               </div>
 
-              <div className="flex gap-2 pt-2">
-                <EditClientDialog client={client} />
-                <ScheduleSessionDialog clientName={client.name} />
-              </div>
-              <div className="space-y-2 pt-2">
-                <SharePortalButton client={client} />
-                <div className="grid grid-cols-2 gap-1">
-                  <AIRecommendationsDialog client={client} />
-                  <GamificationDialog client={client} />
-                </div>
-              </div>
+                  <div className="flex gap-2 pt-2">
+                    <EditClientDialog client={client} />
+                    <ScheduleSessionDialog clientName={client.name} />
+                  </div>
+                  <div className="space-y-2 pt-2">
+                    <SharePortalButton client={client} />
+                    <div className="grid grid-cols-2 gap-1">
+                      <AIRecommendationsDialog client={client} />
+                      <GamificationDialog client={client} />
+                    </div>
+                  </div>
             </CardContent>
           </Card>
         ))}
