@@ -351,6 +351,227 @@ const CreateWorkoutDialog = () => {
   );
 };
 
+const EditWorkoutDialog = ({ plan }: { plan: WorkoutPlan }) => {
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: plan.name,
+    description: plan.description,
+    clientId: plan.clientId,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Updating workout plan:", formData);
+    alert(`Workout plan "${formData.name}" updated successfully!`);
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" className="flex-1">
+          <Edit className="h-4 w-4 mr-2" />
+          Edit
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Edit Workout Plan</DialogTitle>
+          <DialogDescription>
+            Update the workout plan details and exercises.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-plan-name">Plan Name</Label>
+              <Input
+                id="edit-plan-name"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-client">Assigned Client</Label>
+              <Select
+                value={formData.clientId}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, clientId: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {clients.map((client) => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-description">Description</Label>
+              <Textarea
+                id="edit-description"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                rows={3}
+              />
+            </div>
+            <div className="space-y-3">
+              <Label>Current Exercises</Label>
+              <div className="space-y-2 max-h-32 overflow-y-auto">
+                {plan.exercises.map((exercise, index) => (
+                  <div
+                    key={exercise.id}
+                    className="flex items-center justify-between p-2 border rounded"
+                  >
+                    <span className="text-sm font-medium">{exercise.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {exercise.sets} sets × {exercise.reps}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" size="sm" type="button">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Exercise
+              </Button>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">Update Plan</Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const ExerciseLibraryDialog = () => {
+  const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+
+  const filteredExercises = exerciseLibrary.filter((exercise) => {
+    const matchesSearch = exercise.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      categoryFilter === "all" || exercise.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  const categories = Array.from(
+    new Set(exerciseLibrary.map((ex) => ex.category)),
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline">
+          <Dumbbell className="h-4 w-4 mr-2" />
+          Exercise Library
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh]">
+        <DialogHeader>
+          <DialogTitle>Exercise Library</DialogTitle>
+          <DialogDescription>
+            Browse and manage your exercise database
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          {/* Search and Filter */}
+          <div className="flex gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search exercises..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Exercise Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
+            {filteredExercises.map((exercise) => (
+              <Card key={exercise.id} className="p-3">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium">{exercise.name}</h4>
+                    <Button size="sm" variant="outline">
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      {exercise.category}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {exercise.equipment}
+                    </Badge>
+                  </div>
+                  <Badge
+                    className={`text-xs ${
+                      exercise.difficulty === "Beginner"
+                        ? "bg-green-100 text-green-800"
+                        : exercise.difficulty === "Intermediate"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {exercise.difficulty}
+                  </Badge>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <div className="flex justify-between items-center pt-4 border-t">
+            <Button variant="outline">
+              <Plus className="h-4 w-4 mr-2" />
+              Add New Exercise
+            </Button>
+            <div className="text-sm text-muted-foreground">
+              {filteredExercises.length} exercises found
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const Workouts = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [clientFilter, setClientFilter] = useState<string>("all");
@@ -376,10 +597,7 @@ const Workouts = () => {
         </div>
         <div className="flex gap-2">
           <CreateWorkoutDialog />
-          <Button variant="outline">
-            <Dumbbell className="h-4 w-4 mr-2" />
-            Exercise Library
-          </Button>
+          <ExerciseLibraryDialog />
         </div>
       </div>
 
@@ -527,10 +745,7 @@ const Workouts = () => {
                   </div>
 
                   <div className="flex gap-2 pt-2">
-                    <Button size="sm" className="flex-1">
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit
-                    </Button>
+                    <EditWorkoutDialog plan={plan} />
                     <Button size="sm" variant="outline">
                       <Copy className="h-4 w-4" />
                     </Button>

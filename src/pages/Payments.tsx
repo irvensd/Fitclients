@@ -319,6 +319,112 @@ const CreateInvoiceDialog = () => {
   );
 };
 
+const ViewPaymentDialog = ({ payment }: { payment: Payment }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">
+          View
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Payment Details</DialogTitle>
+          <DialogDescription>
+            Payment information for {getClientName(payment.clientId)}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Client</Label>
+              <div className="flex items-center gap-2">
+                <Avatar className="h-6 w-6">
+                  <AvatarFallback className="text-xs">
+                    {getClientName(payment.clientId)
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <span>{getClientName(payment.clientId)}</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Amount</Label>
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <span className="text-lg font-semibold">${payment.amount}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Payment Method</Label>
+              <div className="flex items-center gap-2">
+                {getMethodIcon(payment.method)}
+                <span className="capitalize">
+                  {payment.method.replace("-", " ")}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Status</Label>
+              <div className="flex items-center gap-2">
+                {getStatusIcon(payment.status)}
+                <Badge className={getStatusColor(payment.status)}>
+                  {payment.status}
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Date</Label>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span>{new Date(payment.date).toLocaleDateString()}</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Description</Label>
+            <p className="text-sm text-muted-foreground p-3 bg-muted rounded-lg">
+              {payment.description}
+            </p>
+          </div>
+
+          {payment.sessionId && (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Related Session</Label>
+              <p className="text-sm text-muted-foreground">
+                Session ID: {payment.sessionId}
+              </p>
+            </div>
+          )}
+
+          <div className="flex justify-between pt-4 border-t">
+            <Button variant="outline" size="sm">
+              Send Receipt
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                Edit
+              </Button>
+              {payment.status === "pending" && (
+                <Button size="sm">Mark as Paid</Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const Payments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -495,9 +601,7 @@ const Payments = () => {
                         </span>
                       </div>
                       <div className="text-lg font-bold">${payment.amount}</div>
-                      <Button variant="outline" size="sm">
-                        View
-                      </Button>
+                      <ViewPaymentDialog payment={payment} />
                     </div>
                   </div>
                 </CardContent>
