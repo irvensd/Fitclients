@@ -57,38 +57,109 @@ const generateRevenueData = (payments: Payment[]) => {
   });
 };
 
-// Generate client growth data
-const generateClientGrowthData = () => {
+// Generate client growth data from real clients
+const generateClientGrowthData = (clients: Client[]) => {
   const months = ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  let total = 15;
-  return months.map((month) => {
-    total += Math.floor(Math.random() * 3) + 1;
+  const now = new Date();
+
+  if (clients.length === 0) {
+    return months.map((month) => ({
+      month,
+      totalClients: 0,
+      newClients: 0,
+    }));
+  }
+
+  let runningTotal = 0;
+  return months.map((month, index) => {
+    const monthNum = now.getMonth() - 5 + index;
+    const year = now.getFullYear() + (monthNum < 0 ? -1 : 0);
+    const adjustedMonth = monthNum < 0 ? 12 + monthNum : monthNum;
+
+    const newClientsThisMonth = clients.filter((client) => {
+      const joinDate = new Date(client.dateJoined);
+      return (
+        joinDate.getMonth() === adjustedMonth && joinDate.getFullYear() === year
+      );
+    }).length;
+
+    runningTotal += newClientsThisMonth;
+
     return {
       month,
-      totalClients: total,
-      newClients: Math.floor(Math.random() * 4) + 1,
+      totalClients: runningTotal,
+      newClients: newClientsThisMonth,
     };
   });
 };
 
-// Generate session type distribution
-const generateSessionTypeData = () => {
-  const types = ["Personal Training", "Assessment", "Consultation"];
-  return types.map((type, index) => ({
-    name: type,
-    value: [45, 30, 25][index],
-    color: ["#16a34a", "#2563eb", "#dc2626"][index],
-  }));
+// Generate session type distribution from real sessions
+const generateSessionTypeData = (sessions: Session[]) => {
+  if (sessions.length === 0) {
+    return [
+      { name: "Personal Training", value: 0, color: "#16a34a" },
+      { name: "Assessment", value: 0, color: "#2563eb" },
+      { name: "Consultation", value: 0, color: "#dc2626" },
+    ];
+  }
+
+  const sessionCounts = sessions.reduce(
+    (acc, session) => {
+      const type = session.type.replace("-", " ");
+      const typeName = type.charAt(0).toUpperCase() + type.slice(1);
+      acc[typeName] = (acc[typeName] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  return [
+    {
+      name: "Personal Training",
+      value: sessionCounts["Personal training"] || 0,
+      color: "#16a34a",
+    },
+    {
+      name: "Assessment",
+      value: sessionCounts["Assessment"] || 0,
+      color: "#2563eb",
+    },
+    {
+      name: "Consultation",
+      value: sessionCounts["Consultation"] || 0,
+      color: "#dc2626",
+    },
+  ];
 };
 
-// Generate weekly session distribution
-const generateWeeklySessionData = () => {
+// Generate weekly session distribution from real sessions
+const generateWeeklySessionData = (sessions: Session[]) => {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  return days.map((day) => ({
-    day,
-    sessions: Math.floor(Math.random() * 8) + 2,
-    revenue: Math.floor(Math.random() * 600) + 200,
-  }));
+
+  if (sessions.length === 0) {
+    return days.map((day) => ({
+      day,
+      sessions: 0,
+      revenue: 0,
+    }));
+  }
+
+  return days.map((day, dayIndex) => {
+    const sessionsToday = sessions.filter((session) => {
+      const sessionDate = new Date(session.date);
+      return sessionDate.getDay() === dayIndex; // 0 = Sunday, 1 = Monday, etc.
+    });
+
+    const revenueToday = sessionsToday
+      .filter((session) => session.status === "completed")
+      .reduce((total, session) => total + session.cost, 0);
+
+    return {
+      day,
+      sessions: sessionsToday.length,
+      revenue: revenueToday,
+    };
+  });
 };
 
 export const RevenueChart = () => {
@@ -122,7 +193,8 @@ export const RevenueChart = () => {
 };
 
 export const ClientGrowthChart = () => {
-  const data = generateClientGrowthData();
+  const { clients } = useData();
+  const data = generateClientGrowthData(clients);
 
   return (
     <Card>
@@ -160,7 +232,8 @@ export const ClientGrowthChart = () => {
 };
 
 export const SessionTypeChart = () => {
-  const data = generateSessionTypeData();
+  const { sessions } = useData();
+  const data = generateSessionTypeData(sessions);
 
   return (
     <Card>
@@ -175,7 +248,11 @@ export const SessionTypeChart = () => {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }) => `${name} ${percent.toFixed(0)}%`}
+              label={({ name, percent }) =>
+                data.some((d) => d.value > 0)
+                  ? `${name} ${percent.toFixed(0)}%`
+                  : ""
+              }
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
@@ -187,13 +264,19 @@ export const SessionTypeChart = () => {
             <Tooltip />
           </PieChart>
         </ResponsiveContainer>
+        {sessions.length === 0 && (
+          <div className="text-center text-muted-foreground text-sm mt-4">
+            No sessions yet. Add your first session to see distribution.
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 };
 
 export const WeeklyActivityChart = () => {
-  const data = generateWeeklySessionData();
+  const { sessions } = useData();
+  const data = generateWeeklySessionData(sessions);
 
   return (
     <Card>
@@ -223,6 +306,11 @@ export const WeeklyActivityChart = () => {
             />
           </BarChart>
         </ResponsiveContainer>
+        {sessions.length === 0 && (
+          <div className="text-center text-muted-foreground text-sm mt-4">
+            No sessions yet. Schedule sessions to see weekly patterns.
+          </div>
+        )}
       </CardContent>
     </Card>
   );
