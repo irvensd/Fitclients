@@ -83,6 +83,30 @@ const mockClients: Client[] = [
 
 const AddClientDialog = () => {
   const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    fitnessLevel: "",
+    goals: "",
+    notes: "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would typically save the client data
+    console.log("Creating client:", formData);
+    alert(`Client "${formData.name}" created successfully!`);
+    setOpen(false);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      fitnessLevel: "",
+      goals: "",
+      notes: "",
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -100,59 +124,380 @@ const AddClientDialog = () => {
             goals.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input id="name" placeholder="Enter client name" />
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  placeholder="Enter client name"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="fitness-level">Fitness Level</Label>
+                <Select
+                  value={formData.fitnessLevel}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, fitnessLevel: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="client@email.com"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone</Label>
+                <Input
+                  id="phone"
+                  placeholder="(555) 123-4567"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                />
+              </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="fitness-level">Fitness Level</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="beginner">Beginner</SelectItem>
-                  <SelectItem value="intermediate">Intermediate</SelectItem>
-                  <SelectItem value="advanced">Advanced</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="client@email.com" />
+              <Label htmlFor="goals">Fitness Goals</Label>
+              <Textarea
+                id="goals"
+                placeholder="Describe their fitness goals and objectives..."
+                className="min-h-[80px]"
+                value={formData.goals}
+                onChange={(e) =>
+                  setFormData({ ...formData, goals: e.target.value })
+                }
+                required
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" placeholder="(555) 123-4567" />
+              <Label htmlFor="notes">Notes (Optional)</Label>
+              <Textarea
+                id="notes"
+                placeholder="Any important notes, medical considerations, preferences..."
+                className="min-h-[60px]"
+                value={formData.notes}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
+              />
             </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="goals">Fitness Goals</Label>
-            <Textarea
-              id="goals"
-              placeholder="Describe their fitness goals and objectives..."
-              className="min-h-[80px]"
-            />
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">Create Client</Button>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes (Optional)</Label>
-            <Textarea
-              id="notes"
-              placeholder="Any important notes, medical considerations, preferences..."
-              className="min-h-[60px]"
-            />
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const EditClientDialog = ({ client }: { client: Client }) => {
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: client.name,
+    email: client.email,
+    phone: client.phone,
+    fitnessLevel: client.fitnessLevel,
+    goals: client.goals,
+    notes: client.notes || "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Updating client:", formData);
+    alert(`Client "${formData.name}" updated successfully!`);
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" className="flex-1">
+          <Edit className="h-4 w-4 mr-2" />
+          Edit
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Edit Client</DialogTitle>
+          <DialogDescription>
+            Update client information and fitness goals.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-name">Full Name</Label>
+                <Input
+                  id="edit-name"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-fitness-level">Fitness Level</Label>
+                <Select
+                  value={formData.fitnessLevel}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, fitnessLevel: value as any })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-email">Email</Label>
+                <Input
+                  id="edit-email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-phone">Phone</Label>
+                <Input
+                  id="edit-phone"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-goals">Fitness Goals</Label>
+              <Textarea
+                id="edit-goals"
+                className="min-h-[80px]"
+                value={formData.goals}
+                onChange={(e) =>
+                  setFormData({ ...formData, goals: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-notes">Notes</Label>
+              <Textarea
+                id="edit-notes"
+                className="min-h-[60px]"
+                value={formData.notes}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
+              />
+            </div>
           </div>
-        </div>
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={() => setOpen(false)}>Create Client</Button>
-        </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">Update Client</Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const ScheduleSessionDialog = ({ clientName }: { clientName: string }) => {
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    date: "",
+    startTime: "",
+    endTime: "",
+    type: "",
+    cost: "",
+    notes: "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Scheduling session for:", clientName, formData);
+    alert(
+      `Session scheduled for ${clientName} on ${formData.date} at ${formData.startTime}!`,
+    );
+    setOpen(false);
+    setFormData({
+      date: "",
+      startTime: "",
+      endTime: "",
+      type: "",
+      cost: "",
+      notes: "",
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline" className="flex-1">
+          <Calendar className="h-4 w-4 mr-2" />
+          Schedule
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Schedule Session</DialogTitle>
+          <DialogDescription>
+            Schedule a new training session with {clientName}.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="session-type">Session Type</Label>
+                <Select
+                  value={formData.type}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, type: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="personal-training">
+                      Personal Training
+                    </SelectItem>
+                    <SelectItem value="consultation">Consultation</SelectItem>
+                    <SelectItem value="assessment">Assessment</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="session-cost">Cost ($)</Label>
+                <Input
+                  id="session-cost"
+                  type="number"
+                  placeholder="75"
+                  value={formData.cost}
+                  onChange={(e) =>
+                    setFormData({ ...formData, cost: e.target.value })
+                  }
+                  required
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="session-date">Date</Label>
+                <Input
+                  id="session-date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) =>
+                    setFormData({ ...formData, date: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="session-start">Start Time</Label>
+                <Input
+                  id="session-start"
+                  type="time"
+                  value={formData.startTime}
+                  onChange={(e) =>
+                    setFormData({ ...formData, startTime: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="session-end">End Time</Label>
+                <Input
+                  id="session-end"
+                  type="time"
+                  value={formData.endTime}
+                  onChange={(e) =>
+                    setFormData({ ...formData, endTime: e.target.value })
+                  }
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="session-notes">Notes (Optional)</Label>
+              <Textarea
+                id="session-notes"
+                placeholder="Session notes, special instructions..."
+                className="min-h-[60px]"
+                value={formData.notes}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">Schedule Session</Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
@@ -323,14 +668,8 @@ const Clients = () => {
               </div>
 
               <div className="flex gap-2 pt-2">
-                <Button size="sm" className="flex-1">
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
-                </Button>
-                <Button size="sm" variant="outline" className="flex-1">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Schedule
-                </Button>
+                <EditClientDialog client={client} />
+                <ScheduleSessionDialog clientName={client.name} />
               </div>
             </CardContent>
           </Card>

@@ -105,11 +105,14 @@ const Dashboard = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button>
+          <Button onClick={() => alert("Redirecting to Add Client...")}>
             <Plus className="h-4 w-4 mr-2" />
             Add Client
           </Button>
-          <Button variant="outline">
+          <Button
+            variant="outline"
+            onClick={() => alert("Redirecting to Schedule Session...")}
+          >
             <Calendar className="h-4 w-4 mr-2" />
             Schedule Session
           </Button>
@@ -210,19 +213,35 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-24 flex-col gap-2">
+            <Button
+              variant="outline"
+              className="h-24 flex-col gap-2"
+              onClick={() => alert("Opening Add Client dialog...")}
+            >
               <Users className="h-6 w-6" />
               Add New Client
             </Button>
-            <Button variant="outline" className="h-24 flex-col gap-2">
+            <Button
+              variant="outline"
+              className="h-24 flex-col gap-2"
+              onClick={() => alert("Opening Schedule Session dialog...")}
+            >
               <Calendar className="h-6 w-6" />
               Schedule Session
             </Button>
-            <Button variant="outline" className="h-24 flex-col gap-2">
+            <Button
+              variant="outline"
+              className="h-24 flex-col gap-2"
+              onClick={() => alert("Opening Create Workout dialog...")}
+            >
               <Target className="h-6 w-6" />
               Create Workout
             </Button>
-            <Button variant="outline" className="h-24 flex-col gap-2">
+            <Button
+              variant="outline"
+              className="h-24 flex-col gap-2"
+              onClick={() => alert("Opening Record Payment dialog...")}
+            >
               <DollarSign className="h-6 w-6" />
               Record Payment
             </Button>
