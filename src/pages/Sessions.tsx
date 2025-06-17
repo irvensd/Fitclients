@@ -430,7 +430,7 @@ const Sessions = () => {
     );
   };
 
-  const filteredSessions = mockSessions.filter((session) => {
+  const filteredSessions = sessions.filter((session) => {
     const clientName = getClientName(session.clientId).toLowerCase();
     const matchesSearch = clientName.includes(searchTerm.toLowerCase());
     const matchesStatus =
@@ -447,8 +447,8 @@ const Sessions = () => {
     return matchesSearch && matchesStatus && matchesDate;
   });
 
-  const todaySessions = mockSessions.filter((s) => s.date === "2024-03-15");
-  const upcomingSessions = mockSessions.filter((s) => s.status === "scheduled");
+  const todaySessions = sessions.filter((s) => s.date === "2024-03-15");
+  const upcomingSessions = sessions.filter((s) => s.status === "scheduled");
 
   return (
     <div className="p-6 space-y-6">
