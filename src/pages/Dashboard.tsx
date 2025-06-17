@@ -178,6 +178,36 @@ const Dashboard = () => {
     <div className="space-y-6">
       <DevModeNotice />
 
+      {/* Offline Mode Notice */}
+      <Card className="border-blue-200 bg-blue-50">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Users className="h-5 w-5 text-blue-600" />
+            <h3 className="font-semibold text-blue-800">Demo Mode Active</h3>
+          </div>
+          <p className="text-blue-700 mb-4">
+            You're currently in demo/offline mode. All data is stored locally
+            and will reset when you refresh. This gives you the perfect
+            experience of a new account starting from zero!
+          </p>
+          <p className="text-sm text-blue-600 mb-4">
+            <strong>Try it out:</strong> Add clients, schedule sessions, record
+            payments - everything works and updates in real-time. Charts and
+            metrics will populate as you add data.
+          </p>
+          <div className="flex gap-3">
+            <NavigationButton to="/clients">
+              <Plus className="h-4 w-4 mr-2" />
+              Add First Client
+            </NavigationButton>
+            <NavigationButton to="/sessions" variant="outline">
+              <Calendar className="h-4 w-4 mr-2" />
+              Schedule Session
+            </NavigationButton>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Empty State for New Accounts */}
       {clients.length === 0 &&
         sessions.length === 0 &&
@@ -187,24 +217,12 @@ const Dashboard = () => {
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
                 <Users className="h-10 w-10 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">
-                Welcome to FitClient!
-              </h3>
+              <h3 className="text-lg font-semibold mb-2">Ready to Start!</h3>
               <p className="text-muted-foreground text-center mb-6 max-w-md">
-                Get started by adding your first client, scheduling a session,
-                or recording a payment. Everything starts at zero and grows with
-                your business.
+                This is what every new trainer sees - a clean slate ready to
+                grow. Add your first client or session to see the dashboard come
+                to life!
               </p>
-              <div className="flex gap-3">
-                <NavigationButton to="/clients">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add First Client
-                </NavigationButton>
-                <NavigationButton to="/sessions" variant="outline">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Schedule Session
-                </NavigationButton>
-              </div>
             </CardContent>
           </Card>
         )}
