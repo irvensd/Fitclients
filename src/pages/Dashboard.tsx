@@ -35,7 +35,7 @@ import {
   getTodaysSessions,
   getRecentClients,
 } from "@/lib/dashboardMetrics";
-import { getClientName } from "@/lib/mockData";
+import { useData } from "@/contexts/DataContext";
 
 const formatTime = (time: string) => {
   const [hours, minutes] = time.split(":");
@@ -85,8 +85,18 @@ const formatCancellationTime = (cancelledAt: string) => {
 };
 
 const Dashboard = () => {
-  // Calculate dynamic stats
-  const stats = calculateDashboardStats();
+  const { clients, sessions, payments, loading, getClientName } = useData();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Calculate dynamic stats from Firebase data
+  const stats = calculateDashboardStats(clients, sessions, payments);
   const dashboardStats = {
     totalClients: stats.totalClients,
     upcomingSessions: stats.sessionsThisWeek,
@@ -95,23 +105,25 @@ const Dashboard = () => {
   };
 
   // Get dynamic data
-  const recentCancellations = getRecentCancellations().map((session) => ({
-    id: session.id,
-    clientName: getClientName(session.clientId),
-    sessionDate: new Date(session.date).toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
+  const recentCancellations = getRecentCancellations(sessions).map(
+    (session) => ({
+      id: session.id,
+      clientName: getClientName(session.clientId),
+      sessionDate: new Date(session.date).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+      }),
+      sessionTime: formatTime(session.startTime),
+      type: formatSessionType(session.type),
+      reason:
+        session.notes?.replace("Client cancelled via portal: ", "") ||
+        "No reason provided",
+      cancelledAt: formatCancellationTime(session.cancelledAt!),
+      cancelledBy: session.cancelledBy,
     }),
-    sessionTime: formatTime(session.startTime),
-    type: formatSessionType(session.type),
-    reason:
-      session.notes?.replace("Client cancelled via portal: ", "") ||
-      "No reason provided",
-    cancelledAt: formatCancellationTime(session.cancelledAt!),
-    cancelledBy: session.cancelledBy,
-  }));
+  );
 
-  const recentSessions = getTodaysSessions().map((session) => ({
+  const recentSessions = getTodaysSessions(sessions).map((session) => ({
     id: session.id,
     clientName: getClientName(session.clientId),
     time: formatTime(session.startTime),
@@ -119,7 +131,7 @@ const Dashboard = () => {
     status: session.status,
   }));
 
-  const recentClients = getRecentClients().map((client) => ({
+  const recentClients = getRecentClients(clients).map((client) => ({
     id: client.id,
     name: client.name,
     joinDate: getTimeAgo(client.dateJoined),
@@ -132,6 +144,37 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <DevModeNotice />
+
+      {/* Empty State for New Accounts */}
+      {clients.length === 0 &&
+        sessions.length === 0 &&
+        payments.length === 0 && (
+          <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
+                <Users className="h-10 w-10 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">
+                Welcome to FitClient!
+              </h3>
+              <p className="text-muted-foreground text-center mb-6 max-w-md">
+                Get started by adding your first client, scheduling a session,
+                or recording a payment. Everything starts at zero and grows with
+                your business.
+              </p>
+              <div className="flex gap-3">
+                <NavigationButton to="/clients">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add First Client
+                </NavigationButton>
+                <NavigationButton to="/sessions" variant="outline">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Schedule Session
+                </NavigationButton>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
