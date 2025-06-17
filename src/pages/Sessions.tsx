@@ -116,10 +116,42 @@ const mockSessions: Session[] = [
 ];
 
 const clients = [
-  { id: "1", name: "Sarah Johnson" },
-  { id: "2", name: "Mike Chen" },
-  { id: "3", name: "Emily Davis" },
-  { id: "4", name: "James Wilson" },
+  {
+    id: "1",
+    name: "Sarah Johnson",
+    email: "sarah.johnson@email.com",
+    phone: "(555) 123-4567",
+    dateJoined: "2024-01-15",
+    fitnessLevel: "intermediate" as const,
+    goals: "Weight loss and strength building",
+  },
+  {
+    id: "2",
+    name: "Mike Chen",
+    email: "mike.chen@email.com",
+    phone: "(555) 234-5678",
+    dateJoined: "2024-02-03",
+    fitnessLevel: "beginner" as const,
+    goals: "Build muscle mass and improve endurance",
+  },
+  {
+    id: "3",
+    name: "Emily Davis",
+    email: "emily.davis@email.com",
+    phone: "(555) 345-6789",
+    dateJoined: "2024-01-28",
+    fitnessLevel: "advanced" as const,
+    goals: "Marathon training and performance optimization",
+  },
+  {
+    id: "4",
+    name: "James Wilson",
+    email: "james.wilson@email.com",
+    phone: "(555) 456-7890",
+    dateJoined: "2024-02-10",
+    fitnessLevel: "intermediate" as const,
+    goals: "Functional fitness and injury prevention",
+  },
 ];
 
 const getClientName = (clientId: string) => {
