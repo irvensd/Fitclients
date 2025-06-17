@@ -16,16 +16,45 @@ import {
   Legend,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockSessions, mockPayments, mockClients } from "@/lib/mockData";
+import { useData } from "@/contexts/DataContext";
+import { Client, Session, Payment } from "@/lib/types";
 
-// Generate revenue data for the last 6 months
-const generateRevenueData = () => {
+// Generate revenue data for the last 6 months from real payments
+const generateRevenueData = (payments: Payment[]) => {
   const months = ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return months.map((month, index) => ({
-    month,
-    revenue: Math.floor(Math.random() * 2000) + 3000 + index * 200, // Trending upward
-    sessions: Math.floor(Math.random() * 20) + 25 + index * 2,
-  }));
+  const now = new Date();
+
+  if (payments.length === 0) {
+    // Return zeros for new accounts
+    return months.map((month) => ({
+      month,
+      revenue: 0,
+      sessions: 0,
+    }));
+  }
+
+  return months.map((month, index) => {
+    const monthNum = now.getMonth() - 5 + index;
+    const year = now.getFullYear() + (monthNum < 0 ? -1 : 0);
+    const adjustedMonth = monthNum < 0 ? 12 + monthNum : monthNum;
+
+    const monthlyRevenue = payments
+      .filter((payment) => {
+        const paymentDate = new Date(payment.date);
+        return (
+          paymentDate.getMonth() === adjustedMonth &&
+          paymentDate.getFullYear() === year &&
+          payment.status === "completed"
+        );
+      })
+      .reduce((total, payment) => total + payment.amount, 0);
+
+    return {
+      month,
+      revenue: monthlyRevenue,
+      sessions: Math.floor(monthlyRevenue / 75), // Estimate sessions based on average cost
+    };
+  });
 };
 
 // Generate client growth data
@@ -63,7 +92,8 @@ const generateWeeklySessionData = () => {
 };
 
 export const RevenueChart = () => {
-  const data = generateRevenueData();
+  const { payments } = useData();
+  const data = generateRevenueData(payments);
 
   return (
     <Card>
