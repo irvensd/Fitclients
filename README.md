@@ -26,32 +26,56 @@ A modern, production-ready CRM application specifically designed for personal tr
    npm install
    ```
 
-3. Set up Firebase Authentication:
-
-   - Go to [Firebase Console](https://console.firebase.google.com/)
-   - Create a new project or select existing one
-   - Enable Authentication → Sign-in method → Email/Password
-   - Go to Project Settings → General → Your apps → Web app
-   - Copy the config values
-
-4. Create environment file:
-   ```bash
-   cp .env.example .env
-   ```
-5. Update `.env` with your Firebase configuration values
-
-6. Start the development server:
+3. Start the development server:
    ```bash
    npm run dev
    ```
 
+### Development Mode
+
+The application automatically runs in **Development Mode** when Firebase is not configured:
+
+- ✅ **Works immediately** without Firebase setup
+- 🔐 **Local authentication** using localStorage
+- 📧 **Demo credentials**: `trainer@demo.com` / `demo123`
+- ⚠️ **Dev mode banner** shows configuration status
+
+### Production Setup (Firebase)
+
+For production deployment, set up Firebase Authentication:
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project or select existing one
+3. Enable Authentication → Sign-in method → Email/Password
+4. Go to Project Settings → General → Your apps → Web app
+5. Copy the config values
+6. Create environment file:
+   ```bash
+   cp .env.example .env
+   ```
+7. Update `.env` with your Firebase configuration values
+
 ## 🔐 Authentication
 
-The application uses Firebase Authentication with email/password sign-in:
+The application supports two authentication modes:
 
-- **Public Routes**: Landing page (`/`), Login page (`/login`)
-- **Protected Routes**: All admin CRM functionality requires authentication
-- **Demo Account**: Use `trainer@demo.com` / `demo123` for testing (requires Firebase setup)
+### Development Mode (Default)
+
+- **No Firebase required** - works out of the box
+- **Local storage authentication** for development/testing
+- **Demo credentials**: `trainer@demo.com` / `demo123`
+- **Dev mode indicator** shows when Firebase is not configured
+
+### Production Mode (Firebase)
+
+- **Firebase Authentication** with email/password sign-in
+- **Secure, scalable** authentication for production use
+- **Real user management** with Firebase console
+
+**Routes:**
+
+- **Public**: Landing page (`/`), Login page (`/login`)
+- **Protected**: All admin CRM functionality requires authentication
 
 ## 📱 Routes
 
