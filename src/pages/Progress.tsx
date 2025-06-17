@@ -41,6 +41,7 @@ import {
   Activity,
 } from "lucide-react";
 import { ProgressEntry } from "@/lib/types";
+import { GamificationDashboard } from "@/components/GamificationDashboard";
 
 // Mock progress data
 const mockProgress: ProgressEntry[] = [
