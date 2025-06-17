@@ -192,10 +192,10 @@ export const Layout = ({ children }: LayoutProps) => {
         {/* Top bar with mobile search */}
         <div className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex h-14 items-center justify-between px-4 lg:px-6">
-            <div className="lg:hidden">
+            <div className="lg:hidden flex-1 max-w-md">
               <GlobalSearch />
             </div>
-            <div className="flex items-center gap-2 ml-auto lg:ml-0">
+            <div className="flex items-center gap-2">
               <ThemeToggle />
             </div>
           </div>
