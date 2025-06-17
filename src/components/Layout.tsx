@@ -18,7 +18,6 @@ import {
   Brain,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { QuickActions } from "@/components/QuickActions";
