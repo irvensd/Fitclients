@@ -45,12 +45,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const isDevMode = !isFirebaseConfigured;
 
   React.useEffect(() => {
+    // Set a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+
     if (isFirebaseConfigured && auth) {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
+        clearTimeout(timeoutId);
         setUser(user);
         setLoading(false);
       });
-      return unsubscribe;
+      return () => {
+        clearTimeout(timeoutId);
+        unsubscribe();
+      };
     } else {
       // Development mode - check for stored dev session
       try {
@@ -64,6 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error("Error parsing stored user:", error);
         localStorage.removeItem("devUser");
       }
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   }, []);
