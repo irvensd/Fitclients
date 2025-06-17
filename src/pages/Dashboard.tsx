@@ -17,6 +17,8 @@ import {
   Plus,
   Activity,
   Target,
+  XCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { AdminSummary } from "@/components/AdminSummary";
