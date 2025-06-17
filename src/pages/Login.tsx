@@ -31,17 +31,24 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    clearError();
 
     try {
-      await login(email, password);
+      if (mode === "login") {
+        await login(email, password);
+      } else {
+        await register(email, password, displayName);
+      }
     } catch (err: any) {
-      setError(
-        err.message || "Failed to login. Please check your credentials.",
-      );
+      // Error is handled in AuthContext
     } finally {
       setLoading(false);
     }
+  };
+
+  const switchMode = () => {
+    setMode(mode === "login" ? "register" : "login");
+    clearError();
   };
 
   return (
