@@ -59,7 +59,7 @@ const getClientData = (clientId: string) => {
       upcomingSessions: [
         {
           id: "1",
-          date: "2024-12-25",
+          date: "2025-01-20",
           startTime: "09:00",
           endTime: "10:00",
           type: "Personal Training",
@@ -70,7 +70,7 @@ const getClientData = (clientId: string) => {
         },
         {
           id: "2",
-          date: "2024-12-27",
+          date: "2025-01-22",
           startTime: "09:00",
           endTime: "10:00",
           type: "Personal Training",
