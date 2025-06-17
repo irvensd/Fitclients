@@ -36,7 +36,10 @@ import {
   Activity,
   Zap,
   XCircle,
+  Trophy,
+  Star,
 } from "lucide-react";
+import { GamificationDashboard } from "@/components/GamificationDashboard";
 
 // Mock client data - in real app this would come from API based on clientId
 const getClientData = (clientId: string) => {
