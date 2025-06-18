@@ -307,11 +307,17 @@ const PortalSettingsDialog = ({ client }: { client: any }) => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
-            <Button onClick={handleSave}>Save Changes</Button>
+            <Button onClick={handleSave} className="w-full sm:w-auto">
+              Save Changes
+            </Button>
           </div>
         </div>
       </DialogContent>
