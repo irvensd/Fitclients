@@ -160,7 +160,7 @@ export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="flex h-screen bg-background">
       {/* Desktop sidebar */}
-      <div className="hidden md:flex md:flex-shrink-0">
+      <div className="hidden lg:flex lg:flex-shrink-0">
         <div className="flex flex-col w-64 bg-sidebar-background border-r border-sidebar-border">
           <Sidebar />
         </div>
@@ -172,9 +172,9 @@ export const Layout = ({ children }: LayoutProps) => {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden fixed top-4 left-4 z-50"
+            className="lg:hidden fixed top-3 left-3 z-50 h-10 w-10 bg-background/80 backdrop-blur border shadow-sm"
           >
-            <Menu className="h-6 w-6" />
+            <Menu className="h-5 w-5" />
             <span className="sr-only">Open sidebar</span>
           </Button>
         </SheetTrigger>
@@ -187,25 +187,48 @@ export const Layout = ({ children }: LayoutProps) => {
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar with mobile search */}
         <div className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-14 items-center justify-between px-4 lg:px-6">
-            <div className="flex-1"></div>
-            <div className="flex items-center gap-3">
-              <div className="w-64">
+          <div className="flex h-14 items-center justify-between px-3 sm:px-4 lg:px-6">
+            <div className="flex-1 lg:hidden"></div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Hide search on very small screens, show on sm+ */}
+              <div className="hidden sm:block w-48 md:w-64">
                 <GlobalSearch />
+              </div>
+              {/* Mobile search button for xs screens */}
+              <div className="sm:hidden">
+                <Button variant="ghost" size="sm">
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </Button>
               </div>
             </div>
           </div>
         </div>
 
         <main className="flex-1 overflow-y-auto">
-          <div className="p-6">
-            <BreadcrumbNav />
+          <div className="p-3 sm:p-4 lg:p-6">
+            <div className="mb-4 lg:mb-6">
+              <BreadcrumbNav />
+            </div>
             {children}
           </div>
         </main>
 
-        {/* Quick Actions FAB */}
-        <QuickActions />
+        {/* Quick Actions FAB - positioned better for mobile */}
+        <div className="fixed bottom-4 right-4 lg:bottom-6 lg:right-6 z-40">
+          <QuickActions />
+        </div>
       </div>
     </div>
   );
