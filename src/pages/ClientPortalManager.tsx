@@ -360,26 +360,38 @@ const ClientPortalManager = () => {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Client Portals</h1>
-          <p className="text-muted-foreground">
+        <div className="flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            Client Portals
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Generate and manage shareable client portals with no login required.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => testPortal("1")} size="sm">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button
+            variant="outline"
+            onClick={() => testPortal("1")}
+            size="sm"
+            className="w-full sm:w-auto justify-center"
+          >
             <Eye className="h-4 w-4 mr-2" />
-            Test Portal (Sarah)
+            <span className="text-sm">Test Portal (Sarah)</span>
           </Button>
-          <Button variant="outline" onClick={() => testPortal("2")} size="sm">
+          <Button
+            variant="outline"
+            onClick={() => testPortal("2")}
+            size="sm"
+            className="w-full sm:w-auto justify-center"
+          >
             <Eye className="h-4 w-4 mr-2" />
-            Test Portal (Mike)
+            <span className="text-sm">Test Portal (Mike)</span>
           </Button>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
