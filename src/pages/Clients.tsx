@@ -47,6 +47,7 @@ import {
   DollarSign,
   UserPlus,
   Target,
+  Share2,
 } from "lucide-react";
 import { Client } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
