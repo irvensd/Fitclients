@@ -41,6 +41,11 @@ import {
   TrendingUp,
   Download,
   Send,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Mail,
+  RefreshCw,
 } from "lucide-react";
 import { Payment } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
