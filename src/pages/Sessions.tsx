@@ -40,6 +40,11 @@ import {
   AlertCircle,
   Sparkles,
   FileText,
+  MoreVertical,
+  Play,
+  Square,
+  Edit,
+  Trash2,
 } from "lucide-react";
 import { Session, SessionRecap } from "@/lib/types";
 import { SessionRecapForm } from "@/components/SessionRecapForm";
