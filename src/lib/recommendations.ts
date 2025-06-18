@@ -533,8 +533,21 @@ const generateAIRecommendations = (
   });
 };
 
-const generateKeyInsights = (data: any, analysis: ClientAnalysis): string[] => {
+const generateKeyInsights = (
+  data: any,
+  analysis: ClientAnalysis,
+  usingRealData: boolean,
+): string[] => {
   const insights: string[] = [];
+
+  // Data source insight
+  if (usingRealData) {
+    insights.push("✨ Analysis based on your actual session and progress data");
+  } else {
+    insights.push(
+      "📊 Using demo data - add real sessions for personalized insights",
+    );
+  }
 
   if (analysis.attendanceRate >= 90) {
     insights.push(
