@@ -58,6 +58,14 @@ import {
 import { Client } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import {
+  getClientLimitInfo,
+  canAddClient,
+  getUpgradeMessage,
+} from "@/lib/clientLimits";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
 
 const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
   const [appliedRecs, setAppliedRecs] = useState<any[]>([]);
