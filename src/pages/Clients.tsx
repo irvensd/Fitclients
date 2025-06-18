@@ -109,9 +109,9 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
         </h4>
       </div>
       <div className="space-y-2">
-        {appliedRecs.map((rec) => (
+        {appliedRecs.map((rec, index) => (
           <div
-            key={rec.id}
+            key={`${rec.id}-${index}-${rec.appliedDate}`}
             className="flex items-center justify-between p-2 bg-purple-50 border border-purple-200 rounded-lg"
           >
             <div className="flex items-center gap-2 flex-1">
