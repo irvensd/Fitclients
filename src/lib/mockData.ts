@@ -252,7 +252,7 @@ export const mockSessions: Session[] = [
     cost: 75,
   },
   {
-    id: "13",
+    id: "18",
     clientId: "1",
     date: "2025-01-20",
     startTime: "10:00",
@@ -265,7 +265,7 @@ export const mockSessions: Session[] = [
     cancelledAt: "2025-01-17T10:30:00Z",
   },
   {
-    id: "14",
+    id: "19",
     clientId: "2",
     date: "2025-01-21",
     startTime: "14:00",
