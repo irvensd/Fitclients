@@ -62,10 +62,42 @@ export const mockClients: Client[] = [
     id: "7",
     name: "David Kim",
     email: "david.kim@email.com",
-    phone: "(555) 789-0123",
-    dateJoined: "2025-01-06",
+    phone: "(555) 890-1234",
+    dateJoined: "2024-02-14",
+    fitnessLevel: "intermediate",
+    goals: "Sports performance and agility training",
+  },
+  {
+    id: "8",
+    name: "Rachel Martinez",
+    email: "rachel.martinez@email.com",
+    phone: "(555) 111-2222",
+    dateJoined: new Date().toISOString().split("T")[0], // Today
+    fitnessLevel: "beginner",
+    goals: "Weight loss and general fitness",
+    notes: "New member - very motivated!",
+  },
+  {
+    id: "9",
+    name: "Tom Anderson",
+    email: "tom.anderson@email.com",
+    phone: "(555) 333-4444",
+    dateJoined: new Date(Date.now() - 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // Yesterday
+    fitnessLevel: "intermediate",
+    goals: "Strength training and muscle building",
+  },
+  {
+    id: "10",
+    name: "Sophie Chen",
+    email: "sophie.chen@email.com",
+    phone: "(555) 555-6666",
+    dateJoined: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // 2 days ago
     fitnessLevel: "advanced",
-    goals: "Competition preparation and peak performance",
+    goals: "Powerlifting competition prep",
   },
 ];
 
