@@ -585,6 +585,12 @@ const Sessions = () => {
   const { sessions, loading, getClientName, updateSession, deleteSession } =
     useData();
 
+  // Dialog states
+  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+
   // Session management functions
   const handleStartSession = async (session: Session) => {
     try {
