@@ -261,8 +261,13 @@ const BillingHistory = () => {
 };
 
 export const SubscriptionManager = () => {
-  const { subscription, getCurrentPlan, isOnTrial, refreshSubscription } =
-    useSubscription();
+  const {
+    subscription,
+    getCurrentPlan,
+    isOnTrial,
+    refreshSubscription,
+    updateSubscriptionPlan,
+  } = useSubscription();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -279,15 +284,20 @@ export const SubscriptionManager = () => {
   };
 
   const handleCheckoutSuccess = () => {
+    if (!selectedPlanId) return;
+
+    // Actually update the subscription plan
+    updateSubscriptionPlan(selectedPlanId);
+
     const planKey =
-      selectedPlanId?.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
+      selectedPlanId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
     const selectedPlan = SUBSCRIPTION_PLANS[planKey];
 
     toast({
       title: "Subscription updated!",
-      description: `Successfully upgraded to ${selectedPlan?.name || selectedPlanId} plan.`,
+      description: `Successfully upgraded to ${selectedPlan?.name || selectedPlan} plan.`,
     });
-    refreshSubscription();
+
     setCheckoutModalOpen(false);
     setSelectedPlanId(null);
   };

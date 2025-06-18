@@ -17,12 +17,13 @@ interface SubscriptionData {
 
 interface SubscriptionContextType {
   subscription: SubscriptionData | null;
-  loading: boolean;
   isOnTrial: boolean;
   trialDaysLeft: number;
-  canAccessFeature: (feature: string) => boolean;
-  canExceedClientLimit: (currentCount: number) => boolean;
   getCurrentPlan: () => typeof SUBSCRIPTION_PLANS.FREE;
+  hasFeatureAccess: (feature: string) => boolean;
+  refreshSubscription: () => Promise<void>;
+  updateSubscriptionPlan: (planId: string) => void;
+}
   refreshSubscription: () => Promise<void>;
 }
 
@@ -122,14 +123,15 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
     return canExceedLimit(planId, "clients", currentCount);
   };
 
-  const value: SubscriptionContextType = {
+  const value = {
     subscription,
-    loading,
     isOnTrial,
     trialDaysLeft,
-    canAccessFeature,
-    canExceedClientLimit,
     getCurrentPlan,
+    hasFeatureAccess,
+    refreshSubscription,
+    updateSubscriptionPlan,
+  };
     refreshSubscription,
   };
 
