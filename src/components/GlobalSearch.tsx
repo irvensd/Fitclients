@@ -7,8 +7,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Button } from "@/components/ui/button";
+import { VisuallyHidden, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import {
   Search,
