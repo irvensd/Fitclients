@@ -148,23 +148,6 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
     </div>
   );
 };
-
-            {filteredActiveClients.length === 0 && filteredArchivedClients.length === 0 && (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <h3 className="text-lg font-semibold mb-2">No clients found</h3>
-                  <p className="text-muted-foreground">
-                    Try adjusting your search or filters.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
       textArea.style.top = '-999999px';
       document.body.appendChild(textArea);
       textArea.focus();
