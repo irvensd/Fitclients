@@ -165,15 +165,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   const addClient = async (client: Omit<Client, "id">) => {
     if (!user?.email) throw new Error("User not authenticated");
 
-    // Demo account: use offline mode
+    // Demo account: use offline mode with realistic ID generation
     if (user.email === "trainer@demo.com") {
       const newClient: Client = {
         ...client,
-        id: Date.now().toString(),
+        id: (Math.max(...clients.map((c) => parseInt(c.id))) + 1).toString(),
         dateJoined: new Date().toISOString().split("T")[0],
       };
       setClients((prev) => [newClient, ...prev]);
-      return;
+      return newClient;
     }
 
     try {
