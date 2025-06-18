@@ -566,7 +566,8 @@ const Billing = () => {
   };
 
   const handleCheckoutSuccess = () => {
-    const planKey = selectedPlanId?.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
+    const planKey =
+      selectedPlanId?.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
     const selectedPlan = SUBSCRIPTION_PLANS[planKey];
 
     toast({
@@ -576,8 +577,6 @@ const Billing = () => {
     refreshSubscription();
     setCheckoutModalOpen(false);
     setSelectedPlanId(null);
-  };
-    }
   };
 
   const handleCancelSubscription = async () => {
