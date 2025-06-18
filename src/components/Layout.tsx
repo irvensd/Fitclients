@@ -216,6 +216,7 @@ const MobileSidebar = ({ onNavigate }: { onNavigate?: () => void }) => {
             <Link
               key={item.name}
               to={item.href}
+              onClick={handleNavClick}
               className={cn(
                 "flex items-center gap-4 rounded-xl px-4 py-4 text-base font-medium transition-all duration-200 active:scale-95",
                 isActive
