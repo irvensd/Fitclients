@@ -264,7 +264,20 @@ const AIRecommendations = () => {
                         <Badge className={getPriorityColor(rec.priority)}>
                           {rec.priority}
                         </Badge>
-                        <Button size="sm">
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            console.log(
+                              "Applying recommendation:",
+                              rec.title,
+                              "for client:",
+                              rec.clientName,
+                            );
+                            alert(
+                              `Applied recommendation: ${rec.title}\n\nThis would:\n${rec.actionItems?.slice(0, 2).join("\n") || rec.description}\n\nNotification sent to client dashboard.`,
+                            );
+                          }}
+                        >
                           <Zap className="h-4 w-4 mr-2" />
                           Apply
                         </Button>
