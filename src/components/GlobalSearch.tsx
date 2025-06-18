@@ -151,9 +151,6 @@ export const GlobalSearch = () => {
         </kbd>
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <VisuallyHidden.Root>
-          <DialogTitle>Search</DialogTitle>
-        </VisuallyHidden.Root>
         <CommandInput placeholder="Search clients, sessions, payments..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
