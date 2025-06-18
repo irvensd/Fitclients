@@ -136,8 +136,17 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
                 <p className="text-xs text-purple-600">
                   Applied {new Date(rec.appliedDate).toLocaleDateString()}
                 </p>
-                </div>
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => removeRecommendation(rec.id)}
+              className="ml-2"
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
                   <p className="text-sm text-blue-800">
                     <strong>Note:</strong> Archived clients are in read-only mode.
                     To manage these clients again, upgrade your plan to reactivate them.
