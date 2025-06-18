@@ -40,8 +40,9 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
+import { useNavigate } from "react-router-dom";
 
-// Mock clients data
+// Mock clients data with working portal settings
 const mockClients = [
   {
     id: "1",
