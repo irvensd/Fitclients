@@ -322,6 +322,13 @@ const PortalSettingsDialog = ({ client }: { client: any }) => {
 const ClientPortalManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { clients, loading } = useData();
+  const navigate = useNavigate();
+
+  // Function to test portal
+  const testPortal = (clientId: string) => {
+    const portalUrl = `/client-portal/${clientId}`;
+    window.open(portalUrl, "_blank");
+  };
 
   // Add portal-specific properties for mock purposes
   const clientsWithPortalData = clients.map((client) => ({
