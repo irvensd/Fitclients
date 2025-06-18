@@ -151,9 +151,6 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
       </div>
     </div>
   );
-                </div>
-              </div>
-            )}
 
             {filteredActiveClients.length === 0 && filteredArchivedClients.length === 0 && (
               <Card>
