@@ -353,11 +353,38 @@ const CreateWorkoutDialog = () => {
 
 const Workouts = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { clients, loading } = useData();
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
+  const [activeTab, setActiveTab] = useState("plans");
+  const { clients, loading, getClientName } = useData();
 
-  // Since we don't have workout plans in the data structure yet,
-  // we'll show an empty state and let users create workout plans
-  const workoutPlans: WorkoutPlan[] = [];
+  // Load workout plans from localStorage or use mock data for demo
+  useEffect(() => {
+    const storedPlans = localStorage.getItem("workoutPlans");
+    if (storedPlans) {
+      setWorkoutPlans(JSON.parse(storedPlans));
+    } else {
+      setWorkoutPlans(mockWorkoutPlans);
+    }
+  }, []);
+
+  // Filter exercises by category and search term
+  const filteredExercises = mockExercises.filter((exercise) => {
+    const matchesSearch =
+      exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      exercise.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "All" || exercise.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Get unique categories for filter
+  const categories = [
+    "All",
+    ...Array.from(new Set(mockExercises.map((ex) => ex.category))),
+  ];
+
+  const activeWorkoutPlans = workoutPlans.filter((plan) => plan.isActive);
 
   if (loading) {
     return (
@@ -380,52 +407,195 @@ const Workouts = () => {
         <CreateWorkoutDialog />
       </div>
 
-      {/* Empty State */}
-      {workoutPlans.length === 0 && (
-        <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
-              <Dumbbell className="h-10 w-10 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No Workout Plans Yet</h3>
-            <p className="text-muted-foreground text-center mb-6 max-w-md">
-              Start creating custom workout plans for your clients. Design
-              targeted routines to help them achieve their fitness goals.
-            </p>
-            <CreateWorkoutDialog />
-          </CardContent>
-        </Card>
-      )}
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="plans">Workout Plans</TabsTrigger>
+          <TabsTrigger value="library">Exercise Library</TabsTrigger>
+        </TabsList>
 
-      {/* Exercise Library */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
-            Exercise Library
-          </CardTitle>
-          <CardDescription>
-            Browse available exercises to add to your workout plans
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+        {/* Workout Plans Tab */}
+        <TabsContent value="plans" className="space-y-6">
+          {workoutPlans.length === 0 ? (
+            <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
+                  <Dumbbell className="h-10 w-10 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">
+                  No Workout Plans Yet
+                </h3>
+                <p className="text-muted-foreground text-center mb-6 max-w-md">
+                  Start creating custom workout plans for your clients. Design
+                  targeted routines to help them achieve their fitness goals.
+                </p>
+                <CreateWorkoutDialog />
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {workoutPlans.map((plan) => (
+                <Card
+                  key={plan.id}
+                  className="hover:shadow-md transition-shadow"
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-lg">{plan.name}</CardTitle>
+                        <CardDescription className="mt-1">
+                          {getClientName(plan.clientId)}
+                        </CardDescription>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit Plan
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Copy className="h-4 w-4 mr-2" />
+                            Duplicate
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Play className="h-4 w-4 mr-2" />
+                            Start Session
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive">
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {plan.description}
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="flex items-center gap-1">
+                          <Target className="h-4 w-4" />
+                          {plan.exercises.length} exercises
+                        </span>
+                        <Badge
+                          variant={plan.isActive ? "default" : "secondary"}
+                        >
+                          {plan.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Created:{" "}
+                        {new Date(plan.createdDate).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="mt-4 space-y-1">
+                      <p className="text-sm font-medium">Exercises:</p>
+                      <div className="max-h-20 overflow-y-auto">
+                        {plan.exercises.slice(0, 3).map((exercise, index) => (
+                          <div
+                            key={exercise.id}
+                            className="text-xs text-muted-foreground"
+                          >
+                            • {exercise.name} ({exercise.sets} sets ×{" "}
+                            {exercise.reps})
+                          </div>
+                        ))}
+                        {plan.exercises.length > 3 && (
+                          <div className="text-xs text-muted-foreground">
+                            +{plan.exercises.length - 3} more exercises
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Exercise Library Tab */}
+        <TabsContent value="library" className="space-y-6">
+          {/* Search and Filter */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search exercises..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
+              <SelectTrigger className="w-full sm:w-48">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Exercise Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {exerciseLibrary.map((exercise) => (
-              <Card key={exercise.id} className="border-muted">
+            {filteredExercises.map((exercise) => (
+              <Card
+                key={exercise.id}
+                className="border-muted hover:shadow-md transition-shadow"
+              >
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium">{exercise.name}</h4>
                     <Badge variant="secondary">{exercise.category}</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mb-3">
                     {exercise.description}
                   </p>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Dumbbell className="h-3 w-3" />
+                      {exercise.equipment}
+                    </span>
+                    <Badge variant="outline" className="text-xs">
+                      {exercise.difficulty}
+                    </Badge>
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </CardContent>
-      </Card>
+
+          {filteredExercises.length === 0 && (
+            <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <Target className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">
+                  No exercises found
+                </h3>
+                <p className="text-muted-foreground text-center">
+                  Try adjusting your search or filter criteria.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -437,20 +607,22 @@ const Workouts = () => {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{clients.length}</div>
-            <p className="text-sm text-muted-foreground">Clients</p>
+            <div className="text-2xl font-bold">
+              {activeWorkoutPlans.length}
+            </div>
+            <p className="text-sm text-muted-foreground">Active Plans</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{exerciseLibrary.length}</div>
+            <div className="text-2xl font-bold">{mockExercises.length}</div>
             <p className="text-sm text-muted-foreground">Available Exercises</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-sm text-muted-foreground">Active Plans</p>
+            <div className="text-2xl font-bold">{clients.length}</div>
+            <p className="text-sm text-muted-foreground">Clients</p>
           </CardContent>
         </Card>
       </div>
