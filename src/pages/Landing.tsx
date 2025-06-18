@@ -85,71 +85,363 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="py-20 px-4 bg-muted/50">
+      {/* AI-Powered Features Hero */}
+      <section className="py-20 px-4 bg-gradient-to-br from-purple-50 to-blue-50">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <Brain className="h-4 w-4" />
+              AI-Powered Intelligence
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Everything You Need in One Place
+              Meet Your{" "}
+              <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                AI Coach Assistant
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Designed specifically for independent personal trainers and
-              fitness coaches who manage clients 1-on-1.
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              The first fitness CRM with built-in AI that analyzes client data
+              to provide personalized training recommendations and insights.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="border-2 hover:border-primary/20 transition-colors">
+          {/* AI Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white hover:shadow-lg transition-all">
               <CardContent className="p-6 text-center">
+                <div className="bg-gradient-to-r from-purple-500 to-blue-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Brain className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-semibold mb-2">Smart Recommendations</h3>
+                <p className="text-sm text-muted-foreground">
+                  AI analyzes client progress, attendance, and performance to
+                  suggest personalized training adjustments
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-purple-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition-all">
+              <CardContent className="p-6 text-center">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Target className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-semibold mb-2">Goal Optimization</h3>
+                <p className="text-sm text-muted-foreground">
+                  Automatically adapts training plans based on client progress
+                  toward specific fitness goals
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white hover:shadow-lg transition-all">
+              <CardContent className="p-6 text-center">
+                <div className="bg-gradient-to-r from-purple-500 to-pink-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Bell className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-semibold mb-2">Smart Alerts</h3>
+                <p className="text-sm text-muted-foreground">
+                  Real-time notifications for high-priority recommendations and
+                  client milestones
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Core Features Grid */}
+      <section className="py-20 px-4 bg-muted/30">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Complete Training Business Solution
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Everything you need to manage clients, track progress, and grow
+              your personal training business.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Client Portal - No Login */}
+            <Card className="border-2 hover:border-primary/20 transition-colors group">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center">
+                    <Share2 className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                    No Login Required
+                  </div>
+                </div>
+                <h3 className="font-semibold mb-2">Client Portal</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Shareable client portals that work instantly - no passwords or
+                  accounts required
+                </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    One-click sharing
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Secure unique links
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Gamification */}
+            <Card className="border-2 hover:border-primary/20 transition-colors">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center">
+                    <Trophy className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                    Gamification
+                  </div>
+                </div>
+                <h3 className="font-semibold mb-2">Streak Tracker + Badges</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Keep clients motivated with achievement badges, streaks, and
+                  milestone celebrations
+                </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Session streaks
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Achievement badges
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Client Management */}
+            <Card className="border-2 hover:border-primary/20 transition-colors">
+              <CardContent className="p-6">
                 <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Users className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-semibold mb-2">Client Management</h3>
-                <p className="text-sm text-muted-foreground">
-                  Add, edit, and track client goals, contact info, and fitness
-                  levels
+                <p className="text-sm text-muted-foreground mb-3">
+                  Complete client profiles with goals, fitness levels, and
+                  progress history
                 </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Detailed profiles
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Goal tracking
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
+            {/* Session Scheduling */}
             <Card className="border-2 hover:border-primary/20 transition-colors">
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-6">
                 <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Calendar className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-semibold mb-2">Session Scheduling</h3>
-                <p className="text-sm text-muted-foreground">
-                  Calendar UI with session notes and automated email/text
-                  reminders
+                <p className="text-sm text-muted-foreground mb-3">
+                  Smart scheduling with cancellation management and session
+                  tracking
                 </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Easy scheduling
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Cancellation handling
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
+            {/* Progress Monitoring */}
             <Card className="border-2 hover:border-primary/20 transition-colors">
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                    Visual Charts
+                  </div>
+                </div>
+                <h3 className="font-semibold mb-2">Progress Monitoring</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Track weight, body measurements, progress photos, and fitness
+                  milestones
+                </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Weight tracking
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Body measurements
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Payment Tracking */}
+            <Card className="border-2 hover:border-primary/20 transition-colors">
+              <CardContent className="p-6">
                 <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <DollarSign className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-semibold mb-2">Payment Tracking</h3>
-                <p className="text-sm text-muted-foreground">
-                  Mark payments manually or integrate with Stripe for seamless
-                  billing
+                <p className="text-sm text-muted-foreground mb-3">
+                  Monitor payments, outstanding balances, and billing history
                 </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Payment status
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Revenue analytics
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
+            {/* Workout Planning */}
             <Card className="border-2 hover:border-primary/20 transition-colors">
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-6">
                 <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="h-6 w-6 text-primary" />
+                  <Dumbbell className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-2">Progress Tracking</h3>
-                <p className="text-sm text-muted-foreground">
-                  Log weight, measurements, and progress photos to keep clients
-                  motivated
+                <h3 className="font-semibold mb-2">Workout Planning</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Create personalized workout plans with exercise libraries and
+                  progression tracking
                 </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Custom workouts
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Exercise library
+                  </div>
+                </div>
               </CardContent>
             </Card>
+
+            {/* Analytics Dashboard */}
+            <Card className="border-2 hover:border-primary/20 transition-colors">
+              <CardContent className="p-6">
+                <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-semibold mb-2">Analytics Dashboard</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Comprehensive business analytics with revenue tracking and
+                  client growth
+                </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Revenue charts
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Performance KPIs
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Session Recaps */}
+            <Card className="border-2 hover:border-primary/20 transition-colors">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center">
+                    <FileText className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+                    AI-Powered
+                  </div>
+                </div>
+                <h3 className="font-semibold mb-2">Session Recaps</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  AI-generated session summaries with personalized feedback and
+                  recommendations
+                </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    AI summaries
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Progress notes
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Technical Features */}
+          <div className="mt-16">
+            <h3 className="text-2xl font-bold text-center mb-8">
+              Built for Modern Trainers
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Smartphone className="h-6 w-6 text-primary" />
+                </div>
+                <h4 className="font-semibold mb-1">Mobile Responsive</h4>
+                <p className="text-sm text-muted-foreground">
+                  Fully optimized for mobile devices
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Shield className="h-6 w-6 text-primary" />
+                </div>
+                <h4 className="font-semibold mb-1">Secure & Private</h4>
+                <p className="text-sm text-muted-foreground">
+                  Client data protection and privacy
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Zap className="h-6 w-6 text-primary" />
+                </div>
+                <h4 className="font-semibold mb-1">Real-time Updates</h4>
+                <p className="text-sm text-muted-foreground">
+                  Instant synchronization across devices
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <LinkIcon className="h-6 w-6 text-primary" />
+                </div>
+                <h4 className="font-semibold mb-1">No Complex Setup</h4>
+                <p className="text-sm text-muted-foreground">
+                  Get started immediately
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
