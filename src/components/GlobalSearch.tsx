@@ -153,7 +153,7 @@ export const GlobalSearch = () => {
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
         <VisuallyHidden.Root>
-          <h2>Search</h2>
+          <DialogTitle>Search</DialogTitle>
         </VisuallyHidden.Root>
         <CommandInput placeholder="Search clients, sessions, payments..." />
         <CommandList>
