@@ -36,6 +36,7 @@ import {
   cancelSubscription,
 } from "@/lib/stripe";
 import { useToast } from "@/hooks/use-toast";
+import { DemoCheckoutModal } from "@/components/DemoCheckoutModal";
 
 const PlanCard = ({
   plan,
@@ -265,43 +266,30 @@ export const SubscriptionManager = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
   const currentPlan = getCurrentPlan();
 
   const handleUpgrade = async (planId: string) => {
     if (planId === "free") return;
 
-    setLoading(true);
-    try {
-      const checkoutSession = await createCheckoutSession(planId, "user-id");
+    setSelectedPlanId(planId);
+    setCheckoutModalOpen(true);
+  };
 
-      // In a real implementation, redirect to Stripe checkout
-      toast({
-        title: "Redirecting to checkout...",
-        description:
-          "You'll be redirected to Stripe to complete your subscription.",
-      });
+  const handleCheckoutSuccess = () => {
+    const planKey =
+      selectedPlanId?.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
+    const selectedPlan = SUBSCRIPTION_PLANS[planKey];
 
-      // Mock success for demo
-      setTimeout(() => {
-        const planKey = planId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
-        const selectedPlan = SUBSCRIPTION_PLANS[planKey];
-        toast({
-          title: "Subscription updated!",
-          description: `Successfully upgraded to ${selectedPlan?.name || planId} plan.`,
-        });
-        refreshSubscription();
-      }, 2000);
-    } catch (error) {
-      toast({
-        title: "Upgrade failed",
-        description:
-          "There was an error processing your upgrade. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    toast({
+      title: "Subscription updated!",
+      description: `Successfully upgraded to ${selectedPlan?.name || selectedPlanId} plan.`,
+    });
+    refreshSubscription();
+    setCheckoutModalOpen(false);
+    setSelectedPlanId(null);
   };
 
   const handleCancelSubscription = async () => {
@@ -462,6 +450,19 @@ export const SubscriptionManager = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Demo Checkout Modal */}
+      {selectedPlanId && (
+        <DemoCheckoutModal
+          isOpen={checkoutModalOpen}
+          onClose={() => {
+            setCheckoutModalOpen(false);
+            setSelectedPlanId(null);
+          }}
+          planId={selectedPlanId}
+          onSuccess={handleCheckoutSuccess}
+        />
+      )}
     </div>
   );
 };
