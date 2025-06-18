@@ -588,13 +588,51 @@ const StartSessionDialog = ({
             </p>
           </div>
 
+          {/* Session Scheduling Fields */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="session-date">Session Date</Label>
+              <Input
+                id="session-date"
+                type="date"
+                value={sessionDate}
+                onChange={(e) => setSessionDate(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="session-time">Start Time</Label>
+              <Input
+                id="session-time"
+                type="time"
+                value={sessionTime}
+                onChange={(e) => setSessionTime(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="session-cost">Session Cost ($)</Label>
+            <Input
+              id="session-cost"
+              type="number"
+              min="0"
+              step="0.01"
+              value={sessionCost}
+              onChange={(e) => setSessionCost(e.target.value)}
+              placeholder="75.00"
+              required
+            />
+          </div>
+
           <div className="text-sm text-muted-foreground">
             <p>This will:</p>
             <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Create a new training session record</li>
-              <li>Start the workout timer</li>
-              <li>Allow you to track exercise completion</li>
-              <li>Enable session notes and recap</li>
+              <li>Schedule a new training session</li>
+              <li>Link the workout plan to the session</li>
+              <li>Add session to your calendar</li>
+              <li>Navigate to Sessions page for management</li>
             </ul>
           </div>
         </div>
