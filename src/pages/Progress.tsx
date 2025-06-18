@@ -430,33 +430,41 @@ const ClientProgressCard = ({ client }: { client: Client }) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-green-600">
+          {/* Stats Grid - Responsive */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+            <div className="p-3 sm:p-2 bg-green-50 rounded-lg sm:bg-transparent">
+              <div className="text-xl sm:text-2xl font-bold text-green-600">
                 -{weightLoss}
               </div>
-              <div className="text-sm text-muted-foreground">lbs lost</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">
+                lbs lost
+              </div>
             </div>
-            <div>
-              <div className="text-2xl font-bold">{latestProgress.weight}</div>
-              <div className="text-sm text-muted-foreground">
+            <div className="p-3 sm:p-2 bg-blue-50 rounded-lg sm:bg-transparent">
+              <div className="text-xl sm:text-2xl font-bold">
+                {latestProgress.weight}
+              </div>
+              <div className="text-xs sm:text-sm text-muted-foreground">
                 current weight
               </div>
             </div>
-            <div>
-              <div className="text-2xl font-bold">
+            <div className="p-3 sm:p-2 bg-purple-50 rounded-lg sm:bg-transparent">
+              <div className="text-xl sm:text-2xl font-bold">
                 {latestProgress.bodyFat}%
               </div>
-              <div className="text-sm text-muted-foreground">body fat</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">
+                body fat
+              </div>
             </div>
           </div>
 
-          <div className="h-32">
+          {/* Chart - Responsive height */}
+          <div className="h-40 sm:h-32">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={progressData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" fontSize={12} />
-                <YAxis fontSize={12} />
+                <XAxis dataKey="date" fontSize={10} />
+                <YAxis fontSize={10} />
                 <Tooltip />
                 <Line
                   type="monotone"
@@ -469,14 +477,15 @@ const ClientProgressCard = ({ client }: { client: Client }) => {
             </ResponsiveContainer>
           </div>
 
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="flex-1">
-              <Camera className="h-4 w-4 mr-2" />
-              Photos
+          {/* Action Buttons - Mobile optimized */}
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="outline" size="sm" className="h-10 sm:h-9">
+              <Camera className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">Photos</span>
             </Button>
-            <Button variant="outline" size="sm" className="flex-1">
-              <Ruler className="h-4 w-4 mr-2" />
-              Measurements
+            <Button variant="outline" size="sm" className="h-10 sm:h-9">
+              <Ruler className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">Measurements</span>
             </Button>
           </div>
         </div>
