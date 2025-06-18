@@ -22,6 +22,8 @@ import {
   LogOut,
   Share2,
   Brain,
+  Bell,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { GlobalSearch } from "@/components/GlobalSearch";
