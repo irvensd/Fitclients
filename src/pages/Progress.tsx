@@ -491,13 +491,62 @@ const Progress = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Progress</h1>
+          <h1 className="text-3xl font-bold text-foreground">
+            Client Progress
+          </h1>
           <p className="text-muted-foreground">
-            Track your clients' fitness journey and achievements.
+            Track your clients' fitness journey with measurements and
+            achievements.
           </p>
         </div>
         <AddProgressDialog />
       </div>
+
+      {/* Instructions Card */}
+      <Card className="bg-blue-50 border-blue-200">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white text-sm font-semibold">
+              💡
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-blue-900 mb-2">
+                How to Add Client Measurements
+              </h3>
+              <p className="text-blue-800 text-sm mb-3">
+                The measurements shown in client portals (weight, body fat,
+                chest, waist, arms, etc.) are added here by you, the trainer.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
+                <div>
+                  <p className="font-medium mb-1">📏 Available Measurements:</p>
+                  <ul className="space-y-1">
+                    <li>• Weight (lbs)</li>
+                    <li>• Body Fat (%)</li>
+                    <li>• Chest, Waist, Hips (inches)</li>
+                    <li>• Arms, Thighs (inches)</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-medium mb-1">📱 Client Portal Shows:</p>
+                  <ul className="space-y-1">
+                    <li>• Progress charts & trends</li>
+                    <li>• Latest measurements</li>
+                    <li>• Weight change over time</li>
+                    <li>• Body composition tracking</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="mt-3 p-3 bg-blue-100 rounded-lg">
+                <p className="text-blue-800 text-sm font-medium">
+                  👆 Click "Record Progress" above to add measurements for any
+                  client
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Empty State */}
       {clients.length === 0 && (
