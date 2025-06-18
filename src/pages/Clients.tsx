@@ -53,6 +53,7 @@ import {
   CheckCircle,
   Clock,
   X,
+  AlertTriangle,
 } from "lucide-react";
 import { Client } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
