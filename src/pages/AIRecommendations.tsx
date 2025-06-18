@@ -65,6 +65,20 @@ const AIRecommendations = () => {
     clientName: string;
   }>({ isOpen: false, recommendation: null, clientName: "" });
 
+  // Load applied recommendations from localStorage on mount
+  useState(() => {
+    const stored = localStorage.getItem("appliedRecommendations");
+    if (stored) {
+      try {
+        const appliedRecs = JSON.parse(stored);
+        const ids = new Set(appliedRecs.map((rec: any) => rec.id));
+        setAppliedRecommendationIds(ids);
+      } catch (e) {
+        console.warn("Failed to load applied recommendations:", e);
+      }
+    }
+  });
+
   // Show loading state
   if (loading) {
     return (
