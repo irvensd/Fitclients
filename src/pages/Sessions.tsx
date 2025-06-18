@@ -58,6 +58,301 @@ import { SessionRecapViewer } from "@/components/SessionRecapViewer";
 import { SessionCalendar } from "@/components/SessionCalendar";
 import { useData } from "@/contexts/DataContext";
 
+// Complete Session Dialog
+const CompleteSessionDialog = ({
+  session,
+  open,
+  onOpenChange,
+  onComplete,
+}: {
+  session: Session | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onComplete: (session: Session, notes?: string) => void;
+}) => {
+  const { getClientName } = useData();
+  const [loading, setLoading] = useState(false);
+  const [notes, setNotes] = useState("");
+
+  const handleComplete = async () => {
+    if (!session) return;
+    setLoading(true);
+    try {
+      await onComplete(session, notes);
+      onOpenChange(false);
+      setNotes("");
+    } catch (error) {
+      console.error("Error completing session:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!session) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            Complete Session
+          </DialogTitle>
+          <DialogDescription>
+            Mark this session as completed and add any final notes.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="p-4 bg-muted/50 rounded-lg">
+            <h4 className="font-medium">{getClientName(session.clientId)}</h4>
+            <p className="text-sm text-muted-foreground">
+              {session.type.replace("-", " ").charAt(0).toUpperCase() +
+                session.type.replace("-", " ").slice(1)}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {new Date(session.date).toLocaleDateString()} at{" "}
+              {session.startTime}
+            </p>
+            <p className="text-sm font-medium">${session.cost}</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="completion-notes">Session Notes (Optional)</Label>
+            <Textarea
+              id="completion-notes"
+              placeholder="Add any notes about how the session went, client progress, or next steps..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="min-h-[100px]"
+            />
+          </div>
+
+          <div className="text-sm text-muted-foreground">
+            <p>This will:</p>
+            <ul className="list-disc list-inside mt-2 space-y-1">
+              <li>Mark the session as completed</li>
+              <li>Update the session status</li>
+              <li>Add completion timestamp</li>
+              <li>Allow for session recap creation</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleComplete} disabled={loading}>
+            {loading ? "Completing..." : "Complete Session"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Cancel Session Dialog
+const CancelSessionDialog = ({
+  session,
+  open,
+  onOpenChange,
+  onCancel,
+}: {
+  session: Session | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCancel: (session: Session, reason: string) => void;
+}) => {
+  const { getClientName } = useData();
+  const [loading, setLoading] = useState(false);
+  const [reason, setReason] = useState("");
+
+  const handleCancel = async () => {
+    if (!session) return;
+    setLoading(true);
+    try {
+      await onCancel(session, reason);
+      onOpenChange(false);
+      setReason("");
+    } catch (error) {
+      console.error("Error cancelling session:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!session) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <XCircle className="h-5 w-5 text-orange-600" />
+            Cancel Session
+          </DialogTitle>
+          <DialogDescription>
+            Cancel this session and provide a reason for the cancellation.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="p-4 bg-muted/50 rounded-lg">
+            <h4 className="font-medium">{getClientName(session.clientId)}</h4>
+            <p className="text-sm text-muted-foreground">
+              {session.type.replace("-", " ").charAt(0).toUpperCase() +
+                session.type.replace("-", " ").slice(1)}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {new Date(session.date).toLocaleDateString()} at{" "}
+              {session.startTime}
+            </p>
+            <p className="text-sm font-medium">${session.cost}</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="cancellation-reason">Cancellation Reason</Label>
+            <Textarea
+              id="cancellation-reason"
+              placeholder="Why is this session being cancelled? (e.g., client request, scheduling conflict, illness, etc.)"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="min-h-[100px]"
+              required
+            />
+          </div>
+
+          <div className="text-sm text-muted-foreground">
+            <p>This will:</p>
+            <ul className="list-disc list-inside mt-2 space-y-1">
+              <li>Mark the session as cancelled</li>
+              <li>Record the cancellation reason</li>
+              <li>Add cancellation timestamp</li>
+              <li>Keep the session for record keeping</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Keep Session
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleCancel}
+            disabled={loading || !reason.trim()}
+          >
+            {loading ? "Cancelling..." : "Cancel Session"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Delete Session Dialog
+const DeleteSessionDialog = ({
+  session,
+  open,
+  onOpenChange,
+  onDelete,
+}: {
+  session: Session | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onDelete: (session: Session) => void;
+}) => {
+  const { getClientName } = useData();
+  const [loading, setLoading] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+
+  const handleDelete = async () => {
+    if (!session) return;
+    setLoading(true);
+    try {
+      await onDelete(session);
+      onOpenChange(false);
+      setConfirmText("");
+    } catch (error) {
+      console.error("Error deleting session:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!session) return null;
+
+  const isConfirmed = confirmText.toLowerCase() === "delete";
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Trash2 className="h-5 w-5 text-destructive" />
+            Delete Session
+          </DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. This will permanently delete the
+            session.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <h4 className="font-medium">{getClientName(session.clientId)}</h4>
+            <p className="text-sm text-muted-foreground">
+              {session.type.replace("-", " ").charAt(0).toUpperCase() +
+                session.type.replace("-", " ").slice(1)}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {new Date(session.date).toLocaleDateString()} at{" "}
+              {session.startTime}
+            </p>
+            <p className="text-sm font-medium">${session.cost}</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="delete-confirmation">
+              Type "DELETE" to confirm deletion
+            </Label>
+            <Input
+              id="delete-confirmation"
+              placeholder="DELETE"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+            />
+          </div>
+
+          <div className="text-sm text-destructive">
+            <p>⚠️ Warning: This will permanently:</p>
+            <ul className="list-disc list-inside mt-2 space-y-1">
+              <li>Remove the session from all records</li>
+              <li>Delete any associated session recaps</li>
+              <li>Remove from client history</li>
+              <li>Cannot be recovered</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={loading || !isConfirmed}
+          >
+            {loading ? "Deleting..." : "Delete Session"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const getStatusIcon = (status: string) => {
   switch (status) {
     case "completed":
