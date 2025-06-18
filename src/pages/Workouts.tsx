@@ -57,10 +57,12 @@ const ViewWorkoutDialog = ({
   workout,
   open,
   onOpenChange,
+  onStartSession,
 }: {
   workout: WorkoutPlan | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onStartSession: (workout: WorkoutPlan) => void;
 }) => {
   const { getClientName } = useData();
 
