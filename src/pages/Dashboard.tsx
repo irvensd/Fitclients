@@ -364,6 +364,71 @@ const Dashboard = () => {
             ))}
           </CardContent>
         </Card>
+
+        {/* AI Insights */}
+        <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="p-1 bg-purple-100 rounded-lg">
+                <Brain className="h-4 w-4 text-purple-600" />
+              </div>
+              AI Coach Insights
+            </CardTitle>
+            <CardDescription>
+              Smart recommendations based on client data
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-3 text-center">
+              <div className="p-3 bg-white/50 rounded-lg">
+                <div className="text-lg font-bold text-purple-700">
+                  {stats.totalRecommendations || 8}
+                </div>
+                <p className="text-xs text-purple-600">Active Insights</p>
+              </div>
+              <div className="p-3 bg-white/50 rounded-lg">
+                <div className="text-lg font-bold text-orange-700">
+                  {stats.highPriorityItems || 3}
+                </div>
+                <p className="text-xs text-orange-600">High Priority</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-start gap-2 p-2 bg-white/30 rounded">
+                <Sparkles className="h-4 w-4 mt-0.5 text-yellow-500" />
+                <div className="text-sm">
+                  <p className="font-medium">Workout Intensity</p>
+                  <p className="text-xs text-muted-foreground">
+                    3 clients ready for progression
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2 p-2 bg-white/30 rounded">
+                <TrendingUp className="h-4 w-4 mt-0.5 text-green-500" />
+                <div className="text-sm">
+                  <p className="font-medium">Progress Tracking</p>
+                  <p className="text-xs text-muted-foreground">
+                    Excellent trends across {stats.totalClients} clients
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t">
+              <NavigationButton
+                to="/ai-recommendations"
+                variant="default"
+                size="sm"
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
+              >
+                <Brain className="h-4 w-4 mr-2" />
+                View AI Dashboard
+              </NavigationButton>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Analytics Charts */}
