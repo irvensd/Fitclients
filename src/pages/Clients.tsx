@@ -1299,8 +1299,9 @@ const Clients = () => {
                   Try adjusting your search or filters.
                 </p>
               </CardContent>
-            </Card>
-          )}
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
