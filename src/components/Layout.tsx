@@ -324,7 +324,7 @@ export const Layout = ({ children }: LayoutProps) => {
           <VisuallyHidden.Root>
             <SheetTitle>Navigation Menu</SheetTitle>
           </VisuallyHidden.Root>
-          <Sidebar isMobile={true} />
+          <MobileSidebar onNavigate={() => setSidebarOpen(false)} />
         </SheetContent>
       </Sheet>
 
