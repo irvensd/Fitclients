@@ -158,6 +158,11 @@ const AIRecommendations = () => {
             Smart recommendations and insights to help you coach more
             effectively.
           </p>
+          {lastAnalysisTime && (
+            <p className="text-xs text-purple-600 mt-1">
+              Last analysis: {lastAnalysisTime.toLocaleString()}
+            </p>
+          )}
         </div>
         <Button
           className="bg-gradient-to-r from-purple-600 to-blue-600 text-white"
