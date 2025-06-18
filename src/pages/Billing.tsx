@@ -53,6 +53,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { useNavigate } from "react-router-dom";
 import { DemoCheckoutModal } from "@/components/DemoCheckoutModal";
+import "@/lib/resetSubscription"; // Import for console access
 
 // Mock payment methods - in real app, these would come from Stripe
 const mockPaymentMethods = [
