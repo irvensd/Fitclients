@@ -1106,9 +1106,9 @@ const ClientPortal = () => {
       <div className="max-w-6xl mx-auto px-4 py-4 sm:py-8 space-y-4 sm:space-y-8">
         {/* Client Welcome */}
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
+          <CardContent className="pt-4 sm:pt-6">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <Avatar className="h-16 w-16 sm:h-16 sm:w-16">
                 <AvatarImage src={client.avatar} />
                 <AvatarFallback className="text-lg">
                   {client.name
@@ -1117,17 +1117,23 @@ const ClientPortal = () => {
                     .join("")}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold">Welcome, {client.name}!</h2>
-                <p className="text-muted-foreground">
+              <div className="flex-1 text-center sm:text-left">
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  Welcome, {client.name}!
+                </h2>
+                <p className="text-sm sm:text-base text-muted-foreground">
                   Trainer: {client.trainerName} • Member since{" "}
                   {new Date(client.dateJoined).toLocaleDateString()}
                 </p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="outline">{client.fitnessLevel}</Badge>
-                  <Badge variant="secondary">
+                <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2 mt-2">
+                  <Badge variant="outline" className="text-xs sm:text-sm">
+                    {client.fitnessLevel}
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs sm:text-sm">
                     <Target className="h-3 w-3 mr-1" />
-                    {client.goals}
+                    <span className="truncate max-w-[200px]">
+                      {client.goals}
+                    </span>
                   </Badge>
                 </div>
               </div>
