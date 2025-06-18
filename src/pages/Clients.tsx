@@ -848,7 +848,7 @@ const DeleteClientDialog = ({ client }: { client: Client }) => {
           Delete Client
         </DropdownMenuItem>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Delete Client</DialogTitle>
           <DialogDescription>
