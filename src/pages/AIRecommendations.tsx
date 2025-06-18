@@ -176,12 +176,19 @@ const AIRecommendations = () => {
     return matchesSearch && matchesPriority && matchesType && notApplied;
   });
 
-  // Stats
-  const highPriorityCount = allRecommendations.filter(
+  // Stats - filtered by applied recommendations
+  const activeRecommendations = allRecommendations.filter(
+    (rec) => !appliedRecommendationIds.has(`${rec.clientId}-${rec.id}`),
+  );
+  const highPriorityCount = activeRecommendations.filter(
     (r) => r.priority === "high",
   ).length;
   const clientsNeedingAttention = clientAnalyses.filter((a) =>
-    a.recommendations.some((r) => r.priority === "high"),
+    a.recommendations.some(
+      (r) =>
+        r.priority === "high" &&
+        !appliedRecommendationIds.has(`${a.clientId}-${r.id}`),
+    ),
   ).length;
 
   return (
