@@ -93,7 +93,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { clients, sessions, payments, loading, error, getClientName } =
     useData();
-  const { getCurrentPlan } = useSubscription();
+  const { getCurrentPlan, subscription } = useSubscription();
 
   const currentPlan = getCurrentPlan();
   const currentClientCount = clients.length;

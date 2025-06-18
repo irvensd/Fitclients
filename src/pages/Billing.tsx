@@ -690,7 +690,29 @@ const Billing = () => {
         <CardContent>
           <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
             <div>
-              <h3 className="font-semibold text-lg">{currentPlan.name} Plan</h3>
+              <div className="flex items-center gap-3">
+                <h3 className="font-semibold text-lg">
+                  {currentPlan.name} Plan
+                </h3>
+                <Badge
+                  variant={
+                    currentPlan.id === "gold"
+                      ? "default"
+                      : currentPlan.id === "professional"
+                        ? "secondary"
+                        : "outline"
+                  }
+                  className={
+                    currentPlan.id === "gold"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : ""
+                  }
+                >
+                  {subscription?.status === "active"
+                    ? "Active"
+                    : subscription?.status || "Active"}
+                </Badge>
+              </div>
               <p className="text-muted-foreground">
                 {currentPlan.price === 0
                   ? "Free forever"
@@ -701,6 +723,11 @@ const Billing = () => {
                   <Calendar className="h-3 w-3 mr-1" />
                   Free Trial Active
                 </Badge>
+              )}
+              {!isOnTrial && subscription?.status === "active" && (
+                <p className="text-sm text-green-600 mt-1">
+                  ✓ Subscription active since {new Date().toLocaleDateString()}
+                </p>
               )}
             </div>
 
