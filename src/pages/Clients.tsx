@@ -1081,14 +1081,8 @@ const Clients = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Calendar className="h-4 w-4 mr-2" />
-                            Schedule Session
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <DollarSign className="h-4 w-4 mr-2" />
-                            Record Payment
-                          </DropdownMenuItem>
+                          <ScheduleSessionDialog client={client} />
+                          <RecordPaymentDialog client={client} />
                           <DeleteClientDialog client={client} />
                         </DropdownMenuContent>
                       </DropdownMenu>
