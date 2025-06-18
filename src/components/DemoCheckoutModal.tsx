@@ -81,9 +81,16 @@ export const DemoCheckoutModal = ({
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Payment Successful!</h3>
-            <p className="text-sm text-muted-foreground text-center mb-6">
+            <p className="text-sm text-muted-foreground text-center mb-4">
               Welcome to the {plan.name} plan! Your subscription is now active.
             </p>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-6">
+              <p className="text-sm text-green-800 text-center">
+                <strong>Plan Updated:</strong> You now have access to all{" "}
+                {plan.name} features
+                {plan.id === "gold" && " including unlimited clients!"}
+              </p>
+            </div>
             <Button onClick={handleSuccess} className="w-full">
               Continue to Dashboard
             </Button>
