@@ -254,29 +254,29 @@ const Dashboard = () => {
                 key={cancellation.id}
                 className="p-3 bg-white border border-orange-200 rounded-lg"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                <div className="flex flex-col space-y-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                    <div className="flex items-center gap-2">
                       <XCircle className="h-4 w-4 text-red-600" />
                       <p className="font-medium">{cancellation.clientName}</p>
-                      <Badge
-                        variant="outline"
-                        className="border-red-200 text-red-700"
-                      >
-                        Client Cancelled
-                      </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {cancellation.type} on {cancellation.sessionDate} at{" "}
-                      {cancellation.sessionTime}
-                    </p>
-                    <p className="text-sm bg-red-50 border border-red-200 rounded p-2">
-                      <strong>Reason:</strong> {cancellation.reason}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Cancelled {cancellation.cancelledAt}
-                    </p>
+                    <Badge
+                      variant="outline"
+                      className="border-red-200 text-red-700 w-fit"
+                    >
+                      Client Cancelled
+                    </Badge>
                   </div>
+                  <p className="text-sm text-muted-foreground">
+                    {cancellation.type} on {cancellation.sessionDate} at{" "}
+                    {cancellation.sessionTime}
+                  </p>
+                  <p className="text-sm bg-red-50 border border-red-200 rounded p-2">
+                    <strong>Reason:</strong> {cancellation.reason}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Cancelled {cancellation.cancelledAt}
+                  </p>
                 </div>
               </div>
             ))}
