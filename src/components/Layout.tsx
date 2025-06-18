@@ -170,7 +170,7 @@ const Sidebar = ({
   );
 };
 
-const MobileSidebar = () => {
+const MobileSidebar = ({ onNavigate }: { onNavigate?: () => void }) => {
   const location = useLocation();
   const { logout } = useAuth();
 
@@ -181,6 +181,10 @@ const MobileSidebar = () => {
       console.error("Failed to logout:", error);
       window.location.href = "/login";
     }
+  };
+
+  const handleNavClick = () => {
+    onNavigate?.();
   };
 
   return (
