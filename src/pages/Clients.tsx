@@ -733,7 +733,7 @@ const RecordPaymentDialog = ({ client }: { client: Client }) => {
           Record Payment
         </DropdownMenuItem>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[400px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Record Payment for {client.name}</DialogTitle>
           <DialogDescription>
