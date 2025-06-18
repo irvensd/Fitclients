@@ -206,7 +206,13 @@ export const SessionCalendar = () => {
               Session Details
             </DialogTitle>
             <DialogDescription>
-              {selectedEvent && (
+              View and manage session details
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedEvent && (
+            <>
+              <div className="mb-4">
                 <Badge
                   variant={
                     selectedEvent.resource.status === "completed"
@@ -215,15 +221,10 @@ export const SessionCalendar = () => {
                         ? "secondary"
                         : "destructive"
                   }
-                  className="mt-2"
                 >
                   {selectedEvent.resource.status.toUpperCase()}
                 </Badge>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedEvent && (
+              </div>
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-3">
                 <div className="flex items-center gap-2">
