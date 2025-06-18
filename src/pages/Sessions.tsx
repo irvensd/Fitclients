@@ -501,14 +501,56 @@ const Sessions = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-medium">
-                          {new Date(session.date).toLocaleDateString()}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {session.startTime} - {session.endTime}
-                        </p>
-                        <p className="text-sm font-medium">${session.cost}</p>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="font-medium">
+                            {new Date(session.date).toLocaleDateString()}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {session.startTime} - {session.endTime}
+                          </p>
+                          <p className="text-sm font-medium">${session.cost}</p>
+                        </div>
+
+                        {/* Action Dropdown */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {session.status === "scheduled" && (
+                              <DropdownMenuItem
+                                onClick={() => handleCompleteSession(session)}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Mark Complete
+                              </DropdownMenuItem>
+                            )}
+                            {session.status === "scheduled" && (
+                              <DropdownMenuItem
+                                onClick={() => handleCancelSession(session)}
+                              >
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Cancel Session
+                              </DropdownMenuItem>
+                            )}
+                            {session.status === "completed" && (
+                              <DropdownMenuItem>
+                                <Edit className="h-4 w-4 mr-2" />
+                                Add Session Recap
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => handleDeleteSession(session)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete Session
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                     {session.notes && (
