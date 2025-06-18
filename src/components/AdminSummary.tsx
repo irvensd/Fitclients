@@ -42,16 +42,16 @@ export const AdminSummary = ({
       {/* Upcoming Sessions */}
       <Card className="border-green-200 bg-green-50/50">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Upcoming Sessions
+          <CardTitle className="text-xs sm:text-sm font-medium">
+            Sessions
           </CardTitle>
-          <Calendar className="h-4 w-4 text-green-600" />
+          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
         </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-green-700">
+        <CardContent className="pt-0">
+          <div className="text-xl sm:text-2xl font-bold text-green-700">
             {upcomingSessions}
           </div>
-          <p className="text-xs text-green-600">Next 7 days</p>
+          <p className="text-xs text-green-600 hidden sm:block">Next 7 days</p>
         </CardContent>
       </Card>
 
