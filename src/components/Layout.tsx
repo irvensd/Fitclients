@@ -248,6 +248,7 @@ const MobileSidebar = ({ onNavigate }: { onNavigate?: () => void }) => {
       <div className="border-t bg-gray-50 p-4 space-y-2">
         <Link
           to="/settings"
+          onClick={handleNavClick}
           className={cn(
             "flex items-center gap-4 rounded-xl px-4 py-4 text-base font-medium transition-all duration-200 active:scale-95",
             location.pathname === "/settings" ||
