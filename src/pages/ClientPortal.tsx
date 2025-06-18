@@ -1141,15 +1141,47 @@ const ClientPortal = () => {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="workout">Workout</TabsTrigger>
-            <TabsTrigger value="progress">Progress</TabsTrigger>
-            <TabsTrigger value="achievements">Achievements</TabsTrigger>
-            <TabsTrigger value="payments">Payments</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
+          <div className="overflow-x-auto">
+            <TabsList className="grid w-full grid-cols-6 min-w-[600px] sm:min-w-0">
+              <TabsTrigger
+                value="overview"
+                className="text-xs sm:text-sm px-2 sm:px-4"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger
+                value="sessions"
+                className="text-xs sm:text-sm px-2 sm:px-4"
+              >
+                Sessions
+              </TabsTrigger>
+              <TabsTrigger
+                value="workout"
+                className="text-xs sm:text-sm px-2 sm:px-4"
+              >
+                Workout
+              </TabsTrigger>
+              <TabsTrigger
+                value="progress"
+                className="text-xs sm:text-sm px-2 sm:px-4"
+              >
+                Progress
+              </TabsTrigger>
+              <TabsTrigger
+                value="achievements"
+                className="text-xs sm:text-sm px-2 sm:px-4"
+              >
+                Achievements
+              </TabsTrigger>
+              <TabsTrigger
+                value="payments"
+                className="text-xs sm:text-sm px-2 sm:px-4"
+              >
+                Payments
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="space-y-6">
             {/* Quick Stats */}
