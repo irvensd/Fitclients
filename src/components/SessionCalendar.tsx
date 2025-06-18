@@ -225,7 +225,6 @@ export const SessionCalendar = () => {
                   {selectedEvent.resource.status.toUpperCase()}
                 </Badge>
               </div>
-              <div className="space-y-4">
               <div className="grid grid-cols-1 gap-3">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-muted-foreground" />
