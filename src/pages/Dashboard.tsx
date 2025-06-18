@@ -19,6 +19,8 @@ import {
   Target,
   XCircle,
   AlertTriangle,
+  Brain,
+  Sparkles,
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { AdminSummary } from "@/components/AdminSummary";
