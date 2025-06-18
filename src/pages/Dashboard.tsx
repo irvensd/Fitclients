@@ -384,13 +384,33 @@ const Dashboard = () => {
             <div className="grid grid-cols-2 gap-3 text-center">
               <div className="p-3 bg-white/50 rounded-lg">
                 <div className="text-lg font-bold text-purple-700">
-                  {stats.totalRecommendations || 8}
+                  {(() => {
+                    const appliedRecs = JSON.parse(
+                      localStorage.getItem("appliedRecommendations") || "[]",
+                    );
+                    return Math.max(
+                      0,
+                      (stats.totalRecommendations || 8) - appliedRecs.length,
+                    );
+                  })()}
                 </div>
                 <p className="text-xs text-purple-600">Active Insights</p>
               </div>
               <div className="p-3 bg-white/50 rounded-lg">
                 <div className="text-lg font-bold text-orange-700">
-                  {stats.highPriorityItems || 3}
+                  {(() => {
+                    const appliedRecs = JSON.parse(
+                      localStorage.getItem("appliedRecommendations") || "[]",
+                    );
+                    const highPriorityApplied = appliedRecs.filter(
+                      (r) =>
+                        r.title.includes("Urgent") || r.title.includes("Alert"),
+                    ).length;
+                    return Math.max(
+                      0,
+                      (stats.highPriorityItems || 3) - highPriorityApplied,
+                    );
+                  })()}
                 </div>
                 <p className="text-xs text-orange-600">High Priority</p>
               </div>
