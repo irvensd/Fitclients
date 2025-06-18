@@ -487,9 +487,6 @@ const Dashboard = () => {
         <RevenueAnalytics />
       </div>
 
-      {/* Client Success Stories */}
-      <ClientSuccessStories />
-
       {/* Analytics Charts */}
       <div className="space-y-6">
         <div>
