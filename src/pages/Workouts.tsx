@@ -555,7 +555,7 @@ const StartSessionDialog = ({
       onOpenChange(false);
 
       // Navigate to sessions page to show the new session
-      window.location.href = "/sessions";
+      navigate("/sessions");
     } catch (error) {
       console.error("Error starting session:", error);
       alert("Failed to create session. Please try again.");
