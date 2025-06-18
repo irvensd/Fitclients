@@ -145,7 +145,10 @@ const AIRecommendations = () => {
     const matchesPriority =
       priorityFilter === "all" || rec.priority === priorityFilter;
     const matchesType = typeFilter === "all" || rec.type === typeFilter;
-    return matchesSearch && matchesPriority && matchesType;
+    const notApplied = !appliedRecommendationIds.has(
+      `${rec.clientId}-${rec.id}`,
+    );
+    return matchesSearch && matchesPriority && matchesType && notApplied;
   });
 
   // Stats
