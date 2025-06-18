@@ -633,7 +633,12 @@ const AIRecommendations = () => {
       <Dialog
         open={confirmationModal.isOpen}
         onOpenChange={(open) =>
-          setConfirmationModal({ ...confirmationModal, isOpen: open })
+          setConfirmationModal({
+            ...confirmationModal,
+            isOpen: open,
+            isApplying: false,
+            isSuccess: false,
+          })
         }
       >
         <DialogContent className="sm:max-w-[500px]">
