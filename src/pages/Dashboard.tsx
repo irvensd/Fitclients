@@ -39,6 +39,8 @@ import {
   getRecentClients,
 } from "@/lib/dashboardMetrics";
 import { useData } from "@/contexts/DataContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { getClientLimitInfo, getPlanLimitText } from "@/lib/clientLimits";
 
 const formatTime = (time: string) => {
   const [hours, minutes] = time.split(":");
