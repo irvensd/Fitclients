@@ -184,60 +184,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       ];
       localStorage.setItem("progressEntries", JSON.stringify(demoProgressData));
 
-      // Add demo workout plans
-      const demoWorkoutPlans = [
-        {
-          id: "workout1",
-          clientId: "1", // Sarah Johnson
-          name: "Fat Loss Circuit",
-          description: "High-intensity circuit training for weight loss",
-          exercises: [
-            { name: "Burpees", sets: 3, reps: "10", rest: "30s" },
-            { name: "Mountain Climbers", sets: 3, reps: "20", rest: "30s" },
-            { name: "Jump Squats", sets: 3, reps: "15", rest: "30s" },
-            { name: "Push-ups", sets: 3, reps: "12", rest: "30s" },
-            { name: "Plank", sets: 3, reps: "45s", rest: "30s" },
-          ],
-          createdAt: "2024-01-15",
-          lastUsed: "2024-02-10",
-        },
-        {
-          id: "workout2",
-          clientId: "2", // Mike Chen
-          name: "Upper Body Strength",
-          description: "Compound movements for muscle building",
-          exercises: [
-            { name: "Bench Press", sets: 4, reps: "8-10", rest: "2min" },
-            { name: "Pull-ups", sets: 4, reps: "6-8", rest: "2min" },
-            { name: "Overhead Press", sets: 3, reps: "8-10", rest: "90s" },
-            { name: "Barbell Rows", sets: 3, reps: "10-12", rest: "90s" },
-            { name: "Dips", sets: 3, reps: "10-15", rest: "60s" },
-          ],
-          createdAt: "2024-02-03",
-          lastUsed: "2024-02-15",
-        },
-        {
-          id: "workout3",
-          clientId: "3", // Emily Davis
-          name: "Marathon Base Training",
-          description: "Endurance and strength for distance running",
-          exercises: [
-            { name: "Easy Run", sets: 1, reps: "45min", rest: "-" },
-            { name: "Lunges", sets: 3, reps: "12 each leg", rest: "45s" },
-            {
-              name: "Single Leg Deadlifts",
-              sets: 3,
-              reps: "10 each",
-              rest: "45s",
-            },
-            { name: "Calf Raises", sets: 3, reps: "20", rest: "30s" },
-            { name: "Core Circuit", sets: 3, reps: "60s", rest: "30s" },
-          ],
-          createdAt: "2024-01-28",
-          lastUsed: "2024-02-12",
-        },
-      ];
-      localStorage.setItem("workoutPlans", JSON.stringify(demoWorkoutPlans));
+      // Add comprehensive demo workout plans
+      localStorage.setItem("workoutPlans", JSON.stringify(mockWorkoutPlans));
 
       setLoading(false);
       return;
