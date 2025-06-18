@@ -60,7 +60,7 @@ import { useData } from "@/contexts/DataContext";
 const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
   const [appliedRecs, setAppliedRecs] = useState<any[]>([]);
 
-  useState(() => {
+  useEffect(() => {
     const stored = localStorage.getItem("appliedRecommendations");
     if (stored) {
       try {
@@ -73,7 +73,7 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
         console.warn("Failed to load applied recommendations:", e);
       }
     }
-  });
+  }, [clientId]);
 
   const removeRecommendation = (recId: string) => {
     const stored = localStorage.getItem("appliedRecommendations");
