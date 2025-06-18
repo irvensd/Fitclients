@@ -643,10 +643,16 @@ const Progress = () => {
           </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList>
-              <TabsTrigger value="overview">Progress Overview</TabsTrigger>
-              <TabsTrigger value="gamification">Achievements</TabsTrigger>
-              <TabsTrigger value="insights">AI Insights</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="overview" className="text-xs sm:text-sm">
+                Progress Overview
+              </TabsTrigger>
+              <TabsTrigger value="gamification" className="text-xs sm:text-sm">
+                Achievements
+              </TabsTrigger>
+              <TabsTrigger value="insights" className="text-xs sm:text-sm">
+                AI Insights
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
