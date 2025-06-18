@@ -169,11 +169,11 @@ Your Personal Trainer`;
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button
               variant="outline"
               onClick={handleEmailShare}
-              className="justify-start"
+              className="justify-center sm:justify-start w-full"
             >
               <Mail className="h-4 w-4 mr-2" />
               Email Client
@@ -181,7 +181,7 @@ Your Personal Trainer`;
             <Button
               variant="outline"
               onClick={() => window.open(portalUrl, "_blank")}
-              className="justify-start"
+              className="justify-center sm:justify-start w-full"
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               Preview Portal
