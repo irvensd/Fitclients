@@ -326,7 +326,7 @@ const AIRecommendations = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {allRecommendations
+                {activeRecommendations
                   .filter((r) => r.priority === "high")
                   .slice(0, 3)
                   .map((rec) => (
