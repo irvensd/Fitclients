@@ -287,7 +287,68 @@ const Sessions = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
-  const { sessions, loading, getClientName } = useData();
+  const { sessions, loading, getClientName, updateSession, deleteSession } =
+    useData();
+
+  // Session management functions
+  const handleStartSession = async (session: Session) => {
+    try {
+      await updateSession(session.id, { status: "scheduled" }); // Keep as scheduled but could add "in-progress" status
+      alert(`Session started for ${getClientName(session.clientId)}!`);
+    } catch (error) {
+      console.error("Error starting session:", error);
+      alert("Failed to start session. Please try again.");
+    }
+  };
+
+  const handleCompleteSession = async (session: Session) => {
+    try {
+      await updateSession(session.id, {
+        status: "completed",
+        notes: session.notes
+          ? session.notes + " - Session completed"
+          : "Session completed successfully",
+      });
+      alert(`Session completed for ${getClientName(session.clientId)}!`);
+    } catch (error) {
+      console.error("Error completing session:", error);
+      alert("Failed to complete session. Please try again.");
+    }
+  };
+
+  const handleCancelSession = async (session: Session) => {
+    const reason = prompt("Reason for cancellation (optional):");
+    try {
+      await updateSession(session.id, {
+        status: "cancelled",
+        notes: session.notes
+          ? `${session.notes} - Cancelled: ${reason || "No reason provided"}`
+          : `Cancelled: ${reason || "No reason provided"}`,
+        cancelledBy: "trainer",
+        cancelledAt: new Date().toISOString(),
+      });
+      alert(`Session cancelled for ${getClientName(session.clientId)}.`);
+    } catch (error) {
+      console.error("Error cancelling session:", error);
+      alert("Failed to cancel session. Please try again.");
+    }
+  };
+
+  const handleDeleteSession = async (session: Session) => {
+    if (
+      confirm(
+        `Are you sure you want to delete the session with ${getClientName(session.clientId)}? This action cannot be undone.`,
+      )
+    ) {
+      try {
+        await deleteSession(session.id);
+        alert("Session deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting session:", error);
+        alert("Failed to delete session. Please try again.");
+      }
+    }
+  };
 
   const filteredSessions = sessions.filter((session) => {
     const clientName = getClientName(session.clientId);
