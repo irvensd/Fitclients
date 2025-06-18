@@ -483,21 +483,166 @@ export const mockPayments: Payment[] = [
     description: "February Package (3 sessions)",
   },
 
+  // Recent revenue data distributed across last 6 months
+  {
+    id: "16",
+    clientId: "1",
+    amount: 300,
+    date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // Last month
+    method: "card",
+    status: "completed",
+    description: "Monthly Package (4 sessions)",
+  },
+  {
+    id: "17",
+    clientId: "2",
+    amount: 225,
+    date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // 1.5 months ago
+    method: "bank-transfer",
+    status: "completed",
+    description: "3-Session Package",
+  },
+  {
+    id: "18",
+    clientId: "3",
+    amount: 375,
+    date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // 2 months ago
+    method: "card",
+    status: "completed",
+    description: "5-Session Marathon Prep Package",
+  },
+  {
+    id: "19",
+    clientId: "4",
+    amount: 150,
+    date: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // 3 months ago
+    method: "venmo",
+    status: "completed",
+    description: "2-Session Package",
+  },
+  {
+    id: "20",
+    clientId: "1",
+    amount: 450,
+    date: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // 4 months ago
+    method: "card",
+    status: "completed",
+    description: "6-Session Weight Loss Package",
+  },
+  {
+    id: "21",
+    clientId: "2",
+    amount: 200,
+    date: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // 5 months ago
+    method: "cash",
+    status: "completed",
+    description: "Initial Package Deal",
+  },
+  {
+    id: "22",
+    clientId: "3",
+    amount: 300,
+    date: new Date(Date.now() - 170 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // 5.5 months ago
+    method: "bank-transfer",
+    status: "completed",
+    description: "Monthly Training Package",
+  },
+
+  // This month's revenue
+  {
+    id: "23",
+    clientId: "1",
+    amount: 75,
+    date: new Date().toISOString().split("T")[0], // Today
+    method: "card",
+    status: "completed",
+    description: "Personal Training Session",
+  },
+  {
+    id: "24",
+    clientId: "3",
+    amount: 75,
+    date: new Date().toISOString().split("T")[0], // Today
+    method: "bank-transfer",
+    status: "completed",
+    description: "Marathon Training Session",
+  },
+  {
+    id: "25",
+    clientId: "8", // Rachel (new client)
+    amount: 50,
+    date: new Date().toISOString().split("T")[0], // Today
+    method: "card",
+    status: "completed",
+    description: "Initial Assessment",
+  },
+
+  // Recent weekly revenue
+  {
+    id: "26",
+    clientId: "2",
+    amount: 75,
+    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // 2 days ago
+    method: "cash",
+    status: "completed",
+    description: "Personal Training Session",
+  },
+  {
+    id: "27",
+    clientId: "4",
+    amount: 75,
+    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // 3 days ago
+    method: "venmo",
+    status: "completed",
+    description: "Functional Training Session",
+  },
+  {
+    id: "28",
+    clientId: "1",
+    amount: 75,
+    date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // 5 days ago
+    method: "card",
+    status: "completed",
+    description: "Personal Training Session",
+  },
+
   // Pending payments (invoices due)
   {
     id: "12",
     clientId: "4",
     amount: 225,
-    date: "2024-02-15",
+    date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // Due next week
     method: "bank-transfer",
     status: "pending",
-    description: "February Package (3 sessions)",
+    description: "Monthly Package (3 sessions)",
   },
   {
     id: "13",
-    clientId: "5",
+    clientId: "9", // Tom Anderson
     amount: 50,
-    date: "2024-02-19",
+    date: new Date().toISOString().split("T")[0], // Today
     method: "cash",
     status: "pending",
     description: "Initial Assessment",
