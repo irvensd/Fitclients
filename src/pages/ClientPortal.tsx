@@ -45,6 +45,172 @@ import { GamificationDashboard } from "@/components/GamificationDashboard";
 // Mock client data - in real app this would come from API based on clientId
 const getClientData = (clientId: string) => {
   const clientData = {
+    "1": {
+      client: {
+        id: "1",
+        name: "Sarah Johnson",
+        email: "sarah.johnson@email.com",
+        phone: "(555) 123-4567",
+        dateJoined: "2024-01-15",
+        fitnessLevel: "intermediate",
+        goals: "Weight loss and strength building",
+        trainerName: "Alex Johnson",
+        avatar: "",
+      },
+      upcomingSessions: [
+        {
+          id: "1",
+          date: "2025-01-20",
+          startTime: "09:00",
+          endTime: "10:00",
+          type: "Personal Training",
+          location: "FitGym Downtown",
+          notes: "Focus on upper body strength",
+          status: "scheduled",
+          cost: 75,
+        },
+        {
+          id: "2",
+          date: "2025-01-22",
+          startTime: "09:00",
+          endTime: "10:00",
+          type: "Personal Training",
+          location: "FitGym Downtown",
+          notes: "Cardio and core work",
+          status: "scheduled",
+          cost: 75,
+        },
+        {
+          id: "3",
+          date: "2024-03-22",
+          startTime: "10:00",
+          endTime: "11:00",
+          type: "Personal Training",
+          location: "FitGym Downtown",
+          notes: "Lower body focus",
+          status: "cancelled",
+          cost: 75,
+          cancellationReason: "Client cancelled due to schedule conflict",
+          cancelledAt: "2024-03-17T10:30:00Z",
+          cancelledBy: "client",
+        },
+        {
+          id: "4",
+          date: "2024-03-15",
+          startTime: "09:00",
+          endTime: "10:00",
+          type: "Personal Training",
+          location: "FitGym Downtown",
+          notes: "Completed successfully",
+          status: "completed",
+          cost: 75,
+        },
+      ],
+      workoutPlan: {
+        id: "wp1",
+        name: "Fat Loss Circuit Training",
+        description:
+          "High-intensity circuit training focused on calorie burn and weight loss",
+        exercises: [
+          {
+            name: "Burpees",
+            sets: 3,
+            reps: "10",
+            notes: "Rest 30s between sets",
+          },
+          {
+            name: "Mountain Climbers",
+            sets: 3,
+            reps: "20",
+            notes: "Keep core tight",
+          },
+          { name: "Jump Squats", sets: 3, reps: "15", notes: "Land softly" },
+          {
+            name: "Push-ups",
+            sets: 3,
+            reps: "8-12",
+            notes: "Modify on knees if needed",
+          },
+          {
+            name: "Plank",
+            sets: 3,
+            reps: "45s",
+            notes: "Hold steady position",
+          },
+        ],
+        lastUpdated: "2024-01-15",
+      },
+      progress: [
+        {
+          id: "1",
+          date: "2024-03-15",
+          weight: 159,
+          bodyFat: 19.5,
+          measurements: {
+            chest: 35,
+            waist: 28,
+            hips: 37,
+            arms: 12.5,
+            thighs: 23,
+          },
+          notes: "Excellent progress - lost 6 lbs!",
+        },
+        {
+          id: "2",
+          date: "2024-02-29",
+          weight: 162,
+          bodyFat: 21,
+          measurements: {
+            chest: 35.5,
+            waist: 29,
+            hips: 37.5,
+            arms: 12.2,
+            thighs: 23.5,
+          },
+          notes: "Great progress after 2 weeks!",
+        },
+        {
+          id: "3",
+          date: "2024-01-15",
+          weight: 165,
+          bodyFat: 22,
+          measurements: {
+            chest: 36,
+            waist: 30,
+            hips: 38,
+            arms: 12,
+            thighs: 24,
+          },
+          notes: "Initial measurements",
+        },
+      ],
+      payments: [
+        {
+          id: "1",
+          amount: 75,
+          date: "2024-03-15",
+          status: "completed",
+          description: "Personal Training Session",
+          method: "card",
+        },
+        {
+          id: "2",
+          amount: 75,
+          date: "2024-03-18",
+          status: "pending",
+          description: "Upcoming Session Payment",
+          method: "bank-transfer",
+        },
+        {
+          id: "3",
+          amount: 225,
+          date: "2024-03-01",
+          status: "completed",
+          description: "Monthly Package (3 sessions)",
+          method: "bank-transfer",
+        },
+      ],
+    },
     "sarah-johnson": {
       client: {
         id: "1",
@@ -881,7 +1047,9 @@ const ClientPortal = () => {
                       <p className="text-xs text-muted-foreground">Earned</p>
                     </div>
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-700">🔥</div>
+                      <div className="text-2xl font-bold text-blue-700">
+                        ����
+                      </div>
                       <p className="text-sm font-medium">7 Days</p>
                       <p className="text-xs text-muted-foreground">
                         Current Streak
