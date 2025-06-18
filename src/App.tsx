@@ -22,6 +22,7 @@ import Features from "./pages/Features";
 import ClientPortal from "./pages/ClientPortal";
 import ClientPortalManager from "./pages/ClientPortalManager";
 import AIRecommendations from "./pages/AIRecommendations";
+import Marketing from "./pages/Marketing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -154,6 +155,17 @@ const App = () => (
                     <ProtectedRoute>
                       <Layout>
                         <Features />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/marketing"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Marketing />
                       </Layout>
                     </ProtectedRoute>
                   }

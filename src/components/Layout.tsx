@@ -34,6 +34,7 @@ import {
   Bell,
   Sparkles,
   CheckCircle,
+  TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { GlobalSearch } from "@/components/GlobalSearch";
@@ -89,6 +90,11 @@ const navigation = [
     name: "AI Coach",
     href: "/ai-recommendations",
     icon: Brain,
+  },
+  {
+    name: "Marketing",
+    href: "/marketing",
+    icon: TrendingUp,
   },
 ];
 
