@@ -48,6 +48,11 @@ import {
   UserPlus,
   Target,
   Share2,
+  Brain,
+  Sparkles,
+  CheckCircle,
+  Clock,
+  X,
 } from "lucide-react";
 import { Client } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
