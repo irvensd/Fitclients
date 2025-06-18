@@ -83,6 +83,11 @@ const navigation = [
     href: "/ai-recommendations",
     icon: Brain,
   },
+  {
+    name: "Features",
+    href: "/features",
+    icon: Sparkles,
+  },
 ];
 
 const LogoutButton = () => {
