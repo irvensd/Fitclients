@@ -542,16 +542,20 @@ const ClientPortalManager = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 pt-2">
-                <SharePortalDialog client={client} />
-                <PortalSettingsDialog client={client} />
+              <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                <div className="flex gap-2 flex-1">
+                  <SharePortalDialog client={client} />
+                  <PortalSettingsDialog client={client} />
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => testPortal(client.id)}
                   title="Test Portal"
+                  className="sm:w-auto w-full justify-center"
                 >
                   <Eye className="h-4 w-4" />
+                  <span className="ml-2 sm:hidden">Test Portal</span>
                 </Button>
               </div>
             </CardContent>
