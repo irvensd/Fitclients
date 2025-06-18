@@ -205,7 +205,7 @@ const MobileSidebar = ({ onNavigate }: { onNavigate?: () => void }) => {
   };
 
   return (
-    <div className="flex h-full flex-col bg-white">
+    <div className="flex h-full flex-col bg-white overflow-hidden">
       {/* Mobile Header */}
       <div className="flex h-20 items-center justify-center px-6 border-b bg-gradient-to-r from-primary to-primary/80">
         <div className="flex items-center gap-3">
