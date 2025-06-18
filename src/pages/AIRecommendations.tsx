@@ -776,7 +776,7 @@ const AIRecommendations = () => {
                   duration: 5000,
                 });
 
-                // Auto close after success
+                // Auto close after success and refresh counts
                 setTimeout(() => {
                   setConfirmationModal({
                     isOpen: false,
@@ -785,6 +785,7 @@ const AIRecommendations = () => {
                     isApplying: false,
                     isSuccess: false,
                   });
+                  setRefreshKey((prev) => prev + 1); // Trigger refresh of counts
                 }, 2000);
               }}
               disabled={
