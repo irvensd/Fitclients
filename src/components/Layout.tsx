@@ -297,16 +297,19 @@ export const Layout = ({ children }: LayoutProps) => {
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetTrigger asChild>
           <Button
-            variant="ghost"
+            variant="default"
             size="icon"
-            className="lg:hidden fixed top-3 left-3 z-50 h-10 w-10 bg-background/80 backdrop-blur border shadow-sm"
+            className="lg:hidden fixed top-4 left-4 z-50 h-12 w-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 bg-primary hover:bg-primary/90"
           >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Open sidebar</span>
+            <Menu className="h-6 w-6 text-white" />
+            <span className="sr-only">Open navigation menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-64 bg-sidebar-background">
-          <Sidebar />
+        <SheetContent
+          side="left"
+          className="p-0 w-80 sm:w-96 bg-white border-r-0 shadow-2xl"
+        >
+          <Sidebar isMobile={true} />
         </SheetContent>
       </Sheet>
 
@@ -314,18 +317,28 @@ export const Layout = ({ children }: LayoutProps) => {
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar with mobile search */}
         <div className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-14 items-center justify-between px-3 sm:px-4 lg:px-6">
-            <div className="flex-1 lg:hidden"></div>
-            <div className="flex items-center gap-2 sm:gap-3">
-              {/* Hide search on very small screens, show on sm+ */}
-              <div className="hidden sm:block w-48 md:w-64">
+          <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+            {/* Mobile spacing for menu button */}
+            <div className="flex-1 lg:hidden pl-16"></div>
+
+            {/* Desktop title */}
+            <div className="hidden lg:flex flex-1">
+              <h1 className="text-xl font-semibold text-foreground">
+                FitClient Dashboard
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Search - responsive sizing */}
+              <div className="hidden sm:block w-64 lg:w-80">
                 <GlobalSearch />
               </div>
-              {/* Mobile search button for xs screens */}
+
+              {/* Mobile search icon */}
               <div className="sm:hidden">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="icon" className="h-10 w-10">
                   <svg
-                    className="h-4 w-4"
+                    className="h-5 w-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -337,6 +350,7 @@ export const Layout = ({ children }: LayoutProps) => {
                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
                   </svg>
+                  <span className="sr-only">Search</span>
                 </Button>
               </div>
             </div>
@@ -344,16 +358,16 @@ export const Layout = ({ children }: LayoutProps) => {
         </div>
 
         <main className="flex-1 overflow-y-auto">
-          <div className="p-3 sm:p-4 lg:p-6">
-            <div className="mb-4 lg:mb-6">
+          <div className="p-4 sm:p-6 lg:p-8">
+            <div className="mb-6">
               <BreadcrumbNav />
             </div>
             {children}
           </div>
         </main>
 
-        {/* Quick Actions FAB - positioned better for mobile */}
-        <div className="fixed bottom-4 right-4 lg:bottom-6 lg:right-6 z-40">
+        {/* Quick Actions FAB - optimized for mobile */}
+        <div className="fixed bottom-6 right-6 z-40">
           <QuickActions />
         </div>
       </div>
