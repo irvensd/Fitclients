@@ -566,29 +566,32 @@ export const mockPayments: Payment[] = [
   {
     id: "23",
     clientId: "1",
+    sessionId: "10",
     amount: 75,
     date: new Date().toISOString().split("T")[0], // Today
     method: "card",
     status: "completed",
-    description: "Personal Training Session",
+    description: "Morning Personal Training Session",
   },
   {
     id: "24",
     clientId: "3",
+    sessionId: "11",
     amount: 75,
     date: new Date().toISOString().split("T")[0], // Today
     method: "bank-transfer",
     status: "completed",
-    description: "Marathon Training Session",
+    description: "Marathon Speed Training Session",
   },
   {
     id: "25",
     clientId: "8", // Rachel (new client)
+    sessionId: "21",
     amount: 50,
     date: new Date().toISOString().split("T")[0], // Today
     method: "card",
     status: "completed",
-    description: "Initial Assessment",
+    description: "Initial Fitness Assessment",
   },
 
   // Recent weekly revenue
