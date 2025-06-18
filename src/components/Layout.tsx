@@ -351,6 +351,26 @@ export const Layout = ({ children }: LayoutProps) => {
                 <GlobalSearch />
               </div>
 
+              {/* AI Notifications */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 relative"
+                title="AI Coach Notifications"
+                onClick={() => {
+                  console.log("AI Notifications clicked");
+                  alert(
+                    '🤖 AI Coach Notifications\n\n• 3 new insights available\n• 1 high-priority recommendation\n• Sarah Johnson ready for progression\n\nClick "AI Coach Dashboard" to view all recommendations.',
+                  );
+                }}
+              >
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 h-3 w-3 bg-purple-600 rounded-full flex items-center justify-center">
+                  <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
+                </span>
+                <span className="sr-only">AI Notifications</span>
+              </Button>
+
               {/* Mobile search icon */}
               <div className="sm:hidden">
                 <Button variant="ghost" size="icon" className="h-10 w-10">
