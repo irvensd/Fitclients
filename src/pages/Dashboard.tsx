@@ -422,7 +422,20 @@ const Dashboard = () => {
                 <div className="text-sm">
                   <p className="font-medium">Workout Intensity</p>
                   <p className="text-xs text-muted-foreground">
-                    3 clients ready for progression
+                    {(() => {
+                      const appliedRecs = JSON.parse(
+                        localStorage.getItem("appliedRecommendations") || "[]",
+                      );
+                      const progressionApplied = appliedRecs.filter(
+                        (r) =>
+                          r.title.toLowerCase().includes("progression") ||
+                          r.title.toLowerCase().includes("intensity"),
+                      ).length;
+                      const activeCount = Math.max(0, 3 - progressionApplied);
+                      return activeCount > 0
+                        ? `${activeCount} clients ready for progression`
+                        : "All progressions applied ✓";
+                    })()}
                   </p>
                 </div>
               </div>
