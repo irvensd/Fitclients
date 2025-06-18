@@ -32,137 +32,141 @@ const App = () => (
       <SubscriptionProvider>
         <DataProvider>
           <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-          <Routes>
-            {/* Home route - shows landing or redirects to admin if authenticated */}
-            <Route path="/" element={<LandingRedirect />} />
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                {/* Home route - shows landing or redirects to admin if authenticated */}
+                <Route path="/" element={<LandingRedirect />} />
 
-            {/* Public Routes */}
-            <Route path="/landing" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
+                {/* Public Routes */}
+                <Route path="/landing" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
 
-            {/* Public Client Portal - No Authentication Required */}
-            <Route path="/client-portal/:clientId" element={<ClientPortal />} />
+                {/* Public Client Portal - No Authentication Required */}
+                <Route
+                  path="/client-portal/:clientId"
+                  element={<ClientPortal />}
+                />
 
-            {/* Protected Admin Routes */}
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Dashboard />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
+                {/* Protected Admin Routes */}
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Dashboard />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/clients"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Clients />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/clients"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Clients />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/sessions"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Sessions />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/sessions"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Sessions />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/workouts"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Workouts />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/workouts"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Workouts />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/payments"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Payments />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/payments"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Payments />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/progress"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Progress />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/progress"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Progress />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Settings />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Settings />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/client-portals"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <ClientPortalManager />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/client-portals"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <ClientPortalManager />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="/ai-recommendations"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <AIRecommendations />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/features"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Features />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/ai-recommendations"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <AIRecommendations />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/features"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Features />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
 
-            {/* Catch all route - must be last */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+                {/* Catch all route - must be last */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
           </TooltipProvider>
         </DataProvider>
-      </AuthProvider>
+      </SubscriptionProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
