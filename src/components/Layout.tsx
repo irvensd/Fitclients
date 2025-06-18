@@ -388,7 +388,22 @@ export const Layout = ({ children }: LayoutProps) => {
                     <div className="flex-1">
                       <p className="text-sm font-medium">High Priority Alert</p>
                       <p className="text-xs text-muted-foreground">
-                        Sarah Johnson needs attention - 2 urgent recommendations
+                        {(() => {
+                          const appliedRecs = JSON.parse(
+                            localStorage.getItem("appliedRecommendations") ||
+                              "[]",
+                          );
+                          const activeCount = Math.max(
+                            0,
+                            2 -
+                              appliedRecs.filter(
+                                (r) => r.clientName === "Sarah Johnson",
+                              ).length,
+                          );
+                          return activeCount > 0
+                            ? `Sarah Johnson needs attention - ${activeCount} urgent recommendations`
+                            : "All recommendations addressed ✓";
+                        })()}
                       </p>
                     </div>
                   </DropdownMenuItem>
@@ -399,7 +414,17 @@ export const Layout = ({ children }: LayoutProps) => {
                     <div className="flex-1">
                       <p className="text-sm font-medium">Progress Update</p>
                       <p className="text-xs text-muted-foreground">
-                        3 clients ready for workout progression
+                        {(() => {
+                          const appliedRecs = JSON.parse(
+                            localStorage.getItem("appliedRecommendations") ||
+                              "[]",
+                          );
+                          const activeCount = Math.max(
+                            0,
+                            3 - appliedRecs.length,
+                          );
+                          return `${activeCount} clients ready for workout progression`;
+                        })()}
                       </p>
                     </div>
                   </DropdownMenuItem>
@@ -412,7 +437,17 @@ export const Layout = ({ children }: LayoutProps) => {
                         New Insights Available
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        AI has generated 5 new training recommendations
+                        {(() => {
+                          const appliedRecs = JSON.parse(
+                            localStorage.getItem("appliedRecommendations") ||
+                              "[]",
+                          );
+                          const activeCount = Math.max(
+                            0,
+                            5 - appliedRecs.length,
+                          );
+                          return `AI has generated ${activeCount} new training recommendations`;
+                        })()}
                       </p>
                     </div>
                   </DropdownMenuItem>
