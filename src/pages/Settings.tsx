@@ -455,6 +455,10 @@ const Settings = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="billing" className="space-y-6">
+          <SubscriptionManager />
+        </TabsContent>
+
         <TabsContent value="notifications" className="space-y-6">
           <Card>
             <CardHeader>
