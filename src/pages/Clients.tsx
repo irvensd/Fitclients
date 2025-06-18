@@ -1115,6 +1115,7 @@ const Clients = () => {
                       </p>
                     </div>
                   )}
+                  <AppliedRecommendations clientId={client.id} />
                 </CardContent>
               </Card>
             ))}
