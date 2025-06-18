@@ -7,12 +7,7 @@ import {
   analyticsService,
 } from "@/lib/firebaseService";
 import { Client, Session, Payment } from "@/lib/types";
-import {
-  mockClients,
-  mockSessions,
-  mockPayments,
-  mockWorkoutPlans,
-} from "@/lib/mockData";
+import { mockClients, mockSessions, mockPayments, mockWorkoutPlans } from "@/lib/mockData";
 
 interface DataContextType {
   clients: Client[];
@@ -97,14 +92,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           date: "2024-01-15",
           weight: 165,
           bodyFat: 22,
-          measurements: {
-            chest: 36,
-            waist: 30,
-            hips: 38,
-            arms: 12,
-            thighs: 24,
-          },
-          notes: "Initial measurements",
+          measurements: { chest: 36, waist: 30, hips: 38, arms: 12, thighs: 24 },
+          notes: "Initial measurements"
         },
         {
           id: "prog2",
@@ -112,14 +101,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           date: "2024-01-29",
           weight: 162,
           bodyFat: 21,
-          measurements: {
-            chest: 35.5,
-            waist: 29,
-            hips: 37.5,
-            arms: 12.2,
-            thighs: 23.5,
-          },
-          notes: "Great progress after 2 weeks!",
+          measurements: { chest: 35.5, waist: 29, hips: 37.5, arms: 12.2, thighs: 23.5 },
+          notes: "Great progress after 2 weeks!"
         },
         {
           id: "prog3",
@@ -127,14 +110,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           date: "2024-02-12",
           weight: 159,
           bodyFat: 19.5,
-          measurements: {
-            chest: 35,
-            waist: 28,
-            hips: 37,
-            arms: 12.5,
-            thighs: 23,
-          },
-          notes: "Excellent consistency - lost 6 lbs!",
+          measurements: { chest: 35, waist: 28, hips: 37, arms: 12.5, thighs: 23 },
+          notes: "Excellent consistency - lost 6 lbs!"
         },
         {
           id: "prog4",
@@ -142,14 +119,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           date: "2024-02-03",
           weight: 180,
           bodyFat: 15,
-          measurements: {
-            chest: 42,
-            waist: 32,
-            hips: 40,
-            arms: 15,
-            thighs: 26,
-          },
-          notes: "Starting bulk phase",
+          measurements: { chest: 42, waist: 32, hips: 40, arms: 15, thighs: 26 },
+          notes: "Starting bulk phase"
         },
         {
           id: "prog5",
@@ -157,14 +128,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           date: "2024-02-17",
           weight: 183,
           bodyFat: 15.5,
-          measurements: {
-            chest: 43,
-            waist: 32.5,
-            hips: 40.5,
-            arms: 15.5,
-            thighs: 26.5,
-          },
-          notes: "Good muscle gain, staying lean",
+          measurements: { chest: 43, waist: 32.5, hips: 40.5, arms: 15.5, thighs: 26.5 },
+          notes: "Good muscle gain, staying lean"
         },
         {
           id: "prog6",
@@ -172,15 +137,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           date: "2024-01-28",
           weight: 135,
           bodyFat: 18,
-          measurements: {
-            chest: 34,
-            waist: 26,
-            hips: 36,
-            arms: 10.5,
-            thighs: 21,
-          },
-          notes: "Marathon training baseline",
-        },
+          measurements: { chest: 34, waist: 26, hips: 36, arms: 10.5, thighs: 21 },
+          notes: "Marathon training baseline"
+        }
       ];
       localStorage.setItem("progressEntries", JSON.stringify(demoProgressData));
 
@@ -214,7 +173,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           console.error("Error subscribing to clients:", error);
           setError("Unable to connect to database. Using offline mode.");
           setClients([]); // Set empty data for new accounts
-        },
+        }
       );
 
       const unsubscribeSessions = sessionsService.subscribeToSessions(
@@ -227,7 +186,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           console.error("Error subscribing to sessions:", error);
           setError("Unable to connect to database. Using offline mode.");
           setSessions([]);
-        },
+        }
       );
 
       const unsubscribePayments = paymentsService.subscribeToPayments(
@@ -242,7 +201,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           setError("Unable to connect to database. Using offline mode.");
           setPayments([]);
           setLoading(false);
-        },
+        }
       );
 
       // Cleanup subscriptions
@@ -273,10 +232,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     if (user.email === "trainer@demo.com") {
       const newClient: Client = {
         ...client,
-        id: (Math.max(...clients.map((c) => parseInt(c.id))) + 1).toString(),
+        id: (Math.max(...clients.map(c => parseInt(c.id))) + 1).toString(),
         dateJoined: new Date().toISOString().split("T")[0],
       };
-      setClients((prev) => [newClient, ...prev]);
+      setClients(prev => [newClient, ...prev]);
       return newClient;
     }
 
@@ -293,11 +252,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Demo account: use offline mode
     if (user.email === "trainer@demo.com") {
-      setClients((prev) =>
-        prev.map((client) =>
-          client.id === clientId ? { ...client, ...updates } : client,
-        ),
-      );
+      setClients(prev => prev.map(client =>
+        client.id === clientId ? { ...client, ...updates } : client
+      ));
       return;
     }
 
@@ -314,7 +271,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Demo account: use offline mode
     if (user.email === "trainer@demo.com") {
-      setClients((prev) => prev.filter((client) => client.id !== clientId));
+      setClients(prev => prev.filter(client => client.id !== clientId));
       return;
     }
 
@@ -328,27 +285,41 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Session actions
   const addSession = async (session: Omit<Session, "id">) => {
-    if (!user?.email) throw new Error("User not authenticated");
+    if (!user?.email) {
+      throw new Error("User not authenticated");
+    }
 
-    // Demo account: use offline mode
+    // Demo mode - just add to local state
     if (user.email === "trainer@demo.com") {
       const newSession: Session = {
         ...session,
         id: Date.now().toString(),
       };
       setSessions((prev) => [newSession, ...prev]);
+
+      // Auto-create pending payment for the session
+      const pendingPayment = {
+        id: (Date.now() + 1).toString(),
+        clientId: session.clientId,
+        sessionId: newSession.id,
+        amount: session.cost,
+        date: session.date,
+        method: "bank-transfer" as const, // Default to bank transfer for new sessions
+        status: "pending" as const,
+        description: `Training Session - ${new Date(session.date).toLocaleDateString()}`,
+      };
+      setPayments((prev) => [pendingPayment, ...prev]);
+
       return;
     }
 
     try {
       await sessionsService.addSession(user.email, session);
     } catch (err) {
-      setError("Failed to add session");
-      throw err;
+      console.error("Error adding session:", err);
+      throw new Error("Failed to add session");
     }
   };
-
-  const updateSession = async (
     sessionId: string,
     updates: Partial<Session>,
   ) => {
@@ -356,11 +327,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Demo account: use offline mode
     if (user.email === "trainer@demo.com") {
-      setSessions((prev) =>
-        prev.map((session) =>
-          session.id === sessionId ? { ...session, ...updates } : session,
-        ),
-      );
+      setSessions(prev => prev.map(session =>
+        session.id === sessionId ? { ...session, ...updates } : session
+      ));
       return;
     }
 
@@ -377,7 +346,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Demo account: use offline mode
     if (user.email === "trainer@demo.com") {
-      setSessions((prev) => prev.filter((session) => session.id !== sessionId));
+      setSessions(prev => prev.filter(session => session.id !== sessionId));
       return;
     }
 
@@ -399,7 +368,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         ...payment,
         id: Date.now().toString(),
       };
-      setPayments((prev) => [newPayment, ...prev]);
+      setPayments(prev => [newPayment, ...prev]);
       return;
     }
 
@@ -419,11 +388,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Demo account: use offline mode
     if (user.email === "trainer@demo.com") {
-      setPayments((prev) =>
-        prev.map((payment) =>
-          payment.id === paymentId ? { ...payment, ...updates } : payment,
-        ),
-      );
+      setPayments(prev => prev.map(payment =>
+        payment.id === paymentId ? { ...payment, ...updates } : payment
+      ));
       return;
     }
 
@@ -440,7 +407,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Demo account: use offline mode
     if (user.email === "trainer@demo.com") {
-      setPayments((prev) => prev.filter((payment) => payment.id !== paymentId));
+      setPayments(prev => prev.filter(payment => payment.id !== paymentId));
       return;
     }
 
