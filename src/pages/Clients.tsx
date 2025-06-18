@@ -57,6 +57,91 @@ import {
 import { Client } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
 
+const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
+  const [appliedRecs, setAppliedRecs] = useState<any[]>([]);
+
+  useState(() => {
+    const stored = localStorage.getItem("appliedRecommendations");
+    if (stored) {
+      try {
+        const allApplied = JSON.parse(stored);
+        const clientRecs = allApplied.filter(
+          (rec: any) => rec.clientId === clientId,
+        );
+        setAppliedRecs(clientRecs);
+      } catch (e) {
+        console.warn("Failed to load applied recommendations:", e);
+      }
+    }
+  });
+
+  const removeRecommendation = (recId: string) => {
+    const stored = localStorage.getItem("appliedRecommendations");
+    if (stored) {
+      try {
+        const allApplied = JSON.parse(stored);
+        const updated = allApplied.filter((rec: any) => rec.id !== recId);
+        localStorage.setItem("appliedRecommendations", JSON.stringify(updated));
+        setAppliedRecs(updated.filter((rec: any) => rec.clientId === clientId));
+      } catch (e) {
+        console.warn("Failed to update recommendations:", e);
+      }
+    }
+  };
+
+  if (appliedRecs.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-4 pt-4 border-t">
+      <div className="flex items-center gap-2 mb-3">
+        <Brain className="h-4 w-4 text-purple-600" />
+        <h4 className="font-medium text-sm text-muted-foreground">
+          Active AI Recommendations ({appliedRecs.length})
+        </h4>
+      </div>
+      <div className="space-y-2">
+        {appliedRecs.map((rec) => (
+          <div
+            key={rec.id}
+            className="flex items-center justify-between p-2 bg-purple-50 border border-purple-200 rounded-lg"
+          >
+            <div className="flex items-center gap-2 flex-1">
+              <Sparkles className="h-3 w-3 text-purple-600 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-purple-800 truncate">
+                  {rec.title}
+                </p>
+                <p className="text-xs text-purple-600">
+                  Applied {new Date(rec.appliedDate).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              <Badge
+                variant="outline"
+                className="text-xs border-purple-300 text-purple-700"
+              >
+                {rec.type}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 hover:bg-purple-100"
+                onClick={() => removeRecommendation(rec.id)}
+                title="Mark as completed"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const SharePortalButton = ({ client }: { client: Client }) => {
   const [copied, setCopied] = useState(false);
 
