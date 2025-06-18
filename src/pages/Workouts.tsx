@@ -1029,7 +1029,8 @@ const Workouts = () => {
               {workoutPlans.map((plan) => (
                 <Card
                   key={plan.id}
-                  className="hover:shadow-md transition-shadow"
+                  className="hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => handleViewWorkout(plan)}
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
@@ -1041,24 +1042,49 @@ const Workouts = () => {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditWorkout(plan);
+                            }}
+                          >
                             <Edit className="h-4 w-4 mr-2" />
                             Edit Plan
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDuplicateWorkout(plan);
+                            }}
+                          >
                             <Copy className="h-4 w-4 mr-2" />
                             Duplicate
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStartSession(plan);
+                            }}
+                          >
                             <Play className="h-4 w-4 mr-2" />
                             Start Session
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteWorkout(plan);
+                            }}
+                          >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete
                           </DropdownMenuItem>
