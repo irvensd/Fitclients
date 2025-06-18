@@ -78,11 +78,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
-    // For demo account, use empty data to simulate new account
+    // For demo account, use comprehensive mock data to showcase features
     if (user.email === "trainer@demo.com") {
-      setClients([]);
-      setSessions([]);
-      setPayments([]);
+      setClients(mockClients);
+      setSessions(mockSessions);
+      setPayments(mockPayments);
       setLoading(false);
       return;
     }
