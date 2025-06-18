@@ -592,24 +592,36 @@ const Sessions = () => {
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
 
   // Session management functions
-  const handleStartSession = async (session: Session) => {
-    try {
-      await updateSession(session.id, { status: "scheduled" }); // Keep as scheduled but could add "in-progress" status
-      alert(`Session started for ${getClientName(session.clientId)}!`);
-    } catch (error) {
-      console.error("Error starting session:", error);
-      alert("Failed to start session. Please try again.");
-    }
+  const handleCompleteSession = (session: Session) => {
+    setSelectedSession(session);
+    setCompleteDialogOpen(true);
   };
 
-  const handleCompleteSession = async (session: Session) => {
+  const handleCancelSession = (session: Session) => {
+    setSelectedSession(session);
+    setCancelDialogOpen(true);
+  };
+
+  const handleDeleteSession = (session: Session) => {
+    setSelectedSession(session);
+    setDeleteDialogOpen(true);
+  };
+
+  // Dialog action handlers
+  const onCompleteSession = async (session: Session, notes?: string) => {
     try {
+      const completionNotes = notes || "Session completed successfully";
+      const existingNotes = session.notes || "";
+      const updatedNotes = existingNotes
+        ? `${existingNotes}\n\nCompletion Notes: ${completionNotes}`
+        : `Completion Notes: ${completionNotes}`;
+
       await updateSession(session.id, {
         status: "completed",
-        notes: session.notes
-          ? session.notes + " - Session completed"
-          : "Session completed successfully",
+        notes: updatedNotes,
       });
+
+      // You could show a toast notification here instead of alert
       alert(`Session completed for ${getClientName(session.clientId)}!`);
     } catch (error) {
       console.error("Error completing session:", error);
@@ -617,17 +629,20 @@ const Sessions = () => {
     }
   };
 
-  const handleCancelSession = async (session: Session) => {
-    const reason = prompt("Reason for cancellation (optional):");
+  const onCancelSession = async (session: Session, reason: string) => {
     try {
+      const existingNotes = session.notes || "";
+      const updatedNotes = existingNotes
+        ? `${existingNotes}\n\nCancelled: ${reason}`
+        : `Cancelled: ${reason}`;
+
       await updateSession(session.id, {
         status: "cancelled",
-        notes: session.notes
-          ? `${session.notes} - Cancelled: ${reason || "No reason provided"}`
-          : `Cancelled: ${reason || "No reason provided"}`,
+        notes: updatedNotes,
         cancelledBy: "trainer",
         cancelledAt: new Date().toISOString(),
       });
+
       alert(`Session cancelled for ${getClientName(session.clientId)}.`);
     } catch (error) {
       console.error("Error cancelling session:", error);
@@ -635,19 +650,13 @@ const Sessions = () => {
     }
   };
 
-  const handleDeleteSession = async (session: Session) => {
-    if (
-      confirm(
-        `Are you sure you want to delete the session with ${getClientName(session.clientId)}? This action cannot be undone.`,
-      )
-    ) {
-      try {
-        await deleteSession(session.id);
-        alert("Session deleted successfully.");
-      } catch (error) {
-        console.error("Error deleting session:", error);
-        alert("Failed to delete session. Please try again.");
-      }
+  const onDeleteSession = async (session: Session) => {
+    try {
+      await deleteSession(session.id);
+      alert("Session deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting session:", error);
+      alert("Failed to delete session. Please try again.");
     }
   };
 
