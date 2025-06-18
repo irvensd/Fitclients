@@ -14,9 +14,12 @@ export const SUBSCRIPTION_PLANS = {
     interval: "forever",
     features: [
       "Up to 5 clients",
-      "Basic session scheduling",
-      "Payment tracking",
-      "Progress photos",
+      "Session scheduling & calendar",
+      "Payment tracking & invoicing",
+      "Progress photos & tracking",
+      "Client portal links (no login)",
+      "Workout plan builder",
+      "Session recaps",
       "Email support",
     ],
     limits: {
@@ -34,13 +37,14 @@ export const SUBSCRIPTION_PLANS = {
     stripePriceId: "price_professional", // Will be created in Stripe dashboard
     features: [
       "Up to 50 clients",
-      "Advanced scheduling & calendar",
+      "Everything in Starter, plus:",
+      "Advanced scheduling & calendar sync",
       "Automated reminders (SMS/Email)",
-      "Client progress reports",
-      "Workout plan builder",
-      "Client portal links",
-      "AI Session Recaps",
-      "Priority support",
+      "Detailed client progress reports",
+      "Advanced workout plan builder",
+      "AI-powered session recaps",
+      "Client streak tracking & badges",
+      "Priority email support",
     ],
     limits: {
       clients: 50,
@@ -48,22 +52,24 @@ export const SUBSCRIPTION_PLANS = {
       storage: "5GB",
     },
   },
-  ENTERPRISE: {
-    id: "enterprise",
-    name: "Enterprise",
+  GOLD: {
+    id: "gold",
+    name: "Gold",
     price: 79,
     interval: "month",
-    stripeProductId: "prod_enterprise", // Will be created in Stripe dashboard
-    stripePriceId: "price_enterprise", // Will be created in Stripe dashboard
+    stripeProductId: "prod_gold", // Will be created in Stripe dashboard
+    stripePriceId: "price_gold", // Will be created in Stripe dashboard
     features: [
       "Unlimited clients",
+      "Everything in Professional, plus:",
       "Multi-trainer management",
       "Advanced analytics & reporting",
       "White-label client portals",
-      "API access",
-      "Advanced AI features",
-      "Custom integrations",
-      "Dedicated support",
+      "API access for integrations",
+      "Advanced AI coaching features",
+      "Custom branding options",
+      "Dedicated phone support",
+      "Priority feature requests",
     ],
     limits: {
       clients: -1, // Unlimited

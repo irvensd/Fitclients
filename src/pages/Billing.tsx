@@ -318,7 +318,7 @@ const PlanCard = ({
   loading: boolean;
 }) => {
   const isPro = plan.id === "professional";
-  const isEnterprise = plan.id === "enterprise";
+  const isGold = plan.id === "gold";
 
   return (
     <Card
@@ -346,7 +346,7 @@ const PlanCard = ({
 
       <CardHeader className="text-center">
         <div className="flex items-center justify-center mb-2">
-          {isEnterprise && <Crown className="h-6 w-6 text-yellow-600 mr-2" />}
+          {isGold && <Crown className="h-6 w-6 text-yellow-600 mr-2" />}
           <CardTitle className="text-xl">{plan.name}</CardTitle>
         </div>
 
@@ -573,9 +573,11 @@ const Billing = () => {
 
       // Mock success after a delay
       setTimeout(() => {
+        const planKey = planId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
+        const selectedPlan = SUBSCRIPTION_PLANS[planKey];
         toast({
           title: "Subscription updated!",
-          description: `Successfully upgraded to ${SUBSCRIPTION_PLANS[planId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS].name} plan.`,
+          description: `Successfully upgraded to ${selectedPlan?.name || planId} plan.`,
         });
         refreshSubscription();
       }, 3000);
