@@ -51,6 +51,537 @@ import { WorkoutPlan, Exercise } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
 import { mockExercises, mockWorkoutPlans } from "@/lib/mockData";
 
+// Dialog for viewing workout plan details
+const ViewWorkoutDialog = ({
+  workout,
+  open,
+  onOpenChange,
+}: {
+  workout: WorkoutPlan | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) => {
+  const { getClientName } = useData();
+
+  if (!workout) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Dumbbell className="h-5 w-5" />
+            {workout.name}
+          </DialogTitle>
+          <DialogDescription>
+            Workout plan for {getClientName(workout.clientId)}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Plan Info */}
+          <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+            <div>
+              <p className="text-sm font-medium">Client</p>
+              <p className="text-sm text-muted-foreground">
+                {getClientName(workout.clientId)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Created</p>
+              <p className="text-sm text-muted-foreground">
+                {new Date(workout.createdDate).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="col-span-2">
+              <p className="text-sm font-medium">Description</p>
+              <p className="text-sm text-muted-foreground">
+                {workout.description}
+              </p>
+            </div>
+          </div>
+
+          {/* Exercises */}
+          <div>
+            <h4 className="font-medium mb-4 flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Exercises ({workout.exercises.length})
+            </h4>
+            <div className="space-y-3">
+              {workout.exercises.map((exercise, index) => (
+                <Card key={exercise.id} className="border-muted">
+                  <CardContent className="pt-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="flex items-center justify-center w-6 h-6 bg-primary text-primary-foreground text-xs rounded-full">
+                            {index + 1}
+                          </span>
+                          <h5 className="font-medium">{exercise.name}</h5>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                          {exercise.sets > 0 && (
+                            <div>
+                              <span className="text-muted-foreground">
+                                Sets:
+                              </span>{" "}
+                              {exercise.sets}
+                            </div>
+                          )}
+                          {exercise.reps && (
+                            <div>
+                              <span className="text-muted-foreground">
+                                Reps:
+                              </span>{" "}
+                              {exercise.reps}
+                            </div>
+                          )}
+                          {exercise.weight && (
+                            <div>
+                              <span className="text-muted-foreground">
+                                Weight:
+                              </span>{" "}
+                              {exercise.weight}
+                            </div>
+                          )}
+                          {exercise.duration && (
+                            <div>
+                              <span className="text-muted-foreground">
+                                Duration:
+                              </span>{" "}
+                              {exercise.duration}
+                            </div>
+                          )}
+                        </div>
+                        {exercise.notes && (
+                          <p className="text-sm text-muted-foreground mt-2">
+                            <span className="font-medium">Notes:</span>{" "}
+                            {exercise.notes}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2 pt-4 border-t">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
+          <Button>
+            <Play className="h-4 w-4 mr-2" />
+            Start Session
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Dialog for editing workout plans
+const EditWorkoutDialog = ({
+  workout,
+  open,
+  onOpenChange,
+  onSave,
+}: {
+  workout: WorkoutPlan | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSave: (updatedWorkout: WorkoutPlan) => void;
+}) => {
+  const [loading, setLoading] = useState(false);
+  const { clients } = useData();
+  const [workoutData, setWorkoutData] = useState({
+    clientId: "",
+    name: "",
+    description: "",
+    exercises: [] as Exercise[],
+  });
+  const [currentExercise, setCurrentExercise] = useState({
+    name: "",
+    sets: "",
+    reps: "",
+    weight: "",
+    duration: "",
+    notes: "",
+  });
+
+  // Initialize form data when workout changes
+  useEffect(() => {
+    if (workout) {
+      setWorkoutData({
+        clientId: workout.clientId,
+        name: workout.name,
+        description: workout.description,
+        exercises: [...workout.exercises],
+      });
+    }
+  }, [workout]);
+
+  const handleAddExercise = () => {
+    if (!currentExercise.name) return;
+
+    const newExercise: Exercise = {
+      id: Date.now().toString(),
+      name: currentExercise.name,
+      sets: parseInt(currentExercise.sets) || 0,
+      reps: currentExercise.reps,
+      weight: currentExercise.weight,
+      duration: currentExercise.duration,
+      notes: currentExercise.notes,
+    };
+
+    setWorkoutData({
+      ...workoutData,
+      exercises: [...workoutData.exercises, newExercise],
+    });
+
+    setCurrentExercise({
+      name: "",
+      sets: "",
+      reps: "",
+      weight: "",
+      duration: "",
+      notes: "",
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!workout) return;
+
+    setLoading(true);
+
+    try {
+      const updatedWorkout: WorkoutPlan = {
+        ...workout,
+        clientId: workoutData.clientId,
+        name: workoutData.name,
+        description: workoutData.description,
+        exercises: workoutData.exercises,
+      };
+
+      onSave(updatedWorkout);
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error updating workout:", error);
+      alert("Failed to update workout plan. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!workout) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Edit Workout Plan</DialogTitle>
+          <DialogDescription>
+            Update the workout plan details and exercises
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="client">Client</Label>
+                <Select
+                  value={workoutData.clientId}
+                  onValueChange={(value) =>
+                    setWorkoutData({ ...workoutData, clientId: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select client" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clients.map((client) => (
+                      <SelectItem key={client.id} value={client.id}>
+                        {client.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="name">Workout Name</Label>
+                <Input
+                  id="name"
+                  value={workoutData.name}
+                  onChange={(e) =>
+                    setWorkoutData({ ...workoutData, name: e.target.value })
+                  }
+                  placeholder="e.g., Upper Body Strength"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={workoutData.description}
+                onChange={(e) =>
+                  setWorkoutData({
+                    ...workoutData,
+                    description: e.target.value,
+                  })
+                }
+                placeholder="Brief description of the workout plan..."
+                className="min-h-[80px]"
+              />
+            </div>
+
+            {/* Exercise Builder */}
+            <div className="space-y-4 border-t pt-4">
+              <h4 className="font-medium">Add Exercises</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="exercise-name">Exercise</Label>
+                  <Select
+                    value={currentExercise.name}
+                    onValueChange={(value) =>
+                      setCurrentExercise({ ...currentExercise, name: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select exercise" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {mockExercises.map((exercise) => (
+                        <SelectItem key={exercise.id} value={exercise.name}>
+                          {exercise.name} ({exercise.category})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="sets">Sets</Label>
+                  <Input
+                    id="sets"
+                    type="number"
+                    value={currentExercise.sets}
+                    onChange={(e) =>
+                      setCurrentExercise({
+                        ...currentExercise,
+                        sets: e.target.value,
+                      })
+                    }
+                    placeholder="3"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reps">Reps</Label>
+                  <Input
+                    id="reps"
+                    value={currentExercise.reps}
+                    onChange={(e) =>
+                      setCurrentExercise({
+                        ...currentExercise,
+                        reps: e.target.value,
+                      })
+                    }
+                    placeholder="10-12"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="weight">Weight</Label>
+                  <Input
+                    id="weight"
+                    value={currentExercise.weight}
+                    onChange={(e) =>
+                      setCurrentExercise({
+                        ...currentExercise,
+                        weight: e.target.value,
+                      })
+                    }
+                    placeholder="50 lbs"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="duration">Duration</Label>
+                  <Input
+                    id="duration"
+                    value={currentExercise.duration}
+                    onChange={(e) =>
+                      setCurrentExercise({
+                        ...currentExercise,
+                        duration: e.target.value,
+                      })
+                    }
+                    placeholder="30 sec"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="exercise-notes">Exercise Notes</Label>
+                <Input
+                  id="exercise-notes"
+                  value={currentExercise.notes}
+                  onChange={(e) =>
+                    setCurrentExercise({
+                      ...currentExercise,
+                      notes: e.target.value,
+                    })
+                  }
+                  placeholder="Focus on form, rest 60 seconds between sets..."
+                />
+              </div>
+              <Button
+                type="button"
+                onClick={handleAddExercise}
+                variant="outline"
+              >
+                Add Exercise
+              </Button>
+            </div>
+
+            {/* Exercise List */}
+            {workoutData.exercises.length > 0 && (
+              <div className="space-y-2 border-t pt-4">
+                <h4 className="font-medium">
+                  Exercises ({workoutData.exercises.length})
+                </h4>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {workoutData.exercises.map((exercise, index) => (
+                    <div
+                      key={exercise.id}
+                      className="flex items-center justify-between p-2 bg-muted rounded"
+                    >
+                      <div className="text-sm">
+                        <span className="font-medium">{exercise.name}</span>
+                        <span className="text-muted-foreground ml-2">
+                          {exercise.sets} sets × {exercise.reps}
+                          {exercise.weight && ` @ ${exercise.weight}`}
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          setWorkoutData({
+                            ...workoutData,
+                            exercises: workoutData.exercises.filter(
+                              (_, i) => i !== index,
+                            ),
+                          })
+                        }
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Dialog for starting a workout session
+const StartSessionDialog = ({
+  workout,
+  open,
+  onOpenChange,
+}: {
+  workout: WorkoutPlan | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) => {
+  const { getClientName } = useData();
+  const [loading, setLoading] = useState(false);
+
+  const handleStartSession = async () => {
+    if (!workout) return;
+
+    setLoading(true);
+    try {
+      // Here you would typically create a new session record
+      console.log("Starting session for workout:", workout.name);
+      alert(
+        `Started workout session: ${workout.name} for ${getClientName(workout.clientId)}`,
+      );
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error starting session:", error);
+      alert("Failed to start session. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!workout) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Play className="h-5 w-5" />
+            Start Workout Session
+          </DialogTitle>
+          <DialogDescription>
+            Are you ready to begin this workout session?
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="p-4 bg-muted/50 rounded-lg">
+            <h4 className="font-medium">{workout.name}</h4>
+            <p className="text-sm text-muted-foreground">
+              Client: {getClientName(workout.clientId)}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {workout.exercises.length} exercises planned
+            </p>
+          </div>
+
+          <div className="text-sm text-muted-foreground">
+            <p>This will:</p>
+            <ul className="list-disc list-inside mt-2 space-y-1">
+              <li>Create a new training session record</li>
+              <li>Start the workout timer</li>
+              <li>Allow you to track exercise completion</li>
+              <li>Enable session notes and recap</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleStartSession} disabled={loading}>
+            {loading ? "Starting..." : "Start Session"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const CreateWorkoutDialog = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
