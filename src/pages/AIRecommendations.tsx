@@ -717,8 +717,15 @@ const AIRecommendations = () => {
             <Button
               variant="outline"
               onClick={() =>
-                setConfirmationModal({ ...confirmationModal, isOpen: false })
+                setConfirmationModal({
+                  isOpen: false,
+                  recommendation: null,
+                  clientName: "",
+                  isApplying: false,
+                  isSuccess: false,
+                })
               }
+              disabled={confirmationModal.isApplying}
             >
               Cancel
             </Button>
