@@ -83,6 +83,102 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       setClients(mockClients);
       setSessions(mockSessions);
       setPayments(mockPayments);
+
+      // Add demo progress data to localStorage
+      const demoProgressData = [
+        {
+          id: "prog1",
+          clientId: "1", // Sarah Johnson
+          date: "2024-01-15",
+          weight: 165,
+          bodyFat: 22,
+          measurements: {
+            chest: 36,
+            waist: 30,
+            hips: 38,
+            arms: 12,
+            thighs: 24,
+          },
+          notes: "Initial measurements",
+        },
+        {
+          id: "prog2",
+          clientId: "1",
+          date: "2024-01-29",
+          weight: 162,
+          bodyFat: 21,
+          measurements: {
+            chest: 35.5,
+            waist: 29,
+            hips: 37.5,
+            arms: 12.2,
+            thighs: 23.5,
+          },
+          notes: "Great progress after 2 weeks!",
+        },
+        {
+          id: "prog3",
+          clientId: "1",
+          date: "2024-02-12",
+          weight: 159,
+          bodyFat: 19.5,
+          measurements: {
+            chest: 35,
+            waist: 28,
+            hips: 37,
+            arms: 12.5,
+            thighs: 23,
+          },
+          notes: "Excellent consistency - lost 6 lbs!",
+        },
+        {
+          id: "prog4",
+          clientId: "2", // Mike Chen
+          date: "2024-02-03",
+          weight: 180,
+          bodyFat: 15,
+          measurements: {
+            chest: 42,
+            waist: 32,
+            hips: 40,
+            arms: 15,
+            thighs: 26,
+          },
+          notes: "Starting bulk phase",
+        },
+        {
+          id: "prog5",
+          clientId: "2",
+          date: "2024-02-17",
+          weight: 183,
+          bodyFat: 15.5,
+          measurements: {
+            chest: 43,
+            waist: 32.5,
+            hips: 40.5,
+            arms: 15.5,
+            thighs: 26.5,
+          },
+          notes: "Good muscle gain, staying lean",
+        },
+        {
+          id: "prog6",
+          clientId: "3", // Emily Davis
+          date: "2024-01-28",
+          weight: 135,
+          bodyFat: 18,
+          measurements: {
+            chest: 34,
+            waist: 26,
+            hips: 36,
+            arms: 10.5,
+            thighs: 21,
+          },
+          notes: "Marathon training baseline",
+        },
+      ];
+      localStorage.setItem("progressEntries", JSON.stringify(demoProgressData));
+
       setLoading(false);
       return;
     }
