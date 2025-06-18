@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -18,6 +18,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -39,61 +45,11 @@ import {
   Trash2,
   Play,
   MoreVertical,
+  Filter,
 } from "lucide-react";
 import { WorkoutPlan, Exercise } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
-
-// Exercise library (this can stay static as it's a template library)
-const exerciseLibrary = [
-  {
-    id: "1",
-    name: "Push-ups",
-    category: "Chest",
-    description: "Basic bodyweight exercise for chest and arms",
-  },
-  {
-    id: "2",
-    name: "Squats",
-    category: "Legs",
-    description: "Fundamental lower body exercise",
-  },
-  {
-    id: "3",
-    name: "Planks",
-    category: "Core",
-    description: "Core stability exercise",
-  },
-  {
-    id: "4",
-    name: "Lunges",
-    category: "Legs",
-    description: "Single-leg strength exercise",
-  },
-  {
-    id: "5",
-    name: "Pull-ups",
-    category: "Back",
-    description: "Upper body pulling exercise",
-  },
-  {
-    id: "6",
-    name: "Deadlifts",
-    category: "Full Body",
-    description: "Compound strength exercise",
-  },
-  {
-    id: "7",
-    name: "Burpees",
-    category: "Cardio",
-    description: "Full body cardio exercise",
-  },
-  {
-    id: "8",
-    name: "Mountain Climbers",
-    category: "Cardio",
-    description: "Dynamic core and cardio exercise",
-  },
-];
+import { mockExercises, mockWorkoutPlans } from "@/lib/mockData";
 
 const CreateWorkoutDialog = () => {
   const [open, setOpen] = useState(false);
