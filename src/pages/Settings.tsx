@@ -36,6 +36,7 @@ import {
   Trash2,
   Save,
   Camera,
+  CreditCard,
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { SubscriptionManager } from "@/components/SubscriptionManager";
