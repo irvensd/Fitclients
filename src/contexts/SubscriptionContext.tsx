@@ -104,16 +104,16 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Professional plan restrictions
     if (currentPlan.id === "professional") {
-      const enterpriseOnlyFeatures = [
+      const goldOnlyFeatures = [
         "api-access",
         "white-label",
         "multi-trainer",
-        "advanced-ai",
+        "advanced-analytics",
       ];
-      return !enterpriseOnlyFeatures.includes(feature);
+      return !goldOnlyFeatures.includes(feature);
     }
 
-    // Enterprise has access to everything
+    // Gold has access to everything
     return true;
   };
 

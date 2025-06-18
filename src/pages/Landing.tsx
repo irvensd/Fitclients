@@ -77,7 +77,7 @@ const Landing = () => {
               size="lg"
               variant="outline"
               className="text-lg px-8"
-              onClick={() => (window.location.href = "/login")}
+              onClick={() => window.location.href = '/login'}
             >
               Watch Demo
             </Button>
@@ -94,14 +94,10 @@ const Landing = () => {
               AI-Powered Intelligence
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Meet Your{" "}
-              <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                AI Coach Assistant
-              </span>
+              Meet Your <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">AI Coach Assistant</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              The first fitness CRM with built-in AI that analyzes client data
-              to provide personalized training recommendations and insights.
+              The first fitness CRM with built-in AI that analyzes client data to provide personalized training recommendations and insights.
             </p>
           </div>
 
@@ -114,8 +110,7 @@ const Landing = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Smart Recommendations</h3>
                 <p className="text-sm text-muted-foreground">
-                  AI analyzes client progress, attendance, and performance to
-                  suggest personalized training adjustments
+                  AI analyzes client progress, attendance, and performance to suggest personalized training adjustments
                 </p>
               </CardContent>
             </Card>
@@ -127,8 +122,7 @@ const Landing = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Goal Optimization</h3>
                 <p className="text-sm text-muted-foreground">
-                  Automatically adapts training plans based on client progress
-                  toward specific fitness goals
+                  Automatically adapts training plans based on client progress toward specific fitness goals
                 </p>
               </CardContent>
             </Card>
@@ -140,8 +134,7 @@ const Landing = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Smart Alerts</h3>
                 <p className="text-sm text-muted-foreground">
-                  Real-time notifications for high-priority recommendations and
-                  client milestones
+                  Real-time notifications for high-priority recommendations and client milestones
                 </p>
               </CardContent>
             </Card>
@@ -157,8 +150,7 @@ const Landing = () => {
               Complete Training Business Solution
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to manage clients, track progress, and grow
-              your personal training business.
+              Everything you need to manage clients, track progress, and grow your personal training business.
             </p>
           </div>
 
@@ -176,8 +168,7 @@ const Landing = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Client Portal</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Shareable client portals that work instantly - no passwords or
-                  accounts required
+                  Shareable client portals that work instantly - no passwords or accounts required
                 </p>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -205,8 +196,7 @@ const Landing = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Streak Tracker + Badges</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Keep clients motivated with achievement badges, streaks, and
-                  milestone celebrations
+                  Keep clients motivated with achievement badges, streaks, and milestone celebrations
                 </p>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -229,8 +219,7 @@ const Landing = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Client Management</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Complete client profiles with goals, fitness levels, and
-                  progress history
+                  Complete client profiles with goals, fitness levels, and progress history
                 </p>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -253,8 +242,7 @@ const Landing = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Session Scheduling</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Smart scheduling with cancellation management and session
-                  tracking
+                  Smart scheduling with cancellation management and session tracking
                 </p>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -282,8 +270,7 @@ const Landing = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Progress Monitoring</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Track weight, body measurements, progress photos, and fitness
-                  milestones
+                  Track weight, body measurements, progress photos, and fitness milestones
                 </p>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -329,8 +316,7 @@ const Landing = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Workout Planning</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Create personalized workout plans with exercise libraries and
-                  progression tracking
+                  Create personalized workout plans with exercise libraries and progression tracking
                 </p>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -353,8 +339,7 @@ const Landing = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Analytics Dashboard</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Comprehensive business analytics with revenue tracking and
-                  client growth
+                  Comprehensive business analytics with revenue tracking and client growth
                 </p>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -382,8 +367,7 @@ const Landing = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Session Recaps</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  AI-generated session summaries with personalized feedback and
-                  recommendations
+                  AI-generated session summaries with personalized feedback and recommendations
                 </p>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -401,45 +385,35 @@ const Landing = () => {
 
           {/* Technical Features */}
           <div className="mt-16">
-            <h3 className="text-2xl font-bold text-center mb-8">
-              Built for Modern Trainers
-            </h3>
+            <h3 className="text-2xl font-bold text-center mb-8">Built for Modern Trainers</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="text-center">
                 <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3">
                   <Smartphone className="h-6 w-6 text-primary" />
                 </div>
                 <h4 className="font-semibold mb-1">Mobile Responsive</h4>
-                <p className="text-sm text-muted-foreground">
-                  Fully optimized for mobile devices
-                </p>
+                <p className="text-sm text-muted-foreground">Fully optimized for mobile devices</p>
               </div>
               <div className="text-center">
                 <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3">
                   <Shield className="h-6 w-6 text-primary" />
                 </div>
                 <h4 className="font-semibold mb-1">Secure & Private</h4>
-                <p className="text-sm text-muted-foreground">
-                  Client data protection and privacy
-                </p>
+                <p className="text-sm text-muted-foreground">Client data protection and privacy</p>
               </div>
               <div className="text-center">
                 <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3">
                   <Zap className="h-6 w-6 text-primary" />
                 </div>
                 <h4 className="font-semibold mb-1">Real-time Updates</h4>
-                <p className="text-sm text-muted-foreground">
-                  Instant synchronization across devices
-                </p>
+                <p className="text-sm text-muted-foreground">Instant synchronization across devices</p>
               </div>
               <div className="text-center">
                 <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3">
                   <LinkIcon className="h-6 w-6 text-primary" />
                 </div>
                 <h4 className="font-semibold mb-1">No Complex Setup</h4>
-                <p className="text-sm text-muted-foreground">
-                  Get started immediately
-                </p>
+                <p className="text-sm text-muted-foreground">Get started immediately</p>
               </div>
             </div>
           </div>
@@ -539,8 +513,7 @@ const Landing = () => {
               Choose Your Perfect Plan
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Start free, then grow with plans designed for trainers at every
-              stage of their business.
+              Start free, then grow with plans designed for trainers at every stage of their business.
             </p>
           </div>
 
@@ -550,9 +523,7 @@ const Landing = () => {
               <CardContent className="p-8">
                 <div className="text-center mb-6">
                   <h3 className="text-xl font-bold mb-2">Starter</h3>
-                  <p className="text-muted-foreground text-sm mb-4">
-                    Perfect for new trainers
-                  </p>
+                  <p className="text-muted-foreground text-sm mb-4">Perfect for new trainers</p>
                   <div className="flex items-center justify-center gap-1">
                     <span className="text-3xl font-bold">Free</span>
                   </div>
@@ -601,17 +572,13 @@ const Landing = () => {
               <CardContent className="p-8">
                 <div className="text-center mb-6">
                   <h3 className="text-xl font-bold mb-2">Professional</h3>
-                  <p className="text-muted-foreground text-sm mb-4">
-                    For growing training businesses
-                  </p>
+                  <p className="text-muted-foreground text-sm mb-4">For growing training businesses</p>
                   <div className="flex items-center justify-center gap-1">
                     <span className="text-sm text-muted-foreground">$</span>
                     <span className="text-3xl font-bold">29</span>
                     <span className="text-muted-foreground">/month</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Billed monthly
-                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">Billed monthly</p>
                 </div>
 
                 <div className="space-y-3 mb-8">
@@ -621,15 +588,11 @@ const Landing = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">
-                      Advanced scheduling & calendar
-                    </span>
+                    <span className="text-sm">Advanced scheduling & calendar</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">
-                      Automated reminders (SMS/Email)
-                    </span>
+                    <span className="text-sm">Automated reminders (SMS/Email)</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Check className="h-4 w-4 text-green-600" />
@@ -645,9 +608,7 @@ const Landing = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <Sparkles className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-medium">
-                      AI Session Recaps
-                    </span>
+                    <span className="text-sm font-medium">AI Session Recaps</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Check className="h-4 w-4 text-green-600" />
@@ -656,31 +617,21 @@ const Landing = () => {
                 </div>
 
                 <Link to="/login" className="block">
-                  <Button className="w-full">Start 14-Day Free Trial</Button>
+                  <Button className="w-full">
+                    Start 14-Day Free Trial
+                  </Button>
                 </Link>
               </CardContent>
             </Card>
 
-            {/* Enterprise Plan */}
+            {/* Gold Plan */}
             <Card className="border-2 hover:border-primary/20 transition-all duration-300">
-              <CardContent className="p-8">
-                <div className="text-center mb-6">
-                  <div className="flex items-center justify-center gap-1 mb-2">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
                     <Crown className="h-5 w-5 text-yellow-600" />
-                    <h3 className="text-xl font-bold">Enterprise</h3>
+                    <h3 className="text-xl font-bold">Gold</h3>
                   </div>
-                  <p className="text-muted-foreground text-sm mb-4">
-                    For established fitness businesses
-                  </p>
-                  <div className="flex items-center justify-center gap-1">
-                    <span className="text-sm text-muted-foreground">$</span>
-                    <span className="text-3xl font-bold">79</span>
-                    <span className="text-muted-foreground">/month</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Billed monthly
-                  </p>
-                </div>
 
                 <div className="space-y-3 mb-8">
                   <div className="flex items-center gap-3">
@@ -693,9 +644,7 @@ const Landing = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">
-                      Advanced analytics & reporting
-                    </span>
+                    <span className="text-sm">Advanced analytics & reporting</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Check className="h-4 w-4 text-green-600" />
@@ -707,9 +656,7 @@ const Landing = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <Sparkles className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-medium">
-                      Advanced AI features
-                    </span>
+                    <span className="text-sm font-medium">Advanced AI features</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Check className="h-4 w-4 text-green-600" />
@@ -717,9 +664,7 @@ const Landing = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <Shield className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium">
-                      Dedicated support
-                    </span>
+                    <span className="text-sm font-medium">Dedicated support</span>
                   </div>
                 </div>
 
@@ -751,8 +696,7 @@ const Landing = () => {
                 </div>
                 <h4 className="font-semibold mb-2">Cancel Anytime</h4>
                 <p className="text-sm text-muted-foreground">
-                  No long-term contracts. Upgrade, downgrade, or cancel with one
-                  click.
+                  No long-term contracts. Upgrade, downgrade, or cancel with one click.
                 </p>
               </div>
 
@@ -762,8 +706,7 @@ const Landing = () => {
                 </div>
                 <h4 className="font-semibold mb-2">Data Migration</h4>
                 <p className="text-sm text-muted-foreground">
-                  Moving from another platform? We'll help migrate your data for
-                  free.
+                  Moving from another platform? We'll help migrate your data for free.
                 </p>
               </div>
             </div>
@@ -771,8 +714,7 @@ const Landing = () => {
             <div className="mt-12 p-6 bg-gradient-to-r from-primary/10 to-blue/10 rounded-lg border">
               <h4 className="font-semibold mb-2">Questions about pricing?</h4>
               <p className="text-sm text-muted-foreground mb-4">
-                Need a custom plan or have specific requirements? We're here to
-                help.
+                Need a custom plan or have specific requirements? We're here to help.
               </p>
               <Button variant="outline" size="sm">
                 Contact Our Team
