@@ -245,7 +245,7 @@ const PortalSettingsDialog = ({ client }: { client: any }) => {
           Settings
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[400px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Portal Settings</DialogTitle>
           <DialogDescription>
