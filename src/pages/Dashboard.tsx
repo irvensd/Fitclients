@@ -41,6 +41,9 @@ import {
 import { useData } from "@/contexts/DataContext";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { getClientLimitInfo, getPlanLimitText } from "@/lib/clientLimits";
+import { RevenueAnalytics } from "@/components/RevenueAnalytics";
+import { ClientSuccessStories } from "@/components/ClientSuccessStories";
+import { QuickActionsWidget } from "@/components/QuickActionsWidget";
 
 const formatTime = (time: string) => {
   const [hours, minutes] = time.split(":");
