@@ -564,49 +564,142 @@ const Payments = () => {
             </CardContent>
           </Card>
 
+          {/* Overdue Payments Alert */}
+          {getOverduePayments().length > 0 && (
+            <Card className="border-orange-200 bg-orange-50">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertCircle className="h-5 w-5 text-orange-600" />
+                  <h3 className="font-semibold text-orange-900">
+                    {getOverduePayments().length} Overdue Payment
+                    {getOverduePayments().length > 1 ? "s" : ""}
+                  </h3>
+                </div>
+                <p className="text-sm text-orange-700">
+                  You have overdue payments totaling $
+                  {getOverduePayments()
+                    .reduce((sum, p) => sum + p.amount, 0)
+                    .toFixed(2)}
+                  . Consider sending payment reminders to clients.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Payments List */}
           <div className="space-y-4">
-            {filteredPayments.map((payment) => (
-              <Card
-                key={payment.id}
-                className="hover:shadow-md transition-shadow"
-              >
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(payment.status)}
-                        <Badge className={getStatusColor(payment.status)}>
-                          {payment.status}
-                        </Badge>
+            {filteredPayments.map((payment) => {
+              const isOverdue =
+                payment.status === "pending" &&
+                new Date(payment.date) < new Date();
+              const methodInfo = getPaymentMethodInfo(payment.method);
+
+              return (
+                <Card
+                  key={payment.id}
+                  className={`hover:shadow-md transition-shadow ${
+                    isOverdue ? "border-orange-200 bg-orange-50/30" : ""
+                  }`}
+                >
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          {getStatusIcon(payment.status)}
+                          <Badge className={getStatusColor(payment.status)}>
+                            {payment.status}
+                            {isOverdue && " (OVERDUE)"}
+                          </Badge>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg">
+                            ${payment.amount.toFixed(2)}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {getClientName(payment.clientId)}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {payment.description}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-lg">
-                          ${payment.amount.toFixed(2)}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {getClientName(payment.clientId)}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {payment.description}
-                        </p>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm">{methodInfo.icon}</span>
+                            <Badge
+                              variant="outline"
+                              className={methodInfo.color}
+                            >
+                              {methodInfo.label}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {isOverdue ? "Due: " : ""}
+                            {new Date(payment.date).toLocaleDateString()}
+                          </p>
+                          {payment.sessionId && (
+                            <p className="text-xs text-muted-foreground">
+                              Session #{payment.sessionId}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Action Dropdown */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {payment.status === "pending" && (
+                              <DropdownMenuItem
+                                onClick={() => handleMarkAsPaid(payment)}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Mark as Paid
+                              </DropdownMenuItem>
+                            )}
+                            {payment.status === "pending" && (
+                              <DropdownMenuItem
+                                onClick={() => handleSendReminder(payment)}
+                              >
+                                <Mail className="h-4 w-4 mr-2" />
+                                Send Reminder
+                              </DropdownMenuItem>
+                            )}
+                            {payment.status === "pending" && (
+                              <DropdownMenuItem
+                                onClick={() => handleMarkAsFailed(payment)}
+                              >
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Mark as Failed
+                              </DropdownMenuItem>
+                            )}
+                            {payment.status === "failed" && (
+                              <DropdownMenuItem
+                                onClick={() => handleMarkAsPaid(payment)}
+                              >
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Retry Payment
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => handleDeletePayment(payment)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete Record
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 mb-1">
-                        {getMethodIcon(payment.method)}
-                        <span className="text-sm text-muted-foreground capitalize">
-                          {payment.method.replace("-", " ")}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(payment.date).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           {filteredPayments.length === 0 && (
