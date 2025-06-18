@@ -523,6 +523,7 @@ const StartSessionDialog = ({
     new Date().toTimeString().slice(0, 5),
   );
   const [sessionCost, setSessionCost] = useState("75");
+  const [sessionNotes, setSessionNotes] = useState("");
 
   const handleStartSession = async () => {
     if (!workout) return;
@@ -542,7 +543,7 @@ const StartSessionDialog = ({
         type: "personal-training" as const,
         status: "scheduled" as const,
         cost: parseFloat(sessionCost),
-        notes: `Workout Plan: ${workout.name} - ${workout.description}`,
+        notes: `Workout Plan: ${workout.name}\n${workout.description}\n\nPlanned Exercises: ${workout.exercises.map((ex) => ex.name).join(", ")}\n\nSession Notes: ${sessionNotes}`,
       };
 
       // Add session to data
@@ -552,6 +553,9 @@ const StartSessionDialog = ({
       alert(
         `Session scheduled successfully!\n\nWorkout: ${workout.name}\nClient: ${getClientName(workout.clientId)}\nDate: ${new Date(sessionDate).toLocaleDateString()}\nTime: ${sessionTime}`,
       );
+
+      // Reset form
+      setSessionNotes("");
 
       // Close dialog
       onOpenChange(false);
@@ -570,32 +574,57 @@ const StartSessionDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Play className="h-5 w-5" />
-            Start Workout Session
+            <Play className="h-5 w-5 text-blue-600" />
+            Schedule Training Session
           </DialogTitle>
           <DialogDescription>
-            Are you ready to begin this workout session?
+            Schedule a training session using this workout plan.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="p-4 bg-muted/50 rounded-lg">
-            <h4 className="font-medium">{workout.name}</h4>
-            <p className="text-sm text-muted-foreground">
+        <div className="space-y-6">
+          {/* Workout Plan Details */}
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="font-medium text-blue-900">{workout.name}</h4>
+            <p className="text-sm text-blue-700 mt-1">
               Client: {getClientName(workout.clientId)}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-blue-600 mt-1">
               {workout.exercises.length} exercises planned
             </p>
+            <p className="text-xs text-blue-600 mt-2">{workout.description}</p>
+          </div>
+
+          {/* Exercise Preview */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Planned Exercises</Label>
+            <div className="max-h-32 overflow-y-auto p-3 bg-muted/30 rounded-lg border">
+              <div className="space-y-1">
+                {workout.exercises.slice(0, 5).map((exercise, index) => (
+                  <div
+                    key={exercise.id}
+                    className="text-xs text-muted-foreground"
+                  >
+                    {index + 1}. {exercise.name} ({exercise.sets} sets ×{" "}
+                    {exercise.reps})
+                  </div>
+                ))}
+                {workout.exercises.length > 5 && (
+                  <div className="text-xs text-muted-foreground font-medium">
+                    +{workout.exercises.length - 5} more exercises
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Session Scheduling Fields */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="session-date">Session Date</Label>
+              <Label htmlFor="session-date">Session Date *</Label>
               <Input
                 id="session-date"
                 type="date"
@@ -605,7 +634,7 @@ const StartSessionDialog = ({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="session-time">Start Time</Label>
+              <Label htmlFor="session-time">Start Time *</Label>
               <Input
                 id="session-time"
                 type="time"
@@ -617,7 +646,7 @@ const StartSessionDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="session-cost">Session Cost ($)</Label>
+            <Label htmlFor="session-cost">Session Cost ($) *</Label>
             <Input
               id="session-cost"
               type="number"
@@ -630,13 +659,27 @@ const StartSessionDialog = ({
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="session-notes">
+              Additional Session Notes (Optional)
+            </Label>
+            <Textarea
+              id="session-notes"
+              placeholder="Any specific notes for this session (modifications, client goals, special considerations)..."
+              value={sessionNotes}
+              onChange={(e) => setSessionNotes(e.target.value)}
+              className="min-h-[80px]"
+            />
+          </div>
+
           <div className="text-sm text-muted-foreground">
             <p>This will:</p>
             <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Schedule a new training session</li>
+              <li>Create a scheduled training session</li>
               <li>Link the workout plan to the session</li>
               <li>Add session to your calendar</li>
               <li>Navigate to Sessions page for management</li>
+              <li>Allow session completion and recap creation</li>
             </ul>
           </div>
         </div>
@@ -645,8 +688,11 @@ const StartSessionDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleStartSession} disabled={loading}>
-            {loading ? "Starting..." : "Start Session"}
+          <Button
+            onClick={handleStartSession}
+            disabled={loading || !sessionDate || !sessionTime || !sessionCost}
+          >
+            {loading ? "Creating Session..." : "Schedule Session"}
           </Button>
         </div>
       </DialogContent>
