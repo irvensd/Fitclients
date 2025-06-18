@@ -277,7 +277,7 @@ export const mockSessions: Session[] = [
     cost: 75,
   },
   {
-    id: "12",
+    id: "23",
     clientId: "1", // Sarah Johnson
     date: "2024-02-16",
     startTime: "09:00",
