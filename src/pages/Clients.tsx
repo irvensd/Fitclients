@@ -222,7 +222,14 @@ const SharePortalButton = ({ client }: { client: Client }) => {
 const AddClientDialog = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { addClient } = useData();
+  const { addClient, clients } = useData();
+  const { getCurrentPlan } = useSubscription();
+  const { toast } = useToast();
+
+  const currentPlan = getCurrentPlan();
+  const currentClientCount = clients.length;
+  const limitInfo = getClientLimitInfo(currentPlan.id, currentClientCount);
+  const upgradeMessage = getUpgradeMessage(currentPlan.id, currentClientCount);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -237,6 +244,18 @@ const AddClientDialog = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check client limit before proceeding
+    if (!canAddClient(currentPlan.id, currentClientCount)) {
+      toast({
+        title: "Client limit reached",
+        description:
+          upgradeMessage || "You've reached your client limit for this plan.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -296,12 +315,26 @@ const AddClientDialog = () => {
     }
   };
 
+  const handleDialogOpen = (newOpen: boolean) => {
+    if (newOpen && !limitInfo.canAddMore) {
+      toast({
+        title: "Client limit reached",
+        description:
+          upgradeMessage || "You've reached your client limit for this plan.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setOpen(newOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleDialogOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button disabled={!limitInfo.canAddMore}>
           <Plus className="h-4 w-4 mr-2" />
           Add Client
+          {!limitInfo.isUnlimited && ` (${limitInfo.remainingSlots} left)`}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
