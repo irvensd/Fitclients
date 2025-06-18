@@ -73,11 +73,9 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
     if (stored) {
       try {
         const allApplied = JSON.parse(stored);
-        // Filter for this client and remove duplicates by id
         const clientRecs = allApplied
           .filter((rec: any) => rec.clientId === clientId)
           .reduce((unique: any[], current: any) => {
-            // Only add if we don't already have this ID
             if (!unique.find(item => item.id === current.id)) {
               unique.push(current);
             }
@@ -97,8 +95,6 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
         const allApplied = JSON.parse(stored);
         const updated = allApplied.filter((rec: any) => rec.id !== recId);
         localStorage.setItem('appliedRecommendations', JSON.stringify(updated));
-
-        // Update local state with deduplicated client recommendations
         const clientRecs = updated
           .filter((rec: any) => rec.clientId === clientId)
           .reduce((unique: any[], current: any) => {
@@ -151,6 +147,7 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
       </div>
     </div>
   );
+};
 
             {filteredActiveClients.length === 0 && filteredArchivedClients.length === 0 && (
               <Card>
