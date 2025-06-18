@@ -61,6 +61,7 @@ const AIRecommendations = () => {
   const [appliedRecommendationIds, setAppliedRecommendationIds] = useState<
     Set<string>
   >(new Set());
+  const [refreshKey, setRefreshKey] = useState(0);
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
     recommendation: any;
