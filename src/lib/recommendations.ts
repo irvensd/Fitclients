@@ -232,6 +232,149 @@ const generateAIRecommendations = (
 ): Recommendation[] => {
   const recommendations: Recommendation[] = [];
 
+  // Beginner-specific recommendations
+  if (client.fitnessLevel === "beginner" && analysis.attendanceRate > 70) {
+    recommendations.push({
+      id: "beginner-progression",
+      type: "workout",
+      priority: "medium",
+      title: "Ready for Progressive Overload",
+      description: `${client.name} has shown consistent attendance and is ready to advance their training intensity.`,
+      reasoning:
+        "Good attendance rate and beginner status indicates readiness for gradual progression to prevent plateaus.",
+      actionItems: [
+        "Increase weights by 5-10% for major lifts",
+        "Add one additional set to compound exercises",
+        "Introduce new movement patterns gradually",
+        "Focus on perfect form with increased load",
+      ],
+      confidence: 82,
+      dataPoints: [
+        `${analysis.attendanceRate}% attendance rate`,
+        "Beginner fitness level with room for rapid gains",
+        "No signs of overtraining or fatigue",
+      ],
+      estimatedImpact: "15-20% strength increase in 4 weeks",
+      timeframe: "2-3 weeks",
+    });
+  }
+
+  // Client goals-specific recommendations
+  if (
+    client.goals.toLowerCase().includes("weight") &&
+    analysis.progressTrend !== "improving"
+  ) {
+    recommendations.push({
+      id: "weight-loss-optimization",
+      type: "cardio",
+      priority: "high",
+      title: "Optimize Weight Loss Strategy",
+      description: `Enhance ${client.name}'s weight loss progress with targeted cardio and nutrition guidance.`,
+      reasoning:
+        "Weight loss goals require a combination of strength training and cardiovascular exercise for optimal results.",
+      actionItems: [
+        "Add 2x 30-minute HIIT sessions per week",
+        "Implement daily 10,000 steps target",
+        "Focus on compound movements in strength training",
+        "Discuss nutrition tracking and meal planning",
+      ],
+      confidence: 88,
+      dataPoints: [
+        "Weight loss goal identified",
+        "Current progress trend needs improvement",
+        "High potential for cardio integration",
+      ],
+      estimatedImpact: "1-2 lbs per week weight loss",
+      timeframe: "2-4 weeks",
+    });
+  }
+
+  // Advanced client recommendations
+  if (client.fitnessLevel === "advanced" && analysis.attendanceRate > 85) {
+    recommendations.push({
+      id: "advanced-periodization",
+      type: "workout",
+      priority: "medium",
+      title: "Implement Periodization Strategy",
+      description: `${client.name}'s advanced level and high attendance merit a sophisticated periodization approach.`,
+      reasoning:
+        "Advanced athletes benefit from systematic variation in training intensity and volume to prevent plateaus.",
+      actionItems: [
+        "Design 4-week mesocycles with varying intensities",
+        "Implement deload weeks every 4th week",
+        "Add sport-specific or goal-specific training phases",
+        "Track performance metrics more precisely",
+      ],
+      confidence: 90,
+      dataPoints: [
+        "Advanced fitness level",
+        `${analysis.attendanceRate}% attendance showing dedication`,
+        "Ready for complex training protocols",
+      ],
+      estimatedImpact: "Prevent plateaus and optimize long-term gains",
+      timeframe: "4-8 weeks",
+    });
+  }
+
+  // Data-driven recommendation for real data users
+  if (usingRealData && data.recentSessions.length > 3) {
+    const recentPerformance =
+      data.recentSessions
+        .slice(-3)
+        .reduce((sum: number, session: any) => sum + session.performance, 0) /
+      3;
+
+    if (recentPerformance > 85) {
+      recommendations.push({
+        id: "performance-excellence",
+        type: "workout",
+        priority: "low",
+        title: "Maintain Excellence with New Challenges",
+        description: `${client.name} is performing exceptionally well. Time to introduce new challenges to maintain engagement.`,
+        reasoning:
+          "High performance scores indicate mastery of current program and readiness for advanced techniques.",
+        actionItems: [
+          "Introduce complex movement patterns",
+          "Add unilateral training exercises",
+          "Implement tempo variations in lifts",
+          "Consider advanced training techniques (drop sets, super sets)",
+        ],
+        confidence: 85,
+        dataPoints: [
+          `Average performance score: ${Math.round(recentPerformance)}%`,
+          "Consistent high-level execution",
+          "Ready for advanced challenges",
+        ],
+        estimatedImpact: "Sustained motivation and continued progress",
+        timeframe: "1-2 weeks",
+      });
+    } else if (recentPerformance < 75) {
+      recommendations.push({
+        id: "performance-support",
+        type: "recovery",
+        priority: "high",
+        title: "Address Performance Decline",
+        description: `${client.name}'s recent performance suggests need for recovery or program adjustment.`,
+        reasoning:
+          "Declining performance may indicate overtraining, fatigue, or need for program modification.",
+        actionItems: [
+          "Assess sleep quality and stress levels",
+          "Implement additional recovery strategies",
+          "Consider reducing training intensity temporarily",
+          "Schedule comprehensive program review",
+        ],
+        confidence: 80,
+        dataPoints: [
+          `Average performance score: ${Math.round(recentPerformance)}%`,
+          "Declining trend in session quality",
+          "Immediate intervention needed",
+        ],
+        estimatedImpact: "Restore performance and prevent burnout",
+        timeframe: "Immediate",
+      });
+    }
+  }
+
   // Workout Progression Recommendation
   if (
     analysis.progressTrend === "plateauing" &&
