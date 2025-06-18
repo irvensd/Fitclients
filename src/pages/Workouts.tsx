@@ -889,6 +889,14 @@ const Workouts = () => {
   const [activeTab, setActiveTab] = useState("plans");
   const { clients, loading, getClientName } = useData();
 
+  // Dialog states
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [startSessionDialogOpen, setStartSessionDialogOpen] = useState(false);
+  const [selectedWorkout, setSelectedWorkout] = useState<WorkoutPlan | null>(
+    null,
+  );
+
   // Load workout plans from localStorage or use mock data for demo
   useEffect(() => {
     const storedPlans = localStorage.getItem("workoutPlans");
