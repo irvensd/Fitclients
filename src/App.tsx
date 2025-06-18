@@ -22,7 +22,6 @@ import Features from "./pages/Features";
 import ClientPortal from "./pages/ClientPortal";
 import ClientPortalManager from "./pages/ClientPortalManager";
 import AIRecommendations from "./pages/AIRecommendations";
-import Billing from "./pages/Billing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -155,17 +154,6 @@ const App = () => (
                     <ProtectedRoute>
                       <Layout>
                         <Features />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/billing"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Billing />
                       </Layout>
                     </ProtectedRoute>
                   }

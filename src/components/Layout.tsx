@@ -90,11 +90,6 @@ const navigation = [
     href: "/ai-recommendations",
     icon: Brain,
   },
-  {
-    name: "Billing",
-    href: "/billing",
-    icon: CreditCard,
-  },
 ];
 
 const LogoutButton = () => {
