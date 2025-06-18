@@ -171,8 +171,17 @@ export const generateRecommendations = (
   };
 
   // Generate AI recommendations based on analysis
-  analysis.recommendations = generateAIRecommendations(clientData, analysis);
-  analysis.keyInsights = generateKeyInsights(clientData, analysis);
+  analysis.recommendations = generateAIRecommendations(
+    clientData,
+    analysis,
+    client,
+    usingRealData,
+  );
+  analysis.keyInsights = generateKeyInsights(
+    clientData,
+    analysis,
+    usingRealData,
+  );
 
   return analysis;
 };
