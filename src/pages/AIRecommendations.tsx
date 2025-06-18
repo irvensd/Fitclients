@@ -297,9 +297,9 @@ const AIRecommendations = () => {
               <span className="text-sm font-medium">Total Insights</span>
             </div>
             <div className="text-2xl font-bold text-green-700">
-              {allRecommendations.length}
+              {activeRecommendations.length}
             </div>
-            <p className="text-xs text-green-600">Generated</p>
+            <p className="text-xs text-green-600">Active</p>
           </CardContent>
         </Card>
       </div>
