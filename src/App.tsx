@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { DataProvider } from "./contexts/DataContext";
 import { SubscriptionProvider } from "./contexts/SubscriptionContext";
+import { MarketingProvider } from "./contexts/MarketingContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LandingRedirect } from "./components/LandingRedirect";
 import { Layout } from "./components/Layout";
