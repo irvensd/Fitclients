@@ -1086,14 +1086,16 @@ const ClientPortal = () => {
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Zap className="h-6 w-6" />
+        <div className="max-w-6xl mx-auto px-4 py-4 sm:py-6">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Zap className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">FitClient Portal</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-xl sm:text-2xl font-bold">
+                FitClient Portal
+              </h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Your Personal Fitness Dashboard
               </p>
             </div>
@@ -1101,7 +1103,7 @@ const ClientPortal = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-6xl mx-auto px-4 py-4 sm:py-8 space-y-4 sm:space-y-8">
         {/* Client Welcome */}
         <Card>
           <CardContent className="pt-6">
