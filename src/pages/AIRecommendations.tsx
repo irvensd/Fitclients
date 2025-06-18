@@ -210,10 +210,12 @@ const AIRecommendations = () => {
             setLastAnalysisTime(new Date());
             setIsAnalyzing(false);
 
-            // Show success message
-            alert(
-              `🤖 AI Analysis Complete!\n\n✅ Analyzed ${clients.length} clients\n✅ Generated ${allRecommendations.length} recommendations\n✅ Identified ${highPriorityCount} high-priority items\n\nRecommendations have been updated with the latest data.`,
-            );
+            // Show success toast
+            toast({
+              title: "🤖 AI Analysis Complete!",
+              description: `Analyzed ${clients.length} clients and generated ${allRecommendations.length} recommendations with ${highPriorityCount} high-priority items.`,
+              duration: 5000,
+            });
           }}
           disabled={isAnalyzing}
         >
