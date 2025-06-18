@@ -1187,12 +1187,14 @@ const ClientPortal = () => {
             {/* Quick Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium">Next Session</span>
+                <CardContent className="pt-4 sm:pt-6">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                    <span className="text-xs sm:text-sm font-medium">
+                      Next Session
+                    </span>
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-lg sm:text-2xl font-bold mt-1">
                     {upcomingSessions.length > 0
                       ? new Date(upcomingSessions[0].date).toLocaleDateString()
                       : "None"}
@@ -1206,12 +1208,14 @@ const ClientPortal = () => {
               </Card>
 
               <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-2">
-                    <Scale className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium">Current Weight</span>
+                <CardContent className="pt-4 sm:pt-6">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Scale className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                    <span className="text-xs sm:text-sm font-medium">
+                      Current Weight
+                    </span>
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-lg sm:text-2xl font-bold mt-1">
                     {latestProgress?.weight || "N/A"} lbs
                   </div>
                   <p className="text-xs text-muted-foreground">
@@ -1232,12 +1236,14 @@ const ClientPortal = () => {
               </Card>
 
               <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-medium">Body Fat</span>
+                <CardContent className="pt-4 sm:pt-6">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
+                    <span className="text-xs sm:text-sm font-medium">
+                      Body Fat
+                    </span>
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-lg sm:text-2xl font-bold mt-1">
                     {latestProgress?.bodyFat || "N/A"}%
                   </div>
                   <p className="text-xs text-muted-foreground">
@@ -1247,12 +1253,14 @@ const ClientPortal = () => {
               </Card>
 
               <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4 text-orange-600" />
-                    <span className="text-sm font-medium">Payment Status</span>
+                <CardContent className="pt-4 sm:pt-6">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
+                    <span className="text-xs sm:text-sm font-medium">
+                      Payment Status
+                    </span>
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-lg sm:text-2xl font-bold mt-1">
                     {payments.filter((p: any) => p.status === "pending").length}
                   </div>
                   <p className="text-xs text-muted-foreground">pending</p>
