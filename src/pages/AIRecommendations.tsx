@@ -157,7 +157,10 @@ const AIRecommendations = () => {
             effectively.
           </p>
         </div>
-        <Button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+        <Button
+          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+          onClick={() => window.location.reload()}
+        >
           <Brain className="h-4 w-4 mr-2" />
           Generate New Analysis
         </Button>
