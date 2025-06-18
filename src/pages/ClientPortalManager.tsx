@@ -366,6 +366,16 @@ const ClientPortalManager = () => {
             Generate and manage shareable client portals with no login required.
           </p>
         </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => testPortal("1")} size="sm">
+            <Eye className="h-4 w-4 mr-2" />
+            Test Portal (Sarah)
+          </Button>
+          <Button variant="outline" onClick={() => testPortal("2")} size="sm">
+            <Eye className="h-4 w-4 mr-2" />
+            Test Portal (Mike)
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
