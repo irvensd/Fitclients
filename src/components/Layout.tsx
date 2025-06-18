@@ -315,6 +315,9 @@ export const Layout = ({ children }: LayoutProps) => {
           side="left"
           className="p-0 w-80 sm:w-96 bg-white border-r-0 shadow-2xl"
         >
+          <VisuallyHidden.Root>
+            <SheetTitle>Navigation Menu</SheetTitle>
+          </VisuallyHidden.Root>
           <Sidebar isMobile={true} />
         </SheetContent>
       </Sheet>
