@@ -49,6 +49,11 @@ const navigation = [
     icon: LayoutDashboard,
   },
   {
+    name: "Features",
+    href: "/features",
+    icon: Sparkles,
+  },
+  {
     name: "Clients",
     href: "/clients",
     icon: Users,
@@ -82,11 +87,6 @@ const navigation = [
     name: "AI Coach",
     href: "/ai-recommendations",
     icon: Brain,
-  },
-  {
-    name: "Features",
-    href: "/features",
-    icon: Sparkles,
   },
 ];
 
