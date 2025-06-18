@@ -598,6 +598,139 @@ const AIRecommendations = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Confirmation Modal */}
+      <Dialog
+        open={confirmationModal.isOpen}
+        onOpenChange={(open) =>
+          setConfirmationModal({ ...confirmationModal, isOpen: open })
+        }
+      >
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Zap className="h-5 w-5 text-purple-600" />
+              </div>
+              Apply AI Recommendation
+            </DialogTitle>
+            <DialogDescription>
+              Confirm applying this recommendation to{" "}
+              {confirmationModal.clientName}'s training plan
+            </DialogDescription>
+          </DialogHeader>
+
+          {confirmationModal.recommendation && (
+            <div className="space-y-4">
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-purple-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">
+                    {getTypeIcon(confirmationModal.recommendation.type)}
+                  </span>
+                  <h3 className="font-semibold">
+                    {confirmationModal.recommendation.title}
+                  </h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {confirmationModal.recommendation.description}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Badge
+                    className={getPriorityColor(
+                      confirmationModal.recommendation.priority,
+                    )}
+                  >
+                    {confirmationModal.recommendation.priority} priority
+                  </Badge>
+                  <Badge variant="outline">
+                    {confirmationModal.recommendation.confidence}% confidence
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Action Items:</h4>
+                <ul className="space-y-1">
+                  {confirmationModal.recommendation.actionItems
+                    ?.slice(0, 3)
+                    .map((item: string, index: number) => (
+                      <li
+                        key={index}
+                        className="text-sm text-muted-foreground flex items-start gap-2"
+                      >
+                        <CheckCircle className="h-4 w-4 mt-0.5 text-green-500 flex-shrink-0" />
+                        {item}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-800">
+                  <strong>Expected Impact:</strong>{" "}
+                  {confirmationModal.recommendation.estimatedImpact}
+                </p>
+                <p className="text-sm text-green-700 mt-1">
+                  <strong>Timeframe:</strong>{" "}
+                  {confirmationModal.recommendation.timeframe}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() =>
+                setConfirmationModal({ ...confirmationModal, isOpen: false })
+              }
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                const recId = `${confirmationModal.recommendation.clientId}-${confirmationModal.recommendation.id}`;
+                setAppliedRecommendationIds(
+                  (prev) => new Set([...prev, recId]),
+                );
+
+                // Store applied recommendation in localStorage for persistence
+                const appliedRecs = JSON.parse(
+                  localStorage.getItem("appliedRecommendations") || "[]",
+                );
+                appliedRecs.push({
+                  id: recId,
+                  clientId: confirmationModal.recommendation.clientId,
+                  clientName: confirmationModal.clientName,
+                  title: confirmationModal.recommendation.title,
+                  type: confirmationModal.recommendation.type,
+                  appliedDate: new Date().toISOString(),
+                  status: "active",
+                });
+                localStorage.setItem(
+                  "appliedRecommendations",
+                  JSON.stringify(appliedRecs),
+                );
+
+                setConfirmationModal({
+                  isOpen: false,
+                  recommendation: null,
+                  clientName: "",
+                });
+
+                // Show success message
+                alert(
+                  `✅ Recommendation Applied!\n\n"${confirmationModal.recommendation.title}" has been added to ${confirmationModal.clientName}'s training plan.\n\nThis recommendation will now appear on their client card and will be tracked for progress.`,
+                );
+              }}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+            >
+              <Zap className="h-4 w-4 mr-2" />
+              Apply Recommendation
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
