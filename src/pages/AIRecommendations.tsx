@@ -427,11 +427,30 @@ const AIRecommendations = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm">
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          console.log(
+                            "Applying recommendation:",
+                            rec.title,
+                            "for client:",
+                            rec.clientName,
+                          );
+                          alert(
+                            `Applied recommendation: ${rec.title}\n\nThis would:\n${rec.actionItems?.slice(0, 2).join("\n") || rec.description}\n\nNotification sent to client dashboard.`,
+                          );
+                        }}
+                      >
                         <Zap className="h-4 w-4 mr-2" />
                         Apply
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          console.log("Viewing details for:", rec.title);
+                        }}
+                      >
                         Details
                       </Button>
                     </div>
