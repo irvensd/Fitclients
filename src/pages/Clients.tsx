@@ -56,20 +56,20 @@ const SharePortalButton = ({ client }: { client: Client }) => {
 
   const copyToClipboardFallback = (text: string): boolean => {
     try {
-      const textArea = document.createElement('textarea');
+      const textArea = document.createElement("textarea");
       textArea.value = text;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
       document.body.appendChild(textArea);
       textArea.focus();
       textArea.select();
 
-      const successful = document.execCommand('copy');
+      const successful = document.execCommand("copy");
       document.body.removeChild(textArea);
       return successful;
     } catch (err) {
-      console.error('Fallback copy failed:', err);
+      console.error("Fallback copy failed:", err);
       return false;
     }
   };
@@ -85,7 +85,7 @@ const SharePortalButton = ({ client }: { client: Client }) => {
         await navigator.clipboard.writeText(portalUrl);
         copySuccessful = true;
       } catch (err) {
-        console.warn('Modern clipboard API failed, trying fallback:', err);
+        console.warn("Modern clipboard API failed, trying fallback:", err);
         // Don't throw here, try fallback instead
       }
     }
@@ -157,9 +157,14 @@ const AddClientDialog = () => {
         };
 
         // Store in localStorage for now (in a real app, this would go to the database)
-        const existingMeasurements = JSON.parse(localStorage.getItem("progressEntries") || "[]");
+        const existingMeasurements = JSON.parse(
+          localStorage.getItem("progressEntries") || "[]",
+        );
         existingMeasurements.push(initialMeasurements);
-        localStorage.setItem("progressEntries", JSON.stringify(existingMeasurements));
+        localStorage.setItem(
+          "progressEntries",
+          JSON.stringify(existingMeasurements),
+        );
       }
 
       // Reset form and close dialog
@@ -273,7 +278,9 @@ const AddClientDialog = () => {
 
             {/* Initial Measurements Section */}
             <div className="space-y-4 border-t pt-4">
-              <h4 className="text-sm font-medium text-foreground">Initial Measurements</h4>
+              <h4 className="text-sm font-medium text-foreground">
+                Initial Measurements
+              </h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="weight">Weight (lbs) *</Label>
@@ -500,7 +507,10 @@ const ScheduleSessionDialog = ({ client }: { client: Client }) => {
     date: new Date().toISOString().split("T")[0],
     startTime: "09:00",
     endTime: "10:00",
-    type: "personal-training" as "personal-training" | "consultation" | "assessment",
+    type: "personal-training" as
+      | "personal-training"
+      | "consultation"
+      | "assessment",
     cost: 75,
     notes: "",
   });
@@ -581,7 +591,12 @@ const ScheduleSessionDialog = ({ client }: { client: Client }) => {
                     setFormData({
                       ...formData,
                       type: value as typeof formData.type,
-                      cost: value === "assessment" ? 50 : value === "consultation" ? 60 : 75
+                      cost:
+                        value === "assessment"
+                          ? 50
+                          : value === "consultation"
+                            ? 60
+                            : 75,
                     })
                   }
                 >
@@ -589,9 +604,13 @@ const ScheduleSessionDialog = ({ client }: { client: Client }) => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="personal-training">Personal Training ($75)</SelectItem>
+                    <SelectItem value="personal-training">
+                      Personal Training ($75)
+                    </SelectItem>
                     <SelectItem value="assessment">Assessment ($50)</SelectItem>
-                    <SelectItem value="consultation">Consultation ($60)</SelectItem>
+                    <SelectItem value="consultation">
+                      Consultation ($60)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -742,7 +761,7 @@ const RecordPaymentDialog = ({ client }: { client: Client }) => {
                 onValueChange={(value) =>
                   setFormData({
                     ...formData,
-                    method: value as typeof formData.method
+                    method: value as typeof formData.method,
                   })
                 }
               >
@@ -851,7 +870,6 @@ const DeleteClientDialog = ({ client }: { client: Client }) => {
       </DialogContent>
     </Dialog>
   );
-};
 };
 
 const Clients = () => {
