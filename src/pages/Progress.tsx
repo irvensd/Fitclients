@@ -124,7 +124,7 @@ const AddProgressDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button className="w-full sm:w-auto justify-center">
           <Plus className="h-4 w-4 mr-2" />
           Record Progress
         </Button>
