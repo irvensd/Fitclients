@@ -671,6 +671,15 @@ const Billing = () => {
             </p>
           </div>
         </div>
+        {/* Debug info - current plan */}
+        <div className="text-right">
+          <p className="text-sm font-medium">
+            Current Plan: {currentPlan.name}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Status: {subscription?.status || "unknown"}
+          </p>
+        </div>
       </div>
 
       {/* Trial Status */}
