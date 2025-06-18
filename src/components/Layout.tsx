@@ -97,8 +97,18 @@ const LogoutButton = () => {
   );
 };
 
-const Sidebar = ({ className }: { className?: string }) => {
+const Sidebar = ({
+  className,
+  isMobile = false,
+}: {
+  className?: string;
+  isMobile?: boolean;
+}) => {
   const location = useLocation();
+
+  if (isMobile) {
+    return <MobileSidebar />;
+  }
 
   return (
     <div className={cn("flex h-full w-64 flex-col", className)}>
@@ -149,6 +159,123 @@ const Sidebar = ({ className }: { className?: string }) => {
           Settings
         </Link>
         <LogoutButton />
+      </div>
+    </div>
+  );
+};
+
+const MobileSidebar = () => {
+  const location = useLocation();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Failed to logout:", error);
+      window.location.href = "/login";
+    }
+  };
+
+  return (
+    <div className="flex h-full flex-col bg-white">
+      {/* Mobile Header */}
+      <div className="flex h-20 items-center justify-center px-6 border-b bg-gradient-to-r from-primary to-primary/80">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur">
+            <Zap className="h-6 w-6 text-white" />
+          </div>
+          <div className="text-center">
+            <h1 className="text-xl font-bold text-white">FitClient</h1>
+            <p className="text-xs text-white/80">Trainer Dashboard</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      <nav className="flex-1 p-4 space-y-2">
+        <div className="mb-6">
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            Main Menu
+          </h2>
+        </div>
+
+        {navigation.map((item) => {
+          const isActive = location.pathname === item.href;
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={cn(
+                "flex items-center gap-4 rounded-xl px-4 py-4 text-base font-medium transition-all duration-200 active:scale-95",
+                isActive
+                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  : "text-gray-700 hover:bg-gray-50 active:bg-gray-100",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex items-center justify-center w-10 h-10 rounded-lg transition-colors",
+                  isActive ? "bg-white/20" : "bg-gray-100",
+                )}
+              >
+                <item.icon
+                  className={cn(
+                    "h-5 w-5",
+                    isActive ? "text-white" : "text-gray-600",
+                  )}
+                />
+              </div>
+              <span className="flex-1">{item.name}</span>
+              {isActive && <div className="w-2 h-2 rounded-full bg-white/60" />}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Mobile Footer */}
+      <div className="border-t bg-gray-50 p-4 space-y-2">
+        <Link
+          to="/settings"
+          className={cn(
+            "flex items-center gap-4 rounded-xl px-4 py-4 text-base font-medium transition-all duration-200 active:scale-95",
+            location.pathname === "/settings" ||
+              location.pathname === "/admin/settings"
+              ? "bg-primary text-white shadow-lg shadow-primary/20"
+              : "text-gray-700 hover:bg-white active:bg-gray-100",
+          )}
+        >
+          <div
+            className={cn(
+              "flex items-center justify-center w-10 h-10 rounded-lg transition-colors",
+              location.pathname === "/settings" ||
+                location.pathname === "/admin/settings"
+                ? "bg-white/20"
+                : "bg-gray-200",
+            )}
+          >
+            <Settings
+              className={cn(
+                "h-5 w-5",
+                location.pathname === "/settings" ||
+                  location.pathname === "/admin/settings"
+                  ? "text-white"
+                  : "text-gray-600",
+              )}
+            />
+          </div>
+          <span className="flex-1">Settings</span>
+        </Link>
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-4 rounded-xl px-4 py-4 text-base font-medium text-red-600 hover:bg-red-50 active:bg-red-100 transition-all duration-200 active:scale-95 w-full"
+        >
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-100">
+            <LogOut className="h-5 w-5 text-red-600" />
+          </div>
+          <span className="flex-1 text-left">Logout</span>
+        </button>
       </div>
     </div>
   );
