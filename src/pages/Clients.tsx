@@ -1018,6 +1018,11 @@ const Clients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [fitnessLevelFilter, setFitnessLevelFilter] = useState("all");
   const { clients, loading } = useData();
+  const { getCurrentPlan } = useSubscription();
+
+  const currentPlan = getCurrentPlan();
+  const currentClientCount = clients.length;
+  const limitInfo = getClientLimitInfo(currentPlan.id, currentClientCount);
 
   const filteredClients = clients.filter((client) => {
     const matchesSearch =
