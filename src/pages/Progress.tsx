@@ -605,31 +605,39 @@ const Progress = () => {
       {clients.length > 0 && (
         <>
           {/* Overview Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             <Card>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold">{clients.length}</div>
-                <p className="text-sm text-muted-foreground">Total Clients</p>
+              <CardContent className="pt-4 sm:pt-6">
+                <div className="text-xl sm:text-2xl font-bold">
+                  {clients.length}
+                </div>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Total Clients
+                </p>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-sm text-muted-foreground">
+              <CardContent className="pt-4 sm:pt-6">
+                <div className="text-xl sm:text-2xl font-bold">0</div>
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   Progress Entries
                 </p>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-sm text-muted-foreground">Goals Achieved</p>
+              <CardContent className="pt-4 sm:pt-6">
+                <div className="text-xl sm:text-2xl font-bold">0</div>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Goals Achieved
+                </p>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-sm text-muted-foreground">Photos Uploaded</p>
+              <CardContent className="pt-4 sm:pt-6">
+                <div className="text-xl sm:text-2xl font-bold">0</div>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Photos Uploaded
+                </p>
               </CardContent>
             </Card>
           </div>
