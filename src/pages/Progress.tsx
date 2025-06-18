@@ -514,25 +514,28 @@ const Progress = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
+        <div className="flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Client Progress
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Track your clients' fitness journey with measurements and
             achievements.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button
             variant="outline"
             onClick={() => window.open("/client-portal/1", "_blank")}
             size="sm"
+            className="w-full sm:w-auto justify-center"
           >
             <TrendingUp className="h-4 w-4 mr-2" />
-            View in Client Portal
+            <span className="text-sm">View in Client Portal</span>
           </Button>
-          <AddProgressDialog />
+          <div className="w-full sm:w-auto">
+            <AddProgressDialog />
+          </div>
         </div>
       </div>
 
