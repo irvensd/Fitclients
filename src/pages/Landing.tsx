@@ -13,6 +13,18 @@ import {
   Crown,
   Sparkles,
   Shield,
+  Brain,
+  Share2,
+  Trophy,
+  Target,
+  BarChart3,
+  Bell,
+  Smartphone,
+  Link as LinkIcon,
+  Activity,
+  Dumbbell,
+  Scale,
+  FileText,
 } from "lucide-react";
 
 const Landing = () => {
