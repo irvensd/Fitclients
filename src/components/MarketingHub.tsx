@@ -23,6 +23,7 @@ import {
   Download,
   Copy,
   QrCode,
+  Plus,
 } from "lucide-react";
 
 interface MarketingMetrics {

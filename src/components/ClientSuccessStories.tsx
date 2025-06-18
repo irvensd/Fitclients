@@ -224,7 +224,7 @@ export const ClientSuccessStories = () => {
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm" className="flex-1">
-                      <MessageSquote className="h-4 w-4 mr-1" />
+                      <MessageSquare className="h-4 w-4 mr-1" />
                       View Story
                     </Button>
                   </DialogTrigger>
