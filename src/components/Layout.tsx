@@ -360,24 +360,74 @@ export const Layout = ({ children }: LayoutProps) => {
               </div>
 
               {/* AI Notifications */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 relative"
-                title="AI Coach Notifications"
-                onClick={() => {
-                  console.log("AI Notifications clicked");
-                  alert(
-                    '🤖 AI Coach Notifications\n\n• 3 new insights available\n• 1 high-priority recommendation\n• Sarah Johnson ready for progression\n\nClick "AI Coach Dashboard" to view all recommendations.',
-                  );
-                }}
-              >
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-purple-600 rounded-full flex items-center justify-center">
-                  <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
-                </span>
-                <span className="sr-only">AI Notifications</span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 relative"
+                    title="AI Coach Notifications"
+                  >
+                    <Bell className="h-5 w-5" />
+                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-purple-600 rounded-full flex items-center justify-center">
+                      <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
+                    </span>
+                    <span className="sr-only">AI Notifications</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80">
+                  <DropdownMenuLabel className="flex items-center gap-2">
+                    <Brain className="h-4 w-4 text-purple-600" />
+                    AI Coach Notifications
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="flex items-start gap-3 p-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100">
+                      <Sparkles className="h-4 w-4 text-red-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">High Priority Alert</p>
+                      <p className="text-xs text-muted-foreground">
+                        Sarah Johnson needs attention - 2 urgent recommendations
+                      </p>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-start gap-3 p-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+                      <TrendingUp className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Progress Update</p>
+                      <p className="text-xs text-muted-foreground">
+                        3 clients ready for workout progression
+                      </p>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-start gap-3 p-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+                      <Zap className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">
+                        New Insights Available
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        AI has generated 5 new training recommendations
+                      </p>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/ai-recommendations"
+                      className="flex items-center justify-center gap-2 p-3 text-purple-600"
+                    >
+                      <Brain className="h-4 w-4" />
+                      View AI Coach Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               {/* Mobile search icon */}
               <div className="sm:hidden">
