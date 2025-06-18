@@ -1068,6 +1068,50 @@ const Clients = () => {
 
       {clients.length > 0 && (
         <>
+          {/* Client Limit Card */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Client Usage - {currentPlan.name} Plan
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">
+                    {limitInfo.current} of{" "}
+                    {limitInfo.isUnlimited ? "unlimited" : limitInfo.limit}{" "}
+                    clients
+                  </span>
+                  {!limitInfo.isUnlimited && (
+                    <Badge
+                      variant={
+                        limitInfo.percentageUsed > 80
+                          ? "destructive"
+                          : "secondary"
+                      }
+                    >
+                      {Math.round(limitInfo.percentageUsed)}% used
+                    </Badge>
+                  )}
+                </div>
+                {!limitInfo.isUnlimited && (
+                  <Progress value={limitInfo.percentageUsed} className="h-2" />
+                )}
+                {!limitInfo.canAddMore && (
+                  <Alert>
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      You've reached your client limit. Upgrade your plan to add
+                      more clients.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Stats Overview */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
             <Card>
