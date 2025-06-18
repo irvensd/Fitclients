@@ -137,12 +137,12 @@ Your Personal Trainer`;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">
+        <Button size="sm" className="flex-1 sm:flex-initial">
           <Share2 className="h-4 w-4 mr-2" />
-          Share Portal
+          <span className="text-sm">Share Portal</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] mx-4 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Share Client Portal</DialogTitle>
           <DialogDescription>
