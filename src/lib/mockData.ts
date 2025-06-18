@@ -205,16 +205,75 @@ export const mockSessions: Session[] = [
     cost: 75,
   },
 
-  // Today and upcoming sessions
+  // Today's sessions
+  {
+    id: "10",
+    clientId: "1", // Sarah Johnson
+    date: new Date().toISOString().split("T")[0], // Today
+    startTime: "08:00",
+    endTime: "09:00",
+    type: "personal-training",
+    status: "completed",
+    notes: "Morning session - excellent energy and focus!",
+    cost: 75,
+  },
   {
     id: "11",
+    clientId: "3", // Emily Davis
+    date: new Date().toISOString().split("T")[0], // Today
+    startTime: "09:30",
+    endTime: "10:30",
+    type: "personal-training",
+    status: "completed",
+    notes: "Speed work completed - great progress on intervals",
+    cost: 75,
+  },
+  {
+    id: "20",
     clientId: "2", // Mike Chen
-    date: "2024-02-15",
+    date: new Date().toISOString().split("T")[0], // Today
+    startTime: "11:00",
+    endTime: "12:00",
+    type: "personal-training",
+    status: "scheduled",
+    notes: "Upper body focus - chest and back",
+    cost: 75,
+  },
+  {
+    id: "21",
+    clientId: "8", // Rachel Martinez (new client)
+    date: new Date().toISOString().split("T")[0], // Today
+    startTime: "14:00",
+    endTime: "15:00",
+    type: "assessment",
+    status: "scheduled",
+    notes: "Initial fitness assessment for new client",
+    cost: 50,
+  },
+  {
+    id: "22",
+    clientId: "4", // James Wilson
+    date: new Date().toISOString().split("T")[0], // Today
+    startTime: "16:00",
+    endTime: "17:00",
+    type: "personal-training",
+    status: "scheduled",
+    notes: "Functional movement and core stability",
+    cost: 75,
+  },
+
+  // Tomorrow and upcoming sessions
+  {
+    id: "12",
+    clientId: "2", // Mike Chen
+    date: new Date(Date.now() + 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0], // Tomorrow
     startTime: "10:30",
     endTime: "11:30",
     type: "personal-training",
     status: "scheduled",
-    notes: "Upper body focus - chest and back",
+    notes: "Lower body focus - squats and deadlifts",
     cost: 75,
   },
   {
