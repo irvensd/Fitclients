@@ -109,15 +109,36 @@ const getClientData = (clientId: string) => {
       workoutPlan: {
         id: "wp1",
         name: "Fat Loss Circuit Training",
-        description: "High-intensity circuit training focused on calorie burn and weight loss",
+        description:
+          "High-intensity circuit training focused on calorie burn and weight loss",
         exercises: [
-          { name: "Burpees", sets: 3, reps: "10", notes: "Rest 30s between sets" },
-          { name: "Mountain Climbers", sets: 3, reps: "20", notes: "Keep core tight" },
+          {
+            name: "Burpees",
+            sets: 3,
+            reps: "10",
+            notes: "Rest 30s between sets",
+          },
+          {
+            name: "Mountain Climbers",
+            sets: 3,
+            reps: "20",
+            notes: "Keep core tight",
+          },
           { name: "Jump Squats", sets: 3, reps: "15", notes: "Land softly" },
-          { name: "Push-ups", sets: 3, reps: "8-12", notes: "Modify on knees if needed" },
-          { name: "Plank", sets: 3, reps: "45s", notes: "Hold steady position" },
+          {
+            name: "Push-ups",
+            sets: 3,
+            reps: "8-12",
+            notes: "Modify on knees if needed",
+          },
+          {
+            name: "Plank",
+            sets: 3,
+            reps: "45s",
+            notes: "Hold steady position",
+          },
         ],
-        lastUpdated: "2024-01-15"
+        lastUpdated: "2024-01-15",
       },
       progress: [
         {
@@ -125,7 +146,13 @@ const getClientData = (clientId: string) => {
           date: "2024-03-15",
           weight: 159,
           bodyFat: 19.5,
-          measurements: { chest: 35, waist: 28, hips: 37, arms: 12.5, thighs: 23 },
+          measurements: {
+            chest: 35,
+            waist: 28,
+            hips: 37,
+            arms: 12.5,
+            thighs: 23,
+          },
           notes: "Excellent progress - lost 6 lbs!",
         },
         {
@@ -133,7 +160,13 @@ const getClientData = (clientId: string) => {
           date: "2024-02-29",
           weight: 162,
           bodyFat: 21,
-          measurements: { chest: 35.5, waist: 29, hips: 37.5, arms: 12.2, thighs: 23.5 },
+          measurements: {
+            chest: 35.5,
+            waist: 29,
+            hips: 37.5,
+            arms: 12.2,
+            thighs: 23.5,
+          },
           notes: "Great progress after 2 weeks!",
         },
         {
@@ -141,7 +174,13 @@ const getClientData = (clientId: string) => {
           date: "2024-01-15",
           weight: 165,
           bodyFat: 22,
-          measurements: { chest: 36, waist: 30, hips: 38, arms: 12, thighs: 24 },
+          measurements: {
+            chest: 36,
+            waist: 30,
+            hips: 38,
+            arms: 12,
+            thighs: 24,
+          },
           notes: "Initial measurements",
         },
       ],
@@ -238,26 +277,41 @@ const getClientData = (clientId: string) => {
             createdAt: "2024-03-15T11:00:00Z",
             trainerForm: {
               workoutFocus: "Upper body strength",
-              exercisesCompleted: ["Push-ups", "Bench Press", "Pull-ups", "Shoulder Press"],
+              exercisesCompleted: [
+                "Push-ups",
+                "Bench Press",
+                "Pull-ups",
+                "Shoulder Press",
+              ],
               clientPerformance: "excellent",
               clientMood: "energetic",
               achievementsToday: "First unassisted pull-up!",
               challengesFaced: "",
               notesForNextSession: "Ready to increase weights",
-              progressObservations: "Significant improvement in upper body strength"
+              progressObservations:
+                "Significant improvement in upper body strength",
             },
             aiGeneratedContent: {
-              workoutSummary: "Today's personal training session focused on upper body strength. Sarah completed push-ups, bench press, pull-ups, and shoulder press with excellent form and technique. Significant improvement in upper body strength was observed.",
-              personalizedEncouragement: "Sarah, your energy today was contagious! 🔋 You're really hitting your stride. The progress is undeniable! Your consistency is paying off, and today's achievements of \"First unassisted pull-up!\" prove you're on the right track toward your goal of weight loss and strength building.",
-              nextStepsRecommendations: "For next session: Ready to increase weights; Continue building on today's momentum with consistent progression.",
-              keyAchievements: ["First unassisted pull-up!", "Completed 4 exercises", "Excellent performance rating"],
-              motivationalQuote: "\"Strength doesn't come from what you can do. It comes from overcoming the things you once thought you couldn't.\" - Rikki Rogers",
-              progressHighlight: "Sarah is showing consistent improvement in upper body strength"
+              workoutSummary:
+                "Today's personal training session focused on upper body strength. Sarah completed push-ups, bench press, pull-ups, and shoulder press with excellent form and technique. Significant improvement in upper body strength was observed.",
+              personalizedEncouragement:
+                "Sarah, your energy today was contagious! 🔋 You're really hitting your stride. The progress is undeniable! Your consistency is paying off, and today's achievements of \"First unassisted pull-up!\" prove you're on the right track toward your goal of weight loss and strength building.",
+              nextStepsRecommendations:
+                "For next session: Ready to increase weights; Continue building on today's momentum with consistent progression.",
+              keyAchievements: [
+                "First unassisted pull-up!",
+                "Completed 4 exercises",
+                "Excellent performance rating",
+              ],
+              motivationalQuote:
+                "\"Strength doesn't come from what you can do. It comes from overcoming the things you once thought you couldn't.\" - Rikki Rogers",
+              progressHighlight:
+                "Sarah is showing consistent improvement in upper body strength",
             },
             sharedWithClient: true,
             clientViewed: true,
-            clientViewedAt: "2024-03-15T15:30:00Z"
-          }
+            clientViewedAt: "2024-03-15T15:30:00Z",
+          },
         },
       ],
       workoutPlan: {
@@ -375,9 +429,27 @@ const getClientData = (clientId: string) => {
         name: "Mike's Muscle Building Program",
         description: "8-week beginner muscle building program",
         exercises: [
-          { id: "1", name: "Bench Press", sets: 3, reps: "8-10", notes: "Start light, focus on form" },
-          { id: "2", name: "Deadlifts", sets: 3, reps: "5-8", notes: "Keep back straight" },
-          { id: "3", name: "Squats", sets: 3, reps: "10-12", notes: "Full range of motion" },
+          {
+            id: "1",
+            name: "Bench Press",
+            sets: 3,
+            reps: "8-10",
+            notes: "Start light, focus on form",
+          },
+          {
+            id: "2",
+            name: "Deadlifts",
+            sets: 3,
+            reps: "5-8",
+            notes: "Keep back straight",
+          },
+          {
+            id: "3",
+            name: "Squats",
+            sets: 3,
+            reps: "10-12",
+            notes: "Full range of motion",
+          },
         ],
         createdDate: "2024-02-03",
       },
@@ -387,12 +459,25 @@ const getClientData = (clientId: string) => {
           date: "2024-03-15",
           weight: 180,
           bodyFat: 15.2,
-          measurements: { chest: 42, waist: 34, hips: 38, arms: 15, thighs: 24 },
+          measurements: {
+            chest: 42,
+            waist: 34,
+            hips: 38,
+            arms: 15,
+            thighs: 24,
+          },
           notes: "Good progress on strength gains!",
         },
       ],
       payments: [
-        { id: "1", date: "2024-03-15", amount: 300, description: "4-Session Package", status: "paid", dueDate: "2024-03-15" },
+        {
+          id: "1",
+          date: "2024-03-15",
+          amount: 300,
+          description: "4-Session Package",
+          status: "paid",
+          dueDate: "2024-03-15",
+        },
       ],
     },
     "emily-davis": {
@@ -425,9 +510,27 @@ const getClientData = (clientId: string) => {
         name: "Emily's Marathon Training",
         description: "16-week marathon training program",
         exercises: [
-          { id: "1", name: "Long Run", sets: 1, reps: "60-90 min", notes: "Conversational pace" },
-          { id: "2", name: "Tempo Run", sets: 1, reps: "30 min", notes: "Comfortably hard effort" },
-          { id: "3", name: "Core Strengthening", sets: 3, reps: "15 each", notes: "Focus on stability" },
+          {
+            id: "1",
+            name: "Long Run",
+            sets: 1,
+            reps: "60-90 min",
+            notes: "Conversational pace",
+          },
+          {
+            id: "2",
+            name: "Tempo Run",
+            sets: 1,
+            reps: "30 min",
+            notes: "Comfortably hard effort",
+          },
+          {
+            id: "3",
+            name: "Core Strengthening",
+            sets: 3,
+            reps: "15 each",
+            notes: "Focus on stability",
+          },
         ],
         createdDate: "2024-01-28",
       },
@@ -437,12 +540,25 @@ const getClientData = (clientId: string) => {
           date: "2024-03-15",
           weight: 125,
           bodyFat: 12.8,
-          measurements: { chest: 34, waist: 26, hips: 36, arms: 11, thighs: 20 },
+          measurements: {
+            chest: 34,
+            waist: 26,
+            hips: 36,
+            arms: 11,
+            thighs: 20,
+          },
           notes: "Excellent endurance improvements!",
         },
       ],
       payments: [
-        { id: "1", date: "2024-03-15", amount: 400, description: "8-Session Package", status: "paid", dueDate: "2024-03-15" },
+        {
+          id: "1",
+          date: "2024-03-15",
+          amount: 400,
+          description: "8-Session Package",
+          status: "paid",
+          dueDate: "2024-03-15",
+        },
       ],
     },
     "james-wilson": {
@@ -475,9 +591,27 @@ const getClientData = (clientId: string) => {
         name: "James's Functional Fitness",
         description: "12-week functional movement program",
         exercises: [
-          { id: "1", name: "Turkish Get-ups", sets: 3, reps: "5 each side", notes: "Slow and controlled" },
-          { id: "2", name: "Farmer's Walks", sets: 3, reps: "40 yards", notes: "Heavy weight, good posture" },
-          { id: "3", name: "Single Leg RDL", sets: 3, reps: "10 each leg", notes: "Focus on balance" },
+          {
+            id: "1",
+            name: "Turkish Get-ups",
+            sets: 3,
+            reps: "5 each side",
+            notes: "Slow and controlled",
+          },
+          {
+            id: "2",
+            name: "Farmer's Walks",
+            sets: 3,
+            reps: "40 yards",
+            notes: "Heavy weight, good posture",
+          },
+          {
+            id: "3",
+            name: "Single Leg RDL",
+            sets: 3,
+            reps: "10 each leg",
+            notes: "Focus on balance",
+          },
         ],
         createdDate: "2024-02-10",
       },
@@ -487,7 +621,13 @@ const getClientData = (clientId: string) => {
           date: "2024-03-15",
           weight: 195,
           bodyFat: 18.5,
-          measurements: { chest: 44, waist: 36, hips: 40, arms: 16, thighs: 26 },
+          measurements: {
+            chest: 44,
+            waist: 36,
+            hips: 40,
+            arms: 16,
+            thighs: 26,
+          },
           notes: "Great improvement in mobility and stability!",
         },
       ],
@@ -520,14 +660,35 @@ const getClientData = (clientId: string) => {
       workoutPlan: {
         id: "wp2",
         name: "Upper Body Strength Builder",
-        description: "Compound movements for building muscle mass in the upper body",
+        description:
+          "Compound movements for building muscle mass in the upper body",
         exercises: [
-          { name: "Bench Press", sets: 4, reps: "8-10", notes: "Rest 2-3 min between sets" },
-          { name: "Pull-ups", sets: 4, reps: "6-8", notes: "Use assistance if needed" },
-          { name: "Overhead Press", sets: 3, reps: "8-10", notes: "Keep core engaged" },
-          { name: "Barbell Rows", sets: 3, reps: "10-12", notes: "Squeeze shoulder blades" },
+          {
+            name: "Bench Press",
+            sets: 4,
+            reps: "8-10",
+            notes: "Rest 2-3 min between sets",
+          },
+          {
+            name: "Pull-ups",
+            sets: 4,
+            reps: "6-8",
+            notes: "Use assistance if needed",
+          },
+          {
+            name: "Overhead Press",
+            sets: 3,
+            reps: "8-10",
+            notes: "Keep core engaged",
+          },
+          {
+            name: "Barbell Rows",
+            sets: 3,
+            reps: "10-12",
+            notes: "Squeeze shoulder blades",
+          },
         ],
-        lastUpdated: "2024-02-03"
+        lastUpdated: "2024-02-03",
       },
       progress: [
         {
@@ -535,7 +696,13 @@ const getClientData = (clientId: string) => {
           date: "2024-03-15",
           weight: 183,
           bodyFat: 15.5,
-          measurements: { chest: 43, waist: 32.5, hips: 40.5, arms: 15.5, thighs: 26.5 },
+          measurements: {
+            chest: 43,
+            waist: 32.5,
+            hips: 40.5,
+            arms: 15.5,
+            thighs: 26.5,
+          },
           notes: "Good muscle gain, staying lean",
         },
         {
@@ -543,7 +710,13 @@ const getClientData = (clientId: string) => {
           date: "2024-02-03",
           weight: 180,
           bodyFat: 15,
-          measurements: { chest: 42, waist: 32, hips: 40, arms: 15, thighs: 26 },
+          measurements: {
+            chest: 42,
+            waist: 32,
+            hips: 40,
+            arms: 15,
+            thighs: 26,
+          },
           notes: "Starting bulk phase",
         },
       ],
@@ -596,12 +769,32 @@ const getClientData = (clientId: string) => {
         name: "Marathon Base Training",
         description: "Endurance and strength training for marathon preparation",
         exercises: [
-          { name: "Easy Run", sets: 1, reps: "45 min", notes: "Maintain conversational pace" },
-          { name: "Lunges", sets: 3, reps: "12 each leg", notes: "Focus on form over speed" },
-          { name: "Single Leg Deadlifts", sets: 3, reps: "10 each", notes: "Balance and control" },
-          { name: "Calf Raises", sets: 3, reps: "20", notes: "Full range of motion" },
+          {
+            name: "Easy Run",
+            sets: 1,
+            reps: "45 min",
+            notes: "Maintain conversational pace",
+          },
+          {
+            name: "Lunges",
+            sets: 3,
+            reps: "12 each leg",
+            notes: "Focus on form over speed",
+          },
+          {
+            name: "Single Leg Deadlifts",
+            sets: 3,
+            reps: "10 each",
+            notes: "Balance and control",
+          },
+          {
+            name: "Calf Raises",
+            sets: 3,
+            reps: "20",
+            notes: "Full range of motion",
+          },
         ],
-        lastUpdated: "2024-01-28"
+        lastUpdated: "2024-01-28",
       },
       progress: [
         {
@@ -609,7 +802,13 @@ const getClientData = (clientId: string) => {
           date: "2024-03-15",
           weight: 125,
           bodyFat: 12.8,
-          measurements: { chest: 34, waist: 26, hips: 36, arms: 11, thighs: 20 },
+          measurements: {
+            chest: 34,
+            waist: 26,
+            hips: 36,
+            arms: 11,
+            thighs: 20,
+          },
           notes: "Excellent endurance improvements!",
         },
         {
@@ -617,7 +816,13 @@ const getClientData = (clientId: string) => {
           date: "2024-01-28",
           weight: 135,
           bodyFat: 18,
-          measurements: { chest: 34, waist: 26, hips: 36, arms: 10.5, thighs: 21 },
+          measurements: {
+            chest: 34,
+            waist: 26,
+            hips: 36,
+            arms: 10.5,
+            thighs: 21,
+          },
           notes: "Marathon training baseline",
         },
       ],
@@ -637,10 +842,13 @@ const getClientData = (clientId: string) => {
   return clientData[clientId] || null;
 };
 
-  return clientData[clientId as keyof typeof clientData] || null;
-};
-
-const CancelSessionDialog = ({ session, onCancel }: { session: any; onCancel: (sessionId: string, reason: string) => void }) => {
+const CancelSessionDialog = ({
+  session,
+  onCancel,
+}: {
+  session: any;
+  onCancel: (sessionId: string, reason: string) => void;
+}) => {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -654,7 +862,7 @@ const CancelSessionDialog = ({ session, onCancel }: { session: any; onCancel: (s
     setIsSubmitting(true);
 
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     onCancel(session.id, reason);
     setOpen(false);
@@ -665,7 +873,8 @@ const CancelSessionDialog = ({ session, onCancel }: { session: any; onCancel: (s
   const isWithin24Hours = () => {
     const sessionDateTime = new Date(`${session.date}T${session.startTime}`);
     const now = new Date();
-    const hoursUntilSession = (sessionDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+    const hoursUntilSession =
+      (sessionDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
     return hoursUntilSession <= 24;
   };
 
@@ -676,7 +885,14 @@ const CancelSessionDialog = ({ session, onCancel }: { session: any; onCancel: (s
   const isCancelled = session.status === "cancelled";
 
   // Debug logging
-  console.log("Session:", session.id, "Date:", session.date, "Status:", session.status);
+  console.log(
+    "Session:",
+    session.id,
+    "Date:",
+    session.date,
+    "Status:",
+    session.status,
+  );
   console.log("Session DateTime:", sessionDateTime);
   console.log("Current Time:", now);
   console.log("Is Past Session:", isPastSession);
@@ -689,7 +905,11 @@ const CancelSessionDialog = ({ session, onCancel }: { session: any; onCancel: (s
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-red-600 border-red-200 hover:bg-red-50"
+        >
           <XCircle className="h-4 w-4 mr-1" />
           Cancel Session
         </Button>
@@ -701,7 +921,8 @@ const CancelSessionDialog = ({ session, onCancel }: { session: any; onCancel: (s
             Cancel Session
           </DialogTitle>
           <DialogDescription>
-            Cancel your {session.type} session on {new Date(session.date).toLocaleDateString()} at {session.startTime}
+            Cancel your {session.type} session on{" "}
+            {new Date(session.date).toLocaleDateString()} at {session.startTime}
           </DialogDescription>
         </DialogHeader>
 
@@ -711,10 +932,12 @@ const CancelSessionDialog = ({ session, onCancel }: { session: any; onCancel: (s
               <div className="flex items-start gap-2">
                 <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5" />
                 <div className="text-sm">
-                  <p className="font-medium text-orange-800">Late Cancellation Notice</p>
+                  <p className="font-medium text-orange-800">
+                    Late Cancellation Notice
+                  </p>
                   <p className="text-orange-700 mt-1">
-                    This session is within 24 hours. Cancellation policies may apply.
-                    Please contact your trainer if this is an emergency.
+                    This session is within 24 hours. Cancellation policies may
+                    apply. Please contact your trainer if this is an emergency.
                   </p>
                 </div>
               </div>
@@ -739,7 +962,11 @@ const CancelSessionDialog = ({ session, onCancel }: { session: any; onCancel: (s
         </div>
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={isSubmitting}
+          >
             Keep Session
           </Button>
           <Button
@@ -1008,14 +1235,20 @@ const ClientPortal = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <div className="text-2xl font-bold text-yellow-700">🏆</div>
+                      <div className="text-2xl font-bold text-yellow-700">
+                        🏆
+                      </div>
                       <p className="text-sm font-medium">5 Badges</p>
                       <p className="text-xs text-muted-foreground">Earned</p>
                     </div>
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-700">����</div>
+                      <div className="text-2xl font-bold text-blue-700">
+                        ����
+                      </div>
                       <p className="text-sm font-medium">7 Days</p>
-                      <p className="text-xs text-muted-foreground">Current Streak</p>
+                      <p className="text-xs text-muted-foreground">
+                        Current Streak
+                      </p>
                     </div>
                   </div>
                   <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
@@ -1023,7 +1256,9 @@ const ClientPortal = () => {
                       <div className="text-lg">🎯</div>
                       <p className="text-sm font-medium">Latest Achievement</p>
                     </div>
-                    <p className="text-sm text-green-800">Week Warrior - 7 consecutive days!</p>
+                    <p className="text-sm text-green-800">
+                      Week Warrior - 7 consecutive days!
+                    </p>
                   </div>
                 </div>
                 <div className="pt-3 border-t">
@@ -1056,16 +1291,19 @@ const ClientPortal = () => {
                           {new Date(session.date).toLocaleDateString()} at{" "}
                           {session.startTime}
                         </p>
-                        {session.status === "cancelled" && session.cancellationReason && (
-                          <p className="text-xs text-red-600 mt-1">
-                            Cancelled: {session.cancellationReason}
-                          </p>
-                        )}
+                        {session.status === "cancelled" &&
+                          session.cancellationReason && (
+                            <p className="text-xs text-red-600 mt-1">
+                              Cancelled: {session.cancellationReason}
+                            </p>
+                          )}
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge className={getStatusColor(session.status)}>
                           {getStatusIcon(session.status)}
-                          <span className="ml-1 capitalize">{session.status}</span>
+                          <span className="ml-1 capitalize">
+                            {session.status}
+                          </span>
                         </Badge>
                       </div>
                     </div>
@@ -1121,7 +1359,8 @@ const ClientPortal = () => {
               <CardHeader>
                 <CardTitle>Your Sessions</CardTitle>
                 <CardDescription>
-                  All your training sessions - upcoming, completed, and cancelled
+                  All your training sessions - upcoming, completed, and
+                  cancelled
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1134,7 +1373,9 @@ const ClientPortal = () => {
                             <h4 className="font-semibold">{session.type}</h4>
                             <Badge className={getStatusColor(session.status)}>
                               {getStatusIcon(session.status)}
-                              <span className="ml-1 capitalize">{session.status}</span>
+                              <span className="ml-1 capitalize">
+                                {session.status}
+                              </span>
                             </Badge>
                           </div>
 
@@ -1148,8 +1389,7 @@ const ClientPortal = () => {
                               {session.startTime} - {session.endTime}
                             </div>
                             <div className="flex items-center gap-1">
-                              <DollarSign className="h-4 w-4" />
-                              ${session.cost}
+                              <DollarSign className="h-4 w-4" />${session.cost}
                             </div>
                           </div>
 
@@ -1158,11 +1398,15 @@ const ClientPortal = () => {
                           {session.status === "cancelled" && (
                             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                               <p className="text-sm text-red-800">
-                                <strong>Cancelled:</strong> {session.cancellationReason}
+                                <strong>Cancelled:</strong>{" "}
+                                {session.cancellationReason}
                               </p>
                               {session.cancelledAt && (
                                 <p className="text-xs text-red-600 mt-1">
-                                  Cancelled on {new Date(session.cancelledAt).toLocaleString()}
+                                  Cancelled on{" "}
+                                  {new Date(
+                                    session.cancelledAt,
+                                  ).toLocaleString()}
                                 </p>
                               )}
                             </div>
@@ -1190,35 +1434,61 @@ const ClientPortal = () => {
                         <div className="mt-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
                           <div className="flex items-center gap-2 mb-3">
                             <Sparkles className="h-5 w-5 text-purple-600" />
-                            <h4 className="font-semibold text-purple-800">Your Personal Session Recap</h4>
+                            <h4 className="font-semibold text-purple-800">
+                              Your Personal Session Recap
+                            </h4>
                           </div>
 
                           <div className="space-y-3">
                             <div>
-                              <h5 className="font-medium text-sm mb-1">💪 How You Did</h5>
-                              <p className="text-sm text-gray-700">{session.recap.aiGeneratedContent.personalizedEncouragement}</p>
+                              <h5 className="font-medium text-sm mb-1">
+                                💪 How You Did
+                              </h5>
+                              <p className="text-sm text-gray-700">
+                                {
+                                  session.recap.aiGeneratedContent
+                                    .personalizedEncouragement
+                                }
+                              </p>
                             </div>
 
                             <div>
-                              <h5 className="font-medium text-sm mb-1">🏆 Today's Wins</h5>
+                              <h5 className="font-medium text-sm mb-1">
+                                🏆 Today's Wins
+                              </h5>
                               <ul className="text-sm space-y-1">
-                                {session.recap.aiGeneratedContent.keyAchievements.map((achievement, idx) => (
-                                  <li key={idx} className="flex items-center gap-2">
-                                    <CheckCircle className="h-3 w-3 text-green-600" />
-                                    {achievement}
-                                  </li>
-                                ))}
+                                {session.recap.aiGeneratedContent.keyAchievements.map(
+                                  (achievement, idx) => (
+                                    <li
+                                      key={idx}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <CheckCircle className="h-3 w-3 text-green-600" />
+                                      {achievement}
+                                    </li>
+                                  ),
+                                )}
                               </ul>
                             </div>
 
                             <div>
-                              <h5 className="font-medium text-sm mb-1">🎯 What's Next</h5>
-                              <p className="text-sm text-gray-700">{session.recap.aiGeneratedContent.nextStepsRecommendations}</p>
+                              <h5 className="font-medium text-sm mb-1">
+                                🎯 What's Next
+                              </h5>
+                              <p className="text-sm text-gray-700">
+                                {
+                                  session.recap.aiGeneratedContent
+                                    .nextStepsRecommendations
+                                }
+                              </p>
                             </div>
 
                             <div className="pt-2 border-t border-purple-200">
                               <p className="text-xs italic text-purple-700">
-                                {session.recap.aiGeneratedContent.motivationalQuote}
+                                {
+                                  session.recap.aiGeneratedContent
+                                    .motivationalQuote
+                                }
                               </p>
                             </div>
                           </div>
@@ -1231,7 +1501,8 @@ const ClientPortal = () => {
                     <div className="text-center py-8">
                       <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <p className="text-muted-foreground">
-                        No sessions scheduled yet. Your trainer will schedule sessions for you.
+                        No sessions scheduled yet. Your trainer will schedule
+                        sessions for you.
                       </p>
                     </div>
                   )}
