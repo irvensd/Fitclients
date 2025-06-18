@@ -756,19 +756,26 @@ const AIRecommendations = () => {
                 const appliedRecs = JSON.parse(
                   localStorage.getItem("appliedRecommendations") || "[]",
                 );
-                appliedRecs.push({
-                  id: recId,
-                  clientId: confirmationModal.recommendation.clientId,
-                  clientName: confirmationModal.clientName,
-                  title: confirmationModal.recommendation.title,
-                  type: confirmationModal.recommendation.type,
-                  appliedDate: new Date().toISOString(),
-                  status: "active",
-                });
-                localStorage.setItem(
-                  "appliedRecommendations",
-                  JSON.stringify(appliedRecs),
+
+                // Check if this recommendation already exists to prevent duplicates
+                const existingRec = appliedRecs.find(
+                  (rec: any) => rec.id === recId,
                 );
+                if (!existingRec) {
+                  appliedRecs.push({
+                    id: recId,
+                    clientId: confirmationModal.recommendation.clientId,
+                    clientName: confirmationModal.clientName,
+                    title: confirmationModal.recommendation.title,
+                    type: confirmationModal.recommendation.type,
+                    appliedDate: new Date().toISOString(),
+                    status: "active",
+                  });
+                  localStorage.setItem(
+                    "appliedRecommendations",
+                    JSON.stringify(appliedRecs),
+                  );
+                }
 
                 setConfirmationModal({
                   ...confirmationModal,
