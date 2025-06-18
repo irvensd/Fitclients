@@ -22,7 +22,10 @@ interface SubscriptionContextType {
   getCurrentPlan: () => typeof SUBSCRIPTION_PLANS.FREE;
   hasFeatureAccess: (feature: string) => boolean;
   refreshSubscription: () => Promise<void>;
-  updateSubscriptionPlan: (planId: string) => void;
+  updateSubscriptionPlan: (
+    planId: string,
+    onDowngradeClients?: (newLimit: number, selectedIds: string[]) => void,
+  ) => void;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(
@@ -110,7 +113,10 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
     console.log("Refreshing subscription data...");
   };
 
-  const updateSubscriptionPlan = (planId: string) => {
+  const updateSubscriptionPlan = (
+    planId: string,
+    onDowngradeClients?: (newLimit: number, selectedIds: string[]) => void,
+  ) => {
     const newSubscription: SubscriptionData = {
       status: "active",
       currentPlan: planId,
@@ -123,6 +129,16 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
     // Persist to localStorage
     localStorage.setItem("subscription_data", JSON.stringify(newSubscription));
     console.log(`Subscription updated to ${planId} plan`);
+
+    // Handle client downgrade if callback provided
+    if (onDowngradeClients) {
+      const newPlan = Object.values(SUBSCRIPTION_PLANS).find(
+        (p) => p.id === planId,
+      );
+      if (newPlan) {
+        onDowngradeClients(newPlan.limits.clients, []);
+      }
+    }
   };
 
   const value = {
