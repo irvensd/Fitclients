@@ -57,9 +57,18 @@ export const SmartRecommendations = ({
   >(new Set());
 
   useEffect(() => {
-    // Simulate AI analysis processing
+    // Simulate AI analysis processing with real data
     setTimeout(() => {
-      const analysisResult = generateRecommendations(client, [], []);
+      // In a real app, you'd fetch this data from DataContext or API
+      // For now, we'll simulate it but with the structure for real data integration
+      const recentSessions: any[] = []; // Would come from useData hook
+      const progressEntries: any[] = []; // Would come from useData hook
+
+      const analysisResult = generateRecommendations(
+        client,
+        recentSessions,
+        progressEntries,
+      );
       setAnalysis(analysisResult);
       setLoading(false);
     }, 1000);
