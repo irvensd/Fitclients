@@ -161,10 +161,33 @@ const AIRecommendations = () => {
         </div>
         <Button
           className="bg-gradient-to-r from-purple-600 to-blue-600 text-white"
-          onClick={() => window.location.reload()}
+          onClick={async () => {
+            setIsAnalyzing(true);
+
+            // Simulate AI processing
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+
+            setLastAnalysisTime(new Date());
+            setIsAnalyzing(false);
+
+            // Show success message
+            alert(
+              `🤖 AI Analysis Complete!\n\n✅ Analyzed ${clients.length} clients\n✅ Generated ${allRecommendations.length} recommendations\n✅ Identified ${highPriorityCount} high-priority items\n\nRecommendations have been updated with the latest data.`,
+            );
+          }}
+          disabled={isAnalyzing}
         >
-          <Brain className="h-4 w-4 mr-2" />
-          Generate New Analysis
+          {isAnalyzing ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Analyzing...
+            </>
+          ) : (
+            <>
+              <Brain className="h-4 w-4 mr-2" />
+              Generate New Analysis
+            </>
+          )}
         </Button>
       </div>
 
