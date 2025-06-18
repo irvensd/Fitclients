@@ -136,31 +136,32 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
                 <p className="text-xs text-purple-600">
                   Applied {new Date(rec.appliedDate).toLocaleDateString()}
                 </p>
+                </div>
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Note:</strong> Archived clients are in read-only mode.
+                    To manage these clients again, upgrade your plan to reactivate them.
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-1">
-              <Badge variant="outline" className="text-xs border-purple-300 text-purple-700">
-                {rec.type}
-              </Badge>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 hover:bg-purple-100"
-                onClick={() => removeRecommendation(rec.id)}
-                title="Mark as completed"
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </div>
+            )}
+
+            {filteredActiveClients.length === 0 && filteredArchivedClients.length === 0 && (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <h3 className="text-lg font-semibold mb-2">No clients found</h3>
+                  <p className="text-muted-foreground">
+                    Try adjusting your search or filters.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   );
 };
-
-const SharePortalButton = ({ client }: { client: Client }) => {
-  const [copied, setCopied] = useState(false);
 
   const copyToClipboardFallback = (text: string): boolean => {
     try {
