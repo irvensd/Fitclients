@@ -129,7 +129,7 @@ const AddProgressDialog = () => {
           Record Progress
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Record Progress Entry</DialogTitle>
           <DialogDescription>
@@ -138,7 +138,8 @@ const AddProgressDialog = () => {
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+            {/* Client and Date - Stack on mobile */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="client">Client</Label>
                 <Select
@@ -173,7 +174,8 @@ const AddProgressDialog = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Weight and Body Fat - Stack on mobile */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="weight">Weight (lbs)</Label>
                 <Input
@@ -202,9 +204,12 @@ const AddProgressDialog = () => {
               </div>
             </div>
 
+            {/* Body Measurements Section */}
             <div className="space-y-4 border-t pt-4">
               <h4 className="font-medium">Body Measurements (inches)</h4>
-              <div className="grid grid-cols-2 gap-4">
+
+              {/* Chest and Waist - Stack on mobile */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="chest">Chest</Label>
                   <Input
@@ -232,7 +237,9 @@ const AddProgressDialog = () => {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+
+              {/* Hips, Arms, Thighs - Single column on mobile, 3 cols on larger screens */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="hips">Hips</Label>
                   <Input
@@ -284,15 +291,23 @@ const AddProgressDialog = () => {
                   setFormData({ ...formData, notes: e.target.value })
                 }
                 placeholder="How the client is feeling, observations, achievements..."
-                className="min-h-[80px]"
+                className="min-h-[60px] sm:min-h-[80px]"
               />
             </div>
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full sm:w-auto"
+            >
               {loading ? "Recording..." : "Record Progress"}
             </Button>
           </div>
