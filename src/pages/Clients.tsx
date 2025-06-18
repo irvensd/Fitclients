@@ -56,20 +56,20 @@ const SharePortalButton = ({ client }: { client: Client }) => {
 
   const copyToClipboardFallback = (text: string): boolean => {
     try {
-      const textArea = document.createElement("textarea");
+      const textArea = document.createElement('textarea');
       textArea.value = text;
-      textArea.style.position = "fixed";
-      textArea.style.left = "-999999px";
-      textArea.style.top = "-999999px";
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
       document.body.appendChild(textArea);
       textArea.focus();
       textArea.select();
 
-      const successful = document.execCommand("copy");
+      const successful = document.execCommand('copy');
       document.body.removeChild(textArea);
       return successful;
     } catch (err) {
-      console.error("Fallback copy failed:", err);
+      console.error('Fallback copy failed:', err);
       return false;
     }
   };
@@ -85,7 +85,7 @@ const SharePortalButton = ({ client }: { client: Client }) => {
         await navigator.clipboard.writeText(portalUrl);
         copySuccessful = true;
       } catch (err) {
-        console.warn("Modern clipboard API failed, trying fallback:", err);
+        console.warn('Modern clipboard API failed, trying fallback:', err);
         // Don't throw here, try fallback instead
       }
     }
@@ -157,14 +157,9 @@ const AddClientDialog = () => {
         };
 
         // Store in localStorage for now (in a real app, this would go to the database)
-        const existingMeasurements = JSON.parse(
-          localStorage.getItem("progressEntries") || "[]",
-        );
+        const existingMeasurements = JSON.parse(localStorage.getItem("progressEntries") || "[]");
         existingMeasurements.push(initialMeasurements);
-        localStorage.setItem(
-          "progressEntries",
-          JSON.stringify(existingMeasurements),
-        );
+        localStorage.setItem("progressEntries", JSON.stringify(existingMeasurements));
       }
 
       // Reset form and close dialog
@@ -278,9 +273,7 @@ const AddClientDialog = () => {
 
             {/* Initial Measurements Section */}
             <div className="space-y-4 border-t pt-4">
-              <h4 className="text-sm font-medium text-foreground">
-                Initial Measurements
-              </h4>
+              <h4 className="text-sm font-medium text-foreground">Initial Measurements</h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="weight">Weight (lbs) *</Label>
@@ -499,6 +492,310 @@ const EditClientDialog = ({ client }: { client: Client }) => {
   );
 };
 
+const ScheduleSessionDialog = ({ client }: { client: Client }) => {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { addSession } = useData();
+  const [formData, setFormData] = useState({
+    date: new Date().toISOString().split("T")[0],
+    startTime: "09:00",
+    endTime: "10:00",
+    type: "personal-training" as "personal-training" | "consultation" | "assessment",
+    cost: 75,
+    notes: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await addSession({
+        clientId: client.id,
+        date: formData.date,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        type: formData.type,
+        status: "scheduled",
+        cost: formData.cost,
+        notes: formData.notes,
+      });
+
+      setFormData({
+        date: new Date().toISOString().split("T")[0],
+        startTime: "09:00",
+        endTime: "10:00",
+        type: "personal-training",
+        cost: 75,
+        notes: "",
+      });
+      setOpen(false);
+    } catch (error) {
+      console.error("Error scheduling session:", error);
+      alert("Failed to schedule session. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            setOpen(true);
+          }}
+        >
+          <Calendar className="h-4 w-4 mr-2" />
+          Schedule Session
+        </DropdownMenuItem>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Schedule Session for {client.name}</DialogTitle>
+          <DialogDescription>
+            Schedule a new training session for your client.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="date">Date</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) =>
+                    setFormData({ ...formData, date: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="type">Session Type</Label>
+                <Select
+                  value={formData.type}
+                  onValueChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      type: value as typeof formData.type,
+                      cost: value === "assessment" ? 50 : value === "consultation" ? 60 : 75
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="personal-training">Personal Training ($75)</SelectItem>
+                    <SelectItem value="assessment">Assessment ($50)</SelectItem>
+                    <SelectItem value="consultation">Consultation ($60)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startTime">Start Time</Label>
+                <Input
+                  id="startTime"
+                  type="time"
+                  value={formData.startTime}
+                  onChange={(e) =>
+                    setFormData({ ...formData, startTime: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="endTime">End Time</Label>
+                <Input
+                  id="endTime"
+                  type="time"
+                  value={formData.endTime}
+                  onChange={(e) =>
+                    setFormData({ ...formData, endTime: e.target.value })
+                  }
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cost">Cost ($)</Label>
+              <Input
+                id="cost"
+                type="number"
+                value={formData.cost}
+                onChange={(e) =>
+                  setFormData({ ...formData, cost: parseInt(e.target.value) })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notes">Notes (Optional)</Label>
+              <Textarea
+                id="notes"
+                value={formData.notes}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
+                placeholder="Session focus, client goals, special considerations..."
+                className="min-h-[60px]"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Scheduling..." : "Schedule Session"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const RecordPaymentDialog = ({ client }: { client: Client }) => {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { addPayment } = useData();
+  const [formData, setFormData] = useState({
+    amount: 75,
+    method: "card" as "card" | "cash" | "bank-transfer" | "venmo",
+    description: "Personal Training Session",
+    date: new Date().toISOString().split("T")[0],
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await addPayment({
+        clientId: client.id,
+        amount: formData.amount,
+        date: formData.date,
+        method: formData.method,
+        status: "completed",
+        description: formData.description,
+      });
+
+      setFormData({
+        amount: 75,
+        method: "card",
+        description: "Personal Training Session",
+        date: new Date().toISOString().split("T")[0],
+      });
+      setOpen(false);
+    } catch (error) {
+      console.error("Error recording payment:", error);
+      alert("Failed to record payment. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            setOpen(true);
+          }}
+        >
+          <DollarSign className="h-4 w-4 mr-2" />
+          Record Payment
+        </DropdownMenuItem>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[400px]">
+        <DialogHeader>
+          <DialogTitle>Record Payment for {client.name}</DialogTitle>
+          <DialogDescription>
+            Record a payment received from your client.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="amount">Amount ($)</Label>
+              <Input
+                id="amount"
+                type="number"
+                value={formData.amount}
+                onChange={(e) =>
+                  setFormData({ ...formData, amount: parseInt(e.target.value) })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="method">Payment Method</Label>
+              <Select
+                value={formData.method}
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    method: value as typeof formData.method
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="card">Credit Card</SelectItem>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="venmo">Venmo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="date">Payment Date</Label>
+              <Input
+                id="date"
+                type="date"
+                value={formData.date}
+                onChange={(e) =>
+                  setFormData({ ...formData, date: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                placeholder="What was this payment for?"
+                required
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Recording..." : "Record Payment"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const DeleteClientDialog = ({ client }: { client: Client }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -527,8 +824,8 @@ const DeleteClientDialog = ({ client }: { client: Client }) => {
             setOpen(true);
           }}
         >
-          <Trash className="h-4 w-4 mr-2" />
-          Delete
+          <Trash2 className="h-4 w-4 mr-2" />
+          Delete Client
         </DropdownMenuItem>
       </DialogTrigger>
       <DialogContent>
@@ -536,10 +833,10 @@ const DeleteClientDialog = ({ client }: { client: Client }) => {
           <DialogTitle>Delete Client</DialogTitle>
           <DialogDescription>
             Are you sure you want to delete {client.name}? This action cannot be
-            undone.
+            undone and will remove all associated sessions and data.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 pt-4">
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
@@ -548,12 +845,13 @@ const DeleteClientDialog = ({ client }: { client: Client }) => {
             onClick={handleDelete}
             disabled={loading}
           >
-            {loading ? "Deleting..." : "Delete"}
+            {loading ? "Deleting..." : "Delete Client"}
           </Button>
         </div>
       </DialogContent>
     </Dialog>
   );
+};
 };
 
 const Clients = () => {
