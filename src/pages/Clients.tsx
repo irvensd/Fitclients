@@ -65,9 +65,16 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
     if (stored) {
       try {
         const allApplied = JSON.parse(stored);
-        const clientRecs = allApplied.filter(
-          (rec: any) => rec.clientId === clientId,
-        );
+        // Filter for this client and remove duplicates by id
+        const clientRecs = allApplied
+          .filter((rec: any) => rec.clientId === clientId)
+          .reduce((unique: any[], current: any) => {
+            // Only add if we don't already have this ID
+            if (!unique.find((item) => item.id === current.id)) {
+              unique.push(current);
+            }
+            return unique;
+          }, []);
         setAppliedRecs(clientRecs);
       } catch (e) {
         console.warn("Failed to load applied recommendations:", e);
