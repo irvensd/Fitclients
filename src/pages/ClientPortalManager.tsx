@@ -240,12 +240,12 @@ const PortalSettingsDialog = ({ client }: { client: any }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="flex-1 sm:flex-initial">
           <Settings className="h-4 w-4 mr-2" />
-          Settings
+          <span className="text-sm">Settings</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] mx-4 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Portal Settings</DialogTitle>
           <DialogDescription>
