@@ -88,14 +88,28 @@ const Settings = () => {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="business">Business</TabsTrigger>
-          <TabsTrigger value="pricing">Pricing</TabsTrigger>
-          <TabsTrigger value="billing">Billing</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="grid w-full grid-cols-6 min-w-[600px] lg:min-w-0">
+            <TabsTrigger value="profile" className="text-xs sm:text-sm">
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="business" className="text-xs sm:text-sm">
+              Business
+            </TabsTrigger>
+            <TabsTrigger value="pricing" className="text-xs sm:text-sm">
+              Pricing
+            </TabsTrigger>
+            <TabsTrigger value="billing" className="text-xs sm:text-sm">
+              Billing
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="text-xs sm:text-sm">
+              Notifications
+            </TabsTrigger>
+            <TabsTrigger value="security" className="text-xs sm:text-sm">
+              Security
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="profile" className="space-y-6">
           <Card>
