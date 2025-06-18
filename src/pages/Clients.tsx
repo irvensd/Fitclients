@@ -165,13 +165,6 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
     </div>
   );
 };
-
-  const copyToClipboardFallback = (text: string): boolean => {
-    try {
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
       textArea.style.top = '-999999px';
       document.body.appendChild(textArea);
       textArea.focus();
