@@ -225,69 +225,72 @@ export const SessionCalendar = () => {
                   {selectedEvent.resource.status.toUpperCase()}
                 </Badge>
               </div>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-3">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">
-                    {getClientName(selectedEvent.resource.clientId)}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>
-                    {moment(selectedEvent.start).format("MMMM Do, YYYY")}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                  <span>
-                    {moment(selectedEvent.start).format("h:mm A")} -{" "}
-                    {moment(selectedEvent.end).format("h:mm A")}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                  <span>{formatSessionType(selectedEvent.resource.type)}</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  <span>${selectedEvent.resource.cost}</span>
-                </div>
-
-                {selectedEvent.resource.notes && (
-                  <div className="mt-4">
-                    <h4 className="font-medium mb-2">Notes:</h4>
-                    <p className="text-sm text-muted-foreground bg-muted p-2 rounded">
-                      {selectedEvent.resource.notes}
-                    </p>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">
+                      {getClientName(selectedEvent.resource.clientId)}
+                    </span>
                   </div>
-                )}
 
-                {selectedEvent.resource.status === "cancelled" &&
-                  selectedEvent.resource.cancelledBy && (
-                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
-                      <p className="text-sm text-red-800">
-                        <strong>Cancelled by:</strong>{" "}
-                        {selectedEvent.resource.cancelledBy}
-                        {selectedEvent.resource.cancelledAt && (
-                          <>
-                            <br />
-                            <strong>When:</strong>{" "}
-                            {moment(selectedEvent.resource.cancelledAt).format(
-                              "MMMM Do, YYYY [at] h:mm A",
-                            )}
-                          </>
-                        )}
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span>
+                      {moment(selectedEvent.start).format("MMMM Do, YYYY")}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                    <span>
+                      {moment(selectedEvent.start).format("h:mm A")} -{" "}
+                      {moment(selectedEvent.end).format("h:mm A")}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    <span>
+                      {formatSessionType(selectedEvent.resource.type)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <span>${selectedEvent.resource.cost}</span>
+                  </div>
+
+                  {selectedEvent.resource.notes && (
+                    <div className="mt-4">
+                      <h4 className="font-medium mb-2">Notes:</h4>
+                      <p className="text-sm text-muted-foreground bg-muted p-2 rounded">
+                        {selectedEvent.resource.notes}
                       </p>
                     </div>
                   )}
+
+                  {selectedEvent.resource.status === "cancelled" &&
+                    selectedEvent.resource.cancelledBy && (
+                      <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
+                        <p className="text-sm text-red-800">
+                          <strong>Cancelled by:</strong>{" "}
+                          {selectedEvent.resource.cancelledBy}
+                          {selectedEvent.resource.cancelledAt && (
+                            <>
+                              <br />
+                              <strong>When:</strong>{" "}
+                              {moment(
+                                selectedEvent.resource.cancelledAt,
+                              ).format("MMMM Do, YYYY [at] h:mm A")}
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    )}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </DialogContent>
       </Dialog>
