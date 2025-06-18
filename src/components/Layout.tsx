@@ -448,7 +448,7 @@ export const Layout = ({ children }: LayoutProps) => {
         </SheetTrigger>
         <SheetContent
           side="left"
-          className="p-0 w-80 sm:w-96 bg-white border-r-0 shadow-2xl"
+          className="p-0 w-80 sm:w-96 bg-white border-r-0 shadow-2xl overflow-y-auto"
         >
           <VisuallyHidden.Root>
             <SheetTitle>Navigation Menu</SheetTitle>
