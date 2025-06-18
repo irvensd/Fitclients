@@ -928,17 +928,21 @@ const Clients = () => {
       {clients.length > 0 && (
         <>
           {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Clients
+                <CardTitle className="text-xs sm:text-sm font-medium">
+                  Total
                 </CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
               </CardHeader>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold">{clients.length}</div>
-                <p className="text-sm text-muted-foreground">Total Clients</p>
+              <CardContent className="pt-2 sm:pt-6">
+                <div className="text-xl sm:text-2xl font-bold">
+                  {clients.length}
+                </div>
+                <p className="text-xs text-muted-foreground hidden sm:block">
+                  Total Clients
+                </p>
               </CardContent>
             </Card>
             <Card>
