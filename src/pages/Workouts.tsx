@@ -1321,6 +1321,10 @@ const Workouts = () => {
           workout={selectedWorkout}
           open={viewDialogOpen}
           onOpenChange={setViewDialogOpen}
+          onStartSession={(workout) => {
+            setViewDialogOpen(false);
+            handleStartSession(workout);
+          }}
         />
 
         <EditWorkoutDialog
