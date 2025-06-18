@@ -510,23 +510,53 @@ const StartSessionDialog = ({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) => {
-  const { getClientName } = useData();
+  const { getClientName, addSession } = useData();
   const [loading, setLoading] = useState(false);
+  const [sessionDate, setSessionDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
+  const [sessionTime, setSessionTime] = useState(
+    new Date().toTimeString().slice(0, 5),
+  );
+  const [sessionCost, setSessionCost] = useState("75");
 
   const handleStartSession = async () => {
     if (!workout) return;
 
     setLoading(true);
     try {
-      // Here you would typically create a new session record
-      console.log("Starting session for workout:", workout.name);
+      // Calculate end time (assume 1 hour session)
+      const startTime = new Date(`${sessionDate}T${sessionTime}`);
+      const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Add 1 hour
+
+      // Create session object
+      const newSession = {
+        clientId: workout.clientId,
+        date: sessionDate,
+        startTime: sessionTime,
+        endTime: endTime.toTimeString().slice(0, 5),
+        type: "personal-training" as const,
+        status: "scheduled" as const,
+        cost: parseFloat(sessionCost),
+        notes: `Workout Plan: ${workout.name} - ${workout.description}`,
+      };
+
+      // Add session to data
+      await addSession(newSession);
+
+      // Show success message
       alert(
-        `Started workout session: ${workout.name} for ${getClientName(workout.clientId)}`,
+        `Session scheduled successfully!\n\nWorkout: ${workout.name}\nClient: ${getClientName(workout.clientId)}\nDate: ${new Date(sessionDate).toLocaleDateString()}\nTime: ${sessionTime}`,
       );
+
+      // Close dialog
       onOpenChange(false);
+
+      // Navigate to sessions page to show the new session
+      window.location.href = "/sessions";
     } catch (error) {
       console.error("Error starting session:", error);
-      alert("Failed to start session. Please try again.");
+      alert("Failed to create session. Please try again.");
     } finally {
       setLoading(false);
     }
