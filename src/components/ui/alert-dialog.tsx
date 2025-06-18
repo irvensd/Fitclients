@@ -137,4 +137,5 @@ export {
   AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
+  VisuallyHidden,
 };
