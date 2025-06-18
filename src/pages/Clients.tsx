@@ -1291,7 +1291,7 @@ const Clients = () => {
             ))}
           </div>
 
-          {filteredClients.length === 0 && (
+          {filteredActiveClients.length === 0 && filteredArchivedClients.length === 0 && (
             <Card>
               <CardContent className="text-center py-12">
                 <h3 className="text-lg font-semibold mb-2">No clients found</h3>
@@ -1299,9 +1299,8 @@ const Clients = () => {
                   Try adjusting your search or filters.
                 </p>
               </CardContent>
-              </div>
-            )}
-          </div>
+            </Card>
+          )}
         </>
       )}
     </div>
