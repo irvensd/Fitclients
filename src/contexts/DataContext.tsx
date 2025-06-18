@@ -7,6 +7,7 @@ import {
   analyticsService,
 } from "@/lib/firebaseService";
 import { Client, Session, Payment } from "@/lib/types";
+import { mockClients, mockSessions, mockPayments } from "@/lib/mockData";
 
 interface DataContextType {
   clients: Client[];
