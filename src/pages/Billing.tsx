@@ -52,6 +52,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { useNavigate } from "react-router-dom";
+import { DemoCheckoutModal } from "@/components/DemoCheckoutModal";
 
 // Mock payment methods - in real app, these would come from Stripe
 const mockPaymentMethods = [
@@ -552,44 +553,30 @@ const Billing = () => {
   const [loading, setLoading] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState(mockPaymentMethods);
+  const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
   const currentPlan = getCurrentPlan();
 
   const handleUpgrade = async (planId: string) => {
     if (planId === "free") return;
 
-    setLoading(true);
-    try {
-      // Create Stripe checkout session
-      const checkoutSession = await createCheckoutSession(planId, "user-id");
+    setSelectedPlanId(planId);
+    setCheckoutModalOpen(true);
+  };
 
-      toast({
-        title: "Redirecting to Stripe...",
-        description: "You'll be redirected to complete your payment securely.",
-      });
+  const handleCheckoutSuccess = () => {
+    const planKey = selectedPlanId?.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
+    const selectedPlan = SUBSCRIPTION_PLANS[planKey];
 
-      // In a real implementation, redirect to Stripe checkout
-      window.open("https://checkout.stripe.com", "_blank");
-
-      // Mock success after a delay
-      setTimeout(() => {
-        const planKey = planId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
-        const selectedPlan = SUBSCRIPTION_PLANS[planKey];
-        toast({
-          title: "Subscription updated!",
-          description: `Successfully upgraded to ${selectedPlan?.name || planId} plan.`,
-        });
-        refreshSubscription();
-      }, 3000);
-    } catch (error) {
-      toast({
-        title: "Upgrade failed",
-        description:
-          "There was an error processing your upgrade. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+    toast({
+      title: "Subscription updated!",
+      description: `Successfully upgraded to ${selectedPlan?.name || selectedPlanId} plan.`,
+    });
+    refreshSubscription();
+    setCheckoutModalOpen(false);
+    setSelectedPlanId(null);
+  };
     }
   };
 
@@ -831,6 +818,19 @@ const Billing = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Demo Checkout Modal */}
+      {selectedPlanId && (
+        <DemoCheckoutModal
+          isOpen={checkoutModalOpen}
+          onClose={() => {
+            setCheckoutModalOpen(false);
+            setSelectedPlanId(null);
+          }}
+          planId={selectedPlanId}
+          onSuccess={handleCheckoutSuccess}
+        />
+      )}
     </div>
   );
 };
