@@ -38,6 +38,7 @@ import {
   Camera,
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
+import { SubscriptionManager } from "@/components/SubscriptionManager";
 
 const Settings = () => {
   const [notifications, setNotifications] = useState({
