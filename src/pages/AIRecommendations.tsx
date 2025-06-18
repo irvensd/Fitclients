@@ -65,7 +65,15 @@ const AIRecommendations = () => {
     isOpen: boolean;
     recommendation: any;
     clientName: string;
-  }>({ isOpen: false, recommendation: null, clientName: "" });
+    isApplying: boolean;
+    isSuccess: boolean;
+  }>({
+    isOpen: false,
+    recommendation: null,
+    clientName: "",
+    isApplying: false,
+    isSuccess: false,
+  });
 
   // Load applied recommendations from localStorage on mount
   useEffect(() => {
