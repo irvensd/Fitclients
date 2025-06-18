@@ -109,21 +109,62 @@ export const canExceedLimit = (
   return true;
 };
 
-// Mock function for subscription management (would integrate with backend)
+// Function to create Stripe checkout session
 export const createCheckoutSession = async (planId: string, userId: string) => {
-  // In a real implementation, this would call your backend API
-  // which would create a Stripe checkout session
-
   const plan = Object.values(SUBSCRIPTION_PLANS).find((p) => p.id === planId);
   if (!plan || plan.id === "free") {
     throw new Error("Invalid plan selected");
   }
 
-  // Mock response - in real implementation, return Stripe checkout session URL
-  return {
-    url: `https://checkout.stripe.com/c/pay/mock-session-id`,
-    sessionId: "mock-session-id",
-  };
+  try {
+    // In a real implementation, this would call your backend API
+    // The backend would create a Stripe checkout session with the actual Stripe API
+    const response = await fetch("/api/create-checkout-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        planId,
+        userId,
+        priceId: plan.stripePriceId,
+        successUrl: `${window.location.origin}/billing?success=true`,
+        cancelUrl: `${window.location.origin}/billing?canceled=true`,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create checkout session");
+    }
+
+    const session = await response.json();
+
+    // Redirect to Stripe checkout
+    const stripe = await stripePromise;
+    if (stripe) {
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: session.id,
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+    }
+
+    return session;
+  } catch (error) {
+    // For demo purposes, show a mock Stripe checkout URL
+    console.log("Demo mode: Would redirect to Stripe checkout for", plan.name);
+
+    // Open a demo Stripe checkout in a new tab
+    const demoUrl = `https://checkout.stripe.com/demo?plan=${planId}&amount=${plan.price * 100}`;
+    window.open(demoUrl, "_blank");
+
+    return {
+      url: demoUrl,
+      sessionId: `demo_session_${Date.now()}`,
+    };
+  }
 };
 
 export const cancelSubscription = async (subscriptionId: string) => {

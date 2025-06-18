@@ -37,11 +37,13 @@ import {
   Save,
   Camera,
   CreditCard,
+  Sparkles,
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
-import { SubscriptionManager } from "@/components/SubscriptionManager";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState({
     emailReminders: true,
     smsReminders: false,
@@ -470,7 +472,67 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="billing" className="space-y-6">
-          <SubscriptionManager />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Billing & Payments
+              </CardTitle>
+              <CardDescription>
+                Manage your subscription, payment methods, and billing history
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CreditCard className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">
+                  Complete Billing Management
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  Access your full billing dashboard to manage subscriptions,
+                  payment methods, and view detailed billing history.
+                </p>
+                <Button
+                  size="lg"
+                  onClick={() => navigate("/billing")}
+                  className="min-w-[200px]"
+                >
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Go to Billing Dashboard
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t">
+                <div className="text-center">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Shield className="h-5 w-5 text-green-600" />
+                  </div>
+                  <h4 className="font-medium text-sm">Secure Payments</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Powered by Stripe
+                  </p>
+                </div>
+                <div className="text-center">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <h4 className="font-medium text-sm">14-Day Free Trial</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Try before you buy
+                  </p>
+                </div>
+                <div className="text-center">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Sparkles className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <h4 className="font-medium text-sm">Cancel Anytime</h4>
+                  <p className="text-xs text-muted-foreground">No contracts</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6">
