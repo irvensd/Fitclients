@@ -714,7 +714,15 @@ const AIRecommendations = () => {
               Cancel
             </Button>
             <Button
-              onClick={() => {
+              onClick={async () => {
+                setConfirmationModal({
+                  ...confirmationModal,
+                  isApplying: true,
+                });
+
+                // Simulate processing time
+                await new Promise((resolve) => setTimeout(resolve, 1500));
+
                 const recId = `${confirmationModal.recommendation.clientId}-${confirmationModal.recommendation.id}`;
                 setAppliedRecommendationIds(
                   (prev) => new Set([...prev, recId]),
@@ -739,9 +747,9 @@ const AIRecommendations = () => {
                 );
 
                 setConfirmationModal({
-                  isOpen: false,
-                  recommendation: null,
-                  clientName: "",
+                  ...confirmationModal,
+                  isSuccess: true,
+                  isApplying: false,
                 });
 
                 // Show success toast
@@ -750,11 +758,39 @@ const AIRecommendations = () => {
                   description: `"${confirmationModal.recommendation.title}" has been added to ${confirmationModal.clientName}'s training plan and will appear on their client card.`,
                   duration: 5000,
                 });
+
+                // Auto close after success
+                setTimeout(() => {
+                  setConfirmationModal({
+                    isOpen: false,
+                    recommendation: null,
+                    clientName: "",
+                    isApplying: false,
+                    isSuccess: false,
+                  });
+                }, 2000);
               }}
+              disabled={
+                confirmationModal.isApplying || confirmationModal.isSuccess
+              }
               className="bg-gradient-to-r from-purple-600 to-blue-600 text-white"
             >
-              <Zap className="h-4 w-4 mr-2" />
-              Apply Recommendation
+              {confirmationModal.isApplying ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Applying...
+                </>
+              ) : confirmationModal.isSuccess ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Applied!
+                </>
+              ) : (
+                <>
+                  <Zap className="h-4 w-4 mr-2" />
+                  Apply Recommendation
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
