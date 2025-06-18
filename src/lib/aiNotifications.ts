@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Client, Session } from "./types";
 import { ClientAnalysis } from "./recommendations";
 
