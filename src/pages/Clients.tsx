@@ -89,7 +89,17 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
         const allApplied = JSON.parse(stored);
         const updated = allApplied.filter((rec: any) => rec.id !== recId);
         localStorage.setItem("appliedRecommendations", JSON.stringify(updated));
-        setAppliedRecs(updated.filter((rec: any) => rec.clientId === clientId));
+
+        // Update local state with deduplicated client recommendations
+        const clientRecs = updated
+          .filter((rec: any) => rec.clientId === clientId)
+          .reduce((unique: any[], current: any) => {
+            if (!unique.find((item) => item.id === current.id)) {
+              unique.push(current);
+            }
+            return unique;
+          }, []);
+        setAppliedRecs(clientRecs);
       } catch (e) {
         console.warn("Failed to update recommendations:", e);
       }
