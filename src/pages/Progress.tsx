@@ -499,7 +499,17 @@ const Progress = () => {
             achievements.
           </p>
         </div>
-        <AddProgressDialog />
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => window.open("/client-portal/1", "_blank")}
+            size="sm"
+          >
+            <TrendingUp className="h-4 w-4 mr-2" />
+            View in Client Portal
+          </Button>
+          <AddProgressDialog />
+        </div>
       </div>
 
       {/* Instructions Card */}
