@@ -66,7 +66,7 @@ const AIRecommendations = () => {
   }>({ isOpen: false, recommendation: null, clientName: "" });
 
   // Load applied recommendations from localStorage on mount
-  useState(() => {
+  React.useEffect(() => {
     const stored = localStorage.getItem("appliedRecommendations");
     if (stored) {
       try {
@@ -77,7 +77,7 @@ const AIRecommendations = () => {
         console.warn("Failed to load applied recommendations:", e);
       }
     }
-  });
+  }, []);
 
   // Show loading state
   if (loading) {
