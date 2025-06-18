@@ -281,7 +281,119 @@ const Payments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [methodFilter, setMethodFilter] = useState("all");
-  const { payments, clients, loading, getClientName } = useData();
+  const {
+    payments,
+    clients,
+    loading,
+    getClientName,
+    updatePayment,
+    deletePayment,
+  } = useData();
+
+  // Enhanced payment management functions
+  const handleMarkAsPaid = async (payment: Payment) => {
+    try {
+      await updatePayment(payment.id, {
+        status: "completed",
+        date: new Date().toISOString().split("T")[0], // Update to current date when marked as paid
+      });
+      alert(
+        `Payment of $${payment.amount} marked as completed for ${getClientName(payment.clientId)}`,
+      );
+    } catch (error) {
+      console.error("Error updating payment:", error);
+      alert("Failed to update payment status. Please try again.");
+    }
+  };
+
+  const handleMarkAsFailed = async (payment: Payment) => {
+    const reason = prompt("Reason for payment failure (optional):");
+    try {
+      await updatePayment(payment.id, {
+        status: "failed",
+        description:
+          payment.description +
+          (reason ? ` - Failed: ${reason}` : " - Payment failed"),
+      });
+      alert(`Payment marked as failed for ${getClientName(payment.clientId)}`);
+    } catch (error) {
+      console.error("Error updating payment:", error);
+      alert("Failed to update payment status. Please try again.");
+    }
+  };
+
+  const handleSendReminder = (payment: Payment) => {
+    // In a real app, this would send an email/SMS reminder
+    alert(
+      `Payment reminder sent to ${getClientName(payment.clientId)}\n\nAmount: $${payment.amount}\nDue: ${new Date(payment.date).toLocaleDateString()}\nMethod: ${payment.method.replace("-", " ")}`,
+    );
+  };
+
+  const handleDeletePayment = async (payment: Payment) => {
+    if (
+      confirm(
+        `Are you sure you want to delete this payment record?\n\nClient: ${getClientName(payment.clientId)}\nAmount: $${payment.amount}\n\nThis action cannot be undone.`,
+      )
+    ) {
+      try {
+        await deletePayment(payment.id);
+        alert("Payment record deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting payment:", error);
+        alert("Failed to delete payment. Please try again.");
+      }
+    }
+  };
+
+  // Get payment method display info
+  const getPaymentMethodInfo = (method: string) => {
+    switch (method) {
+      case "bank-transfer":
+        return {
+          label: "Bank Transfer",
+          color: "bg-blue-100 text-blue-800",
+          icon: "🏦",
+        };
+      case "card":
+        return {
+          label: "Credit/Debit Card",
+          color: "bg-green-100 text-green-800",
+          icon: "💳",
+        };
+      case "cash":
+        return {
+          label: "Cash",
+          color: "bg-gray-100 text-gray-800",
+          icon: "💵",
+        };
+      case "venmo":
+        return {
+          label: "Venmo",
+          color: "bg-purple-100 text-purple-800",
+          icon: "📱",
+        };
+      case "paypal":
+        return {
+          label: "PayPal",
+          color: "bg-blue-100 text-blue-800",
+          icon: "🅿️",
+        };
+      default:
+        return {
+          label: method,
+          color: "bg-gray-100 text-gray-800",
+          icon: "💰",
+        };
+    }
+  };
+
+  // Get overdue payments
+  const getOverduePayments = () => {
+    const today = new Date();
+    return payments.filter(
+      (p) => p.status === "pending" && new Date(p.date) < today,
+    );
+  };
 
   const filteredPayments = payments.filter((payment) => {
     const clientName = getClientName(payment.clientId);
