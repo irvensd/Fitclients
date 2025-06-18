@@ -346,6 +346,8 @@ const AIRecommendations = () => {
                               isOpen: true,
                               recommendation: rec,
                               clientName: rec.clientName,
+                              isApplying: false,
+                              isSuccess: false,
                             });
                           }}
                         >
