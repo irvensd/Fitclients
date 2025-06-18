@@ -33,6 +33,8 @@ import {
   Brain,
   Bell,
   Sparkles,
+  Calendar,
+  CheckCircle,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { GlobalSearch } from "@/components/GlobalSearch";
