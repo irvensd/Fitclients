@@ -1243,6 +1243,26 @@ const Workouts = () => {
             <p className="text-sm text-muted-foreground">Clients</p>
           </CardContent>
         </Card>
+
+        {/* Dialog Components */}
+        <ViewWorkoutDialog
+          workout={selectedWorkout}
+          open={viewDialogOpen}
+          onOpenChange={setViewDialogOpen}
+        />
+
+        <EditWorkoutDialog
+          workout={selectedWorkout}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          onSave={handleSaveWorkout}
+        />
+
+        <StartSessionDialog
+          workout={selectedWorkout}
+          open={startSessionDialogOpen}
+          onOpenChange={setStartSessionDialogOpen}
+        />
       </div>
     </div>
   );
