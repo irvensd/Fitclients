@@ -1,429 +1,230 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useAuth } from "./AuthContext";
-import {
-  clientsService,
-  sessionsService,
-  paymentsService,
-  analyticsService,
-} from "@/lib/firebaseService";
+import { createContext, useContext, useState, useEffect } from "react";
+import { mockClients, mockSessions, mockPayments } from "@/lib/mockData";
 import { Client, Session, Payment } from "@/lib/types";
-import { mockClients, mockSessions, mockPayments, mockWorkoutPlans } from "@/lib/mockData";
+import {
+  ClientWithStatus,
+  archiveExcessClients,
+  reactivateAllClients,
+  getActiveClients,
+} from "@/lib/clientDowngrade";
 
 interface DataContextType {
-  clients: Client[];
+  clients: ClientWithStatus[];
   sessions: Session[];
   payments: Payment[];
   loading: boolean;
   error: string | null;
 
-  // Client actions
-  addClient: (client: Omit<Client, "id">) => Promise<void>;
-  updateClient: (clientId: string, updates: Partial<Client>) => Promise<void>;
-  deleteClient: (clientId: string) => Promise<void>;
+  // Client operations
+  addClient: (client: Omit<Client, "id">) => Promise<Client>;
+  updateClient: (id: string, updates: Partial<Client>) => Promise<void>;
+  deleteClient: (id: string) => Promise<void>;
+  getClientName: (id: string) => string;
 
-  // Session actions
-  addSession: (session: Omit<Session, "id">) => Promise<void>;
-  updateSession: (
-    sessionId: string,
-    updates: Partial<Session>,
+  // Client status operations
+  archiveClients: (clientIds: string[], reason?: string) => Promise<void>;
+  reactivateClients: (clientIds: string[]) => Promise<void>;
+  handlePlanDowngrade: (
+    newLimit: number,
+    selectedActiveIds: string[],
   ) => Promise<void>;
-  deleteSession: (sessionId: string) => Promise<void>;
+  getActiveClients: () => ClientWithStatus[];
+  getArchivedClients: () => ClientWithStatus[];
 
-  // Payment actions
-  addPayment: (payment: Omit<Payment, "id">) => Promise<void>;
-  updatePayment: (
-    paymentId: string,
-    updates: Partial<Payment>,
-  ) => Promise<void>;
-  deletePayment: (paymentId: string) => Promise<void>;
+  // Session operations
+  addSession: (session: Omit<Session, "id">) => Promise<Session>;
+  updateSession: (id: string, updates: Partial<Session>) => Promise<void>;
+  deleteSession: (id: string) => Promise<void>;
 
-  // Helper functions
-  getClientName: (clientId: string) => string;
-  refreshData: () => void;
+  // Payment operations
+  addPayment: (payment: Omit<Payment, "id">) => Promise<Payment>;
+  updatePayment: (id: string, updates: Partial<Payment>) => Promise<void>;
+  deletePayment: (id: string) => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-export const useData = () => {
-  const context = useContext(DataContext);
-  if (context === undefined) {
-    throw new Error("useData must be used within a DataProvider");
-  }
-  return context;
-};
-
-export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const { user } = useAuth();
-  const [clients, setClients] = useState<Client[]>([]);
+const DataProvider = ({ children }: { children: React.ReactNode }) => {
+  const [clients, setClients] = useState<ClientWithStatus[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Helper function to get client name
-  const getClientName = (clientId: string): string => {
-    const client = clients.find((c) => c.id === clientId);
-    return client ? client.name : "Unknown Client";
-  };
-
-  // Initialize data when user logs in
   useEffect(() => {
-    if (!user?.email) {
-      setClients([]);
-      setSessions([]);
-      setPayments([]);
-      setLoading(false);
-      return;
-    }
+    // Simulate loading delay
+    setTimeout(() => {
+      // Initialize clients with active status
+      const clientsWithStatus: ClientWithStatus[] = mockClients.map(
+        (client) => ({
+          ...client,
+          status: {
+            isActive: true,
+            archivedAt: undefined,
+            archiveReason: undefined,
+          },
+        }),
+      );
 
-    // For demo account, use comprehensive mock data to showcase features
-    if (user.email === "trainer@demo.com") {
-      setClients(mockClients);
+      setClients(clientsWithStatus);
       setSessions(mockSessions);
       setPayments(mockPayments);
-
-      // Add demo progress data to localStorage
-      const demoProgressData = [
-        {
-          id: "prog1",
-          clientId: "1", // Sarah Johnson
-          date: "2024-01-15",
-          weight: 165,
-          bodyFat: 22,
-          measurements: { chest: 36, waist: 30, hips: 38, arms: 12, thighs: 24 },
-          notes: "Initial measurements"
-        },
-        {
-          id: "prog2",
-          clientId: "1",
-          date: "2024-01-29",
-          weight: 162,
-          bodyFat: 21,
-          measurements: { chest: 35.5, waist: 29, hips: 37.5, arms: 12.2, thighs: 23.5 },
-          notes: "Great progress after 2 weeks!"
-        },
-        {
-          id: "prog3",
-          clientId: "1",
-          date: "2024-02-12",
-          weight: 159,
-          bodyFat: 19.5,
-          measurements: { chest: 35, waist: 28, hips: 37, arms: 12.5, thighs: 23 },
-          notes: "Excellent consistency - lost 6 lbs!"
-        },
-        {
-          id: "prog4",
-          clientId: "2", // Mike Chen
-          date: "2024-02-03",
-          weight: 180,
-          bodyFat: 15,
-          measurements: { chest: 42, waist: 32, hips: 40, arms: 15, thighs: 26 },
-          notes: "Starting bulk phase"
-        },
-        {
-          id: "prog5",
-          clientId: "2",
-          date: "2024-02-17",
-          weight: 183,
-          bodyFat: 15.5,
-          measurements: { chest: 43, waist: 32.5, hips: 40.5, arms: 15.5, thighs: 26.5 },
-          notes: "Good muscle gain, staying lean"
-        },
-        {
-          id: "prog6",
-          clientId: "3", // Emily Davis
-          date: "2024-01-28",
-          weight: 135,
-          bodyFat: 18,
-          measurements: { chest: 34, waist: 26, hips: 36, arms: 10.5, thighs: 21 },
-          notes: "Marathon training baseline"
-        }
-      ];
-      localStorage.setItem("progressEntries", JSON.stringify(demoProgressData));
-
-      // Add comprehensive demo workout plans
-      localStorage.setItem("workoutPlans", JSON.stringify(mockWorkoutPlans));
-
       setLoading(false);
-      return;
-    }
-    const userId = user.email; // Using email as userId for simplicity
-    setLoading(true);
-    setError(null);
+    }, 1000);
+  }, []);
 
-    // Initialize trainer profile if needed
-    analyticsService
-      .initializeTrainerProfile(userId, user.email)
-      .catch((error) => {
-        console.error("Failed to initialize trainer profile:", error);
-        // Don't fail completely if this doesn't work
-      });
-
-    try {
-      // Subscribe to real-time data updates with error handling
-      const unsubscribeClients = clientsService.subscribeToClients(
-        userId,
-        (newClients) => {
-          setClients(newClients);
-          setError(null); // Clear error on successful data load
-        },
-        (error) => {
-          console.error("Error subscribing to clients:", error);
-          setError("Unable to connect to database. Using offline mode.");
-          setClients([]); // Set empty data for new accounts
-        }
-      );
-
-      const unsubscribeSessions = sessionsService.subscribeToSessions(
-        userId,
-        (newSessions) => {
-          setSessions(newSessions);
-          setError(null);
-        },
-        (error) => {
-          console.error("Error subscribing to sessions:", error);
-          setError("Unable to connect to database. Using offline mode.");
-          setSessions([]);
-        }
-      );
-
-      const unsubscribePayments = paymentsService.subscribeToPayments(
-        userId,
-        (newPayments) => {
-          setPayments(newPayments);
-          setLoading(false);
-          setError(null);
-        },
-        (error) => {
-          console.error("Error subscribing to payments:", error);
-          setError("Unable to connect to database. Using offline mode.");
-          setPayments([]);
-          setLoading(false);
-        }
-      );
-
-      // Cleanup subscriptions
-      return () => {
-        try {
-          unsubscribeClients();
-          unsubscribeSessions();
-          unsubscribePayments();
-        } catch (error) {
-          console.error("Error unsubscribing:", error);
-        }
-      };
-    } catch (error) {
-      console.error("Error setting up Firebase subscriptions:", error);
-      setError("Unable to connect to database. Using offline mode.");
-      setClients([]);
-      setSessions([]);
-      setPayments([]);
-      setLoading(false);
-    }
-  }, [user]);
-
-  // Client actions
-  const addClient = async (client: Omit<Client, "id">) => {
-    if (!user?.email) throw new Error("User not authenticated");
-
-    // Demo account: use offline mode with realistic ID generation
-    if (user.email === "trainer@demo.com") {
-      const newClient: Client = {
-        ...client,
-        id: (Math.max(...clients.map(c => parseInt(c.id))) + 1).toString(),
-        dateJoined: new Date().toISOString().split("T")[0],
-      };
-      setClients(prev => [newClient, ...prev]);
-      return newClient;
-    }
-
-    try {
-      await clientsService.addClient(user.email, client);
-    } catch (err) {
-      setError("Failed to add client");
-      throw err;
-    }
+  // Generate unique ID
+  const generateId = () => {
+    return Date.now().toString();
   };
 
-  const updateClient = async (clientId: string, updates: Partial<Client>) => {
-    if (!user?.email) throw new Error("User not authenticated");
+  // Client operations
+  const addClient = async (clientData: Omit<Client, "id">): Promise<Client> => {
+    const newClient = {
+      ...clientData,
+      id: generateId(),
+      dateJoined: new Date().toISOString().split("T")[0],
+    };
 
-    // Demo account: use offline mode
-    if (user.email === "trainer@demo.com") {
-      setClients(prev => prev.map(client =>
-        client.id === clientId ? { ...client, ...updates } : client
-      ));
-      return;
-    }
+    const clientWithStatus: ClientWithStatus = {
+      ...newClient,
+      status: {
+        isActive: true,
+        archivedAt: undefined,
+        archiveReason: undefined,
+      },
+    };
 
-    try {
-      await clientsService.updateClient(user.email, clientId, updates);
-    } catch (err) {
-      setError("Failed to update client");
-      throw err;
-    }
+    setClients((prev) => [...prev, clientWithStatus]);
+    return newClient;
   };
 
-  const deleteClient = async (clientId: string) => {
-    if (!user?.email) throw new Error("User not authenticated");
-
-    // Demo account: use offline mode
-    if (user.email === "trainer@demo.com") {
-      setClients(prev => prev.filter(client => client.id !== clientId));
-      return;
-    }
-
-    try {
-      await clientsService.deleteClient(user.email, clientId);
-    } catch (err) {
-      setError("Failed to delete client");
-      throw err;
-    }
+  const updateClient = async (id: string, updates: Partial<Client>) => {
+    setClients((prev) =>
+      prev.map((client) =>
+        client.id === id ? { ...client, ...updates } : client,
+      ),
+    );
   };
 
-  // Session actions
-  const addSession = async (session: Omit<Session, "id">) => {
-    if (!user?.email) {
-      throw new Error("User not authenticated");
-    }
-
-    // Demo mode - just add to local state
-    if (user.email === "trainer@demo.com") {
-      const newSession: Session = {
-        ...session,
-        id: Date.now().toString(),
-      };
-      setSessions((prev) => [newSession, ...prev]);
-
-      // Auto-create pending payment for the session
-      const pendingPayment = {
-        id: (Date.now() + 1).toString(),
-        clientId: session.clientId,
-        sessionId: newSession.id,
-        amount: session.cost,
-        date: session.date,
-        method: "bank-transfer" as const, // Default to bank transfer for new sessions
-        status: "pending" as const,
-        description: `Training Session - ${new Date(session.date).toLocaleDateString()}`,
-      };
-      setPayments((prev) => [pendingPayment, ...prev]);
-
-      return;
-    }
-
-    try {
-      await sessionsService.addSession(user.email, session);
-    } catch (err) {
-      console.error("Error adding session:", err);
-      throw new Error("Failed to add session");
-    }
+  const deleteClient = async (id: string) => {
+    setClients((prev) => prev.filter((client) => client.id !== id));
+    // Also remove related sessions and payments
+    setSessions((prev) => prev.filter((session) => session.clientId !== id));
+    setPayments((prev) => prev.filter((payment) => payment.clientId !== id));
   };
 
-  const updateSession = async (
-    sessionId: string,
-    updates: Partial<Session>,
+  const getClientName = (id: string): string => {
+    const client = clients.find((c) => c.id === id);
+    return client?.name || "Unknown Client";
+  };
+
+  // Client status operations
+  const archiveClients = async (
+    clientIds: string[],
+    reason: string = "manual",
   ) => {
-    if (!user?.email) throw new Error("User not authenticated");
-
-    // Demo account: use offline mode
-    if (user.email === "trainer@demo.com") {
-      setSessions(prev => prev.map(session =>
-        session.id === sessionId ? { ...session, ...updates } : session
-      ));
-      return;
-    }
-
-    try {
-      await sessionsService.updateSession(user.email, sessionId, updates);
-    } catch (err) {
-      setError("Failed to update session");
-      throw err;
-    }
+    const now = new Date().toISOString();
+    setClients((prev) =>
+      prev.map((client) =>
+        clientIds.includes(client.id)
+          ? {
+              ...client,
+              status: {
+                isActive: false,
+                archivedAt: now,
+                archiveReason: reason as "plan_downgrade" | "manual",
+              },
+            }
+          : client,
+      ),
+    );
   };
 
-  const deleteSession = async (sessionId: string) => {
-    if (!user?.email) throw new Error("User not authenticated");
-
-    // Demo account: use offline mode
-    if (user.email === "trainer@demo.com") {
-      setSessions(prev => prev.filter(session => session.id !== sessionId));
-      return;
-    }
-
-    try {
-      await sessionsService.deleteSession(user.email, sessionId);
-    } catch (err) {
-      setError("Failed to delete session");
-      throw err;
-    }
+  const reactivateClients = async (clientIds: string[]) => {
+    setClients((prev) =>
+      prev.map((client) =>
+        clientIds.includes(client.id)
+          ? {
+              ...client,
+              status: {
+                isActive: true,
+                archivedAt: undefined,
+                archiveReason: undefined,
+              },
+            }
+          : client,
+      ),
+    );
   };
 
-  // Payment actions
-  const addPayment = async (payment: Omit<Payment, "id">) => {
-    if (!user?.email) throw new Error("User not authenticated");
-
-    // Demo account: use offline mode
-    if (user.email === "trainer@demo.com") {
-      const newPayment: Payment = {
-        ...payment,
-        id: Date.now().toString(),
-      };
-      setPayments(prev => [newPayment, ...prev]);
-      return;
-    }
-
-    try {
-      await paymentsService.addPayment(user.email, payment);
-    } catch (err) {
-      setError("Failed to add payment");
-      throw err;
-    }
-  };
-
-  const updatePayment = async (
-    paymentId: string,
-    updates: Partial<Payment>,
+  const handlePlanDowngrade = async (
+    newLimit: number,
+    selectedActiveIds: string[],
   ) => {
-    if (!user?.email) throw new Error("User not authenticated");
-
-    // Demo account: use offline mode
-    if (user.email === "trainer@demo.com") {
-      setPayments(prev => prev.map(payment =>
-        payment.id === paymentId ? { ...payment, ...updates } : payment
-      ));
-      return;
-    }
-
-    try {
-      await paymentsService.updatePayment(user.email, paymentId, updates);
-    } catch (err) {
-      setError("Failed to update payment");
-      throw err;
-    }
+    const plainClients = clients.map(({ status, ...client }) => client);
+    const updatedClients = archiveExcessClients(
+      plainClients,
+      newLimit,
+      selectedActiveIds,
+    );
+    setClients(updatedClients);
   };
 
-  const deletePayment = async (paymentId: string) => {
-    if (!user?.email) throw new Error("User not authenticated");
-
-    // Demo account: use offline mode
-    if (user.email === "trainer@demo.com") {
-      setPayments(prev => prev.filter(payment => payment.id !== paymentId));
-      return;
-    }
-
-    try {
-      await paymentsService.deletePayment(user.email, paymentId);
-    } catch (err) {
-      setError("Failed to delete payment");
-      throw err;
-    }
+  const getActiveClientsOnly = () => {
+    return getActiveClients(clients);
   };
 
-  const refreshData = () => {
-    // Data refreshes automatically via subscriptions
-    setError(null);
+  const getArchivedClientsOnly = () => {
+    return clients.filter((client) => !client.status.isActive);
+  };
+
+  // Session operations
+  const addSession = async (
+    sessionData: Omit<Session, "id">,
+  ): Promise<Session> => {
+    const newSession = {
+      ...sessionData,
+      id: generateId(),
+    };
+    setSessions((prev) => [...prev, newSession]);
+    return newSession;
+  };
+
+  const updateSession = async (id: string, updates: Partial<Session>) => {
+    setSessions((prev) =>
+      prev.map((session) =>
+        session.id === id ? { ...session, ...updates } : session,
+      ),
+    );
+  };
+
+  const deleteSession = async (id: string) => {
+    setSessions((prev) => prev.filter((session) => session.id !== id));
+  };
+
+  // Payment operations
+  const addPayment = async (
+    paymentData: Omit<Payment, "id">,
+  ): Promise<Payment> => {
+    const newPayment = {
+      ...paymentData,
+      id: generateId(),
+    };
+    setPayments((prev) => [...prev, newPayment]);
+    return newPayment;
+  };
+
+  const updatePayment = async (id: string, updates: Partial<Payment>) => {
+    setPayments((prev) =>
+      prev.map((payment) =>
+        payment.id === id ? { ...payment, ...updates } : payment,
+      ),
+    );
+  };
+
+  const deletePayment = async (id: string) => {
+    setPayments((prev) => prev.filter((payment) => payment.id !== id));
   };
 
   const value = {
@@ -448,7 +249,16 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     updatePayment,
     deletePayment,
   };
-  };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 };
+
+export const useData = () => {
+  const context = useContext(DataContext);
+  if (context === undefined) {
+    throw new Error("useData must be used within a DataProvider");
+  }
+  return context;
+};
+
+export { DataProvider };

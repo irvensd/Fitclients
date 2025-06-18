@@ -37,6 +37,12 @@ import {
 } from "@/lib/stripe";
 import { useToast } from "@/hooks/use-toast";
 import { DemoCheckoutModal } from "@/components/DemoCheckoutModal";
+import { ClientSelectionModal } from "@/components/ClientSelectionModal";
+import { useData } from "@/contexts/DataContext";
+import {
+  willDowngradeAffectClients,
+  getDowngradeImpact,
+} from "@/lib/clientDowngrade";
 
 const PlanCard = ({
   plan,
@@ -268,11 +274,18 @@ export const SubscriptionManager = () => {
     refreshSubscription,
     updateSubscriptionPlan,
   } = useSubscription();
+  const { clients, handlePlanDowngrade } = useData();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [clientSelectionOpen, setClientSelectionOpen] = useState(false);
+  const [pendingDowngrade, setPendingDowngrade] = useState<{
+    planId: string;
+    planName: string;
+    newLimit: number;
+  } | null>(null);
 
   const currentPlan = getCurrentPlan();
 
@@ -302,21 +315,74 @@ export const SubscriptionManager = () => {
     setSelectedPlanId(null);
   };
 
-  const handleCancelSubscription = async () => {
-    if (!subscription?.subscriptionId) return;
+  const handleClientSelectionConfirm = async (selectedClientIds: string[]) => {
+    if (!pendingDowngrade) return;
 
     setLoading(true);
     try {
+      // Handle the plan downgrade with selected clients
+      await handlePlanDowngrade(pendingDowngrade.newLimit, selectedClientIds);
+      updateSubscriptionPlan(pendingDowngrade.planId);
+
+      const impact = getDowngradeImpact(
+        clients.filter((c) => c.status.isActive),
+        pendingDowngrade.newLimit,
+      );
+
+      toast({
+        title:
+          pendingDowngrade.planId === "free"
+            ? "Subscription cancelled"
+            : "Plan downgraded",
+        description: `${impact.willRemainActive} clients remain active, ${impact.willBeArchived} clients archived.`,
+      });
+
+      setClientSelectionOpen(false);
+      setPendingDowngrade(null);
+    } catch (error) {
+      toast({
+        title: "Downgrade failed",
+        description:
+          "There was an error processing your downgrade. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!subscription?.subscriptionId) return;
+
+    // Check if downgrading to free will affect clients
+    const activeClients = clients.filter((c) => c.status.isActive);
+    const freeLimit = 5;
+
+    if (willDowngradeAffectClients(activeClients.length, freeLimit)) {
+      // Need client selection
+      setPendingDowngrade({
+        planId: "free",
+        planName: "Free",
+        newLimit: freeLimit,
+      });
+      setClientSelectionOpen(true);
+      setCancelDialogOpen(false);
+      return;
+    }
+
+    // No client impact, proceed with cancellation
+    setLoading(true);
+    try {
       await cancelSubscription(subscription.subscriptionId);
+      updateSubscriptionPlan("free");
 
       toast({
         title: "Subscription cancelled",
         description:
-          "Your subscription has been cancelled. You'll continue to have access until the end of your billing period.",
+          "Your subscription has been cancelled and downgraded to the free plan.",
       });
 
       setCancelDialogOpen(false);
-      refreshSubscription();
     } catch (error) {
       toast({
         title: "Cancellation failed",
@@ -471,6 +537,21 @@ export const SubscriptionManager = () => {
           }}
           planId={selectedPlanId}
           onSuccess={handleCheckoutSuccess}
+        />
+      )}
+
+      {/* Client Selection Modal for Downgrades */}
+      {pendingDowngrade && (
+        <ClientSelectionModal
+          isOpen={clientSelectionOpen}
+          onClose={() => {
+            setClientSelectionOpen(false);
+            setPendingDowngrade(null);
+          }}
+          clients={clients.filter((c) => c.status.isActive)}
+          newPlanName={pendingDowngrade.planName}
+          newLimit={pendingDowngrade.newLimit}
+          onConfirm={handleClientSelectionConfirm}
         />
       )}
     </div>
