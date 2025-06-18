@@ -205,8 +205,8 @@ const CreateWorkoutDialog = () => {
                     <SelectTrigger>
                       <SelectValue placeholder="Select exercise" />
                     </SelectTrigger>
-                    <SelectContent>
-                      {exerciseLibrary.map((exercise) => (
+                    <SelectContent className="max-h-60">
+                      {mockExercises.map((exercise) => (
                         <SelectItem key={exercise.id} value={exercise.name}>
                           {exercise.name} ({exercise.category})
                         </SelectItem>
