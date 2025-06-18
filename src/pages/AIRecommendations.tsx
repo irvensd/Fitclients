@@ -736,10 +736,12 @@ const AIRecommendations = () => {
                   clientName: "",
                 });
 
-                // Show success message
-                alert(
-                  `✅ Recommendation Applied!\n\n"${confirmationModal.recommendation.title}" has been added to ${confirmationModal.clientName}'s training plan.\n\nThis recommendation will now appear on their client card and will be tracked for progress.`,
-                );
+                // Show success toast
+                toast({
+                  title: "✅ Recommendation Applied!",
+                  description: `"${confirmationModal.recommendation.title}" has been added to ${confirmationModal.clientName}'s training plan and will appear on their client card.`,
+                  duration: 5000,
+                });
               }}
               className="bg-gradient-to-r from-purple-600 to-blue-600 text-white"
             >
