@@ -907,6 +907,59 @@ const Workouts = () => {
     }
   }, []);
 
+  // Action handlers
+  const handleViewWorkout = (workout: WorkoutPlan) => {
+    setSelectedWorkout(workout);
+    setViewDialogOpen(true);
+  };
+
+  const handleEditWorkout = (workout: WorkoutPlan) => {
+    setSelectedWorkout(workout);
+    setEditDialogOpen(true);
+  };
+
+  const handleDuplicateWorkout = (workout: WorkoutPlan) => {
+    const duplicatedWorkout: WorkoutPlan = {
+      ...workout,
+      id: Date.now().toString(),
+      name: `${workout.name} (Copy)`,
+      createdDate: new Date().toISOString().split("T")[0],
+    };
+
+    const updatedPlans = [...workoutPlans, duplicatedWorkout];
+    setWorkoutPlans(updatedPlans);
+    localStorage.setItem("workoutPlans", JSON.stringify(updatedPlans));
+
+    alert(`Workout plan "${duplicatedWorkout.name}" created successfully!`);
+  };
+
+  const handleStartSession = (workout: WorkoutPlan) => {
+    setSelectedWorkout(workout);
+    setStartSessionDialogOpen(true);
+  };
+
+  const handleDeleteWorkout = (workout: WorkoutPlan) => {
+    if (confirm(`Are you sure you want to delete "${workout.name}"?`)) {
+      const updatedPlans = workoutPlans.filter(
+        (plan) => plan.id !== workout.id,
+      );
+      setWorkoutPlans(updatedPlans);
+      localStorage.setItem("workoutPlans", JSON.stringify(updatedPlans));
+
+      alert(`Workout plan "${workout.name}" deleted successfully.`);
+    }
+  };
+
+  const handleSaveWorkout = (updatedWorkout: WorkoutPlan) => {
+    const updatedPlans = workoutPlans.map((plan) =>
+      plan.id === updatedWorkout.id ? updatedWorkout : plan,
+    );
+    setWorkoutPlans(updatedPlans);
+    localStorage.setItem("workoutPlans", JSON.stringify(updatedPlans));
+
+    alert(`Workout plan "${updatedWorkout.name}" updated successfully!`);
+  };
+
   // Filter exercises by category and search term
   const filteredExercises = mockExercises.filter((exercise) => {
     const matchesSearch =
