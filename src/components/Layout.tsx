@@ -220,7 +220,7 @@ const MobileSidebar = ({ onNavigate }: { onNavigate?: () => void }) => {
       </div>
 
       {/* Mobile Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         <div className="mb-6">
           <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
             Main Menu
