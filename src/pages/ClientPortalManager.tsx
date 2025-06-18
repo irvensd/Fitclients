@@ -103,7 +103,7 @@ const mockClients = [
 const SharePortalDialog = ({ client }: { client: any }) => {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const portalUrl = `${window.location.origin}/client-portal/${client.portalId}`;
+  const portalUrl = `${window.location.origin}/client-portal/${client.id}`;
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(portalUrl);
