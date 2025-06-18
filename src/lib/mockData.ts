@@ -412,7 +412,7 @@ export const mockPayments: Payment[] = [
     description: "Initial Assessment",
   },
   {
-    id: "10",
+    id: "14",
     clientId: "6",
     amount: 150,
     date: "2025-01-13",
@@ -423,7 +423,7 @@ export const mockPayments: Payment[] = [
 
   // Failed payment
   {
-    id: "11",
+    id: "15",
     clientId: "7",
     amount: 75,
     date: "2025-01-19",
