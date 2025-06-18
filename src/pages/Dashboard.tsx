@@ -476,11 +476,26 @@ const Dashboard = () => {
         </Card>
       </div>
 
+      {/* Quick Actions Widget */}
+      <QuickActionsWidget />
+
+      {/* Revenue Analytics */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Advanced Business Analytics</h2>
+          <Badge className="bg-purple-100 text-purple-800">New Feature</Badge>
+        </div>
+        <RevenueAnalytics />
+      </div>
+
+      {/* Client Success Stories */}
+      <ClientSuccessStories />
+
       {/* Analytics Charts */}
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground mb-4">
-            Analytics Dashboard
+            Performance Charts
           </h2>
           <p className="text-muted-foreground mb-6">
             Track your business performance and growth metrics
