@@ -10,7 +10,7 @@ import {
 interface SubscriptionData {
   status: "trialing" | "active" | "canceled" | "past_due" | "unpaid";
   currentPlan: string;
-  trialEnd?: string;
+  trialEnd?: string | null;
   subscriptionId?: string;
   customerId?: string;
 }
@@ -24,48 +24,34 @@ interface SubscriptionContextType {
   refreshSubscription: () => Promise<void>;
   updateSubscriptionPlan: (planId: string) => void;
 }
-  refreshSubscription: () => Promise<void>;
-}
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(
   undefined,
 );
 
-export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const { user } = useAuth();
+const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
   const [subscription, setSubscription] = useState<SubscriptionData | null>(
-    null,
+    () => {
+      // Check for persisted subscription data
+      const saved = localStorage.getItem("subscription_data");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          // Fall through to default
+        }
+      }
+
+      // Default to Professional plan (trial period is over)
+      return {
+        status: "active",
+        currentPlan: "professional",
+        trialEnd: null,
+        subscriptionId: "sub_professional123",
+        customerId: "cus_professional123",
+      };
+    },
   );
-  const [loading, setLoading] = useState(true);
-
-  const refreshSubscription = async () => {
-    if (!user) {
-      setSubscription(null);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const subscriptionData = await getSubscriptionStatus(user.uid);
-      setSubscription(subscriptionData);
-    } catch (error) {
-      console.error("Failed to fetch subscription:", error);
-      // Default to free plan on error
-      setSubscription({
-        status: "canceled",
-        currentPlan: "free",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    refreshSubscription();
-  }, [user]);
 
   const isOnTrial = React.useMemo(() => {
     return subscription?.status === "trialing";
@@ -88,7 +74,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
     return plan || SUBSCRIPTION_PLANS.FREE;
   };
 
-  const canAccessFeature = (feature: string) => {
+  const hasFeatureAccess = (feature: string) => {
     const currentPlan = getCurrentPlan();
 
     // Free plan restrictions
@@ -98,7 +84,8 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
         "api-access",
         "white-label",
         "multi-trainer",
-        "advanced-ai",
+        "sms-reminders",
+        "priority-support",
       ];
       return !restrictedFeatures.includes(feature);
     }
@@ -118,9 +105,24 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
     return true;
   };
 
-  const canExceedClientLimit = (currentCount: number) => {
-    const planId = subscription?.currentPlan || "free";
-    return canExceedLimit(planId, "clients", currentCount);
+  const refreshSubscription = async () => {
+    // In a real app, this would fetch the latest subscription data from the server
+    console.log("Refreshing subscription data...");
+  };
+
+  const updateSubscriptionPlan = (planId: string) => {
+    const newSubscription: SubscriptionData = {
+      status: "active",
+      currentPlan: planId,
+      trialEnd: null,
+      subscriptionId: `sub_${planId}_${Date.now()}`,
+      customerId: `cus_${planId}_${Date.now()}`,
+    };
+
+    setSubscription(newSubscription);
+    // Persist to localStorage
+    localStorage.setItem("subscription_data", JSON.stringify(newSubscription));
+    console.log(`Subscription updated to ${planId} plan`);
   };
 
   const value = {
@@ -131,8 +133,6 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
     hasFeatureAccess,
     refreshSubscription,
     updateSubscriptionPlan,
-  };
-    refreshSubscription,
   };
 
   return (
@@ -151,3 +151,5 @@ export const useSubscription = () => {
   }
   return context;
 };
+
+export { SubscriptionProvider };
