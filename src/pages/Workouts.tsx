@@ -512,6 +512,7 @@ const StartSessionDialog = ({
   onOpenChange: (open: boolean) => void;
 }) => {
   const { getClientName, addSession } = useData();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [sessionDate, setSessionDate] = useState(
     new Date().toISOString().split("T")[0],
