@@ -52,6 +52,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const AIRecommendations = () => {
   const { clients, sessions, payments, loading } = useData();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
