@@ -57,6 +57,7 @@ import {
 } from "lucide-react";
 import { Client } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
   const [appliedRecs, setAppliedRecs] = useState<any[]>([]);
