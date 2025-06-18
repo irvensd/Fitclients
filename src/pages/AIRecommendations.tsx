@@ -48,6 +48,7 @@ import {
   getTypeIcon,
 } from "@/lib/recommendations";
 import { useData } from "@/contexts/DataContext";
+import { useToast } from "@/hooks/use-toast";
 
 const AIRecommendations = () => {
   const { clients, sessions, payments, loading } = useData();
