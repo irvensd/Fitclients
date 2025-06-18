@@ -159,16 +159,14 @@ export const createCheckoutSession = async (planId: string, userId: string) => {
 
     return session;
   } catch (error) {
-    // For demo purposes, show a mock Stripe checkout URL
+    // For demo purposes, simulate a successful checkout without external redirect
     console.log("Demo mode: Would redirect to Stripe checkout for", plan.name);
 
-    // Open a demo Stripe checkout in a new tab
-    const demoUrl = `https://checkout.stripe.com/demo?plan=${planId}&amount=${plan.price * 100}`;
-    window.open(demoUrl, "_blank");
-
+    // Simulate a successful checkout session creation
     return {
-      url: demoUrl,
+      url: `/billing?demo=true&plan=${planId}`,
       sessionId: `demo_session_${Date.now()}`,
+      isDemoMode: true,
     };
   }
 };
