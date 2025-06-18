@@ -146,6 +146,16 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/features"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Features />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Catch all route - must be last */}
               <Route path="*" element={<NotFound />} />
