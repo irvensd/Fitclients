@@ -151,10 +151,6 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
       </div>
     </div>
   );
-                  <p className="text-sm text-blue-800">
-                    <strong>Note:</strong> Archived clients are in read-only mode.
-                    To manage these clients again, upgrade your plan to reactivate them.
-                  </p>
                 </div>
               </div>
             )}
