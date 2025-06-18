@@ -504,7 +504,7 @@ const ClientPortalManager = () => {
                 <div className="flex items-center gap-2">
                   <Link className="h-4 w-4 text-muted-foreground" />
                   <span className="text-xs font-mono text-muted-foreground">
-                    /client-portal/{client.portalId}
+                    /client-portal/{client.id}
                   </span>
                 </div>
               </div>
@@ -516,9 +516,8 @@ const ClientPortalManager = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    window.open(`/client-portal/${client.portalId}`, "_blank")
-                  }
+                  onClick={() => testPortal(client.id)}
+                  title="Test Portal"
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
