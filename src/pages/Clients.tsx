@@ -42,7 +42,7 @@ import {
   Phone,
   MoreHorizontal,
   Edit,
-  Trash,
+  Trash2,
   Calendar,
   DollarSign,
   UserPlus,
