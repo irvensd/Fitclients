@@ -93,6 +93,11 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { clients, sessions, payments, loading, error, getClientName } =
     useData();
+  const { getCurrentPlan } = useSubscription();
+
+  const currentPlan = getCurrentPlan();
+  const currentClientCount = clients.length;
+  const limitInfo = getClientLimitInfo(currentPlan.id, currentClientCount);
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
