@@ -59,12 +59,7 @@ import { SessionCalendar } from "@/components/SessionCalendar";
 import { useData } from "@/contexts/DataContext";
 
 // Complete Session Dialog
-const CompleteSessionDialog = ({
-  session,
-  open,
-  onOpenChange,
-  onComplete,
-}: {
+const CompleteSessionDialog = ({ session, open, onOpenChange, onComplete }: {
   session: Session | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -107,12 +102,10 @@ const CompleteSessionDialog = ({
           <div className="p-4 bg-muted/50 rounded-lg">
             <h4 className="font-medium">{getClientName(session.clientId)}</h4>
             <p className="text-sm text-muted-foreground">
-              {session.type.replace("-", " ").charAt(0).toUpperCase() +
-                session.type.replace("-", " ").slice(1)}
+              {session.type.replace("-", " ").charAt(0).toUpperCase() + session.type.replace("-", " ").slice(1)}
             </p>
             <p className="text-sm text-muted-foreground">
-              {new Date(session.date).toLocaleDateString()} at{" "}
-              {session.startTime}
+              {new Date(session.date).toLocaleDateString()} at {session.startTime}
             </p>
             <p className="text-sm font-medium">${session.cost}</p>
           </div>
@@ -153,12 +146,7 @@ const CompleteSessionDialog = ({
 };
 
 // Cancel Session Dialog
-const CancelSessionDialog = ({
-  session,
-  open,
-  onOpenChange,
-  onCancel,
-}: {
+const CancelSessionDialog = ({ session, open, onOpenChange, onCancel }: {
   session: Session | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -201,12 +189,10 @@ const CancelSessionDialog = ({
           <div className="p-4 bg-muted/50 rounded-lg">
             <h4 className="font-medium">{getClientName(session.clientId)}</h4>
             <p className="text-sm text-muted-foreground">
-              {session.type.replace("-", " ").charAt(0).toUpperCase() +
-                session.type.replace("-", " ").slice(1)}
+              {session.type.replace("-", " ").charAt(0).toUpperCase() + session.type.replace("-", " ").slice(1)}
             </p>
             <p className="text-sm text-muted-foreground">
-              {new Date(session.date).toLocaleDateString()} at{" "}
-              {session.startTime}
+              {new Date(session.date).toLocaleDateString()} at {session.startTime}
             </p>
             <p className="text-sm font-medium">${session.cost}</p>
           </div>
@@ -252,12 +238,7 @@ const CancelSessionDialog = ({
 };
 
 // Delete Session Dialog
-const DeleteSessionDialog = ({
-  session,
-  open,
-  onOpenChange,
-  onDelete,
-}: {
+const DeleteSessionDialog = ({ session, open, onOpenChange, onDelete }: {
   session: Session | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -294,8 +275,7 @@ const DeleteSessionDialog = ({
             Delete Session
           </DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the
-            session.
+            This action cannot be undone. This will permanently delete the session.
           </DialogDescription>
         </DialogHeader>
 
@@ -303,12 +283,10 @@ const DeleteSessionDialog = ({
           <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
             <h4 className="font-medium">{getClientName(session.clientId)}</h4>
             <p className="text-sm text-muted-foreground">
-              {session.type.replace("-", " ").charAt(0).toUpperCase() +
-                session.type.replace("-", " ").slice(1)}
+              {session.type.replace("-", " ").charAt(0).toUpperCase() + session.type.replace("-", " ").slice(1)}
             </p>
             <p className="text-sm text-muted-foreground">
-              {new Date(session.date).toLocaleDateString()} at{" "}
-              {session.startTime}
+              {new Date(session.date).toLocaleDateString()} at {session.startTime}
             </p>
             <p className="text-sm font-medium">${session.cost}</p>
           </div>
@@ -582,8 +560,7 @@ const Sessions = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
-  const { sessions, loading, getClientName, updateSession, deleteSession } =
-    useData();
+  const { sessions, loading, getClientName, updateSession, deleteSession } = useData();
 
   // Dialog states
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
@@ -618,7 +595,7 @@ const Sessions = () => {
 
       await updateSession(session.id, {
         status: "completed",
-        notes: updatedNotes,
+        notes: updatedNotes
       });
 
       // You could show a toast notification here instead of alert
@@ -640,7 +617,7 @@ const Sessions = () => {
         status: "cancelled",
         notes: updatedNotes,
         cancelledBy: "trainer",
-        cancelledAt: new Date().toISOString(),
+        cancelledAt: new Date().toISOString()
       });
 
       alert(`Session cancelled for ${getClientName(session.clientId)}.`);
@@ -831,17 +808,13 @@ const Sessions = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             {session.status === "scheduled" && (
-                              <DropdownMenuItem
-                                onClick={() => handleCompleteSession(session)}
-                              >
+                              <DropdownMenuItem onClick={() => handleCompleteSession(session)}>
                                 <CheckCircle className="h-4 w-4 mr-2" />
                                 Mark Complete
                               </DropdownMenuItem>
                             )}
                             {session.status === "scheduled" && (
-                              <DropdownMenuItem
-                                onClick={() => handleCancelSession(session)}
-                              >
+                              <DropdownMenuItem onClick={() => handleCancelSession(session)}>
                                 <XCircle className="h-4 w-4 mr-2" />
                                 Cancel Session
                               </DropdownMenuItem>
@@ -899,6 +872,28 @@ const Sessions = () => {
             <ScheduleSessionDialog />
           </TabsContent>
         </Tabs>
+
+        {/* Dialog Components */}
+        <CompleteSessionDialog
+          session={selectedSession}
+          open={completeDialogOpen}
+          onOpenChange={setCompleteDialogOpen}
+          onComplete={onCompleteSession}
+        />
+
+        <CancelSessionDialog
+          session={selectedSession}
+          open={cancelDialogOpen}
+          onOpenChange={setCancelDialogOpen}
+          onCancel={onCancelSession}
+        />
+
+        <DeleteSessionDialog
+          session={selectedSession}
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onDelete={onDeleteSession}
+        />
       )}
     </div>
   );
