@@ -54,15 +54,13 @@ import {
   Clock,
   X,
   AlertTriangle,
+  Archive,
+  Eye,
 } from "lucide-react";
 import { Client } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import {
-  getClientLimitInfo,
-  canAddClient,
-  getUpgradeMessage,
-} from "@/lib/clientLimits";
+import { getClientLimitInfo, canAddClient, getUpgradeMessage } from "@/lib/clientLimits";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
@@ -71,7 +69,7 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
   const [appliedRecs, setAppliedRecs] = useState<any[]>([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem("appliedRecommendations");
+    const stored = localStorage.getItem('appliedRecommendations');
     if (stored) {
       try {
         const allApplied = JSON.parse(stored);
@@ -80,38 +78,38 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
           .filter((rec: any) => rec.clientId === clientId)
           .reduce((unique: any[], current: any) => {
             // Only add if we don't already have this ID
-            if (!unique.find((item) => item.id === current.id)) {
+            if (!unique.find(item => item.id === current.id)) {
               unique.push(current);
             }
             return unique;
           }, []);
         setAppliedRecs(clientRecs);
       } catch (e) {
-        console.warn("Failed to load applied recommendations:", e);
+        console.warn('Failed to load applied recommendations:', e);
       }
     }
   }, [clientId]);
 
   const removeRecommendation = (recId: string) => {
-    const stored = localStorage.getItem("appliedRecommendations");
+    const stored = localStorage.getItem('appliedRecommendations');
     if (stored) {
       try {
         const allApplied = JSON.parse(stored);
         const updated = allApplied.filter((rec: any) => rec.id !== recId);
-        localStorage.setItem("appliedRecommendations", JSON.stringify(updated));
+        localStorage.setItem('appliedRecommendations', JSON.stringify(updated));
 
         // Update local state with deduplicated client recommendations
         const clientRecs = updated
           .filter((rec: any) => rec.clientId === clientId)
           .reduce((unique: any[], current: any) => {
-            if (!unique.find((item) => item.id === current.id)) {
+            if (!unique.find(item => item.id === current.id)) {
               unique.push(current);
             }
             return unique;
           }, []);
         setAppliedRecs(clientRecs);
       } catch (e) {
-        console.warn("Failed to update recommendations:", e);
+        console.warn('Failed to update recommendations:', e);
       }
     }
   };
@@ -130,26 +128,18 @@ const AppliedRecommendations = ({ clientId }: { clientId: string }) => {
       </div>
       <div className="space-y-2">
         {appliedRecs.map((rec, index) => (
-          <div
-            key={`${rec.id}-${index}-${rec.appliedDate}`}
-            className="flex items-center justify-between p-2 bg-purple-50 border border-purple-200 rounded-lg"
-          >
+          <div key={`${rec.id}-${index}-${rec.appliedDate}`} className="flex items-center justify-between p-2 bg-purple-50 border border-purple-200 rounded-lg">
             <div className="flex items-center gap-2 flex-1">
               <Sparkles className="h-3 w-3 text-purple-600 flex-shrink-0" />
               <div className="min-w-0">
-                <p className="text-sm font-medium text-purple-800 truncate">
-                  {rec.title}
-                </p>
+                <p className="text-sm font-medium text-purple-800 truncate">{rec.title}</p>
                 <p className="text-xs text-purple-600">
                   Applied {new Date(rec.appliedDate).toLocaleDateString()}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <Badge
-                variant="outline"
-                className="text-xs border-purple-300 text-purple-700"
-              >
+              <Badge variant="outline" className="text-xs border-purple-300 text-purple-700">
                 {rec.type}
               </Badge>
               <Button
@@ -174,20 +164,20 @@ const SharePortalButton = ({ client }: { client: Client }) => {
 
   const copyToClipboardFallback = (text: string): boolean => {
     try {
-      const textArea = document.createElement("textarea");
+      const textArea = document.createElement('textarea');
       textArea.value = text;
-      textArea.style.position = "fixed";
-      textArea.style.left = "-999999px";
-      textArea.style.top = "-999999px";
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
       document.body.appendChild(textArea);
       textArea.focus();
       textArea.select();
 
-      const successful = document.execCommand("copy");
+      const successful = document.execCommand('copy');
       document.body.removeChild(textArea);
       return successful;
     } catch (err) {
-      console.error("Fallback copy failed:", err);
+      console.error('Fallback copy failed:', err);
       return false;
     }
   };
@@ -203,7 +193,7 @@ const SharePortalButton = ({ client }: { client: Client }) => {
         await navigator.clipboard.writeText(portalUrl);
         copySuccessful = true;
       } catch (err) {
-        console.warn("Modern clipboard API failed, trying fallback:", err);
+        console.warn('Modern clipboard API failed, trying fallback:', err);
         // Don't throw here, try fallback instead
       }
     }
@@ -237,7 +227,9 @@ const AddClientDialog = () => {
   const { toast } = useToast();
 
   const currentPlan = getCurrentPlan();
-  const currentClientCount = clients.length;
+  const activeClients = getActiveClients();
+  const archivedClients = getArchivedClients();
+  const currentClientCount = activeClients.length;
   const limitInfo = getClientLimitInfo(currentPlan.id, currentClientCount);
   const upgradeMessage = getUpgradeMessage(currentPlan.id, currentClientCount);
   const [formData, setFormData] = useState({
@@ -259,8 +251,7 @@ const AddClientDialog = () => {
     if (!canAddClient(currentPlan.id, currentClientCount)) {
       toast({
         title: "Client limit reached",
-        description:
-          upgradeMessage || "You've reached your client limit for this plan.",
+        description: upgradeMessage || "You've reached your client limit for this plan.",
         variant: "destructive",
       });
       return;
@@ -294,14 +285,9 @@ const AddClientDialog = () => {
         };
 
         // Store in localStorage for now (in a real app, this would go to the database)
-        const existingMeasurements = JSON.parse(
-          localStorage.getItem("progressEntries") || "[]",
-        );
+        const existingMeasurements = JSON.parse(localStorage.getItem("progressEntries") || "[]");
         existingMeasurements.push(initialMeasurements);
-        localStorage.setItem(
-          "progressEntries",
-          JSON.stringify(existingMeasurements),
-        );
+        localStorage.setItem("progressEntries", JSON.stringify(existingMeasurements));
       }
 
       // Reset form and close dialog
@@ -329,8 +315,7 @@ const AddClientDialog = () => {
     if (newOpen && !limitInfo.canAddMore) {
       toast({
         title: "Client limit reached",
-        description:
-          upgradeMessage || "You've reached your client limit for this plan.",
+        description: upgradeMessage || "You've reached your client limit for this plan.",
         variant: "destructive",
       });
       return;
@@ -429,9 +414,7 @@ const AddClientDialog = () => {
 
             {/* Initial Measurements Section */}
             <div className="space-y-4 border-t pt-4">
-              <h4 className="text-sm font-medium text-foreground">
-                Initial Measurements
-              </h4>
+              <h4 className="text-sm font-medium text-foreground">Initial Measurements</h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="weight">Weight (lbs) *</Label>
@@ -658,10 +641,7 @@ const ScheduleSessionDialog = ({ client }: { client: Client }) => {
     date: new Date().toISOString().split("T")[0],
     startTime: "09:00",
     endTime: "10:00",
-    type: "personal-training" as
-      | "personal-training"
-      | "consultation"
-      | "assessment",
+    type: "personal-training" as "personal-training" | "consultation" | "assessment",
     cost: 75,
     notes: "",
   });
@@ -742,12 +722,7 @@ const ScheduleSessionDialog = ({ client }: { client: Client }) => {
                     setFormData({
                       ...formData,
                       type: value as typeof formData.type,
-                      cost:
-                        value === "assessment"
-                          ? 50
-                          : value === "consultation"
-                            ? 60
-                            : 75,
+                      cost: value === "assessment" ? 50 : value === "consultation" ? 60 : 75
                     })
                   }
                 >
@@ -755,13 +730,9 @@ const ScheduleSessionDialog = ({ client }: { client: Client }) => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="personal-training">
-                      Personal Training ($75)
-                    </SelectItem>
+                    <SelectItem value="personal-training">Personal Training ($75)</SelectItem>
                     <SelectItem value="assessment">Assessment ($50)</SelectItem>
-                    <SelectItem value="consultation">
-                      Consultation ($60)
-                    </SelectItem>
+                    <SelectItem value="consultation">Consultation ($60)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -912,7 +883,7 @@ const RecordPaymentDialog = ({ client }: { client: Client }) => {
                 onValueChange={(value) =>
                   setFormData({
                     ...formData,
-                    method: value as typeof formData.method,
+                    method: value as typeof formData.method
                   })
                 }
               >
@@ -1026,14 +997,24 @@ const DeleteClientDialog = ({ client }: { client: Client }) => {
 const Clients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [fitnessLevelFilter, setFitnessLevelFilter] = useState("all");
-  const { clients, loading } = useData();
+  const { clients, loading, getActiveClients, getArchivedClients } = useData();
   const { getCurrentPlan } = useSubscription();
 
   const currentPlan = getCurrentPlan();
   const currentClientCount = clients.length;
   const limitInfo = getClientLimitInfo(currentPlan.id, currentClientCount);
 
-  const filteredClients = clients.filter((client) => {
+  const filteredActiveClients = activeClients.filter((client) => {
+    const matchesSearch =
+      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFitnessLevel =
+      fitnessLevelFilter === "all" ||
+      client.fitnessLevel === fitnessLevelFilter;
+    return matchesSearch && matchesFitnessLevel;
+  });
+
+  const filteredArchivedClients = archivedClients.filter((client) => {
     const matchesSearch =
       client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -1065,7 +1046,7 @@ const Clients = () => {
       </div>
 
       {/* Empty State */}
-      {clients.length === 0 && (
+      {activeClients.length === 0 && archivedClients.length === 0 && (
         <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
@@ -1081,7 +1062,7 @@ const Clients = () => {
         </Card>
       )}
 
-      {clients.length > 0 && (
+      {(activeClients.length > 0 || archivedClients.length > 0) && (
         <>
           {/* Client Limit Card */}
           <Card className="mb-6">
@@ -1095,18 +1076,10 @@ const Clients = () => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">
-                    {limitInfo.current} of{" "}
-                    {limitInfo.isUnlimited ? "unlimited" : limitInfo.limit}{" "}
-                    clients
+                    {limitInfo.current} of {limitInfo.isUnlimited ? "unlimited" : limitInfo.limit} clients
                   </span>
                   {!limitInfo.isUnlimited && (
-                    <Badge
-                      variant={
-                        limitInfo.percentageUsed > 80
-                          ? "destructive"
-                          : "secondary"
-                      }
-                    >
+                    <Badge variant={limitInfo.percentageUsed > 80 ? "destructive" : "secondary"}>
                       {Math.round(limitInfo.percentageUsed)}% used
                     </Badge>
                   )}
@@ -1118,8 +1091,7 @@ const Clients = () => {
                   <Alert>
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
-                      You've reached your client limit. Upgrade your plan to add
-                      more clients.
+                      You've reached your client limit. Upgrade your plan to add more clients.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -1137,12 +1109,8 @@ const Clients = () => {
                 <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent className="pt-2 sm:pt-6">
-                <div className="text-xl sm:text-2xl font-bold">
-                  {clients.length}
-                </div>
-                <p className="text-xs text-muted-foreground hidden sm:block">
-                  Total Clients
-                </p>
+                <div className="text-xl sm:text-2xl font-bold">{activeClients.length}</div>
+                <p className="text-xs text-muted-foreground hidden sm:block">Active Clients</p>
               </CardContent>
             </Card>
             <Card>
@@ -1152,7 +1120,7 @@ const Clients = () => {
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="text-2xl font-bold">
-                  {clients.filter((c) => c.fitnessLevel === "beginner").length}
+                  {activeClients.filter((c) => c.fitnessLevel === "beginner").length}
                 </div>
                 <p className="text-sm text-muted-foreground">New to fitness</p>
               </CardContent>
@@ -1167,7 +1135,7 @@ const Clients = () => {
               <CardContent className="pt-6">
                 <div className="text-2xl font-bold">
                   {
-                    clients.filter((c) => c.fitnessLevel === "intermediate")
+                    activeClients.filter((c) => c.fitnessLevel === "intermediate")
                       .length
                   }
                 </div>
@@ -1183,7 +1151,7 @@ const Clients = () => {
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="text-2xl font-bold">
-                  {clients.filter((c) => c.fitnessLevel === "advanced").length}
+                  {activeClients.filter((c) => c.fitnessLevel === "advanced").length}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Peak performance
@@ -1223,9 +1191,12 @@ const Clients = () => {
             </CardContent>
           </Card>
 
-          {/* Client List */}
-          <div className="grid gap-4">
-            {filteredClients.map((client) => (
+          {/* Active Client List */}
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-lg font-semibold mb-4">Active Clients ({filteredActiveClients.length})</h2>
+              <div className="grid gap-4">
+                {filteredActiveClients.map((client) => (
               <Card
                 key={client.id}
                 className="hover:shadow-md transition-shadow"
