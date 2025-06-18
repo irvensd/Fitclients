@@ -227,6 +227,8 @@ const calculateGoalProgress = (data: any): number => {
 const generateAIRecommendations = (
   data: any,
   analysis: ClientAnalysis,
+  client: Client,
+  usingRealData: boolean,
 ): Recommendation[] => {
   const recommendations: Recommendation[] = [];
 
