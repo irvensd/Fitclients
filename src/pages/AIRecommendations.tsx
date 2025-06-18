@@ -48,6 +48,14 @@ const AIRecommendations = () => {
   const [typeFilter, setTypeFilter] = useState("all");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [lastAnalysisTime, setLastAnalysisTime] = useState<Date | null>(null);
+  const [appliedRecommendationIds, setAppliedRecommendationIds] = useState<
+    Set<string>
+  >(new Set());
+  const [confirmationModal, setConfirmationModal] = useState<{
+    isOpen: boolean;
+    recommendation: any;
+    clientName: string;
+  }>({ isOpen: false, recommendation: null, clientName: "" });
 
   // Show loading state
   if (loading) {
