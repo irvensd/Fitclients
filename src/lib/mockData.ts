@@ -264,7 +264,7 @@ export const mockSessions: Session[] = [
 
   // Tomorrow and upcoming sessions
   {
-    id: "12",
+    id: "24",
     clientId: "2", // Mike Chen
     date: new Date(Date.now() + 24 * 60 * 60 * 1000)
       .toISOString()
