@@ -288,7 +288,6 @@ export const SessionCalendar = () => {
                   )}
               </div>
             </div>
-            </>
           )}
         </DialogContent>
       </Dialog>
