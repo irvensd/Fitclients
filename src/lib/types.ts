@@ -10,6 +10,22 @@ export interface Client {
   avatar?: string;
 }
 
+export interface UserProfile {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  phone?: string;
+  avatar?: string;
+  bio?: string;
+  businessName?: string;
+  website?: string;
+  address?: string;
+  createdAt: string;
+  lastLogin?: string;
+}
+
 export interface Session {
   id: string;
   clientId: string;

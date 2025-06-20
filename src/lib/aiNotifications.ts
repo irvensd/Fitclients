@@ -1,6 +1,20 @@
 import { useState, useEffect } from "react";
 import { Client, Session } from "./types";
 import { ClientAnalysis } from "./recommendations";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  doc,
+  updateDoc,
+  limit,
+} from "firebase/firestore";
+import { auth } from "./firebase";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface AINotification {
   id: string;
@@ -36,9 +50,31 @@ export const defaultNotificationSettings: NotificationSettings = {
 };
 
 class AINotificationManager {
-  private notifications: AINotification[] = [];
   private settings: NotificationSettings = defaultNotificationSettings;
   private listeners: ((notifications: AINotification[]) => void)[] = [];
+  private userId: string | null = null;
+  private db = getFirestore();
+  private notificationsCollection: any = null; // Will be set up in constructor
+  private unsubscribe: (() => void) | null = null;
+
+  constructor() {
+    this.getSettings(); // Load settings on initialization
+  }
+
+  // Set user and initialize Firestore listener
+  setUser(userId: string) {
+    if (this.userId === userId) return; // Already initialized for this user
+    
+    this.userId = userId;
+    this.notificationsCollection = collection(this.db, "users", this.userId, "notifications");
+    
+    // Clean up previous listener if any
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+    
+    this.subscribeToNotifications();
+  }
 
   // Generate notifications based on client analysis
   generateNotificationsFromAnalysis(
@@ -162,49 +198,60 @@ class AINotificationManager {
   }
 
   // Add notifications to the system
-  addNotifications(newNotifications: AINotification[]): void {
+  async addNotifications(newNotifications: Omit<AINotification, 'id' | 'read' | 'timestamp'>[]): Promise<void> {
+    if (!this.userId) {
+      console.warn("User not set, cannot add notifications.");
+      return;
+    }
+
     const filteredNotifications = newNotifications.filter((notification) => {
       // Apply settings filters
       if (!this.settings.enableAINotifications) return false;
       if (this.settings.highPriorityOnly && notification.priority !== "high")
         return false;
-
       return true;
     });
 
-    this.notifications.unshift(...filteredNotifications);
-
-    // Keep only last 50 notifications
-    this.notifications = this.notifications.slice(0, 50);
-
-    this.notifyListeners();
+    for (const notification of filteredNotifications) {
+      try {
+        await addDoc(this.notificationsCollection, {
+          ...notification,
+          timestamp: new Date().toISOString(),
+          read: false,
+        });
+      } catch (error) {
+        console.error("Error adding notification to Firestore:", error);
+      }
+    }
   }
 
   // Get all notifications
   getNotifications(): AINotification[] {
-    return this.notifications;
+    return []; // This method is no longer used
   }
 
   // Get unread notifications
   getUnreadNotifications(): AINotification[] {
-    return this.notifications.filter((n) => !n.read);
+    return []; // This method is no longer used
   }
 
   // Mark notification as read
-  markAsRead(notificationId: string): void {
-    const notification = this.notifications.find(
-      (n) => n.id === notificationId,
-    );
-    if (notification) {
-      notification.read = true;
-      this.notifyListeners();
+  async markAsRead(notificationId: string): Promise<void> {
+    if (!this.userId) return;
+    const notifDoc = doc(this.db, "users", this.userId, "notifications", notificationId);
+    try {
+      await updateDoc(notifDoc, { read: true });
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
     }
   }
 
   // Mark all as read
-  markAllAsRead(): void {
-    this.notifications.forEach((n) => (n.read = true));
-    this.notifyListeners();
+  async markAllAsRead(): Promise<void> {
+    // This is more complex with Firestore, requires a batch write or cloud function.
+    // For now, we will mark a few recent ones as read on the client-side triggered query.
+    // A proper implementation would be fetching all unread and batch updating them.
+    console.warn("markAllAsRead is not fully implemented for Firestore yet.");
   }
 
   // Update settings
@@ -238,16 +285,36 @@ class AINotificationManager {
   // Subscribe to notification changes
   subscribe(listener: (notifications: AINotification[]) => void): () => void {
     this.listeners.push(listener);
+    // Unsubscribe from the listener array
     return () => {
       this.listeners = this.listeners.filter((l) => l !== listener);
     };
   }
 
-  private notifyListeners(): void {
-    this.listeners.forEach((listener) => listener(this.notifications));
+  private notifyListeners(notifications: AINotification[]): void {
+    this.listeners.forEach((listener) => listener(notifications));
+  }
+
+  // New method to listen to firestore
+  private subscribeToNotifications() {
+    if (!this.userId) return;
+
+    const q = query(this.notificationsCollection, orderBy("timestamp", "desc"), limit(50));
+    
+    this.unsubscribe = onSnapshot(q, (snapshot) => {
+      const notifications = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...(doc.data() as object),
+      })) as AINotification[];
+      this.notifyListeners(notifications);
+    }, (error) => {
+      console.error("Error fetching notifications:", error);
+    });
   }
 
   // Simulate real-time notifications (in production, this would come from webhooks/websockets)
+  // This simulation will be removed and replaced by real triggers.
+  /*
   startSimulation(): void {
     // Generate random insights every 30 seconds for demo
     setInterval(() => {
@@ -284,6 +351,7 @@ class AINotificationManager {
       }
     }, 30000);
   }
+  */
 }
 
 // Global notification manager instance
@@ -292,28 +360,32 @@ export const aiNotificationManager = new AINotificationManager();
 // React hook for using notifications
 export const useAINotifications = () => {
   const [notifications, setNotifications] = useState<AINotification[]>([]);
+  const { user } = useAuth(); // Assuming useAuth() gives you the user object
 
   useEffect(() => {
-    const unsubscribe = aiNotificationManager.subscribe(setNotifications);
-    setNotifications(aiNotificationManager.getNotifications());
-    return unsubscribe;
-  }, []);
+    if (user && user.uid) {
+      aiNotificationManager.setUser(user.uid);
+      const unsubscribe = aiNotificationManager.subscribe(setNotifications);
+      return () => {
+        unsubscribe();
+      };
+    } else {
+      setNotifications([]); // Clear notifications if no user
+    }
+  }, [user]);
 
   return {
     notifications,
     unreadCount: notifications.filter((n) => !n.read).length,
     markAsRead: aiNotificationManager.markAsRead.bind(aiNotificationManager),
-    markAllAsRead: aiNotificationManager.markAllAsRead.bind(
-      aiNotificationManager,
-    ),
+    markAllAsRead: aiNotificationManager.markAllAsRead.bind(aiNotificationManager),
     settings: aiNotificationManager.getSettings(),
-    updateSettings: aiNotificationManager.updateSettings.bind(
-      aiNotificationManager,
-    ),
+    updateSettings: aiNotificationManager.updateSettings.bind(aiNotificationManager),
   };
 };
 
-// Initialize simulation on module load (for demo purposes)
+// Initialize simulation on module load (for demo purposes) - THIS WILL BE REMOVED/CHANGED
+/*
 if (typeof window !== "undefined") {
   // Add some demo notifications
   setTimeout(() => {
@@ -331,6 +403,7 @@ if (typeof window !== "undefined") {
     ]);
 
     // Start the simulation
-    aiNotificationManager.startSimulation();
+    // aiNotificationManager.startSimulation();
   }, 2000);
 }
+*/

@@ -50,7 +50,79 @@ import {
 } from "lucide-react";
 import { WorkoutPlan, Exercise } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
-import { mockExercises, mockWorkoutPlans } from "@/lib/mockData";
+import { mockExercises } from "@/lib/mockData";
+import EmptyState from "@/components/EmptyState";
+import { useAuth } from "@/contexts/AuthContext";
+
+const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, getClientName }) => (
+  <Card
+    className="hover:shadow-md transition-shadow cursor-pointer"
+    onClick={() => onView(plan)}
+  >
+    <CardHeader className="pb-3">
+      <div className="flex justify-between items-start">
+        <div className="space-y-1">
+          <CardTitle className="text-lg">{plan.name}</CardTitle>
+          <CardDescription>
+            For: {getClientName(plan.clientId) || "Unassigned"}
+          </CardDescription>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DropdownMenuItem onClick={() => onEdit(plan)}>
+              <Edit className="mr-2 h-4 w-4" /> Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDuplicate(plan)}>
+              <Copy className="mr-2 h-4 w-4" /> Duplicate
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onStart(plan)}>
+              <Play className="mr-2 h-4 w-4" /> Start Session
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onDelete(plan)}
+              className="text-red-600"
+            >
+              <Trash2 className="mr-2 h-4 w-4" /> Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </CardHeader>
+    <CardContent>
+      <div className="flex items-center text-sm text-muted-foreground">
+        <Users className="h-4 w-4 mr-2" />
+        <span>{plan.exercises.length} exercises</span>
+      </div>
+      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+        {plan.description}
+      </p>
+    </CardContent>
+  </Card>
+);
+
+const ExerciseCard = ({ exercise }) => (
+  <Card>
+    <CardHeader>
+      <CardTitle>{exercise.name}</CardTitle>
+      <CardDescription>{exercise.category}</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <p className="text-sm text-muted-foreground">{exercise.description}</p>
+    </CardContent>
+  </Card>
+);
 
 // Dialog for viewing workout plan details
 const ViewWorkoutDialog = ({
@@ -199,7 +271,7 @@ const EditWorkoutDialog = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const { clients } = useData();
-  const [workoutData, setWorkoutData] = useState({
+  const [workoutData, setWorkoutData] = useState<any>({
     clientId: "",
     name: "",
     description: "",
@@ -256,24 +328,17 @@ const EditWorkoutDialog = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!workout) return;
-
     setLoading(true);
 
     try {
-      const updatedWorkout: WorkoutPlan = {
+      const updatedWorkout = {
         ...workout,
-        clientId: workoutData.clientId,
-        name: workoutData.name,
-        description: workoutData.description,
-        exercises: workoutData.exercises,
+        ...workoutData,
       };
-
-      onSave(updatedWorkout);
+      onSave(updatedWorkout as WorkoutPlan);
       onOpenChange(false);
     } catch (error) {
       console.error("Error updating workout:", error);
-      alert("Failed to update workout plan. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -283,11 +348,11 @@ const EditWorkoutDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Workout Plan</DialogTitle>
           <DialogDescription>
-            Update the workout plan details and exercises
+            Modify the details of this workout plan.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -503,7 +568,7 @@ const EditWorkoutDialog = ({
   );
 };
 
-// Dialog for starting a workout session
+// Dialog for starting a session from a workout plan
 const StartSessionDialog = ({
   workout,
   open,
@@ -513,58 +578,28 @@ const StartSessionDialog = ({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) => {
-  const { getClientName, addSession } = useData();
-  const navigate = useNavigate();
+  const { addSession } = useData();
   const [loading, setLoading] = useState(false);
-  const [sessionDate, setSessionDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
-  const [sessionTime, setSessionTime] = useState(
-    new Date().toTimeString().slice(0, 5),
-  );
-  const [sessionCost, setSessionCost] = useState("75");
-  const [sessionNotes, setSessionNotes] = useState("");
+  const navigate = useNavigate();
 
   const handleStartSession = async () => {
     if (!workout) return;
-
     setLoading(true);
     try {
-      // Calculate end time (assume 1 hour session)
-      const startTime = new Date(`${sessionDate}T${sessionTime}`);
-      const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Add 1 hour
-
-      // Create session object
-      const newSession = {
+      await addSession({
         clientId: workout.clientId,
-        date: sessionDate,
-        startTime: sessionTime,
-        endTime: endTime.toTimeString().slice(0, 5),
-        type: "personal-training" as const,
-        status: "scheduled" as const,
-        cost: parseFloat(sessionCost),
-        notes: `Workout Plan: ${workout.name}\n${workout.description}\n\nPlanned Exercises: ${workout.exercises.map((ex) => ex.name).join(", ")}\n\nSession Notes: ${sessionNotes}`,
-      };
-
-      // Add session to data
-      await addSession(newSession);
-
-      // Show success message
-      alert(
-        `Session scheduled successfully!\n\nWorkout: ${workout.name}\nClient: ${getClientName(workout.clientId)}\nDate: ${new Date(sessionDate).toLocaleDateString()}\nTime: ${sessionTime}`,
-      );
-
-      // Reset form
-      setSessionNotes("");
-
-      // Close dialog
+        date: new Date().toISOString().split("T")[0],
+        startTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        endTime: "",
+        type: "personal-training",
+        status: "scheduled",
+        notes: `Session started from workout plan: ${workout.name}`,
+        cost: 50, // Example cost
+      });
       onOpenChange(false);
-
-      // Navigate to sessions page to show the new session
       navigate("/sessions");
     } catch (error) {
       console.error("Error starting session:", error);
-      alert("Failed to create session. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -574,125 +609,19 @@ const StartSessionDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Play className="h-5 w-5 text-blue-600" />
-            Schedule Training Session
-          </DialogTitle>
+          <DialogTitle>Start Session from Plan</DialogTitle>
           <DialogDescription>
-            Schedule a training session using this workout plan.
+            This will create a new session based on the workout plan "{workout.name}".
           </DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-6">
-          {/* Workout Plan Details */}
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-medium text-blue-900">{workout.name}</h4>
-            <p className="text-sm text-blue-700 mt-1">
-              Client: {getClientName(workout.clientId)}
-            </p>
-            <p className="text-sm text-blue-600 mt-1">
-              {workout.exercises.length} exercises planned
-            </p>
-            <p className="text-xs text-blue-600 mt-2">{workout.description}</p>
-          </div>
-
-          {/* Exercise Preview */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Planned Exercises</Label>
-            <div className="max-h-32 overflow-y-auto p-3 bg-muted/30 rounded-lg border">
-              <div className="space-y-1">
-                {workout.exercises.slice(0, 5).map((exercise, index) => (
-                  <div
-                    key={exercise.id}
-                    className="text-xs text-muted-foreground"
-                  >
-                    {index + 1}. {exercise.name} ({exercise.sets} sets ×{" "}
-                    {exercise.reps})
-                  </div>
-                ))}
-                {workout.exercises.length > 5 && (
-                  <div className="text-xs text-muted-foreground font-medium">
-                    +{workout.exercises.length - 5} more exercises
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Session Scheduling Fields */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="session-date">Session Date *</Label>
-              <Input
-                id="session-date"
-                type="date"
-                value={sessionDate}
-                onChange={(e) => setSessionDate(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="session-time">Start Time *</Label>
-              <Input
-                id="session-time"
-                type="time"
-                value={sessionTime}
-                onChange={(e) => setSessionTime(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="session-cost">Session Cost ($) *</Label>
-            <Input
-              id="session-cost"
-              type="number"
-              min="0"
-              step="0.01"
-              value={sessionCost}
-              onChange={(e) => setSessionCost(e.target.value)}
-              placeholder="75.00"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="session-notes">
-              Additional Session Notes (Optional)
-            </Label>
-            <Textarea
-              id="session-notes"
-              placeholder="Any specific notes for this session (modifications, client goals, special considerations)..."
-              value={sessionNotes}
-              onChange={(e) => setSessionNotes(e.target.value)}
-              className="min-h-[80px]"
-            />
-          </div>
-
-          <div className="text-sm text-muted-foreground">
-            <p>This will:</p>
-            <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Create a scheduled training session</li>
-              <li>Link the workout plan to the session</li>
-              <li>Add session to your calendar</li>
-              <li>Navigate to Sessions page for management</li>
-              <li>Allow session completion and recap creation</li>
-            </ul>
-          </div>
-        </div>
-
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={handleStartSession}
-            disabled={loading || !sessionDate || !sessionTime || !sessionCost}
-          >
-            {loading ? "Creating Session..." : "Schedule Session"}
+          <Button onClick={handleStartSession} disabled={loading}>
+            {loading ? "Starting..." : "Start Session"}
           </Button>
         </div>
       </DialogContent>
@@ -700,10 +629,18 @@ const StartSessionDialog = ({
   );
 };
 
-const CreateWorkoutDialog = () => {
-  const [open, setOpen] = useState(false);
+// Dialog for creating new workout plans
+const CreateWorkoutDialog = ({
+  isOpen,
+  onOpenChange,
+  onWorkoutCreated,
+}: {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onWorkoutCreated: () => void;
+}) => {
   const [loading, setLoading] = useState(false);
-  const { clients } = useData();
+  const { clients, addWorkoutPlan } = useData();
   const [workoutData, setWorkoutData] = useState({
     clientId: "",
     name: "",
@@ -721,7 +658,6 @@ const CreateWorkoutDialog = () => {
 
   const handleAddExercise = () => {
     if (!currentExercise.name) return;
-
     const newExercise: Exercise = {
       id: Date.now().toString(),
       name: currentExercise.name,
@@ -731,20 +667,11 @@ const CreateWorkoutDialog = () => {
       duration: currentExercise.duration,
       notes: currentExercise.notes,
     };
-
     setWorkoutData({
       ...workoutData,
       exercises: [...workoutData.exercises, newExercise],
     });
-
-    setCurrentExercise({
-      name: "",
-      sets: "",
-      reps: "",
-      weight: "",
-      duration: "",
-      notes: "",
-    });
+    setCurrentExercise({ name: "", sets: "", reps: "", weight: "", duration: "", notes: "" });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -752,39 +679,23 @@ const CreateWorkoutDialog = () => {
     setLoading(true);
 
     try {
-      // In offline mode, just log the workout plan
-      console.log("Created workout plan:", workoutData);
-      alert(`Workout plan "${workoutData.name}" created successfully!`);
-
-      // Reset form and close dialog
-      setWorkoutData({
-        clientId: "",
-        name: "",
-        description: "",
-        exercises: [],
-      });
-      setOpen(false);
+      await addWorkoutPlan({ ...workoutData, isActive: true });
+      onWorkoutCreated();
+      onOpenChange(false);
     } catch (error) {
       console.error("Error creating workout:", error);
-      alert("Failed to create workout plan. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Workout
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Workout Plan</DialogTitle>
           <DialogDescription>
-            Design a custom workout plan for your client
+            Build a new workout plan for a client.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -987,11 +898,11 @@ const CreateWorkoutDialog = () => {
             )}
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Create Workout"}
+              {loading ? "Creating..." : "Create Plan"}
             </Button>
           </div>
         </form>
@@ -1001,391 +912,202 @@ const CreateWorkoutDialog = () => {
 };
 
 const Workouts = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
+  const {
+    workoutPlans,
+    loading,
+    addWorkoutPlan,
+    updateWorkoutPlan,
+    deleteWorkoutPlan,
+    getClientName,
+    clients,
+  } = useData();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("plans");
-  const { clients, loading, getClientName } = useData();
-
-  // Dialog states
-  const [viewDialogOpen, setViewDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [startSessionDialogOpen, setStartSessionDialogOpen] = useState(false);
-  const [selectedWorkout, setSelectedWorkout] = useState<WorkoutPlan | null>(
+  const [workoutToView, setWorkoutToView] = useState<WorkoutPlan | null>(null);
+  const [workoutToEdit, setWorkoutToEdit] = useState<WorkoutPlan | null>(null);
+  const [workoutToStart, setWorkoutToStart] = useState<WorkoutPlan | null>(
     null,
   );
+  const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Load workout plans from localStorage or use mock data for demo
-  useEffect(() => {
-    const storedPlans = localStorage.getItem("workoutPlans");
-    if (storedPlans) {
-      setWorkoutPlans(JSON.parse(storedPlans));
-    } else {
-      setWorkoutPlans(mockWorkoutPlans);
-    }
-  }, []);
-
-  // Action handlers
-  const handleViewWorkout = (workout: WorkoutPlan) => {
-    setSelectedWorkout(workout);
-    setViewDialogOpen(true);
-  };
-
-  const handleEditWorkout = (workout: WorkoutPlan) => {
-    setSelectedWorkout(workout);
-    setEditDialogOpen(true);
+  const handleSaveWorkout = (updatedWorkout: WorkoutPlan) => {
+    updateWorkoutPlan(updatedWorkout.id, updatedWorkout);
+    setWorkoutToEdit(null);
   };
 
   const handleDuplicateWorkout = (workout: WorkoutPlan) => {
-    const duplicatedWorkout: WorkoutPlan = {
-      ...workout,
-      id: Date.now().toString(),
+    const { id, createdDate, ...planToCopy } = workout;
+    const duplicatedWorkout: Omit<WorkoutPlan, "id" | "createdDate"> = {
+      ...planToCopy,
       name: `${workout.name} (Copy)`,
-      createdDate: new Date().toISOString().split("T")[0],
     };
-
-    const updatedPlans = [...workoutPlans, duplicatedWorkout];
-    setWorkoutPlans(updatedPlans);
-    localStorage.setItem("workoutPlans", JSON.stringify(updatedPlans));
-
-    alert(`Workout plan "${duplicatedWorkout.name}" created successfully!`);
-  };
-
-  const handleStartSession = (workout: WorkoutPlan) => {
-    setSelectedWorkout(workout);
-    setStartSessionDialogOpen(true);
+    addWorkoutPlan(duplicatedWorkout);
   };
 
   const handleDeleteWorkout = (workout: WorkoutPlan) => {
     if (confirm(`Are you sure you want to delete "${workout.name}"?`)) {
-      const updatedPlans = workoutPlans.filter(
-        (plan) => plan.id !== workout.id,
-      );
-      setWorkoutPlans(updatedPlans);
-      localStorage.setItem("workoutPlans", JSON.stringify(updatedPlans));
-
-      alert(`Workout plan "${workout.name}" deleted successfully.`);
+      deleteWorkoutPlan(workout.id);
     }
   };
 
-  const handleSaveWorkout = (updatedWorkout: WorkoutPlan) => {
-    const updatedPlans = workoutPlans.map((plan) =>
-      plan.id === updatedWorkout.id ? updatedWorkout : plan,
-    );
-    setWorkoutPlans(updatedPlans);
-    localStorage.setItem("workoutPlans", JSON.stringify(updatedPlans));
-
-    alert(`Workout plan "${updatedWorkout.name}" updated successfully!`);
+  const handleStartSession = (workout: WorkoutPlan) => {
+    setWorkoutToStart(workout);
   };
 
-  // Filter exercises by category and search term
-  const filteredExercises = mockExercises.filter((exercise) => {
-    const matchesSearch =
-      exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      exercise.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || exercise.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const handleCreateWorkout = () => {
+    setCreateDialogOpen(true);
+  };
 
-  // Get unique categories for filter
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (user?.email !== "trainer@demo.com" && workoutPlans.length === 0 && !loading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <EmptyState
+          Icon={Dumbbell}
+          title="No workout plans yet"
+          description="Get started by creating your first workout plan."
+          actionText="Create Workout Plan"
+          onAction={handleCreateWorkout}
+        />
+        <CreateWorkoutDialog
+          isOpen={isCreateDialogOpen}
+          onOpenChange={setCreateDialogOpen}
+          onWorkoutCreated={() => {
+            setCreateDialogOpen(false);
+            setActiveTab("plans");
+          }}
+        />
+      </div>
+    );
+  }
+
   const categories = [
     "All",
     ...Array.from(new Set(mockExercises.map((ex) => ex.category))),
   ];
 
-  const activeWorkoutPlans = workoutPlans.filter((plan) => plan.isActive);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  const filteredExercises = mockExercises.filter((exercise) => {
+    const matchesSearch =
+      exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      exercise.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory.toLowerCase() === "all" || exercise.category.toLowerCase() === selectedCategory.toLowerCase();
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Workout Plans</h1>
-          <p className="text-muted-foreground">
-            Create and manage custom workout plans for your clients.
-          </p>
-        </div>
-        <CreateWorkoutDialog />
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Workouts</h1>
+        <Button onClick={handleCreateWorkout}>
+          <Plus className="h-4 w-4 mr-2" />
+          Create New Plan
+        </Button>
       </div>
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="plans">Workout Plans</TabsTrigger>
-          <TabsTrigger value="library">Exercise Library</TabsTrigger>
-        </TabsList>
+      <div>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="plans">My Plans</TabsTrigger>
+            <TabsTrigger value="library">Exercise Library</TabsTrigger>
+          </TabsList>
+          <TabsContent value="plans" className="space-y-6 mt-6">
+            {workoutPlans.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {workoutPlans.map((plan) => (
+                  <WorkoutCard
+                    key={plan.id}
+                    plan={plan}
+                    onView={setWorkoutToView}
+                    onEdit={setWorkoutToEdit}
+                    onDuplicate={handleDuplicateWorkout}
+                    onStart={handleStartSession}
+                    onDelete={handleDeleteWorkout}
+                    getClientName={getClientName}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>No workout plans found.</CardTitle>
+                  <CardDescription>
+                    Get started by creating a new workout plan for your clients.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            )}
+          </TabsContent>
 
-        {/* Workout Plans Tab */}
-        <TabsContent value="plans" className="space-y-6">
-          {workoutPlans.length === 0 ? (
-            <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
-              <CardContent className="flex flex-col items-center justify-center py-16">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
-                  <Dumbbell className="h-10 w-10 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">
-                  No Workout Plans Yet
-                </h3>
-                <p className="text-muted-foreground text-center mb-6 max-w-md">
-                  Start creating custom workout plans for your clients. Design
-                  targeted routines to help them achieve their fitness goals.
-                </p>
-                <CreateWorkoutDialog />
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {workoutPlans.map((plan) => (
-                <Card
-                  key={plan.id}
-                  className="hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => handleViewWorkout(plan)}
+          <TabsContent value="library" className="space-y-6 mt-6">
+            <div className="flex justify-between items-center">
+              <div className="w-full max-w-sm">
+                <Input
+                  placeholder="Search exercises..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pr-8"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <Select
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
                 >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{plan.name}</CardTitle>
-                        <CardDescription className="mt-1">
-                          {getClientName(plan.clientId)}
-                        </CardDescription>
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditWorkout(plan);
-                            }}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Plan
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDuplicateWorkout(plan);
-                            }}
-                          >
-                            <Copy className="h-4 w-4 mr-2" />
-                            Duplicate
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleStartSession(plan);
-                            }}
-                          >
-                            <Play className="h-4 w-4 mr-2" />
-                            Start Session
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteWorkout(plan);
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {plan.description}
-                    </p>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="flex items-center gap-1">
-                          <Target className="h-4 w-4" />
-                          {plan.exercises.length} exercises
-                        </span>
-                        <Badge
-                          variant={plan.isActive ? "default" : "secondary"}
-                        >
-                          {plan.isActive ? "Active" : "Inactive"}
-                        </Badge>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        Created:{" "}
-                        {new Date(plan.createdDate).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <div className="mt-4 space-y-1">
-                      <p className="text-sm font-medium">Exercises:</p>
-                      <div className="max-h-20 overflow-y-auto">
-                        {plan.exercises.slice(0, 3).map((exercise, index) => (
-                          <div
-                            key={exercise.id}
-                            className="text-xs text-muted-foreground"
-                          >
-                            • {exercise.name} ({exercise.sets} sets ×{" "}
-                            {exercise.reps})
-                          </div>
-                        ))}
-                        {plan.exercises.length > 3 && (
-                          <div className="text-xs text-muted-foreground">
-                            +{plan.exercises.length - 3} more exercises
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+              {filteredExercises.map((exercise) => (
+                <ExerciseCard key={exercise.id} exercise={exercise} />
               ))}
             </div>
-          )}
-        </TabsContent>
-
-        {/* Exercise Library Tab */}
-        <TabsContent value="library" className="space-y-6">
-          {/* Search and Filter */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search exercises..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger className="w-full sm:w-48">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Filter by category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Exercise Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredExercises.map((exercise) => (
-              <Card
-                key={exercise.id}
-                className="border-muted hover:shadow-md transition-shadow"
-              >
-                <CardContent className="pt-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium">{exercise.name}</h4>
-                    <Badge variant="secondary">{exercise.category}</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {exercise.description}
-                  </p>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Dumbbell className="h-3 w-3" />
-                      {exercise.equipment}
-                    </span>
-                    <Badge variant="outline" className="text-xs">
-                      {exercise.difficulty}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {filteredExercises.length === 0 && (
-            <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
-              <CardContent className="flex flex-col items-center justify-center py-16">
-                <Target className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  No exercises found
-                </h3>
-                <p className="text-muted-foreground text-center">
-                  Try adjusting your search or filter criteria.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{workoutPlans.length}</div>
-            <p className="text-sm text-muted-foreground">Total Plans</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">
-              {activeWorkoutPlans.length}
-            </div>
-            <p className="text-sm text-muted-foreground">Active Plans</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{mockExercises.length}</div>
-            <p className="text-sm text-muted-foreground">Available Exercises</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{clients.length}</div>
-            <p className="text-sm text-muted-foreground">Clients</p>
-          </CardContent>
-        </Card>
-
-        {/* Dialog Components */}
-        <ViewWorkoutDialog
-          workout={selectedWorkout}
-          open={viewDialogOpen}
-          onOpenChange={setViewDialogOpen}
-          onStartSession={(workout) => {
-            setViewDialogOpen(false);
-            handleStartSession(workout);
-          }}
-        />
-
-        <EditWorkoutDialog
-          workout={selectedWorkout}
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-          onSave={handleSaveWorkout}
-        />
-
-        <StartSessionDialog
-          workout={selectedWorkout}
-          open={startSessionDialogOpen}
-          onOpenChange={setStartSessionDialogOpen}
-        />
+          </TabsContent>
+        </Tabs>
       </div>
+
+      {/* Dialog Components */}
+      <CreateWorkoutDialog
+        isOpen={isCreateDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onWorkoutCreated={() => setCreateDialogOpen(false)}
+      />
+      <ViewWorkoutDialog
+        workout={workoutToView}
+        open={!!workoutToView}
+        onOpenChange={() => setWorkoutToView(null)}
+        onStartSession={(workout) => {
+          setWorkoutToView(null);
+          handleStartSession(workout);
+        }}
+      />
+      <EditWorkoutDialog
+        workout={workoutToEdit}
+        open={!!workoutToEdit}
+        onOpenChange={() => setWorkoutToEdit(null)}
+        onSave={handleSaveWorkout}
+      />
+      <StartSessionDialog
+        workout={workoutToStart}
+        open={!!workoutToStart}
+        onOpenChange={() => setWorkoutToStart(null)}
+      />
     </div>
   );
 };

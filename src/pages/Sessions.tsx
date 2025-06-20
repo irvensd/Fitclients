@@ -57,6 +57,8 @@ import { SessionRecapForm } from "@/components/SessionRecapForm";
 import { SessionRecapViewer } from "@/components/SessionRecapViewer";
 import { SessionCalendar } from "@/components/SessionCalendar";
 import { useData } from "@/contexts/DataContext";
+import EmptyState from "@/components/EmptyState";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Complete Session Dialog
 const CompleteSessionDialog = ({
@@ -383,10 +385,19 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const ScheduleSessionDialog = () => {
-  const [open, setOpen] = useState(false);
+const ScheduleSessionDialog = ({
+  isOpen,
+  onOpenChange,
+  sessionToEdit,
+  onSessionScheduled,
+}: {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  sessionToEdit: Session | null;
+  onSessionScheduled: () => void;
+}) => {
+  const { clients, addSession, updateSession } = useData();
   const [loading, setLoading] = useState(false);
-  const { clients, addSession } = useData();
   const [formData, setFormData] = useState({
     clientId: "",
     date: "",
@@ -426,7 +437,8 @@ const ScheduleSessionDialog = () => {
         cost: "",
         notes: "",
       });
-      setOpen(false);
+      onOpenChange(false);
+      onSessionScheduled();
     } catch (error) {
       console.error("Error adding session:", error);
       alert("Failed to schedule session. Please try again.");
@@ -436,7 +448,7 @@ const ScheduleSessionDialog = () => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
@@ -565,7 +577,7 @@ const ScheduleSessionDialog = () => {
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
@@ -579,122 +591,134 @@ const ScheduleSessionDialog = () => {
 };
 
 const Sessions = () => {
+  const {
+    sessions,
+    loading,
+    getClientName,
+    addSession,
+    updateSession,
+    deleteSession,
+  } = useData();
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState("list");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
-  const { sessions, loading, getClientName, updateSession, deleteSession } =
-    useData();
 
-  // Dialog states
-  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [sessionToComplete, setSessionToComplete] = useState<Session | null>(
+    null,
+  );
+  const [sessionToCancel, setSessionToCancel] = useState<Session | null>(null);
+  const [sessionToDelete, setSessionToDelete] = useState<Session | null>(null);
+  const [sessionToRecap, setSessionToRecap] = useState<Session | null>(null);
+  const [sessionToEdit, setSessionToEdit] = useState<Session | null>(null);
+  const [isScheduleDialogOpen, setScheduleDialogOpen] = useState(false);
 
-  // Session management functions
-  const handleCompleteSession = (session: Session) => {
-    setSelectedSession(session);
-    setCompleteDialogOpen(true);
-  };
+  const filteredSessions = sessions
+    .filter((session) => {
+      const clientName = getClientName(session.clientId);
+      const matchesSearch = clientName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter === "all" || session.status === statusFilter;
 
-  const handleCancelSession = (session: Session) => {
-    setSelectedSession(session);
-    setCancelDialogOpen(true);
-  };
+      let matchesDate = true;
+      if (dateFilter !== "all") {
+        const sessionDate = new Date(session.date);
+        const today = new Date();
 
-  const handleDeleteSession = (session: Session) => {
-    setSelectedSession(session);
-    setDeleteDialogOpen(true);
-  };
-
-  // Dialog action handlers
-  const onCompleteSession = async (session: Session, notes?: string) => {
-    try {
-      const completionNotes = notes || "Session completed successfully";
-      const existingNotes = session.notes || "";
-      const updatedNotes = existingNotes
-        ? `${existingNotes}\n\nCompletion Notes: ${completionNotes}`
-        : `Completion Notes: ${completionNotes}`;
-
-      await updateSession(session.id, {
-        status: "completed",
-        notes: updatedNotes,
-      });
-
-      // You could show a toast notification here instead of alert
-      alert(`Session completed for ${getClientName(session.clientId)}!`);
-    } catch (error) {
-      console.error("Error completing session:", error);
-      alert("Failed to complete session. Please try again.");
-    }
-  };
-
-  const onCancelSession = async (session: Session, reason: string) => {
-    try {
-      const existingNotes = session.notes || "";
-      const updatedNotes = existingNotes
-        ? `${existingNotes}\n\nCancelled: ${reason}`
-        : `Cancelled: ${reason}`;
-
-      await updateSession(session.id, {
-        status: "cancelled",
-        notes: updatedNotes,
-        cancelledBy: "trainer",
-        cancelledAt: new Date().toISOString(),
-      });
-
-      alert(`Session cancelled for ${getClientName(session.clientId)}.`);
-    } catch (error) {
-      console.error("Error cancelling session:", error);
-      alert("Failed to cancel session. Please try again.");
-    }
-  };
-
-  const onDeleteSession = async (session: Session) => {
-    try {
-      await deleteSession(session.id);
-      alert("Session deleted successfully.");
-    } catch (error) {
-      console.error("Error deleting session:", error);
-      alert("Failed to delete session. Please try again.");
-    }
-  };
-
-  const filteredSessions = sessions.filter((session) => {
-    const clientName = getClientName(session.clientId);
-    const matchesSearch = clientName
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || session.status === statusFilter;
-
-    let matchesDate = true;
-    if (dateFilter !== "all") {
-      const sessionDate = new Date(session.date);
-      const today = new Date();
-
-      switch (dateFilter) {
-        case "today":
-          matchesDate = sessionDate.toDateString() === today.toDateString();
-          break;
-        case "week":
-          const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-          matchesDate = sessionDate >= weekAgo && sessionDate <= today;
-          break;
-        case "month":
-          const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-          matchesDate = sessionDate >= monthAgo && sessionDate <= today;
-          break;
+        switch (dateFilter) {
+          case "today":
+            matchesDate = sessionDate.toDateString() === today.toDateString();
+            break;
+          case "week":
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            matchesDate = sessionDate >= weekAgo && sessionDate <= today;
+            break;
+          case "month":
+            const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+            matchesDate = sessionDate >= monthAgo && sessionDate <= today;
+            break;
+        }
       }
-    }
 
-    return matchesSearch && matchesStatus && matchesDate;
-  });
+      return matchesSearch && matchesStatus && matchesDate;
+    })
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  const handleCompleteSession = (session: Session) => {
+    setSessionToComplete(session);
+  };
+  const handleCancelSession = (session: Session) => {
+    setSessionToCancel(session);
+  };
+  const handleDeleteSession = (session: Session) => {
+    setSessionToDelete(session);
+  };
+
+  const onCompleteSession = async (session: Session, notes?: string) => {
+    try {
+      await updateSession(session.id, {
+        status: "completed",
+        notes,
+      });
+    } catch (error) {
+      console.error("Error completing session:", error);
+    }
+  };
+  const onCancelSession = async (session: Session, reason: string) => {
+    try {
+      await updateSession(session.id, {
+        status: "cancelled",
+        notes: reason,
+      });
+    } catch (error) {
+      console.error("Error cancelling session:", error);
+    }
+  };
+  const onDeleteSession = async (session: Session) => {
+    try {
+      await deleteSession(session.id);
+    } catch (error) {
+      console.error("Error deleting session:", error);
+    }
+  };
+
+  const handleScheduleSession = () => {
+    setSessionToEdit(null);
+    setScheduleDialogOpen(true);
+  };
+
+  const handleEditSession = (session: Session) => {
+    setSessionToEdit(session);
+    setScheduleDialogOpen(true);
+  };
+  
+  if (user?.email !== "trainer@demo.com" && sessions.length === 0 && !loading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <EmptyState
+          Icon={Calendar}
+          title="No sessions scheduled"
+          description="Get started by scheduling your first session."
+          actionText="Schedule Session"
+          onAction={handleScheduleSession}
+        />
+        <ScheduleSessionDialog
+          isOpen={isScheduleDialogOpen}
+          onOpenChange={setScheduleDialogOpen}
+          sessionToEdit={sessionToEdit}
+          onSessionScheduled={() => setScheduleDialogOpen(false)}
+        />
       </div>
     );
   }
@@ -710,7 +734,12 @@ const Sessions = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <ScheduleSessionDialog />
+          <ScheduleSessionDialog
+            isOpen={isScheduleDialogOpen}
+            onOpenChange={setScheduleDialogOpen}
+            sessionToEdit={sessionToEdit}
+            onSessionScheduled={() => setScheduleDialogOpen(false)}
+          />
         </div>
       </div>
 
@@ -726,7 +755,12 @@ const Sessions = () => {
               Start scheduling sessions with your clients. Use the calendar view
               or create your first session below.
             </p>
-            <ScheduleSessionDialog />
+            <ScheduleSessionDialog
+              isOpen={isScheduleDialogOpen}
+              onOpenChange={setScheduleDialogOpen}
+              sessionToEdit={sessionToEdit}
+              onSessionScheduled={() => setScheduleDialogOpen(false)}
+            />
           </CardContent>
         </Card>
       )}
@@ -896,30 +930,38 @@ const Sessions = () => {
 
           {/* Schedule New Session Tab */}
           <TabsContent value="schedule" className="space-y-6">
-            <ScheduleSessionDialog />
+            <ScheduleSessionDialog
+              isOpen={isScheduleDialogOpen}
+              onOpenChange={setScheduleDialogOpen}
+              sessionToEdit={sessionToEdit}
+              onSessionScheduled={() => {
+                setScheduleDialogOpen(false);
+                setActiveTab("list");
+              }}
+            />
           </TabsContent>
         </Tabs>
       )}
 
       {/* Dialog Components */}
       <CompleteSessionDialog
-        session={selectedSession}
-        open={completeDialogOpen}
-        onOpenChange={setCompleteDialogOpen}
+        session={sessionToComplete}
+        open={!!sessionToComplete}
+        onOpenChange={() => setSessionToComplete(null)}
         onComplete={onCompleteSession}
       />
 
       <CancelSessionDialog
-        session={selectedSession}
-        open={cancelDialogOpen}
-        onOpenChange={setCancelDialogOpen}
+        session={sessionToCancel}
+        open={!!sessionToCancel}
+        onOpenChange={() => setSessionToCancel(null)}
         onCancel={onCancelSession}
       />
 
       <DeleteSessionDialog
-        session={selectedSession}
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
+        session={sessionToDelete}
+        open={!!sessionToDelete}
+        onOpenChange={() => setSessionToDelete(null)}
         onDelete={onDeleteSession}
       />
     </div>

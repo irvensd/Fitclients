@@ -397,6 +397,35 @@ const Landing = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Mobile App - Coming Soon */}
+            <Card className="border-2 hover:border-primary/20 transition-colors">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center">
+                    <Smartphone className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                    Coming Soon
+                  </div>
+                </div>
+                <h3 className="font-semibold mb-2">Mobile App</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Native mobile app for iOS and Android with full feature access
+                  and offline capabilities
+                </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    iOS & Android
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    Offline support
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Technical Features */}

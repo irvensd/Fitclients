@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -38,9 +38,12 @@ import {
   Camera,
   CreditCard,
   Sparkles,
+  RefreshCw,
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { SubscriptionManager } from "@/components/SubscriptionManager";
+import { useAuth } from "@/contexts/AuthContext";
+import { userProfileService } from "@/lib/firebaseService";
 
 const Settings = () => {
   const [notifications, setNotifications] = useState({
@@ -70,6 +73,122 @@ const Settings = () => {
     taxRate: 8.5,
   });
 
+  const { user, userProfile, updateUserProfile } = useAuth();
+  
+  const [profileForm, setProfileForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    bio: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Manual refresh profile function
+  const refreshProfile = async () => {
+    if (!user?.uid) return;
+    
+    setRefreshing(true);
+    try {
+      console.log("Manually refreshing profile for UID:", user.uid);
+      const profile = await userProfileService.getUserProfile(user.uid);
+      console.log("Refreshed profile data:", profile);
+      
+      if (profile) {
+        setProfileForm({
+          firstName: profile.firstName || "",
+          lastName: profile.lastName || "",
+          email: profile.email || "",
+          phone: profile.phone || "",
+          bio: profile.bio || "",
+        });
+        alert("Profile refreshed successfully!");
+      } else {
+        alert("No profile found. Please try saving your information.");
+      }
+    } catch (error) {
+      console.error("Error refreshing profile:", error);
+      alert("Failed to refresh profile. Check console for details.");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // Update form when userProfile loads
+  useEffect(() => {
+    console.log("Settings page - userProfile:", userProfile);
+    console.log("Settings page - user:", user);
+    
+    if (userProfile) {
+      setProfileForm({
+        firstName: userProfile.firstName || "",
+        lastName: userProfile.lastName || "",
+        email: userProfile.email || "",
+        phone: userProfile.phone || "",
+        bio: userProfile.bio || "",
+      });
+      setProfileLoading(false);
+    } else if (user?.email) {
+      // If no profile but we have user, at least set the email
+      setProfileForm(prev => ({
+        ...prev,
+        email: user.email || "",
+      }));
+      // Wait a bit more for profile to load
+      setTimeout(() => setProfileLoading(false), 2000);
+    }
+  }, [userProfile, user]);
+
+  const handleSaveProfile = async () => {
+    if (!user?.uid) {
+      alert("You must be logged in to save profile changes.");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      // First check if profile exists
+      const existingProfile = await userProfileService.getUserProfile(user.uid);
+      
+      if (existingProfile) {
+        // Update existing profile
+        await updateUserProfile({
+          firstName: profileForm.firstName,
+          lastName: profileForm.lastName,
+          phone: profileForm.phone,
+          bio: profileForm.bio,
+          displayName: `${profileForm.firstName} ${profileForm.lastName}`.trim(),
+        });
+        console.log("Profile updated successfully");
+      } else {
+        // Create new profile
+        console.log("No existing profile found, creating new one");
+        await userProfileService.createUserProfile(user.uid, {
+          email: user.email || profileForm.email,
+          firstName: profileForm.firstName,
+          lastName: profileForm.lastName,
+          displayName: `${profileForm.firstName} ${profileForm.lastName}`.trim(),
+          phone: profileForm.phone,
+          bio: profileForm.bio,
+        });
+        console.log("Profile created successfully");
+      }
+      
+      alert("Profile saved successfully!");
+      
+      // Refresh the profile data
+      await refreshProfile();
+    } catch (error) {
+      console.error("Failed to save profile:", error);
+      alert("Failed to save profile. Please check the console for details.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <DevModeNotice />
@@ -82,10 +201,21 @@ const Settings = () => {
             Manage your account preferences and business settings.
           </p>
         </div>
-        <Button>
-          <Save className="h-4 w-4 mr-2" />
-          Save Changes
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={refreshProfile} 
+            disabled={refreshing}
+            title="Refresh profile data from server"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            {refreshing ? "Refreshing..." : "Refresh"}
+          </Button>
+          <Button onClick={handleSaveProfile} disabled={loading}>
+            <Save className="h-4 w-4 mr-2" />
+            {loading ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
@@ -150,34 +280,73 @@ const Settings = () => {
               <Separator />
 
               {/* Personal Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="first-name">First Name</Label>
-                  <Input id="first-name" defaultValue="Alex" />
+              {profileLoading ? (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label>First Name</Label>
+                      <div className="h-10 bg-muted animate-pulse rounded-md" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Last Name</Label>
+                      <div className="h-10 bg-muted animate-pulse rounded-md" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Email Address</Label>
+                      <div className="h-10 bg-muted animate-pulse rounded-md" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Phone Number</Label>
+                      <div className="h-10 bg-muted animate-pulse rounded-md" />
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="last-name">Last Name</Label>
-                  <Input id="last-name" defaultValue="Johnson" />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="first-name">First Name</Label>
+                    <Input 
+                      id="first-name" 
+                      value={profileForm.firstName}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, firstName: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="last-name">Last Name</Label>
+                    <Input 
+                      id="last-name" 
+                      value={profileForm.lastName}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, lastName: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email Address</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={profileForm.email}
+                      disabled
+                      title="Email cannot be changed"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input 
+                      id="phone" 
+                      value={profileForm.phone}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, phone: e.target.value }))}
+                      placeholder="(555) 123-4567"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    defaultValue="alex@fittrainerpro.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" defaultValue="(555) 123-4567" />
-                </div>
-              </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="bio">Professional Bio</Label>
                 <Textarea
                   id="bio"
-                  defaultValue={businessInfo.bio}
+                  value={profileForm.bio}
+                  onChange={(e) => setProfileForm(prev => ({ ...prev, bio: e.target.value }))}
                   rows={4}
                   placeholder="Tell clients about your experience, certifications, and training philosophy..."
                 />

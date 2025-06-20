@@ -34,11 +34,22 @@ import {
   Bell,
   Sparkles,
   CheckCircle,
+  Home,
+  Megaphone,
+  Search,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { QuickActions } from "@/components/QuickActions";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useIsMobile } from "@/hooks/use-mobile";
+import NotificationBell from "./NotificationBell";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -93,7 +104,8 @@ const navigation = [
   {
     name: "Marketing",
     href: "/marketing",
-    icon: TrendingUp,
+    icon: Megaphone,
+    soon: true,
   },
 ];
 
@@ -315,120 +327,11 @@ const MobileSidebar = ({ onNavigate }: { onNavigate?: () => void }) => {
   );
 };
 
-const AINotifications = () => {
-  const { clients } = useData();
-  const appliedRecs = JSON.parse(
-    localStorage.getItem("appliedRecommendations") || "[]",
-  );
-
-  // Generate dynamic notifications based on real data
-  const notifications = [];
-
-  // High priority client alerts
-  const clientsNeedingAttention = clients
-    .filter(
-      (client) => client.fitnessLevel === "beginner" || Math.random() > 0.7,
-    )
-    .slice(0, 2);
-
-  if (clientsNeedingAttention.length > 0) {
-    notifications.push({
-      id: "client-attention",
-      icon: Sparkles,
-      iconBg: "bg-red-100",
-      iconColor: "text-red-600",
-      title: "High Priority Alert",
-      description: `${clientsNeedingAttention[0]?.name || "Client"} needs attention - check AI recommendations`,
-      link: "/ai-recommendations",
-    });
-  }
-
-  // Progress updates
-  const activeProgressCount = Math.max(0, clients.length - appliedRecs.length);
-  if (activeProgressCount > 0) {
-    notifications.push({
-      id: "progress-update",
-      icon: TrendingUp,
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-600",
-      title: "Progress Update",
-      description: `${activeProgressCount} clients ready for workout progression`,
-      link: "/progress",
-    });
-  }
-
-  // New AI insights
-  const insightCount = Math.max(0, 5 - appliedRecs.length);
-  if (insightCount > 0) {
-    notifications.push({
-      id: "new-insights",
-      icon: Zap,
-      iconBg: "bg-green-100",
-      iconColor: "text-green-600",
-      title: "New Insights Available",
-      description: `AI has generated ${insightCount} new training recommendations`,
-      link: "/ai-recommendations",
-    });
-  }
-
-  // Session alerts (if there are recent sessions)
-  if (clients.length > 0) {
-    notifications.push({
-      id: "session-alert",
-      icon: Calendar,
-      iconBg: "bg-orange-100",
-      iconColor: "text-orange-600",
-      title: "Session Reminder",
-      description: `Upcoming sessions today - check your schedule`,
-      link: "/sessions",
-    });
-  }
-
-  return (
-    <>
-      {notifications.slice(0, 3).map((notification) => (
-        <DropdownMenuItem key={notification.id} asChild>
-          <Link
-            to={notification.link}
-            className="flex items-start gap-3 p-3 cursor-pointer hover:bg-muted transition-colors"
-          >
-            <div
-              className={`flex h-8 w-8 items-center justify-center rounded-full ${notification.iconBg}`}
-            >
-              <notification.icon
-                className={`h-4 w-4 ${notification.iconColor}`}
-              />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium">{notification.title}</p>
-              <p className="text-xs text-muted-foreground">
-                {notification.description}
-              </p>
-            </div>
-          </Link>
-        </DropdownMenuItem>
-      ))}
-
-      {notifications.length === 0 && (
-        <DropdownMenuItem
-          disabled
-          className="flex items-center justify-center p-6"
-        >
-          <div className="text-center">
-            <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-            <p className="text-sm font-medium">All caught up!</p>
-            <p className="text-xs text-muted-foreground">
-              No new notifications
-            </p>
-          </div>
-        </DropdownMenuItem>
-      )}
-    </>
-  );
-};
-
 export const Layout = ({ children }: LayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, loading, logout } = useAuth();
+  const location = useLocation();
+  const isMobile = useIsMobile();
 
   return (
     <div className="flex h-screen bg-background">
@@ -477,13 +380,9 @@ export const Layout = ({ children }: LayoutProps) => {
               </h1>
             </div>
 
-            <div className="flex items-center gap-3">
-              {/* Search - responsive sizing */}
-              <div className="hidden sm:block w-64 lg:w-80">
-                <GlobalSearch />
-              </div>
-
-              {/* AI Notifications */}
+            <div className="flex items-center gap-2 ml-auto">
+              <GlobalSearch />
+              <NotificationBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -505,8 +404,6 @@ export const Layout = ({ children }: LayoutProps) => {
                     AI Coach Notifications
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <AINotifications />
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link
                       to="/ai-recommendations"
@@ -518,26 +415,15 @@ export const Layout = ({ children }: LayoutProps) => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            </div>
 
-              {/* Mobile search icon */}
-              <div className="sm:hidden">
-                <Button variant="ghost" size="icon" className="h-10 w-10">
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                  <span className="sr-only">Search</span>
-                </Button>
-              </div>
+            {/* Mobile search icon */}
+            <div className="ml-auto flex items-center gap-2 sm:hidden">
+              <Button variant="ghost" size="icon" className="h-10 w-10">
+                <Search className="h-5 w-5" />
+                <span className="sr-only">Search</span>
+              </Button>
+              <NotificationBell />
             </div>
           </div>
         </div>

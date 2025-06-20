@@ -1,43 +1,43 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow authenticated trainers to access their own data
-    // Using email as the document ID for trainers
-    match /trainers/{trainerId} {
+    // Allow authenticated users to access their own data
+    // Using user UID as the document ID
+    match /users/{userId} {
       allow read, write, create: if request.auth != null &&
-        (request.auth.token.email == trainerId || request.auth.uid == trainerId);
+        request.auth.uid == userId;
 
-      // Allow access to subcollections (clients, sessions, payments)
-      // Only the owner trainer can access their subcollections
+      // Allow access to subcollections (clients, sessions, payments, workoutPlans)
+      // Only the owner user can access their subcollections
       match /{collection}/{document} {
         allow read, write, create, delete: if request.auth != null &&
-          (request.auth.token.email == trainerId || request.auth.uid == trainerId);
+          request.auth.uid == userId;
       }
+    }
+
+    // sessionRecaps - only authenticated users can access
+    match /sessionRecaps/{recapId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Workout plans - only authenticated users can access
+    match /workoutPlans/{planId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Progress entries - only authenticated users can access
+    match /progressEntries/{entryId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Payments - only authenticated users can access
+    match /payments/{paymentId} {
+      allow read, write: if request.auth != null;
     }
 
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;
-    }
-  }
-}
-    match /sessionRecaps/{recapId} {
-      allow read, write: if request.auth != null;
-    }
-
-    // Workout plans - only authenticated trainers can access
-    match /workoutPlans/{planId} {
-      allow read, write: if request.auth != null;
-    }
-
-    // Progress entries - only authenticated trainers can access
-    match /progressEntries/{entryId} {
-      allow read, write: if request.auth != null;
-    }
-
-    // Payments - only authenticated trainers can access
-    match /payments/{paymentId} {
-      allow read, write: if request.auth != null;
     }
   }
 }

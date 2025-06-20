@@ -11,13 +11,79 @@ import {
   onSnapshot,
   serverTimestamp,
   writeBatch,
+  getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { Client, Session, Payment } from "./types";
+import { Client, Session, Payment, UserProfile } from "./types";
 
 // Helper to get user's collection path
 const getUserCollection = (userId: string, collectionName: string) => {
-  return collection(db, "trainers", userId, collectionName);
+  return collection(db, "users", userId, collectionName);
+};
+
+// === USER PROFILE SERVICES ===
+export const userProfileService = {
+  // Create user profile when they first register
+  createUserProfile: async (userId: string, profileData: Omit<UserProfile, "id" | "createdAt">) => {
+    try {
+      const userRef = doc(db, "users", userId);
+      const userProfile: UserProfile = {
+        ...profileData,
+        id: userId,
+        createdAt: new Date().toISOString(),
+        // Ensure all fields are initialized
+        phone: profileData.phone || "",
+        bio: profileData.bio || "",
+        businessName: profileData.businessName || "",
+        website: profileData.website || "",
+        address: profileData.address || "",
+        lastLogin: new Date().toISOString(),
+      };
+      
+      console.log("Creating user profile with data:", userProfile);
+      await setDoc(userRef, userProfile);
+      console.log("User profile created successfully for:", userId);
+      return userProfile;
+    } catch (error) {
+      console.error("Error creating user profile:", error);
+      throw error;
+    }
+  },
+
+  // Get user profile
+  getUserProfile: async (userId: string): Promise<UserProfile | null> => {
+    try {
+      console.log("Fetching user profile for:", userId);
+      const userRef = doc(db, "users", userId);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        const data = userDoc.data() as UserProfile;
+        console.log("User profile found:", data);
+        return data;
+      }
+      console.log("No user profile found for:", userId);
+      return null;
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      throw error;
+    }
+  },
+
+  // Update user profile
+  updateUserProfile: async (userId: string, updates: Partial<UserProfile>) => {
+    const userRef = doc(db, "users", userId);
+    return updateDoc(userRef, updates);
+  },
+
+  // Update last login
+  updateLastLogin: (userId: string) => {
+    const userRef = doc(db, "users", userId);
+    return updateDoc(userRef, {
+      lastLogin: new Date().toISOString(),
+    });
+  },
 };
 
 // === CLIENTS SERVICES ===

@@ -19,6 +19,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -34,6 +40,12 @@ import {
   Target,
   UserPlus,
   AlertTriangle,
+  ExternalLink,
+  Share2,
+  Eye,
+  Mail,
+  Copy,
+  ChevronDown,
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { useData } from "@/contexts/DataContext";
@@ -46,8 +58,11 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import EmptyState from "@/components/EmptyState";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-const AddClientDialog = () => {
+const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenChange?: (open: boolean) => void; }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { addClient, clients, getActiveClients } = useData();
@@ -137,8 +152,11 @@ const AddClientDialog = () => {
     setOpen(newOpen);
   };
 
+  const dialogOpen = isOpen !== undefined ? isOpen : open;
+  const dialogOnOpenChange = onOpenChange || handleDialogOpen;
+
   return (
-    <Dialog open={open} onOpenChange={handleDialogOpen}>
+    <Dialog open={dialogOpen} onOpenChange={dialogOnOpenChange}>
       <DialogTrigger asChild>
         <Button disabled={!limitInfo.canAddMore}>
           <Plus className="h-4 w-4 mr-2" />
@@ -252,6 +270,10 @@ const Clients = () => {
   const [fitnessLevelFilter, setFitnessLevelFilter] = useState("all");
   const { clients, loading, getActiveClients, getArchivedClients } = useData();
   const { getCurrentPlan } = useSubscription();
+  const { user } = useAuth();
+  const [isAddClientDialogOpen, setAddClientDialogOpen] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const currentPlan = getCurrentPlan();
   const activeClients = getActiveClients
@@ -271,10 +293,67 @@ const Clients = () => {
     return matchesSearch && matchesFitnessLevel;
   });
 
+  // Portal functions
+  const openClientPortal = (clientId: string) => {
+    const portalUrl = `/client-portal/${clientId}`;
+    window.open(portalUrl, "_blank");
+  };
+
+  const shareClientPortal = (client: any) => {
+    const portalUrl = `${window.location.origin}/client-portal/${client.id}`;
+    
+    const subject = "Your Personal Fitness Portal";
+    const body = `Hi ${client.name},
+
+I've created a personal fitness portal just for you! You can access it anytime to view:
+
+• Your progress and measurements
+• Upcoming training sessions  
+• Your personalized workout plan
+• Payment information
+
+Access your portal here: ${portalUrl}
+
+This link is secure and personalized just for you. Bookmark it for easy access!
+
+Best regards,
+Your Personal Trainer`;
+
+    window.open(
+      `mailto:${client.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+    );
+  };
+
+  const copyPortalLink = async (clientId: string, clientName: string) => {
+    const portalUrl = `${window.location.origin}/client-portal/${clientId}`;
+    await navigator.clipboard.writeText(portalUrl);
+    toast({
+      title: "Portal link copied!",
+      description: `Portal link for ${clientName} has been copied to clipboard.`,
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Show empty state only if not demo user and no clients
+  if (user?.email !== "trainer@demo.com" && clients.length === 0 && !loading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <EmptyState
+          Icon={UserPlus}
+          title="No clients yet"
+          description="Get started by adding your first client."
+          actionText="Add Client"
+          onAction={() => setAddClientDialogOpen(true)}
+        />
+        {/* The AddClientDialog needs to be available for the EmptyState action */}
+        <AddClientDialog isOpen={isAddClientDialogOpen} onOpenChange={setAddClientDialogOpen} />
       </div>
     );
   }
@@ -509,7 +588,47 @@ const Clients = () => {
                                 Joined {client.dateJoined}
                               </span>
                             </div>
+                            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                              {client.goals}
+                            </p>
                           </div>
+                        </div>
+                        
+                        {/* Portal Actions */}
+                        <div className="flex flex-col sm:flex-row gap-2 min-w-fit">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openClientPortal(client.id)}
+                            className="flex items-center gap-2"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            View Portal
+                          </Button>
+                          
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="flex items-center gap-2"
+                              >
+                                <Share2 className="h-4 w-4" />
+                                Share
+                                <ChevronDown className="h-3 w-3" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => shareClientPortal(client)}>
+                                <Mail className="h-4 w-4 mr-2" />
+                                Email Client
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => copyPortalLink(client.id, client.name)}>
+                                <Copy className="h-4 w-4 mr-2" />
+                                Copy Link
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
                     </CardContent>

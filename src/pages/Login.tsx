@@ -18,7 +18,8 @@ import { isFirebaseConfigured } from "@/lib/firebase";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"login" | "register">("login");
 
@@ -38,7 +39,7 @@ const Login = () => {
       if (mode === "login") {
         await login(email, password);
       } else {
-        await register(email, password, displayName);
+        await register(email, password, firstName, lastName);
       }
     } catch (err: any) {
       // Error is handled in AuthContext
@@ -111,13 +112,27 @@ const Login = () => {
 
               {mode === "register" && (
                 <div className="space-y-2">
-                  <Label htmlFor="displayName">Full Name</Label>
+                  <Label htmlFor="firstName">First Name</Label>
                   <Input
-                    id="displayName"
+                    id="firstName"
                     type="text"
-                    placeholder="Your full name"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Your first name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
+
+              {mode === "register" && (
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    placeholder="Your last name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                     required
                   />
                 </div>

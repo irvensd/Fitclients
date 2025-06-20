@@ -228,6 +228,13 @@ const Features = () => {
       description:
         "Get started immediately - no complicated configuration required.",
     },
+    {
+      icon: Smartphone,
+      title: "Native Mobile App",
+      description:
+        "Coming soon: Native iOS and Android apps with full feature access and offline capabilities.",
+      badge: "Coming Soon",
+    },
   ];
 
   return (
@@ -372,7 +379,14 @@ const Features = () => {
                     <feature.icon className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">{feature.title}</h3>
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <h3 className="font-semibold">{feature.title}</h3>
+                      {feature.badge && (
+                        <Badge variant="secondary" className="text-xs">
+                          {feature.badge}
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-sm text-muted-foreground mt-1">
                       {feature.description}
                     </p>
