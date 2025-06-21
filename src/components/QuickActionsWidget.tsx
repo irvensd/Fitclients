@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface QuickAction {
   id: string;
@@ -62,6 +63,160 @@ const formatTimeUntil = (date: Date): string => {
 export const QuickActionsWidget = () => {
   const { clients, sessions, payments, getClientName } = useData();
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  // Calculate pending session reminders (24-48 hours before sessions)
+  const getPendingReminders = () => {
+    const now = new Date();
+    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const dayAfterTomorrow = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+
+    return sessions.filter(session => {
+      const sessionDate = new Date(session.date);
+      return sessionDate >= tomorrow && 
+             sessionDate <= dayAfterTomorrow && 
+             session.status === "scheduled";
+    });
+  };
+
+  const handleSendReminders = () => {
+    const pendingReminders = getPendingReminders();
+    
+    if (pendingReminders.length === 0) {
+      toast({
+        title: "No reminders needed",
+        description: "All clients with upcoming sessions have been notified.",
+      });
+      return;
+    }
+
+    // Send email reminders to each client
+    pendingReminders.forEach(session => {
+      const client = clients.find(c => c.id === session.clientId);
+      if (!client) return;
+
+      const sessionDate = new Date(session.date);
+      const formattedDate = sessionDate.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+
+      const subject = `Reminder: Training Session Tomorrow`;
+      const body = `Hi ${client.name},
+
+This is a friendly reminder about your upcoming training session:
+
+📅 Date: ${formattedDate}
+🕐 Time: ${session.startTime}
+💪 Type: ${session.type.replace('-', ' ')}
+💰 Cost: $${session.cost}
+
+What to bring:
+• Water bottle
+• Comfortable workout clothes
+• Towel
+• Positive energy!
+
+If you need to reschedule or have any questions, please let me know as soon as possible.
+
+Looking forward to our session!
+
+Best regards,
+Your Personal Trainer
+
+---
+Access your personal fitness portal: ${window.location.origin}/client-portal/${client.id}`;
+
+      // Open default email client
+      window.open(
+        `mailto:${client.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      );
+    });
+
+    toast({
+      title: "Reminders sent!",
+      description: `Email reminders sent to ${pendingReminders.length} client${pendingReminders.length > 1 ? 's' : ''} about tomorrow's sessions.`,
+    });
+  };
+
+  const handleClientFollowUp = () => {
+    const pendingPayments = payments.filter(p => p.status === "pending");
+    
+    if (pendingPayments.length === 0) {
+      toast({
+        title: "No follow-ups needed",
+        description: "All payments are up to date!",
+      });
+      return;
+    }
+
+    // Generate follow-up emails for overdue payments
+    pendingPayments.forEach(payment => {
+      const client = clients.find(c => c.id === payment.clientId);
+      if (!client) return;
+
+      const dueDate = new Date(payment.date);
+      const isOverdue = dueDate < new Date();
+      const daysDiff = Math.floor((new Date().getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      const subject = isOverdue ? 
+        `Payment Overdue - Action Required` : 
+        `Payment Reminder - ${client.name}`;
+
+      const body = isOverdue ? 
+        `Hi ${client.name},
+
+I hope you're doing well! I wanted to follow up regarding an overdue payment for our training sessions.
+
+Payment Details:
+💳 Amount: $${payment.amount}
+📅 Due Date: ${dueDate.toLocaleDateString()}
+⏰ Days Overdue: ${daysDiff} days
+📝 Description: ${payment.description}
+
+I understand that life can get busy, and sometimes payments slip through the cracks. If you're experiencing any financial difficulties or need to discuss a payment plan, please don't hesitate to reach out to me directly.
+
+To make payment, you can:
+• Access your portal: ${window.location.origin}/client-portal/${client.id}
+• Send payment via your preferred method
+• Contact me to discuss options
+
+I value our training relationship and want to find a solution that works for both of us.
+
+Best regards,
+Your Personal Trainer` :
+        `Hi ${client.name},
+
+This is a friendly reminder about an upcoming payment for our training sessions.
+
+Payment Details:
+💳 Amount: $${payment.amount}
+📅 Due Date: ${dueDate.toLocaleDateString()}
+📝 Description: ${payment.description}
+
+You can easily make this payment by accessing your personal portal: ${window.location.origin}/client-portal/${client.id}
+
+If you have any questions about this payment or need to discuss payment options, please feel free to reach out.
+
+Thank you for your continued commitment to your fitness journey!
+
+Best regards,
+Your Personal Trainer`;
+
+      window.open(
+        `mailto:${client.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      );
+    });
+
+    toast({
+      title: "Follow-up emails sent!",
+      description: `Payment follow-up emails sent to ${pendingPayments.length} client${pendingPayments.length > 1 ? 's' : ''}.`,
+    });
+  };
+
+  const pendingReminderCount = getPendingReminders().length;
 
   const quickActions: QuickAction[] = [
     {
@@ -93,8 +248,8 @@ export const QuickActionsWidget = () => {
       title: "Send Reminders",
       description: "Notify clients about sessions",
       icon: <MessageSquare className="h-4 w-4" />,
-      action: () => console.log("Send reminder"),
-      badge: "Auto",
+      action: handleSendReminders,
+      badge: pendingReminderCount > 0 ? `${pendingReminderCount} Due` : "Auto",
       variant: "secondary",
     },
     {
@@ -102,7 +257,7 @@ export const QuickActionsWidget = () => {
       title: "Client Follow-up",
       description: "Check in with clients",
       icon: <Phone className="h-4 w-4" />,
-      action: () => console.log("Follow up"),
+      action: handleClientFollowUp,
       badge: payments.filter(p => p.status === "pending").length > 0 ? `${payments.filter(p => p.status === "pending").length} Due` : undefined,
       variant: "outline",
     },
