@@ -386,85 +386,146 @@ const Dashboard = () => {
               AI Coach Insights
             </CardTitle>
             <CardDescription>
-              Smart recommendations based on client data
+              Smart recommendations based on your client data
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 text-center">
-              <div className="p-3 bg-white/50 rounded-lg">
-                <div className="text-lg font-bold text-purple-700">
-                  {(() => {
-                    const appliedRecs = JSON.parse(
-                      localStorage.getItem("appliedRecommendations") || "[]",
-                    );
-                    return Math.max(0, 8 - appliedRecs.length);
-                  })()}
-                </div>
-                <p className="text-xs text-purple-600">Active Insights</p>
+            {clients.length === 0 ? (
+              <div className="text-center py-6">
+                <Brain className="h-8 w-8 text-purple-400 mx-auto mb-2" />
+                <p className="text-sm text-purple-600">Add clients to see AI insights</p>
               </div>
-              <div className="p-3 bg-white/50 rounded-lg">
-                <div className="text-lg font-bold text-orange-700">
-                  {(() => {
-                    const appliedRecs = JSON.parse(
-                      localStorage.getItem("appliedRecommendations") || "[]",
-                    );
-                    const highPriorityApplied = appliedRecs.filter(
-                      (r) =>
-                        r.title.includes("Urgent") || r.title.includes("Alert"),
-                    ).length;
-                    return Math.max(0, 3 - highPriorityApplied);
-                  })()}
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-3 text-center">
+                  <div className="p-3 bg-white/50 rounded-lg">
+                    <div className="text-lg font-bold text-purple-700">
+                      {(() => {
+                        // Calculate real insights based on client data
+                        const now = new Date();
+                        const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+                        
+                        let insights = 0;
+                        
+                        // Clients with no recent sessions (need attention)
+                        const clientsNeedingAttention = clients.filter(client => {
+                          const recentSessions = sessions.filter(session => 
+                            session.clientId === client.id && 
+                            new Date(session.date) >= twoWeeksAgo &&
+                            session.status === "completed"
+                          );
+                          return recentSessions.length === 0;
+                        });
+                        insights += clientsNeedingAttention.length;
+                        
+                        // Clients ready for progression (beginners with 5+ sessions)
+                        const progressionReady = clients.filter(client => {
+                          const completedSessions = sessions.filter(session => 
+                            session.clientId === client.id && 
+                            session.status === "completed"
+                          );
+                          return client.fitnessLevel === "beginner" && completedSessions.length >= 5;
+                        });
+                        insights += progressionReady.length;
+                        
+                        // Payment follow-ups needed
+                        const overduePayments = payments.filter(payment => 
+                          payment.status === "pending" && 
+                          new Date(payment.date) < now
+                        );
+                        insights += Math.min(overduePayments.length, clients.length);
+                        
+                        return Math.max(0, insights);
+                      })()}
+                    </div>
+                    <p className="text-xs text-purple-600">Active Insights</p>
+                  </div>
+                  <div className="p-3 bg-white/50 rounded-lg">
+                    <div className="text-lg font-bold text-orange-700">
+                      {(() => {
+                        // Calculate high priority items
+                        const now = new Date();
+                        let highPriorityCount = 0;
+                        
+                        // Overdue payments
+                        const overduePayments = payments.filter(payment => 
+                          payment.status === "pending" && 
+                          new Date(payment.date) < now
+                        );
+                        highPriorityCount += overduePayments.length;
+                        
+                        // Clients with no sessions in 3+ weeks (urgent attention)
+                        const threeWeeksAgo = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000);
+                        const urgentClients = clients.filter(client => {
+                          const recentSessions = sessions.filter(session => 
+                            session.clientId === client.id && 
+                            new Date(session.date) >= threeWeeksAgo &&
+                            session.status === "completed"
+                          );
+                          return sessions.some(s => s.clientId === client.id) && recentSessions.length === 0;
+                        });
+                        highPriorityCount += urgentClients.length;
+                        
+                        return Math.max(0, highPriorityCount);
+                      })()}
+                    </div>
+                    <p className="text-xs text-orange-600">High Priority</p>
+                  </div>
                 </div>
-                <p className="text-xs text-orange-600">High Priority</p>
-              </div>
-            </div>
 
-            <div className="space-y-3">
-              <div className="flex items-start gap-2 p-2 bg-white/30 rounded">
-                <Sparkles className="h-4 w-4 mt-0.5 text-yellow-500" />
-                <div className="text-sm">
-                  <p className="font-medium">Workout Intensity</p>
-                  <p className="text-xs text-muted-foreground">
-                    {(() => {
-                      const appliedRecs = JSON.parse(
-                        localStorage.getItem("appliedRecommendations") || "[]",
-                      );
-                      const progressionApplied = appliedRecs.filter(
-                        (r) =>
-                          r.title.toLowerCase().includes("progression") ||
-                          r.title.toLowerCase().includes("intensity"),
-                      ).length;
-                      const activeCount = Math.max(0, 3 - progressionApplied);
-                      return activeCount > 0
-                        ? `${activeCount} clients ready for progression`
-                        : "All progressions applied ✓";
-                    })()}
-                  </p>
-                </div>
-              </div>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2 p-2 bg-white/30 rounded">
+                    <Sparkles className="h-4 w-4 mt-0.5 text-yellow-500" />
+                    <div className="text-sm">
+                      <p className="font-medium">Workout Intensity</p>
+                      <p className="text-xs text-muted-foreground">
+                        {(() => {
+                          // Count clients ready for progression
+                          const progressionReady = clients.filter(client => {
+                            const completedSessions = sessions.filter(session => 
+                              session.clientId === client.id && 
+                              session.status === "completed"
+                            );
+                            return client.fitnessLevel === "beginner" && completedSessions.length >= 5;
+                          });
+                          
+                          return progressionReady.length > 0
+                            ? `${progressionReady.length} client${progressionReady.length > 1 ? 's' : ''} ready for progression`
+                            : clients.length > 0 
+                              ? "Clients progressing well ✓"
+                              : "No clients yet";
+                        })()}
+                      </p>
+                    </div>
+                  </div>
 
-              <div className="flex items-start gap-2 p-2 bg-white/30 rounded">
-                <TrendingUp className="h-4 w-4 mt-0.5 text-green-500" />
-                <div className="text-sm">
-                  <p className="font-medium">Progress Tracking</p>
-                  <p className="text-xs text-muted-foreground">
-                    Excellent trends across {stats.totalClients} clients
-                  </p>
+                  <div className="flex items-start gap-2 p-2 bg-white/30 rounded">
+                    <TrendingUp className="h-4 w-4 mt-0.5 text-green-500" />
+                    <div className="text-sm">
+                      <p className="font-medium">Progress Tracking</p>
+                      <p className="text-xs text-muted-foreground">
+                        {clients.length > 0 
+                          ? `Monitoring trends across ${stats.totalClients} client${stats.totalClients > 1 ? 's' : ''}`
+                          : "Add clients to track progress"
+                        }
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="pt-2 border-t">
-              <NavigationButton
-                to="/ai-recommendations"
-                variant="default"
-                size="sm"
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
-              >
-                <Brain className="h-4 w-4 mr-2" />
-                View AI Dashboard
-              </NavigationButton>
-            </div>
+                <div className="pt-2 border-t">
+                  <NavigationButton
+                    to="/ai-recommendations"
+                    variant="default"
+                    size="sm"
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
+                  >
+                    <Brain className="h-4 w-4 mr-2" />
+                    View AI Dashboard
+                  </NavigationButton>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
