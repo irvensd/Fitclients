@@ -10,14 +10,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { VisuallyHidden } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   LayoutDashboard,
   Users,
@@ -31,7 +24,6 @@ import {
   LogOut,
   Share2,
   Brain,
-  Bell,
   Sparkles,
   CheckCircle,
   Home,
@@ -383,38 +375,6 @@ export const Layout = ({ children }: LayoutProps) => {
             <div className="flex items-center gap-2 ml-auto">
               <GlobalSearch />
               <NotificationBell />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 relative"
-                    title="AI Coach Notifications"
-                  >
-                    <Bell className="h-5 w-5" />
-                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-purple-600 rounded-full flex items-center justify-center">
-                      <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
-                    </span>
-                    <span className="sr-only">AI Notifications</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80">
-                  <DropdownMenuLabel className="flex items-center gap-2">
-                    <Brain className="h-4 w-4 text-purple-600" />
-                    AI Coach Notifications
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/ai-recommendations"
-                      className="flex items-center justify-center gap-2 p-3 text-purple-600"
-                    >
-                      <Brain className="h-4 w-4" />
-                      View AI Coach Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
 
             {/* Mobile search icon */}
