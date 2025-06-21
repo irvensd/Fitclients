@@ -70,7 +70,13 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user) {
+    if (!user?.uid) {
+      // Reset state when no user
+      setClients([]);
+      setSessions([]);
+      setPayments([]);
+      setWorkoutPlans([]);
+      setProgressEntries([]);
       setLoading(false);
       return;
     }
@@ -100,6 +106,9 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
         setProgressEntries([]);
         setLoading(false);
       }, 1000);
+      
+      // No cleanup needed for demo account
+      return;
     } else {
       // For real users, start with empty data and set up Firestore listeners
       console.log("Setting up Firestore listeners for real user:", user.uid);
@@ -114,6 +123,8 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
       const workoutPlansCollection = collection(db, "users", user.uid, "workoutPlans");
       const sessionsCollection = collection(db, "users", user.uid, "sessions");
       const clientsCollection = collection(db, "users", user.uid, "clients");
+      const paymentsCollection = collection(db, "users", user.uid, "payments");
+      const progressEntriesCollection = collection(db, "users", user.uid, "progressEntries");
       
       const unsubscribeWorkoutPlans = onSnapshot(workoutPlansCollection, (snapshot) => {
         const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WorkoutPlan));
@@ -123,8 +134,10 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
 
       const unsubscribeSessions = onSnapshot(sessionsCollection, (snapshot) => {
         const sessions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Session));
-        console.log("Loaded sessions from Firestore:", sessions);
+        console.log("🔄 Sessions listener triggered:", sessions.length, "sessions");
         setSessions(sessions);
+      }, (error) => {
+        console.error("❌ Sessions listener error:", error);
       });
 
       const unsubscribeClients = onSnapshot(clientsCollection, (snapshot) => {
@@ -144,14 +157,12 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
         setClients(clients);
       });
 
-      const paymentsCollection = collection(db, "users", user.uid, "payments");
       const unsubscribePayments = onSnapshot(paymentsCollection, (snapshot) => {
         const payments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Payment));
         console.log("Loaded payments from Firestore:", payments);
         setPayments(payments);
       });
 
-      const progressEntriesCollection = collection(db, "users", user.uid, "progressEntries");
       const unsubscribeProgressEntries = onSnapshot(progressEntriesCollection, (snapshot) => {
         const entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgressEntry));
         console.log("Loaded progress entries from Firestore:", entries);
@@ -159,6 +170,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       return () => {
+        console.log("Cleaning up Firestore listeners");
         unsubscribeWorkoutPlans();
         unsubscribeSessions();
         unsubscribeClients();
@@ -166,7 +178,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
         unsubscribeProgressEntries();
       };
     }
-  }, [user]);
+  }, [user?.uid, user?.email]); // Only depend on uid and email, not the entire user object
 
   // Generate unique ID
   const generateId = () => {
@@ -386,11 +398,16 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error("User UID not available");
       }
 
-      console.log("Adding session for user:", user.uid, "Session data:", sessionData);
-      
       const sessionsCollection = collection(db, "users", user.uid, "sessions");
       const { id, ...sessionToSave } = newSession;
-      const docRef = await addDoc(sessionsCollection, sessionToSave);
+      
+      // Add timeout protection - fail after 10 seconds
+      const addPromise = addDoc(sessionsCollection, sessionToSave);
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error("Add operation timed out")), 10000)
+      );
+      
+      const docRef = await Promise.race([addPromise, timeoutPromise]);
 
       setSessions((prev) =>
         prev.map((session) =>
@@ -407,34 +424,62 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updateSession = async (id: string, updates: Partial<Session>) => {
-    const originalSessions = sessions;
-    setSessions((prev) =>
-      prev.map((session) =>
-        session.id === id ? { ...session, ...updates } : session,
-      ),
-    );
-
+    console.log("🔄 DataContext: Starting updateSession", { id, updates });
+    
     try {
-      if (!user) throw new Error("User not authenticated");
+      if (!user) {
+        console.error("❌ No user authenticated");
+        throw new Error("User not authenticated");
+      }
+      
+      if (!user.uid) {
+        console.error("❌ No user UID");
+        throw new Error("User UID not available");
+      }
+
+      console.log("📝 Updating Firebase document...");
       const sessionDoc = doc(db, "users", user.uid, "sessions", id);
+      
       await updateDoc(sessionDoc, updates);
+      console.log("✅ Firebase update completed");
+      
     } catch (error) {
-      setError("Failed to update session. Please try again.");
-      setSessions(originalSessions);
+      console.error("❌ Error in updateSession:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setError(`Failed to update session: ${errorMessage}`);
+      
+      // Re-throw the error so the UI can handle it
+      throw new Error(errorMessage);
     }
   };
 
   const deleteSession = async (id: string) => {
-    const originalSessions = sessions;
-    setSessions((prev) => prev.filter((session) => session.id !== id));
-
+    console.log("🗑️ DataContext: Starting deleteSession", { id });
+    
     try {
-      if (!user) throw new Error("User not authenticated");
+      if (!user) {
+        console.error("❌ No user authenticated");
+        throw new Error("User not authenticated");
+      }
+      
+      if (!user.uid) {
+        console.error("❌ No user UID");
+        throw new Error("User UID not available");
+      }
+
+      console.log("🗑️ Deleting Firebase document...");
       const sessionDoc = doc(db, "users", user.uid, "sessions", id);
+      
       await deleteDoc(sessionDoc);
+      console.log("✅ Firebase delete completed");
+      
     } catch (error) {
-      setError("Failed to delete session. Please try again.");
-      setSessions(originalSessions);
+      console.error("❌ Error in deleteSession:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setError(`Failed to delete session: ${errorMessage}`);
+      
+      // Re-throw the error so the UI can handle it
+      throw new Error(errorMessage);
     }
   };
 
@@ -640,12 +685,13 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 };
 
-export const useData = () => {
+// Custom hook to use the DataContext
+function useData() {
   const context = useContext(DataContext);
   if (context === undefined) {
     throw new Error("useData must be used within a DataProvider");
   }
   return context;
-};
+}
 
-export { DataProvider };
+export { DataProvider, useData };

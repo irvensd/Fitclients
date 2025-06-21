@@ -183,6 +183,7 @@ export const SessionCalendar = () => {
                 components={{
                   event: EventComponent,
                 }}
+                popup
                 style={{ height: "100%" }}
                 step={30}
                 timeslots={2}

@@ -1,15 +1,26 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { Session } from "@/lib/types";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc } from "firebase/firestore";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -24,380 +35,30 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Calendar,
-  Clock,
   Plus,
-  Search,
-  Filter,
-  MapPin,
-  User,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Sparkles,
-  FileText,
   MoreVertical,
-  Play,
-  Square,
   Edit,
+  CheckCircle,
   Trash2,
+  User,
+  Save,
+  X,
+  CalendarDays,
+  List,
 } from "lucide-react";
-import { Session, SessionRecap } from "@/lib/types";
-import { SessionRecapForm } from "@/components/SessionRecapForm";
-import { SessionRecapViewer } from "@/components/SessionRecapViewer";
 import { SessionCalendar } from "@/components/SessionCalendar";
-import { useData } from "@/contexts/DataContext";
-import EmptyState from "@/components/EmptyState";
-import { useAuth } from "@/contexts/AuthContext";
 
-// Complete Session Dialog
-const CompleteSessionDialog = ({
-  session,
-  open,
-  onOpenChange,
-  onComplete,
-}: {
-  session: Session | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onComplete: (session: Session, notes?: string) => void;
-}) => {
-  const { getClientName } = useData();
+// Add Session Dialog Component
+const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [notes, setNotes] = useState("");
-
-  const handleComplete = async () => {
-    if (!session) return;
-    setLoading(true);
-    try {
-      await onComplete(session, notes);
-      onOpenChange(false);
-      setNotes("");
-    } catch (error) {
-      console.error("Error completing session:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!session) return null;
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            Complete Session
-          </DialogTitle>
-          <DialogDescription>
-            Mark this session as completed and add any final notes.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4">
-          <div className="p-4 bg-muted/50 rounded-lg">
-            <h4 className="font-medium">{getClientName(session.clientId)}</h4>
-            <p className="text-sm text-muted-foreground">
-              {session.type.replace("-", " ").charAt(0).toUpperCase() +
-                session.type.replace("-", " ").slice(1)}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {new Date(session.date).toLocaleDateString()} at{" "}
-              {session.startTime}
-            </p>
-            <p className="text-sm font-medium">${session.cost}</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="completion-notes">Session Notes (Optional)</Label>
-            <Textarea
-              id="completion-notes"
-              placeholder="Add any notes about how the session went, client progress, or next steps..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="min-h-[100px]"
-            />
-          </div>
-
-          <div className="text-sm text-muted-foreground">
-            <p>This will:</p>
-            <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Mark the session as completed</li>
-              <li>Update the session status</li>
-              <li>Add completion timestamp</li>
-              <li>Allow for session recap creation</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleComplete} disabled={loading}>
-            {loading ? "Completing..." : "Complete Session"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-// Cancel Session Dialog
-const CancelSessionDialog = ({
-  session,
-  open,
-  onOpenChange,
-  onCancel,
-}: {
-  session: Session | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onCancel: (session: Session, reason: string) => void;
-}) => {
-  const { getClientName } = useData();
-  const [loading, setLoading] = useState(false);
-  const [reason, setReason] = useState("");
-
-  const handleCancel = async () => {
-    if (!session) return;
-    setLoading(true);
-    try {
-      await onCancel(session, reason);
-      onOpenChange(false);
-      setReason("");
-    } catch (error) {
-      console.error("Error cancelling session:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!session) return null;
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <XCircle className="h-5 w-5 text-orange-600" />
-            Cancel Session
-          </DialogTitle>
-          <DialogDescription>
-            Cancel this session and provide a reason for the cancellation.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4">
-          <div className="p-4 bg-muted/50 rounded-lg">
-            <h4 className="font-medium">{getClientName(session.clientId)}</h4>
-            <p className="text-sm text-muted-foreground">
-              {session.type.replace("-", " ").charAt(0).toUpperCase() +
-                session.type.replace("-", " ").slice(1)}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {new Date(session.date).toLocaleDateString()} at{" "}
-              {session.startTime}
-            </p>
-            <p className="text-sm font-medium">${session.cost}</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="cancellation-reason">Cancellation Reason</Label>
-            <Textarea
-              id="cancellation-reason"
-              placeholder="Why is this session being cancelled? (e.g., client request, scheduling conflict, illness, etc.)"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              className="min-h-[100px]"
-              required
-            />
-          </div>
-
-          <div className="text-sm text-muted-foreground">
-            <p>This will:</p>
-            <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Mark the session as cancelled</li>
-              <li>Record the cancellation reason</li>
-              <li>Add cancellation timestamp</li>
-              <li>Keep the session for record keeping</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Keep Session
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleCancel}
-            disabled={loading || !reason.trim()}
-          >
-            {loading ? "Cancelling..." : "Cancel Session"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-// Delete Session Dialog
-const DeleteSessionDialog = ({
-  session,
-  open,
-  onOpenChange,
-  onDelete,
-}: {
-  session: Session | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onDelete: (session: Session) => void;
-}) => {
-  const { getClientName } = useData();
-  const [loading, setLoading] = useState(false);
-  const [confirmText, setConfirmText] = useState("");
-
-  const handleDelete = async () => {
-    if (!session) return;
-    setLoading(true);
-    try {
-      await onDelete(session);
-      onOpenChange(false);
-      setConfirmText("");
-    } catch (error) {
-      console.error("Error deleting session:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!session) return null;
-
-  const isConfirmed = confirmText.toLowerCase() === "delete";
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Trash2 className="h-5 w-5 text-destructive" />
-            Delete Session
-          </DialogTitle>
-          <DialogDescription>
-            This action cannot be undone. This will permanently delete the
-            session.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4">
-          <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-            <h4 className="font-medium">{getClientName(session.clientId)}</h4>
-            <p className="text-sm text-muted-foreground">
-              {session.type.replace("-", " ").charAt(0).toUpperCase() +
-                session.type.replace("-", " ").slice(1)}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {new Date(session.date).toLocaleDateString()} at{" "}
-              {session.startTime}
-            </p>
-            <p className="text-sm font-medium">${session.cost}</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="delete-confirmation">
-              Type "DELETE" to confirm deletion
-            </Label>
-            <Input
-              id="delete-confirmation"
-              placeholder="DELETE"
-              value={confirmText}
-              onChange={(e) => setConfirmText(e.target.value)}
-            />
-          </div>
-
-          <div className="text-sm text-destructive">
-            <p>⚠️ Warning: This will permanently:</p>
-            <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Remove the session from all records</li>
-              <li>Delete any associated session recaps</li>
-              <li>Remove from client history</li>
-              <li>Cannot be recovered</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={loading || !isConfirmed}
-          >
-            {loading ? "Deleting..." : "Delete Session"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case "completed":
-      return <CheckCircle className="h-4 w-4 text-green-600" />;
-    case "scheduled":
-      return <Clock className="h-4 w-4 text-blue-600" />;
-    case "cancelled":
-      return <XCircle className="h-4 w-4 text-red-600" />;
-    case "no-show":
-      return <AlertCircle className="h-4 w-4 text-orange-600" />;
-    default:
-      return <Clock className="h-4 w-4 text-gray-600" />;
-  }
-};
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "completed":
-      return "bg-green-100 text-green-800 border-green-200";
-    case "scheduled":
-      return "bg-blue-100 text-blue-800 border-blue-200";
-    case "cancelled":
-      return "bg-red-100 text-red-800 border-red-200";
-    case "no-show":
-      return "bg-orange-100 text-orange-800 border-orange-200";
-    default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
-  }
-};
-
-const ScheduleSessionDialog = ({
-  isOpen,
-  onOpenChange,
-  sessionToEdit,
-  onSessionScheduled,
-}: {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  sessionToEdit: Session | null;
-  onSessionScheduled: () => void;
-}) => {
-  const { clients, addSession, updateSession } = useData();
-  const [loading, setLoading] = useState(false);
+  const [clients, setClients] = useState<any[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     clientId: "",
     date: "",
@@ -408,25 +69,46 @@ const ScheduleSessionDialog = ({
     notes: "",
   });
 
+  // Load clients when dialog opens
+  useEffect(() => {
+    if (isOpen && user?.uid) {
+      const loadClients = async () => {
+        try {
+          const clientsSnapshot = await getDocs(collection(db, "users", user.uid, "clients"));
+          const clientsData = clientsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setClients(clientsData);
+        } catch (error) {
+          console.error("Error loading clients:", error);
+        }
+      };
+      loadClients();
+    }
+  }, [isOpen, user?.uid]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading || !user?.uid) return;
+    
     setLoading(true);
-
+    
     try {
-      await addSession({
+      const sessionsRef = collection(db, "users", user.uid, "sessions");
+      await addDoc(sessionsRef, {
         clientId: formData.clientId,
         date: formData.date,
         startTime: formData.startTime,
         endTime: formData.endTime,
-        type: formData.type as
-          | "personal-training"
-          | "consultation"
-          | "assessment",
+        type: formData.type as "personal-training" | "consultation" | "assessment",
         status: "scheduled",
         cost: parseFloat(formData.cost),
         notes: formData.notes,
       });
-
+      
+      toast({
+        title: "Session scheduled",
+        description: "New session has been successfully scheduled.",
+      });
+      
       // Reset form and close dialog
       setFormData({
         clientId: "",
@@ -437,22 +119,26 @@ const ScheduleSessionDialog = ({
         cost: "",
         notes: "",
       });
-      onOpenChange(false);
-      onSessionScheduled();
+      setIsOpen(false);
+      onSessionAdded();
     } catch (error) {
-      console.error("Error adding session:", error);
-      alert("Failed to schedule session. Please try again.");
+      console.error("Error creating session:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create session. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          Schedule Session
+          Add Session
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
@@ -486,28 +172,6 @@ const ScheduleSessionDialog = ({
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="type">Session Type</Label>
-                <Select
-                  value={formData.type}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, type: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="personal-training">
-                      Personal Training
-                    </SelectItem>
-                    <SelectItem value="consultation">Consultation</SelectItem>
-                    <SelectItem value="assessment">Assessment</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
                 <Label htmlFor="date">Date</Label>
                 <Input
                   id="date"
@@ -519,10 +183,12 @@ const ScheduleSessionDialog = ({
                   required
                 />
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="start-time">Start Time</Label>
+                <Label htmlFor="startTime">Start Time</Label>
                 <Input
-                  id="start-time"
+                  id="startTime"
                   type="time"
                   value={formData.startTime}
                   onChange={(e) =>
@@ -532,9 +198,9 @@ const ScheduleSessionDialog = ({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="end-time">End Time</Label>
+                <Label htmlFor="endTime">End Time</Label>
                 <Input
-                  id="end-time"
+                  id="endTime"
                   type="time"
                   value={formData.endTime}
                   onChange={(e) =>
@@ -546,11 +212,29 @@ const ScheduleSessionDialog = ({
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
+                <Label htmlFor="type">Session Type</Label>
+                <Select
+                  value={formData.type}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, type: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="personal-training">Personal Training</SelectItem>
+                    <SelectItem value="consultation">Consultation</SelectItem>
+                    <SelectItem value="assessment">Assessment</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="cost">Cost ($)</Label>
                 <Input
                   id="cost"
                   type="number"
-                  placeholder="75"
+                  step="0.01"
                   value={formData.cost}
                   onChange={(e) =>
                     setFormData({ ...formData, cost: e.target.value })
@@ -558,30 +242,25 @@ const ScheduleSessionDialog = ({
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input id="location" placeholder="Gym, Home, Park..." />
-              </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes (Optional)</Label>
+              <Label htmlFor="notes">Notes</Label>
               <Textarea
                 id="notes"
-                placeholder="Session notes, special instructions..."
-                className="min-h-[60px]"
                 value={formData.notes}
                 onChange={(e) =>
                   setFormData({ ...formData, notes: e.target.value })
                 }
+                placeholder="Add any additional notes..."
               />
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Scheduling..." : "Schedule Session"}
+              {loading ? "Creating..." : "Create Session"}
             </Button>
           </div>
         </form>
@@ -591,251 +270,212 @@ const ScheduleSessionDialog = ({
 };
 
 const Sessions = () => {
-  const {
-    sessions,
-    loading,
-    getClientName,
-    addSession,
-    updateSession,
-    deleteSession,
-  } = useData();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("list");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState("all");
+  const { toast } = useToast();
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingSession, setEditingSession] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    clientId: "",
+    date: "",
+    startTime: "",
+    endTime: "",
+    type: "",
+    cost: "",
+    notes: "",
+  });
 
-  const [sessionToComplete, setSessionToComplete] = useState<Session | null>(
-    null,
-  );
-  const [sessionToCancel, setSessionToCancel] = useState<Session | null>(null);
-  const [sessionToDelete, setSessionToDelete] = useState<Session | null>(null);
-  const [sessionToRecap, setSessionToRecap] = useState<Session | null>(null);
-  const [sessionToEdit, setSessionToEdit] = useState<Session | null>(null);
-  const [isScheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  // Load data once on component mount
+  useEffect(() => {
+    if (!user?.uid) return;
 
-  const filteredSessions = sessions
-    .filter((session) => {
-      const clientName = getClientName(session.clientId);
-      const matchesSearch = clientName
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const matchesStatus =
-        statusFilter === "all" || session.status === statusFilter;
-
-      let matchesDate = true;
-      if (dateFilter !== "all") {
-        const sessionDate = new Date(session.date);
-        const today = new Date();
-
-        switch (dateFilter) {
-          case "today":
-            matchesDate = sessionDate.toDateString() === today.toDateString();
-            break;
-          case "week":
-            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-            matchesDate = sessionDate >= weekAgo && sessionDate <= today;
-            break;
-          case "month":
-            const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-            matchesDate = sessionDate >= monthAgo && sessionDate <= today;
-            break;
-        }
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        
+        // Load sessions
+        const sessionsSnapshot = await getDocs(collection(db, "users", user.uid, "sessions"));
+        const sessionsData = sessionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Session));
+        setSessions(sessionsData);
+        
+        // Load clients
+        const clientsSnapshot = await getDocs(collection(db, "users", user.uid, "clients"));
+        const clientsData = clientsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setClients(clientsData);
+        
+      } catch (error) {
+        console.error("Error loading data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load sessions. Please refresh the page.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
       }
+    };
 
-      return matchesSearch && matchesStatus && matchesDate;
-    })
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    loadData();
+  }, [user?.uid, toast]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  const handleCompleteSession = (session: Session) => {
-    setSessionToComplete(session);
-  };
-  const handleCancelSession = (session: Session) => {
-    setSessionToCancel(session);
-  };
-  const handleDeleteSession = (session: Session) => {
-    setSessionToDelete(session);
-  };
-
-  const onCompleteSession = async (session: Session, notes?: string) => {
+  const refreshData = async () => {
+    if (!user?.uid) return;
+    
     try {
-      await updateSession(session.id, {
-        status: "completed",
-        notes,
+      const sessionsSnapshot = await getDocs(collection(db, "users", user.uid, "sessions"));
+      const sessionsData = sessionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Session));
+      setSessions(sessionsData);
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    }
+  };
+
+  const startEditing = (session: Session) => {
+    setEditingSession(session.id);
+    setEditForm({
+      clientId: session.clientId,
+      date: session.date,
+      startTime: session.startTime,
+      endTime: session.endTime,
+      type: session.type,
+      cost: session.cost.toString(),
+      notes: session.notes || "",
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingSession(null);
+    setEditForm({
+      clientId: "",
+      date: "",
+      startTime: "",
+      endTime: "",
+      type: "",
+      cost: "",
+      notes: "",
+    });
+  };
+
+  const saveEdit = async () => {
+    if (!user?.uid || !editingSession) return;
+    
+    try {
+      const sessionRef = doc(db, "users", user.uid, "sessions", editingSession);
+      await updateDoc(sessionRef, {
+        clientId: editForm.clientId,
+        date: editForm.date,
+        startTime: editForm.startTime,
+        endTime: editForm.endTime,
+        type: editForm.type as "personal-training" | "consultation" | "assessment",
+        cost: parseFloat(editForm.cost),
+        notes: editForm.notes,
+      });
+      
+      // Update local state
+      setSessions(prev => prev.map(s => 
+        s.id === editingSession ? {
+          ...s,
+          clientId: editForm.clientId,
+          date: editForm.date,
+          startTime: editForm.startTime,
+          endTime: editForm.endTime,
+          type: editForm.type as "personal-training" | "consultation" | "assessment",
+          cost: parseFloat(editForm.cost),
+          notes: editForm.notes,
+        } : s
+      ));
+      
+      setEditingSession(null);
+      toast({
+        title: "Session updated",
+        description: "Session has been successfully updated.",
+      });
+    } catch (error) {
+      console.error("Error updating session:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update session. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteSession = async (session: Session) => {
+    if (!user?.uid) return;
+    
+    try {
+      const sessionRef = doc(db, "users", user.uid, "sessions", session.id);
+      await deleteDoc(sessionRef);
+      
+      // Update local state immediately
+      setSessions(prev => prev.filter(s => s.id !== session.id));
+      
+      toast({
+        title: "Session deleted",
+        description: "Session has been successfully deleted.",
+      });
+    } catch (error) {
+      console.error("Error deleting session:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete session. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCompleteSession = async (session: Session) => {
+    if (!user?.uid) return;
+    
+    try {
+      const sessionRef = doc(db, "users", user.uid, "sessions", session.id);
+      await updateDoc(sessionRef, { status: "completed" });
+      
+      // Update local state immediately
+      setSessions(prev => prev.map(s => 
+        s.id === session.id ? { ...s, status: "completed" } : s
+      ));
+      
+      toast({
+        title: "Session completed",
+        description: "Session has been marked as completed.",
       });
     } catch (error) {
       console.error("Error completing session:", error);
-    }
-  };
-  const onCancelSession = async (session: Session, reason: string) => {
-    try {
-      await updateSession(session.id, {
-        status: "cancelled",
-        notes: reason,
+      toast({
+        title: "Error",
+        description: "Failed to complete session. Please try again.",
+        variant: "destructive",
       });
-    } catch (error) {
-      console.error("Error cancelling session:", error);
-    }
-  };
-  const onDeleteSession = async (session: Session) => {
-    try {
-      await deleteSession(session.id);
-    } catch (error) {
-      console.error("Error deleting session:", error);
     }
   };
 
-  const handleScheduleSession = () => {
-    setSessionToEdit(null);
-    setScheduleDialogOpen(true);
+  const getClientName = (clientId: string) => {
+    const client = clients.find(c => c.id === clientId);
+    return client?.name || "Unknown Client";
   };
 
-  const handleEditSession = (session: Session) => {
-    setSessionToEdit(session);
-    setScheduleDialogOpen(true);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      case "scheduled":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
-  
-  if (user?.email !== "trainer@demo.com" && sessions.length === 0 && !loading) {
+
+  if (loading) {
     return (
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Sessions</h1>
-            <p className="text-muted-foreground">
-              Manage and track all your training sessions.
-            </p>
-          </div>
-          <ScheduleSessionDialog
-            isOpen={isScheduleDialogOpen}
-            onOpenChange={setScheduleDialogOpen}
-            sessionToEdit={sessionToEdit}
-            onSessionScheduled={() => setScheduleDialogOpen(false)}
-          />
-        </div>
-
-        <div className="space-y-6">
-          {/* Welcome Message */}
-          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                  <Calendar className="h-8 w-8 text-primary" />
-                </div>
-                <h2 className="text-2xl font-bold mb-2">Welcome to Your Session Hub!</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  This is your command center for managing all training sessions. Schedule, track, and manage your client sessions all in one place. 
-                  Get started by scheduling your first session below.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Main Empty State */}
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Schedule Session Section */}
-            <Card className="lg:col-span-2 border-2 border-dashed border-muted-foreground/25 bg-muted/5">
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 mb-6">
-                  <Plus className="h-12 w-12 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">Schedule Your First Session</h3>
-                <p className="text-muted-foreground text-center mb-6 max-w-md">
-                  Start organizing your training schedule! Create your first session to begin 
-                  tracking client appointments and building your fitness business.
-                </p>
-                <ScheduleSessionDialog
-                  isOpen={isScheduleDialogOpen}
-                  onOpenChange={setScheduleDialogOpen}
-                  sessionToEdit={sessionToEdit}
-                  onSessionScheduled={() => setScheduleDialogOpen(false)}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Session Features */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Session Features
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Calendar className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">Smart Scheduling</h4>
-                    <p className="text-xs text-muted-foreground">Calendar integration and time management</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Clock className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">Session Tracking</h4>
-                    <p className="text-xs text-muted-foreground">Track completed, scheduled, and cancelled sessions</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <FileText className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">Session Recaps</h4>
-                    <p className="text-xs text-muted-foreground">Add notes and track progress after each session</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Session Type Preview Cards */}
-          <div className="grid md:grid-cols-3 gap-4">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="pt-6 text-center">
-                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-                  <User className="h-6 w-6 text-blue-600" />
-                </div>
-                <h4 className="font-semibold mb-2">Personal Training</h4>
-                <p className="text-sm text-muted-foreground">
-                  One-on-one focused training sessions with personalized programs
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="pt-6 text-center">
-                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
-                </div>
-                <h4 className="font-semibold mb-2">Assessments</h4>
-                <p className="text-sm text-muted-foreground">
-                  Initial evaluations and progress check-ins with clients
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="pt-6 text-center">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
-                  <MapPin className="h-6 w-6 text-purple-600" />
-                </div>
-                <h4 className="font-semibold mb-2">Consultations</h4>
-                <p className="text-sm text-muted-foreground">
-                  Discovery sessions and program planning meetings
-                </p>
-              </CardContent>
-            </Card>
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading sessions...</p>
           </div>
         </div>
       </div>
@@ -843,9 +483,8 @@ const Sessions = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="container mx-auto p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Sessions</h1>
           <p className="text-muted-foreground">
@@ -853,334 +492,237 @@ const Sessions = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <ScheduleSessionDialog
-            isOpen={isScheduleDialogOpen}
-            onOpenChange={setScheduleDialogOpen}
-            sessionToEdit={sessionToEdit}
-            onSessionScheduled={() => setScheduleDialogOpen(false)}
-          />
+          <Button variant="outline" onClick={refreshData}>
+            Refresh
+          </Button>
+          <AddSessionDialog onSessionAdded={refreshData} />
         </div>
       </div>
 
-      {/* Empty State */}
-      {sessions.length === 0 && (
-        <div className="space-y-6">
-          {/* Welcome Message */}
-          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                  <Calendar className="h-8 w-8 text-primary" />
-                </div>
-                <h2 className="text-2xl font-bold mb-2">Welcome to Your Session Hub!</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  This is your command center for managing all training sessions. Schedule, track, and manage your client sessions all in one place. 
-                  Get started by scheduling your first session below.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+      <Tabs defaultValue="list" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="list" className="flex items-center gap-2">
+            <List className="h-4 w-4" />
+            List View
+          </TabsTrigger>
+          <TabsTrigger value="calendar" className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4" />
+            Calendar View
+          </TabsTrigger>
+        </TabsList>
 
-          {/* Main Empty State */}
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Schedule Session Section */}
-            <Card className="lg:col-span-2 border-2 border-dashed border-muted-foreground/25 bg-muted/5">
+        <TabsContent value="list" className="space-y-6">
+          {sessions.length === 0 ? (
+            <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
-                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 mb-6">
-                  <Plus className="h-12 w-12 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">Schedule Your First Session</h3>
-                <p className="text-muted-foreground text-center mb-6 max-w-md">
-                  Start organizing your training schedule! Create your first session to begin 
-                  tracking client appointments and building your fitness business.
+                <Calendar className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No sessions yet</h3>
+                <p className="text-muted-foreground text-center mb-4">
+                  Start by scheduling your first training session.
                 </p>
-                <ScheduleSessionDialog
-                  isOpen={isScheduleDialogOpen}
-                  onOpenChange={setScheduleDialogOpen}
-                  sessionToEdit={sessionToEdit}
-                  onSessionScheduled={() => setScheduleDialogOpen(false)}
-                />
+                <AddSessionDialog onSessionAdded={refreshData} />
               </CardContent>
             </Card>
-
-            {/* Session Features */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Session Features
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Calendar className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">Smart Scheduling</h4>
-                    <p className="text-xs text-muted-foreground">Calendar integration and time management</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Clock className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">Session Tracking</h4>
-                    <p className="text-xs text-muted-foreground">Track completed, scheduled, and cancelled sessions</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <FileText className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">Session Recaps</h4>
-                    <p className="text-xs text-muted-foreground">Add notes and track progress after each session</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Session Type Preview Cards */}
-          <div className="grid md:grid-cols-3 gap-4">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="pt-6 text-center">
-                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-                  <User className="h-6 w-6 text-blue-600" />
-                </div>
-                <h4 className="font-semibold mb-2">Personal Training</h4>
-                <p className="text-sm text-muted-foreground">
-                  One-on-one focused training sessions with personalized programs
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="pt-6 text-center">
-                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
-                </div>
-                <h4 className="font-semibold mb-2">Assessments</h4>
-                <p className="text-sm text-muted-foreground">
-                  Initial evaluations and progress check-ins with clients
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="pt-6 text-center">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
-                  <MapPin className="h-6 w-6 text-purple-600" />
-                </div>
-                <h4 className="font-semibold mb-2">Consultations</h4>
-                <p className="text-sm text-muted-foreground">
-                  Discovery sessions and program planning meetings
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      )}
-
-      {sessions.length > 0 && (
-        <Tabs defaultValue="list" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <TabsList>
-              <TabsTrigger value="list">Session List</TabsTrigger>
-              <TabsTrigger value="calendar">Calendar</TabsTrigger>
-              <TabsTrigger value="schedule">Schedule New</TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="list" className="space-y-4">
-            {/* Filters */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search sessions by client name..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full sm:w-[160px]">
-                      <SelectValue placeholder="All Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="scheduled">Scheduled</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                      <SelectItem value="no-show">No Show</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={dateFilter} onValueChange={setDateFilter}>
-                    <SelectTrigger className="w-full sm:w-[160px]">
-                      <SelectValue placeholder="All Dates" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Dates</SelectItem>
-                      <SelectItem value="today">Today</SelectItem>
-                      <SelectItem value="week">This Week</SelectItem>
-                      <SelectItem value="month">This Month</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Sessions List */}
-            <div className="space-y-4">
-              {filteredSessions.map((session) => (
-                <Card
-                  key={session.id}
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <CardContent className="pt-6">
+          ) : (
+            <div className="grid gap-4">
+              {sessions
+                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                .map((session) => (
+                <Card key={session.id}>
+                  <CardHeader>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          {getStatusIcon(session.status)}
-                          <Badge className={getStatusColor(session.status)}>
-                            {session.status}
-                          </Badge>
-                        </div>
+                      <div className="flex items-center gap-3">
+                        <User className="h-5 w-5 text-muted-foreground" />
                         <div>
-                          <h3 className="font-semibold">
-                            {getClientName(session.clientId)}
-                          </h3>
+                          <CardTitle className="text-lg">{getClientName(session.clientId)}</CardTitle>
                           <p className="text-sm text-muted-foreground">
-                            {session.type
-                              .replace("-", " ")
-                              .charAt(0)
-                              .toUpperCase() +
-                              session.type.replace("-", " ").slice(1)}
+                            {session.date} • {session.startTime} - {session.endTime}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <p className="font-medium">
-                            {new Date(session.date).toLocaleDateString()}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {session.startTime} - {session.endTime}
-                          </p>
-                          <p className="text-sm font-medium">${session.cost}</p>
-                        </div>
-
-                        {/* Action Dropdown */}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {session.status === "scheduled" && (
-                              <DropdownMenuItem
-                                onClick={() => handleCompleteSession(session)}
-                              >
-                                <CheckCircle className="h-4 w-4 mr-2" />
-                                Mark Complete
-                              </DropdownMenuItem>
-                            )}
-                            {session.status === "scheduled" && (
-                              <DropdownMenuItem
-                                onClick={() => handleCancelSession(session)}
-                              >
-                                <XCircle className="h-4 w-4 mr-2" />
-                                Cancel Session
-                              </DropdownMenuItem>
-                            )}
-                            {session.status === "completed" && (
-                              <DropdownMenuItem>
+                      <div className="flex items-center gap-2">
+                        <Badge className={getStatusColor(session.status)}>
+                          {session.status}
+                        </Badge>
+                        {editingSession !== session.id && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => startEditing(session)}>
                                 <Edit className="h-4 w-4 mr-2" />
-                                Add Session Recap
+                                Edit
                               </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => handleDeleteSession(session)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete Session
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                              {session.status === "scheduled" && (
+                                <DropdownMenuItem onClick={() => handleCompleteSession(session)}>
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Mark Complete
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem 
+                                onClick={() => handleDeleteSession(session)}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                       </div>
                     </div>
-                    {session.notes && (
-                      <div className="mt-4 pt-4 border-t">
-                        <p className="text-sm text-muted-foreground">
-                          {session.notes}
-                        </p>
+                  </CardHeader>
+                  <CardContent>
+                    {editingSession === session.id ? (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Client</Label>
+                            <Select
+                              value={editForm.clientId}
+                              onValueChange={(value) =>
+                                setEditForm({ ...editForm, clientId: value })
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select client" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {clients.map((client) => (
+                                  <SelectItem key={client.id} value={client.id}>
+                                    {client.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Date</Label>
+                            <Input
+                              type="date"
+                              value={editForm.date}
+                              onChange={(e) =>
+                                setEditForm({ ...editForm, date: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Start Time</Label>
+                            <Input
+                              type="time"
+                              value={editForm.startTime}
+                              onChange={(e) =>
+                                setEditForm({ ...editForm, startTime: e.target.value })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>End Time</Label>
+                            <Input
+                              type="time"
+                              value={editForm.endTime}
+                              onChange={(e) =>
+                                setEditForm({ ...editForm, endTime: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Type</Label>
+                            <Select
+                              value={editForm.type}
+                              onValueChange={(value) =>
+                                setEditForm({ ...editForm, type: value })
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="personal-training">Personal Training</SelectItem>
+                                <SelectItem value="consultation">Consultation</SelectItem>
+                                <SelectItem value="assessment">Assessment</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Cost ($)</Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              value={editForm.cost}
+                              onChange={(e) =>
+                                setEditForm({ ...editForm, cost: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Notes</Label>
+                          <Textarea
+                            value={editForm.notes}
+                            onChange={(e) =>
+                              setEditForm({ ...editForm, notes: e.target.value })
+                            }
+                            placeholder="Add any additional notes..."
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" onClick={cancelEditing}>
+                            <X className="h-4 w-4 mr-2" />
+                            Cancel
+                          </Button>
+                          <Button onClick={saveEdit}>
+                            <Save className="h-4 w-4 mr-2" />
+                            Save
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="font-medium">Type:</span> {session.type}
+                          </div>
+                          <div>
+                            <span className="font-medium">Cost:</span> ${session.cost}
+                          </div>
+                        </div>
+                        {session.notes && (
+                          <div className="mt-4">
+                            <span className="font-medium text-sm">Notes:</span>
+                            <p className="text-sm text-muted-foreground mt-1">{session.notes}</p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </CardContent>
                 </Card>
               ))}
             </div>
+          )}
+        </TabsContent>
 
-            {filteredSessions.length === 0 && (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <h3 className="text-lg font-semibold mb-2">
-                    No sessions found
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Try adjusting your search or filters.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          {/* Calendar Tab */}
-          <TabsContent value="calendar" className="space-y-6">
-            <SessionCalendar />
-          </TabsContent>
-
-          {/* Schedule New Session Tab */}
-          <TabsContent value="schedule" className="space-y-6">
-            <ScheduleSessionDialog
-              isOpen={isScheduleDialogOpen}
-              onOpenChange={setScheduleDialogOpen}
-              sessionToEdit={sessionToEdit}
-              onSessionScheduled={() => {
-                setScheduleDialogOpen(false);
-                setActiveTab("list");
-              }}
-            />
-          </TabsContent>
-        </Tabs>
-      )}
-
-      {/* Dialog Components */}
-      <CompleteSessionDialog
-        session={sessionToComplete}
-        open={!!sessionToComplete}
-        onOpenChange={() => setSessionToComplete(null)}
-        onComplete={onCompleteSession}
-      />
-
-      <CancelSessionDialog
-        session={sessionToCancel}
-        open={!!sessionToCancel}
-        onOpenChange={() => setSessionToCancel(null)}
-        onCancel={onCancelSession}
-      />
-
-      <DeleteSessionDialog
-        session={sessionToDelete}
-        open={!!sessionToDelete}
-        onOpenChange={() => setSessionToDelete(null)}
-        onDelete={onDeleteSession}
-      />
+        <TabsContent value="calendar" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CalendarDays className="h-5 w-5" />
+                Training Calendar
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SessionCalendar />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

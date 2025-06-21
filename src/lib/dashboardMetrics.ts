@@ -27,10 +27,14 @@ export const calculateDashboardStats = (
   // Upcoming sessions in the next 7 days
   const upcomingSessions = sessions.filter((session) => {
     const sessionDate = new Date(session.date);
+    // Set time to start of day for accurate comparison
+    const sessionStartOfDay = new Date(sessionDate.getFullYear(), sessionDate.getMonth(), sessionDate.getDate());
+    const todayStartOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const nextWeekStartOfDay = new Date(nextWeek.getFullYear(), nextWeek.getMonth(), nextWeek.getDate());
+    
     return (
-      sessionDate >= today &&
-      sessionDate <= nextWeek &&
-      session.status === "scheduled"
+      sessionStartOfDay >= todayStartOfDay &&
+      sessionStartOfDay <= nextWeekStartOfDay
     );
   }).length;
 
@@ -73,10 +77,14 @@ export const getUpcomingSessions = (sessions: Session[]) => {
 
   return sessions.filter((session) => {
     const sessionDate = new Date(session.date);
+    // Set time to start of day for accurate comparison
+    const sessionStartOfDay = new Date(sessionDate.getFullYear(), sessionDate.getMonth(), sessionDate.getDate());
+    const todayStartOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const nextWeekStartOfDay = new Date(nextWeek.getFullYear(), nextWeek.getMonth(), nextWeek.getDate());
+    
     return (
-      sessionDate >= today &&
-      sessionDate <= nextWeek &&
-      session.status === "scheduled"
+      sessionStartOfDay >= todayStartOfDay &&
+      sessionStartOfDay <= nextWeekStartOfDay
     );
   });
 };
