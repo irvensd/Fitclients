@@ -41,6 +41,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { GamificationDashboard } from "@/components/GamificationDashboard";
+import { useData } from "@/contexts/DataContext";
+import { calculateGamificationData } from "@/lib/gamification";
 
 // Mock client data - in real app this would come from API based on clientId
 const getClientData = (clientId: string) => {
@@ -984,17 +986,51 @@ const CancelSessionDialog = ({
 
 const ClientPortal = () => {
   const { clientId } = useParams();
+  const { clients, sessions, getClientProgressEntries, loading: dataLoading } = useData();
   const [clientData, setClientData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const data = getClientData(clientId || "");
-      setClientData(data);
-      setLoading(false);
-    }, 500);
-  }, [clientId]);
+    if (!dataLoading && clientId) {
+      // Find the actual client from DataContext
+      const client = clients.find(c => c.id === clientId);
+      
+      if (client) {
+        // Get client's sessions
+        const clientSessions = sessions.filter(s => s.clientId === clientId);
+        
+        // Get client's progress entries
+        const progressEntries = getClientProgressEntries(clientId);
+        
+        // Structure the data like the mock data format
+        const data = {
+          client: {
+            ...client,
+            trainerName: "Your Trainer", // You can get this from auth context or settings
+          },
+          upcomingSessions: clientSessions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+          workoutPlan: {
+            id: "1",
+            name: `${client.name}'s Fitness Program`,
+            description: "Personalized fitness program designed for your goals",
+            exercises: [], // You could expand this with actual workout data
+            createdDate: client.dateJoined,
+          },
+          progress: progressEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+          payments: [] // You could add payment data here if available
+        };
+        
+        setClientData(data);
+        setLoading(false);
+      } else if (clients.length > 0) {
+        // Only set to null if we have clients loaded but this ID wasn't found
+        setClientData(null);
+        setLoading(false);
+      }
+      // If clients.length === 0, keep loading until clients are loaded
+    }
+  }, [clientId, clients, sessions, dataLoading, getClientProgressEntries]);
 
   const handleCancelSession = (sessionId: string, reason: string) => {
     if (!clientData) return;
@@ -1021,7 +1057,7 @@ const ClientPortal = () => {
     alert("Session cancelled successfully! Your trainer has been notified.");
   };
 
-  if (loading) {
+  if (loading || dataLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted">
         <div className="text-center">
@@ -1141,7 +1177,7 @@ const ClientPortal = () => {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
           <div className="overflow-x-auto">
             <TabsList className="grid w-full grid-cols-6 min-w-[600px] sm:min-w-0">
               <TabsTrigger
@@ -1185,7 +1221,7 @@ const ClientPortal = () => {
 
           <TabsContent value="overview" className="space-y-4 sm:space-y-6">
             {/* Quick Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <Card>
                 <CardContent className="pt-4 sm:pt-6">
                   <div className="flex items-center gap-1 sm:gap-2">
@@ -1216,10 +1252,10 @@ const ClientPortal = () => {
                     </span>
                   </div>
                   <div className="text-lg sm:text-2xl font-bold mt-1">
-                    {latestProgress?.weight || "N/A"} lbs
+                    {latestProgress?.weight ? `${latestProgress.weight} lbs` : "Not recorded"}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {progressChange !== 0 && (
+                    {progressChange !== 0 && latestProgress?.weight && (
                       <span
                         className={
                           progressChange < 0
@@ -1228,7 +1264,12 @@ const ClientPortal = () => {
                         }
                       >
                         {progressChange > 0 ? "+" : ""}
-                        {progressChange} lbs
+                        {progressChange} lbs from last entry
+                      </span>
+                    )}
+                    {!progressChange && latestProgress?.weight && (
+                      <span className="text-muted-foreground">
+                        Last recorded: {new Date(latestProgress.date).toLocaleDateString()}
                       </span>
                     )}
                   </p>
@@ -1244,10 +1285,12 @@ const ClientPortal = () => {
                     </span>
                   </div>
                   <div className="text-lg sm:text-2xl font-bold mt-1">
-                    {latestProgress?.bodyFat || "N/A"}%
+                    {latestProgress?.bodyFat ? `${latestProgress.bodyFat}%` : "Not recorded"}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Latest reading
+                    {latestProgress?.bodyFat && (
+                      <span>Last recorded: {new Date(latestProgress.date).toLocaleDateString()}</span>
+                    )}
                   </p>
                 </CardContent>
               </Card>
@@ -1255,66 +1298,252 @@ const ClientPortal = () => {
               <Card>
                 <CardContent className="pt-4 sm:pt-6">
                   <div className="flex items-center gap-1 sm:gap-2">
-                    <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
+                    <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                     <span className="text-xs sm:text-sm font-medium">
-                      Payment Status
+                      Progress Entries
                     </span>
                   </div>
                   <div className="text-lg sm:text-2xl font-bold mt-1">
-                    {payments.filter((p: any) => p.status === "pending").length}
+                    {progress.length}
                   </div>
-                  <p className="text-xs text-muted-foreground">pending</p>
+                  <p className="text-xs text-muted-foreground">
+                    {progress.length > 0 
+                      ? `Latest: ${new Date(progress[0].date).toLocaleDateString()}`
+                      : "Start tracking today"
+                    }
+                  </p>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Detailed Current Measurements */}
+            {latestProgress && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Scale className="h-5 w-5 text-primary" />
+                    Current Measurements
+                  </CardTitle>
+                  <CardDescription>
+                    Your most recent body measurements from {new Date(latestProgress.date).toLocaleDateString()}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                     {latestProgress.weight && (
+                       <div className="text-center p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                         <div className="text-xl font-bold text-green-700 dark:text-green-300">
+                           {latestProgress.weight}
+                         </div>
+                         <div className="text-xs text-green-600 dark:text-green-400">
+                           Weight (lbs)
+                         </div>
+                       </div>
+                     )}
+
+                     {latestProgress.height && (
+                       <div className="text-center p-3 bg-cyan-50 dark:bg-cyan-950/20 rounded-lg border border-cyan-200 dark:border-cyan-800">
+                         <div className="text-xl font-bold text-cyan-700 dark:text-cyan-300">
+                           {latestProgress.height}"
+                         </div>
+                         <div className="text-xs text-cyan-600 dark:text-cyan-400">
+                           Height
+                         </div>
+                       </div>
+                     )}
+                     
+                     {latestProgress.bodyFat && (
+                       <div className="text-center p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                         <div className="text-xl font-bold text-purple-700 dark:text-purple-300">
+                           {latestProgress.bodyFat}%
+                         </div>
+                         <div className="text-xs text-purple-600 dark:text-purple-400">
+                           Body Fat
+                         </div>
+                       </div>
+                     )}
+
+                    {latestProgress.measurements?.chest && (
+                      <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div className="text-xl font-bold text-blue-700 dark:text-blue-300">
+                          {latestProgress.measurements.chest}"
+                        </div>
+                        <div className="text-xs text-blue-600 dark:text-blue-400">
+                          Chest
+                        </div>
+                      </div>
+                    )}
+
+                    {latestProgress.measurements?.waist && (
+                      <div className="text-center p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                        <div className="text-xl font-bold text-orange-700 dark:text-orange-300">
+                          {latestProgress.measurements.waist}"
+                        </div>
+                        <div className="text-xs text-orange-600 dark:text-orange-400">
+                          Waist
+                        </div>
+                      </div>
+                    )}
+
+                    {latestProgress.measurements?.hips && (
+                      <div className="text-center p-3 bg-pink-50 dark:bg-pink-950/20 rounded-lg border border-pink-200 dark:border-pink-800">
+                        <div className="text-xl font-bold text-pink-700 dark:text-pink-300">
+                          {latestProgress.measurements.hips}"
+                        </div>
+                        <div className="text-xs text-pink-600 dark:text-pink-400">
+                          Hips
+                        </div>
+                      </div>
+                    )}
+
+                    {latestProgress.measurements?.arms && (
+                      <div className="text-center p-3 bg-indigo-50 dark:bg-indigo-950/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                        <div className="text-xl font-bold text-indigo-700 dark:text-indigo-300">
+                          {latestProgress.measurements.arms}"
+                        </div>
+                        <div className="text-xs text-indigo-600 dark:text-indigo-400">
+                          Arms
+                        </div>
+                      </div>
+                    )}
+
+                    {latestProgress.measurements?.thighs && (
+                      <div className="text-center p-3 bg-teal-50 dark:bg-teal-950/20 rounded-lg border border-teal-200 dark:border-teal-800">
+                        <div className="text-xl font-bold text-teal-700 dark:text-teal-300">
+                          {latestProgress.measurements.thighs}"
+                        </div>
+                        <div className="text-xs text-teal-600 dark:text-teal-400">
+                          Thighs
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {latestProgress.notes && (
+                    <div className="mt-4 p-3 bg-muted rounded-lg">
+                      <h5 className="font-medium text-sm mb-1">Notes from your trainer:</h5>
+                      <p className="text-sm text-muted-foreground">{latestProgress.notes}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             {/* Recent Achievements */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Trophy className="h-5 w-5 text-yellow-600" />
-                  Recent Achievements
+                  Your Achievements
                 </CardTitle>
                 <CardDescription>
-                  Your latest fitness milestones and badges
+                  Your fitness milestones, badges, and current streaks
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-center">
-                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <div className="text-2xl font-bold text-yellow-700">
-                        🏆
-                      </div>
-                      <p className="text-sm font-medium">5 Badges</p>
-                      <p className="text-xs text-muted-foreground">Earned</p>
-                    </div>
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-700">
-                        ����
-                      </div>
-                      <p className="text-sm font-medium">7 Days</p>
-                      <p className="text-xs text-muted-foreground">
-                        Current Streak
-                      </p>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="text-lg">🎯</div>
-                      <p className="text-sm font-medium">Latest Achievement</p>
-                    </div>
-                    <p className="text-sm text-green-800">
-                      Week Warrior - 7 consecutive days!
-                    </p>
-                  </div>
+                  {(() => {
+                    // Calculate real gamification data
+                    const gamificationData = calculateGamificationData(client, upcomingSessions, progress);
+                    
+                    const unlockedBadges = gamificationData.badges.filter(b => b.isUnlocked);
+                    const activeStreaks = gamificationData.currentStreaks.filter(s => s.isActive);
+                    const latestAchievement = gamificationData.recentAchievements[0];
+                    
+                    return (
+                      <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-center">
+                          <div className="p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                            <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
+                              🏆
+                            </div>
+                            <p className="text-sm font-medium">{unlockedBadges.length} Badges</p>
+                            <p className="text-xs text-muted-foreground">
+                              {unlockedBadges.length === 0 ? "Start your journey!" : "Earned"}
+                            </p>
+                          </div>
+                          <div className="p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                            <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                              ⚡
+                            </div>
+                            <p className="text-sm font-medium">
+                              {activeStreaks.length > 0 ? activeStreaks[0].currentCount : 0} Days
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {activeStreaks.length > 0 ? "Current Streak" : "No active streak"}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {latestAchievement ? (
+                          <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="text-lg">{latestAchievement.icon}</div>
+                              <p className="text-sm font-medium">Latest Achievement</p>
+                            </div>
+                            <p className="text-sm text-green-800 dark:text-green-300">
+                              {latestAchievement.title} - {latestAchievement.description}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              +{latestAchievement.xpEarned} XP earned
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="p-3 bg-muted/50 border border-border rounded-lg text-center">
+                            <div className="text-lg mb-2">🎯</div>
+                            <p className="text-sm font-medium">Ready to earn your first achievement?</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Complete your first session to unlock "First Step" badge!
+                            </p>
+                          </div>
+                        )}
+                        
+                        {/* Progress toward next badges */}
+                        {(() => {
+                          const nextBadges = gamificationData.badges
+                            .filter(b => !b.isUnlocked && b.progress && b.progress > 0)
+                            .slice(0, 2);
+                          
+                          return nextBadges.length > 0 && (
+                            <div className="pt-3 border-t">
+                              <h5 className="text-sm font-medium mb-2">Progress toward next badges:</h5>
+                              <div className="space-y-2">
+                                {nextBadges.map(badge => (
+                                  <div key={badge.id} className="space-y-1">
+                                    <div className="flex justify-between text-xs">
+                                      <span className="flex items-center gap-1">
+                                        <span>{badge.icon}</span>
+                                        <span>{badge.name}</span>
+                                      </span>
+                                      <span>{Math.round(badge.progress || 0)}%</span>
+                                    </div>
+                                    <Progress value={badge.progress || 0} className="h-1" />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </>
+                    );
+                  })()}
                 </div>
-                <div className="pt-3 border-t">
-                  <Button variant="outline" size="sm" className="w-full">
-                    <Star className="h-4 w-4 mr-2" />
-                    View All Achievements
-                  </Button>
-                </div>
+                                  <div className="pt-3 border-t">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => {
+                        // Navigate to achievements tab using state
+                        setActiveTab("achievements");
+                        // Scroll to top of the content
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                    >
+                      <Star className="h-4 w-4 mr-2" />
+                      View All Achievements
+                    </Button>
+                  </div>
               </CardContent>
             </Card>
 
@@ -1374,23 +1603,37 @@ const ClientPortal = () => {
                 <CardContent>
                   {latestProgress ? (
                     <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium">Weight</p>
-                          <p className="text-2xl font-bold">
-                            {latestProgress.weight} lbs
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">Body Fat</p>
-                          <p className="text-2xl font-bold">
-                            {latestProgress.bodyFat}%
-                          </p>
-                        </div>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {latestProgress.weight && (
+                          <div>
+                            <p className="text-sm font-medium">Weight</p>
+                            <p className="text-2xl font-bold">
+                              {latestProgress.weight} lbs
+                            </p>
+                          </div>
+                        )}
+                        {latestProgress.height && (
+                          <div>
+                            <p className="text-sm font-medium">Height</p>
+                            <p className="text-2xl font-bold">
+                              {latestProgress.height}"
+                            </p>
+                          </div>
+                        )}
+                        {latestProgress.bodyFat && (
+                          <div>
+                            <p className="text-sm font-medium">Body Fat</p>
+                            <p className="text-2xl font-bold">
+                              {latestProgress.bodyFat}%
+                            </p>
+                          </div>
+                        )}
                       </div>
-                      <div className="p-3 bg-muted rounded-lg">
-                        <p className="text-sm">{latestProgress.notes}</p>
-                      </div>
+                      {latestProgress.notes && (
+                        <div className="p-3 bg-muted rounded-lg">
+                          <p className="text-sm">{latestProgress.notes}</p>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <p className="text-center text-muted-foreground py-4">
@@ -1578,7 +1821,7 @@ const ClientPortal = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {workoutPlan.exercises.map((exercise: any, index: number) => (
+                  {workoutPlan.exercises.length > 0 ? workoutPlan.exercises.map((exercise: any, index: number) => (
                     <div
                       key={exercise.id}
                       className="flex items-center justify-between p-4 border rounded-lg"
@@ -1600,7 +1843,14 @@ const ClientPortal = () => {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="text-center py-8">
+                      <Dumbbell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">
+                        Your personalized workout plan will appear here once created by your trainer.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1619,7 +1869,7 @@ const ClientPortal = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {progress.map((entry: any) => (
+                  {progress.length > 0 ? progress.map((entry: any) => (
                     <Card key={entry.id} className="p-4">
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
@@ -1627,33 +1877,55 @@ const ClientPortal = () => {
                             {new Date(entry.date).toLocaleDateString()}
                           </h4>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-                          <div>
-                            <p className="font-medium">Weight</p>
-                            <p className="text-lg">{entry.weight} lbs</p>
-                          </div>
-                          <div>
-                            <p className="font-medium">Body Fat</p>
-                            <p className="text-lg">{entry.bodyFat}%</p>
-                          </div>
-                          <div>
-                            <p className="font-medium">Chest</p>
-                            <p className="text-lg">
-                              {entry.measurements.chest}"
-                            </p>
-                          </div>
-                          <div>
-                            <p className="font-medium">Waist</p>
-                            <p className="text-lg">
-                              {entry.measurements.waist}"
-                            </p>
-                          </div>
-                          <div>
-                            <p className="font-medium">Arms</p>
-                            <p className="text-lg">
-                              {entry.measurements.arms}"
-                            </p>
-                          </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 text-sm">
+                          {entry.weight && (
+                            <div>
+                              <p className="font-medium text-green-700 dark:text-green-300">Weight</p>
+                              <p className="text-lg font-semibold">{entry.weight} lbs</p>
+                            </div>
+                          )}
+                          {entry.height && (
+                            <div>
+                              <p className="font-medium text-blue-700 dark:text-blue-300">Height</p>
+                              <p className="text-lg font-semibold">{entry.height}"</p>
+                            </div>
+                          )}
+                          {entry.bodyFat && (
+                            <div>
+                              <p className="font-medium text-purple-700 dark:text-purple-300">Body Fat</p>
+                              <p className="text-lg font-semibold">{entry.bodyFat}%</p>
+                            </div>
+                          )}
+                          {entry.measurements?.chest && (
+                            <div>
+                              <p className="font-medium text-blue-700 dark:text-blue-300">Chest</p>
+                              <p className="text-lg font-semibold">{entry.measurements.chest}"</p>
+                            </div>
+                          )}
+                          {entry.measurements?.waist && (
+                            <div>
+                              <p className="font-medium text-orange-700 dark:text-orange-300">Waist</p>
+                              <p className="text-lg font-semibold">{entry.measurements.waist}"</p>
+                            </div>
+                          )}
+                          {entry.measurements?.hips && (
+                            <div>
+                              <p className="font-medium text-pink-700 dark:text-pink-300">Hips</p>
+                              <p className="text-lg font-semibold">{entry.measurements.hips}"</p>
+                            </div>
+                          )}
+                          {entry.measurements?.arms && (
+                            <div>
+                              <p className="font-medium text-indigo-700 dark:text-indigo-300">Arms</p>
+                              <p className="text-lg font-semibold">{entry.measurements.arms}"</p>
+                            </div>
+                          )}
+                          {entry.measurements?.thighs && (
+                            <div>
+                              <p className="font-medium text-teal-700 dark:text-teal-300">Thighs</p>
+                              <p className="text-lg font-semibold">{entry.measurements.thighs}"</p>
+                            </div>
+                          )}
                         </div>
                         {entry.notes && (
                           <div className="p-3 bg-muted rounded-lg">
@@ -1662,7 +1934,14 @@ const ClientPortal = () => {
                         )}
                       </div>
                     </Card>
-                  ))}
+                  )) : (
+                    <div className="text-center py-8">
+                      <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">
+                        No progress data recorded yet. Your trainer will track your progress during sessions.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1680,12 +1959,103 @@ const ClientPortal = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <GamificationDashboard
-                  client={client}
-                  variant="full"
-                  showCelebrations={false}
-                  isClientView={true}
-                />
+                {(() => {
+                  // Calculate real gamification data and pass it properly
+                  const gamificationData = calculateGamificationData(client, upcomingSessions, progress);
+                  
+                  return (
+                    <div className="space-y-6">
+                      {/* Level & Stats Overview */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <Card className="p-4 text-center bg-gradient-to-br from-primary/5 to-primary/10">
+                          <div className="text-2xl font-bold text-primary">{gamificationData.level}</div>
+                          <div className="text-xs text-muted-foreground">Level</div>
+                        </Card>
+                        <Card className="p-4 text-center bg-gradient-to-br from-yellow-50 to-yellow-100/50">
+                          <div className="text-2xl font-bold text-yellow-700">{gamificationData.badges.filter(b => b.isUnlocked).length}</div>
+                          <div className="text-xs text-muted-foreground">Badges Earned</div>
+                        </Card>
+                        <Card className="p-4 text-center bg-gradient-to-br from-blue-50 to-blue-100/50">
+                          <div className="text-2xl font-bold text-blue-700">{gamificationData.currentStreaks.filter(s => s.isActive).length}</div>
+                          <div className="text-xs text-muted-foreground">Active Streaks</div>
+                        </Card>
+                        <Card className="p-4 text-center bg-gradient-to-br from-green-50 to-green-100/50">
+                          <div className="text-2xl font-bold text-green-700">{gamificationData.stats.totalSessions}</div>
+                          <div className="text-xs text-muted-foreground">Total Sessions</div>
+                        </Card>
+                      </div>
+
+                      {/* Badges Grid */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Available Badges</CardTitle>
+                          <CardDescription>Complete activities to unlock these achievements</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {gamificationData.badges.map(badge => (
+                              <div
+                                key={badge.id}
+                                className={`p-4 border rounded-lg text-center transition-all ${
+                                  badge.isUnlocked 
+                                    ? 'bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200' 
+                                    : 'bg-muted/30 border-muted-foreground/20 opacity-60'
+                                }`}
+                              >
+                                <div className="text-2xl mb-2">{badge.icon}</div>
+                                <h4 className="font-medium text-sm">{badge.name}</h4>
+                                <p className="text-xs text-muted-foreground mb-2">{badge.description}</p>
+                                <div className="text-xs font-medium">{badge.requirement}</div>
+                                {!badge.isUnlocked && badge.progress && badge.progress > 0 && (
+                                  <div className="mt-2">
+                                    <Progress value={badge.progress} className="h-1" />
+                                    <p className="text-xs text-muted-foreground mt-1">{Math.round(badge.progress)}% complete</p>
+                                  </div>
+                                )}
+                                {badge.isUnlocked && (
+                                  <div className="mt-2">
+                                    <Badge className="bg-yellow-100 text-yellow-800 text-xs">Unlocked!</Badge>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Current Streaks */}
+                      {gamificationData.currentStreaks.length > 0 && (
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>Your Streaks</CardTitle>
+                            <CardDescription>Keep the momentum going!</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              {gamificationData.currentStreaks.map(streak => (
+                                <div key={streak.id} className="flex items-center justify-between p-4 border rounded-lg">
+                                  <div className="flex items-center gap-3">
+                                    <div className="text-2xl">{streak.icon}</div>
+                                    <div>
+                                      <h4 className="font-medium">{streak.title}</h4>
+                                      <p className="text-sm text-muted-foreground">{streak.description}</p>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="text-lg font-bold">{streak.currentCount}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {streak.isActive ? 'Active' : 'Broken'}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
           </TabsContent>

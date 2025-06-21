@@ -397,10 +397,7 @@ const Dashboard = () => {
                     const appliedRecs = JSON.parse(
                       localStorage.getItem("appliedRecommendations") || "[]",
                     );
-                    return Math.max(
-                      0,
-                      (stats.totalRecommendations || 8) - appliedRecs.length,
-                    );
+                    return Math.max(0, 8 - appliedRecs.length);
                   })()}
                 </div>
                 <p className="text-xs text-purple-600">Active Insights</p>
@@ -415,10 +412,7 @@ const Dashboard = () => {
                       (r) =>
                         r.title.includes("Urgent") || r.title.includes("Alert"),
                     ).length;
-                    return Math.max(
-                      0,
-                      (stats.highPriorityItems || 3) - highPriorityApplied,
-                    );
+                    return Math.max(0, 3 - highPriorityApplied);
                   })()}
                 </div>
                 <p className="text-xs text-orange-600">High Priority</p>
@@ -509,51 +503,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>
-            Common tasks to help you manage your clients efficiently
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <NavigationButton
-              to="/clients"
-              variant="outline"
-              className="h-24 flex-col gap-2"
-            >
-              <Users className="h-6 w-6" />
-              Add New Client
-            </NavigationButton>
-            <NavigationButton
-              to="/sessions"
-              variant="outline"
-              className="h-24 flex-col gap-2"
-            >
-              <Calendar className="h-6 w-6" />
-              Schedule Session
-            </NavigationButton>
-            <NavigationButton
-              to="/workouts"
-              variant="outline"
-              className="h-24 flex-col gap-2"
-            >
-              <Target className="h-6 w-6" />
-              Create Workout
-            </NavigationButton>
-            <NavigationButton
-              to="/payments"
-              variant="outline"
-              className="h-24 flex-col gap-2"
-            >
-              <DollarSign className="h-6 w-6" />
-              Record Payment
-            </NavigationButton>
-          </div>
-        </CardContent>
-      </Card>
+
     </div>
   );
 };

@@ -1,13 +1,13 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { mockClients, mockSessions, mockPayments, mockWorkoutPlans } from "@/lib/mockData";
-import { Client, Session, Payment, WorkoutPlan } from "@/lib/types";
+import { Client, Session, Payment, WorkoutPlan, ProgressEntry } from "@/lib/types";
 import {
   ClientWithStatus,
   archiveExcessClients,
   reactivateAllClients,
   getActiveClients,
 } from "@/lib/clientDowngrade";
-import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "firebase/firestore";
+import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, deleteField } from "firebase/firestore";
 import { useAuth } from "@/contexts/AuthContext";
 import { db } from "@/lib/firebase";
 
@@ -15,6 +15,7 @@ interface DataContextType {
   clients: ClientWithStatus[];
   sessions: Session[];
   payments: Payment[];
+  progressEntries: ProgressEntry[];
   loading: boolean;
   error: string | null;
   workoutPlans: WorkoutPlan[];
@@ -45,6 +46,11 @@ interface DataContextType {
   updatePayment: (id: string, updates: Partial<Payment>) => Promise<void>;
   deletePayment: (id: string) => Promise<void>;
 
+  // Progress operations
+  addProgressEntry: (entry: Omit<ProgressEntry, "id">) => Promise<ProgressEntry>;
+  getClientProgressEntries: (clientId: string) => ProgressEntry[];
+  deleteProgressEntry: (id: string) => Promise<void>;
+
   // Workout Plan operations
   addWorkoutPlan: (plan: Omit<WorkoutPlan, "id" | "createdDate">) => Promise<void>;
   updateWorkoutPlan: (planId: string, updates: Partial<WorkoutPlan>) => Promise<void>;
@@ -58,6 +64,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
+  const [progressEntries, setProgressEntries] = useState<ProgressEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
@@ -90,6 +97,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
         setSessions(mockSessions);
         setPayments(mockPayments);
         setWorkoutPlans(mockWorkoutPlans);
+        setProgressEntries([]);
         setLoading(false);
       }, 1000);
     } else {
@@ -99,6 +107,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
       setSessions([]);
       setPayments([]);
       setWorkoutPlans([]);
+      setProgressEntries([]);
       setLoading(false);
 
       // Set up Firestore listeners for real data
@@ -124,7 +133,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
           return {
             ...clientData,
             id: doc.id,
-            status: {
+            status: clientData.status || {
               isActive: true,
               archivedAt: undefined,
               archiveReason: undefined,
@@ -142,11 +151,19 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
         setPayments(payments);
       });
 
+      const progressEntriesCollection = collection(db, "users", user.uid, "progressEntries");
+      const unsubscribeProgressEntries = onSnapshot(progressEntriesCollection, (snapshot) => {
+        const entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgressEntry));
+        console.log("Loaded progress entries from Firestore:", entries);
+        setProgressEntries(entries);
+      });
+
       return () => {
         unsubscribeWorkoutPlans();
         unsubscribeSessions();
         unsubscribeClients();
         unsubscribePayments();
+        unsubscribeProgressEntries();
       };
     }
   }, [user]);
@@ -242,6 +259,9 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
     reason: string = "manual",
   ) => {
     const now = new Date().toISOString();
+    const originalClients = clients;
+    
+    // Update local state immediately
     setClients((prev) =>
       prev.map((client) =>
         clientIds.includes(client.id)
@@ -256,9 +276,35 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
           : client,
       ),
     );
+
+    // Persist to Firebase
+    try {
+      if (!user) throw new Error("User not authenticated");
+      
+      const updatePromises = clientIds.map(async (clientId) => {
+        const clientDoc = doc(db, "users", user.uid, "clients", clientId);
+        return updateDoc(clientDoc, {
+          status: {
+            isActive: false,
+            archivedAt: now,
+            archiveReason: reason,
+          },
+        });
+      });
+
+      await Promise.all(updatePromises);
+    } catch (error) {
+      setError("Failed to archive clients. Please try again.");
+      // Revert local state on error
+      setClients(originalClients);
+      throw error;
+    }
   };
 
   const reactivateClients = async (clientIds: string[]) => {
+    const originalClients = clients;
+    
+    // Update local state immediately
     setClients((prev) =>
       prev.map((client) =>
         clientIds.includes(client.id)
@@ -273,6 +319,28 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
           : client,
       ),
     );
+
+    // Persist to Firebase
+    try {
+      if (!user) throw new Error("User not authenticated");
+      
+      const updatePromises = clientIds.map(async (clientId) => {
+        const clientDoc = doc(db, "users", user.uid, "clients", clientId);
+        return updateDoc(clientDoc, {
+          "status.isActive": true,
+          "status.archivedAt": deleteField(),
+          "status.archiveReason": deleteField(),
+        });
+      });
+
+      await Promise.all(updatePromises);
+    } catch (error) {
+      console.error("Error reactivating clients:", error);
+      setError("Failed to reactivate clients. Please try again.");
+      // Revert local state on error
+      setClients(originalClients);
+      throw error;
+    }
   };
 
   const handlePlanDowngrade = async (
@@ -493,10 +561,56 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const addProgressEntry = async (entry: Omit<ProgressEntry, "id">) => {
+    const tempId = `temp-${generateId()}`;
+    const newEntry = {
+      ...entry,
+      id: tempId,
+    };
+    setProgressEntries((prev) => [...prev, newEntry]);
+
+    try {
+      if (!user) throw new Error("User not authenticated");
+      const progressEntriesCollection = collection(db, "users", user.uid, "progressEntries");
+      const { id, ...entryToSave } = newEntry;
+      const docRef = await addDoc(progressEntriesCollection, entryToSave);
+
+      setProgressEntries((prev) =>
+        prev.map((entry) =>
+          entry.id === tempId ? { ...entry, id: docRef.id } : entry
+        )
+      );
+      return { ...newEntry, id: docRef.id };
+    } catch (error) {
+      setError("Failed to add progress entry. Please try again.");
+      setProgressEntries((prev) => prev.filter((entry) => entry.id !== tempId));
+      throw error;
+    }
+  };
+
+  const getClientProgressEntries = (clientId: string) => {
+    return progressEntries.filter((entry) => entry.clientId === clientId);
+  };
+
+  const deleteProgressEntry = async (id: string) => {
+    const originalProgressEntries = progressEntries;
+    setProgressEntries((prev) => prev.filter((entry) => entry.id !== id));
+
+    try {
+      if (!user) throw new Error("User not authenticated");
+      const progressEntryDoc = doc(db, "users", user.uid, "progressEntries", id);
+      await deleteDoc(progressEntryDoc);
+    } catch (error) {
+      setError("Failed to delete progress entry. Please try again.");
+      setProgressEntries(originalProgressEntries);
+    }
+  };
+
   const value = {
     clients,
     sessions,
     payments,
+    progressEntries,
     loading,
     error,
     workoutPlans,
@@ -518,6 +632,9 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
     addWorkoutPlan,
     updateWorkoutPlan,
     deleteWorkoutPlan,
+    addProgressEntry,
+    getClientProgressEntries,
+    deleteProgressEntry,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

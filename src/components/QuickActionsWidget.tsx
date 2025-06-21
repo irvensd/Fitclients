@@ -19,6 +19,8 @@ import {
   Users,
   TrendingUp,
 } from "lucide-react";
+import { useData } from "@/contexts/DataContext";
+import { useNavigate } from "react-router-dom";
 
 interface QuickAction {
   id: string;
@@ -30,14 +32,44 @@ interface QuickAction {
   variant?: "default" | "secondary" | "outline";
 }
 
+interface UpcomingTask {
+  id: string;
+  title: string;
+  time: string;
+  type: "reminder" | "payment" | "progress";
+}
+
+const formatTimeUntil = (date: Date): string => {
+  const now = new Date();
+  const diffMs = date.getTime() - now.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffHours / 24);
+  
+  if (diffHours < 1) {
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    return diffMins <= 0 ? "Now" : `In ${diffMins} min`;
+  } else if (diffHours < 24) {
+    return `In ${diffHours} hours`;
+  } else if (diffDays === 1) {
+    return "Tomorrow";
+  } else if (diffDays < 7) {
+    return `In ${diffDays} days`;
+  } else {
+    return `${date.toLocaleDateString()}`;
+  }
+};
+
 export const QuickActionsWidget = () => {
+  const { clients, sessions, payments, getClientName } = useData();
+  const navigate = useNavigate();
+
   const quickActions: QuickAction[] = [
     {
       id: "add-client",
       title: "Add New Client",
       description: "Onboard a new client",
       icon: <Plus className="h-4 w-4" />,
-      action: () => console.log("Add client"),
+      action: () => navigate("/clients"),
       variant: "default",
     },
     {
@@ -45,7 +77,7 @@ export const QuickActionsWidget = () => {
       title: "Schedule Session",
       description: "Book upcoming sessions",
       icon: <Calendar className="h-4 w-4" />,
-      action: () => console.log("Schedule session"),
+      action: () => navigate("/sessions"),
       variant: "outline",
     },
     {
@@ -53,7 +85,7 @@ export const QuickActionsWidget = () => {
       title: "Record Payment",
       description: "Log client payments",
       icon: <DollarSign className="h-4 w-4" />,
-      action: () => console.log("Record payment"),
+      action: () => navigate("/payments"),
       variant: "outline",
     },
     {
@@ -71,7 +103,7 @@ export const QuickActionsWidget = () => {
       description: "Check in with clients",
       icon: <Phone className="h-4 w-4" />,
       action: () => console.log("Follow up"),
-      badge: "3 Due",
+      badge: payments.filter(p => p.status === "pending").length > 0 ? `${payments.filter(p => p.status === "pending").length} Due` : undefined,
       variant: "outline",
     },
     {
@@ -79,31 +111,98 @@ export const QuickActionsWidget = () => {
       title: "Progress Updates",
       description: "Review client progress",
       icon: <TrendingUp className="h-4 w-4" />,
-      action: () => console.log("Progress update"),
+      action: () => navigate("/progress"),
       variant: "outline",
     },
   ];
 
-  const upcomingTasks = [
-    {
-      id: "1",
-      title: "Sarah's Session Reminder",
-      time: "In 2 hours",
-      type: "reminder",
-    },
-    {
-      id: "2",
-      title: "Mike's Payment Due",
-      time: "Tomorrow",
-      type: "payment",
-    },
-    {
-      id: "3",
-      title: "Emma's Progress Check",
-      time: "This week",
-      type: "progress",
-    },
-  ];
+  // Generate real upcoming tasks from user data
+  const generateUpcomingTasks = (): UpcomingTask[] => {
+    const tasks: UpcomingTask[] = [];
+    const now = new Date();
+    const next24Hours = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    // 1. Session reminders (next 24 hours)
+    const upcomingSessions = sessions
+      .filter(session => {
+        const sessionDate = new Date(session.date);
+        return sessionDate >= now && 
+               sessionDate <= next24Hours && 
+               session.status === "scheduled";
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(0, 2); // Limit to 2 most urgent
+
+    upcomingSessions.forEach(session => {
+      const sessionDateTime = new Date(`${session.date}T${session.startTime}`);
+      const clientName = getClientName(session.clientId);
+      tasks.push({
+        id: `session-${session.id}`,
+        title: `${clientName}'s Session Reminder`,
+        time: formatTimeUntil(sessionDateTime),
+        type: "reminder",
+      });
+    });
+
+    // 2. Payment reminders (pending payments)
+    const pendingPayments = payments
+      .filter(payment => payment.status === "pending")
+      .slice(0, 2); // Limit to 2 most urgent
+
+    pendingPayments.forEach(payment => {
+      const clientName = getClientName(payment.clientId);
+      const dueDate = new Date(payment.date);
+      const isOverdue = dueDate < now;
+      tasks.push({
+        id: `payment-${payment.id}`,
+        title: `${clientName}'s Payment ${isOverdue ? "Overdue" : "Due"}`,
+        time: isOverdue ? "Overdue" : formatTimeUntil(dueDate),
+        type: "payment",
+      });
+    });
+
+    // 3. Progress check reminders (clients without recent sessions)
+    const clientsNeedingFollowUp = clients
+      .filter(client => {
+        // Find last session for this client
+        const clientSessions = sessions
+          .filter(s => s.clientId === client.id && s.status === "completed")
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        
+        if (clientSessions.length === 0) return false; // Skip clients with no sessions
+        
+        const lastSession = clientSessions[0];
+        const lastSessionDate = new Date(lastSession.date);
+        const daysSinceLastSession = (now.getTime() - lastSessionDate.getTime()) / (1000 * 60 * 60 * 24);
+        
+        return daysSinceLastSession > 14; // 2 weeks without a session
+      })
+      .slice(0, 1); // Limit to 1 most urgent
+
+    clientsNeedingFollowUp.forEach(client => {
+      tasks.push({
+        id: `progress-${client.id}`,
+        title: `${client.name}'s Progress Check`,
+        time: "This week",
+        type: "progress",
+      });
+    });
+
+    // If no real tasks, show a placeholder
+    if (tasks.length === 0) {
+      tasks.push({
+        id: "no-tasks",
+        title: "All caught up!",
+        time: "Great work",
+        type: "progress",
+      });
+    }
+
+    return tasks.slice(0, 3); // Limit to 3 total tasks
+  };
+
+  const upcomingTasks = generateUpcomingTasks();
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -181,7 +280,11 @@ export const QuickActionsWidget = () => {
             </div>
           ))}
 
-          <Button variant="outline" className="w-full mt-4">
+          <Button 
+            variant="outline" 
+            className="w-full mt-4"
+            onClick={() => navigate("/sessions")}
+          >
             <Users className="h-4 w-4 mr-2" />
             View All Tasks
           </Button>

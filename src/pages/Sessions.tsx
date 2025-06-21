@@ -705,20 +705,139 @@ const Sessions = () => {
   
   if (user?.email !== "trainer@demo.com" && sessions.length === 0 && !loading) {
     return (
-      <div className="flex justify-center items-center h-full">
-        <EmptyState
-          Icon={Calendar}
-          title="No sessions scheduled"
-          description="Get started by scheduling your first session."
-          actionText="Schedule Session"
-          onAction={handleScheduleSession}
-        />
-        <ScheduleSessionDialog
-          isOpen={isScheduleDialogOpen}
-          onOpenChange={setScheduleDialogOpen}
-          sessionToEdit={sessionToEdit}
-          onSessionScheduled={() => setScheduleDialogOpen(false)}
-        />
+      <div className="p-6 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Sessions</h1>
+            <p className="text-muted-foreground">
+              Manage and track all your training sessions.
+            </p>
+          </div>
+          <ScheduleSessionDialog
+            isOpen={isScheduleDialogOpen}
+            onOpenChange={setScheduleDialogOpen}
+            sessionToEdit={sessionToEdit}
+            onSessionScheduled={() => setScheduleDialogOpen(false)}
+          />
+        </div>
+
+        <div className="space-y-6">
+          {/* Welcome Message */}
+          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+                  <Calendar className="h-8 w-8 text-primary" />
+                </div>
+                <h2 className="text-2xl font-bold mb-2">Welcome to Your Session Hub!</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  This is your command center for managing all training sessions. Schedule, track, and manage your client sessions all in one place. 
+                  Get started by scheduling your first session below.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Main Empty State */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Schedule Session Section */}
+            <Card className="lg:col-span-2 border-2 border-dashed border-muted-foreground/25 bg-muted/5">
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 mb-6">
+                  <Plus className="h-12 w-12 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Schedule Your First Session</h3>
+                <p className="text-muted-foreground text-center mb-6 max-w-md">
+                  Start organizing your training schedule! Create your first session to begin 
+                  tracking client appointments and building your fitness business.
+                </p>
+                <ScheduleSessionDialog
+                  isOpen={isScheduleDialogOpen}
+                  onOpenChange={setScheduleDialogOpen}
+                  sessionToEdit={sessionToEdit}
+                  onSessionScheduled={() => setScheduleDialogOpen(false)}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Session Features */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Session Features
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Calendar className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Smart Scheduling</h4>
+                    <p className="text-xs text-muted-foreground">Calendar integration and time management</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Clock className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Session Tracking</h4>
+                    <p className="text-xs text-muted-foreground">Track completed, scheduled, and cancelled sessions</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <FileText className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Session Recaps</h4>
+                    <p className="text-xs text-muted-foreground">Add notes and track progress after each session</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Session Type Preview Cards */}
+          <div className="grid md:grid-cols-3 gap-4">
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="pt-6 text-center">
+                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                  <User className="h-6 w-6 text-blue-600" />
+                </div>
+                <h4 className="font-semibold mb-2">Personal Training</h4>
+                <p className="text-sm text-muted-foreground">
+                  One-on-one focused training sessions with personalized programs
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="pt-6 text-center">
+                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle className="h-6 w-6 text-green-600" />
+                </div>
+                <h4 className="font-semibold mb-2">Assessments</h4>
+                <p className="text-sm text-muted-foreground">
+                  Initial evaluations and progress check-ins with clients
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="pt-6 text-center">
+                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
+                  <MapPin className="h-6 w-6 text-purple-600" />
+                </div>
+                <h4 className="font-semibold mb-2">Consultations</h4>
+                <p className="text-sm text-muted-foreground">
+                  Discovery sessions and program planning meetings
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -745,24 +864,122 @@ const Sessions = () => {
 
       {/* Empty State */}
       {sessions.length === 0 && (
-        <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
-              <Calendar className="h-10 w-10 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No Sessions Yet</h3>
-            <p className="text-muted-foreground text-center mb-6 max-w-md">
-              Start scheduling sessions with your clients. Use the calendar view
-              or create your first session below.
-            </p>
-            <ScheduleSessionDialog
-              isOpen={isScheduleDialogOpen}
-              onOpenChange={setScheduleDialogOpen}
-              sessionToEdit={sessionToEdit}
-              onSessionScheduled={() => setScheduleDialogOpen(false)}
-            />
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          {/* Welcome Message */}
+          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+                  <Calendar className="h-8 w-8 text-primary" />
+                </div>
+                <h2 className="text-2xl font-bold mb-2">Welcome to Your Session Hub!</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  This is your command center for managing all training sessions. Schedule, track, and manage your client sessions all in one place. 
+                  Get started by scheduling your first session below.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Main Empty State */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Schedule Session Section */}
+            <Card className="lg:col-span-2 border-2 border-dashed border-muted-foreground/25 bg-muted/5">
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 mb-6">
+                  <Plus className="h-12 w-12 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Schedule Your First Session</h3>
+                <p className="text-muted-foreground text-center mb-6 max-w-md">
+                  Start organizing your training schedule! Create your first session to begin 
+                  tracking client appointments and building your fitness business.
+                </p>
+                <ScheduleSessionDialog
+                  isOpen={isScheduleDialogOpen}
+                  onOpenChange={setScheduleDialogOpen}
+                  sessionToEdit={sessionToEdit}
+                  onSessionScheduled={() => setScheduleDialogOpen(false)}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Session Features */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Session Features
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Calendar className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Smart Scheduling</h4>
+                    <p className="text-xs text-muted-foreground">Calendar integration and time management</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Clock className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Session Tracking</h4>
+                    <p className="text-xs text-muted-foreground">Track completed, scheduled, and cancelled sessions</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <FileText className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Session Recaps</h4>
+                    <p className="text-xs text-muted-foreground">Add notes and track progress after each session</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Session Type Preview Cards */}
+          <div className="grid md:grid-cols-3 gap-4">
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="pt-6 text-center">
+                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                  <User className="h-6 w-6 text-blue-600" />
+                </div>
+                <h4 className="font-semibold mb-2">Personal Training</h4>
+                <p className="text-sm text-muted-foreground">
+                  One-on-one focused training sessions with personalized programs
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="pt-6 text-center">
+                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle className="h-6 w-6 text-green-600" />
+                </div>
+                <h4 className="font-semibold mb-2">Assessments</h4>
+                <p className="text-sm text-muted-foreground">
+                  Initial evaluations and progress check-ins with clients
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="pt-6 text-center">
+                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
+                  <MapPin className="h-6 w-6 text-purple-600" />
+                </div>
+                <h4 className="font-semibold mb-2">Consultations</h4>
+                <p className="text-sm text-muted-foreground">
+                  Discovery sessions and program planning meetings
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       )}
 
       {sessions.length > 0 && (
