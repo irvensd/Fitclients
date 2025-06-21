@@ -49,8 +49,13 @@ import {
   X,
   CalendarDays,
   List,
+  Clock,
+  DollarSign,
+  ClipboardList,
 } from "lucide-react";
 import { SessionCalendar } from "@/components/SessionCalendar";
+import { format, isToday, isTomorrow, parseISO } from "date-fns";
+import { formatTime, cn } from "@/lib/utils";
 
 // Add Session Dialog Component
 const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) => {
@@ -286,6 +291,40 @@ const Sessions = () => {
     notes: "",
   });
 
+  const groupedSessions = React.useMemo(() => {
+    const sortedSessions = [...sessions].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    const group = sortedSessions.reduce((acc, session) => {
+      const sessionDate = new Date(session.date);
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      let dateKey = sessionDate.toLocaleDateString("en-US", {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+
+      if (sessionDate.toDateString() === today.toDateString()) {
+        dateKey = "Today";
+      } else if (sessionDate.toDateString() === tomorrow.toDateString()) {
+        dateKey = "Tomorrow";
+      }
+      
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
+      }
+      acc[dateKey].push(session);
+      return acc;
+    }, {} as Record<string, Session[]>);
+
+    return group;
+  }, [sessions]);
+
   // Load data once on component mount
   useEffect(() => {
     if (!user?.uid) return;
@@ -459,13 +498,13 @@ const Sessions = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 border-green-200";
       case "cancelled":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-800 border-red-200";
       case "scheduled":
-        return "bg-blue-100 text-blue-800";
+        return "bg-purple-100 text-purple-800 border-purple-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
@@ -524,186 +563,203 @@ const Sessions = () => {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4">
-              {sessions
-                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                .map((session) => (
-                <Card key={session.id}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <User className="h-5 w-5 text-muted-foreground" />
-                        <div>
-                          <CardTitle className="text-lg">{getClientName(session.clientId)}</CardTitle>
-                          <p className="text-sm text-muted-foreground">
-                            {session.date} • {session.startTime} - {session.endTime}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className={getStatusColor(session.status)}>
-                          {session.status}
-                        </Badge>
-                        {editingSession !== session.id && (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => startEditing(session)}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              {session.status === "scheduled" && (
-                                <DropdownMenuItem onClick={() => handleCompleteSession(session)}>
-                                  <CheckCircle className="h-4 w-4 mr-2" />
-                                  Mark Complete
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem 
-                                onClick={() => handleDeleteSession(session)}
-                                className="text-red-600"
+            <div className="space-y-8">
+              {Object.entries(groupedSessions).map(([date, sessionsOnDate]) => (
+                <div key={date}>
+                  <h2 className="text-lg font-semibold text-foreground mb-3 pb-2 border-b">
+                    {date}
+                  </h2>
+                  <div className="space-y-4">
+                    {sessionsOnDate.map((session) => (
+                      <Card key={session.id} className="transition-shadow hover:shadow-lg">
+                        <CardHeader className="pb-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className={`w-1.5 h-16 rounded-full ${getStatusColor(session.status).replace('bg-', 'bg-opacity-100 bg-')}`}></div>
+                              <div>
+                                <CardTitle className="text-xl font-bold text-foreground">
+                                  {getClientName(session.clientId)}
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                  <Clock className="h-4 w-4" />
+                                  <span>
+                                    {formatTime(session.startTime)} -{" "}
+                                    {formatTime(session.endTime)}
+                                  </span>
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge 
+                                variant="outline" 
+                                className={cn("text-sm", getStatusColor(session.status))}
                               >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {editingSession === session.id ? (
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label>Client</Label>
-                            <Select
-                              value={editForm.clientId}
-                              onValueChange={(value) =>
-                                setEditForm({ ...editForm, clientId: value })
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select client" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {clients.map((client) => (
-                                  <SelectItem key={client.id} value={client.id}>
-                                    {client.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                                {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+                              </Badge>
+                              {editingSession !== session.id && (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                      <MoreVertical className="h-5 w-5" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => startEditing(session)}>
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                    {session.status === "scheduled" && (
+                                      <DropdownMenuItem onClick={() => handleCompleteSession(session)}>
+                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        Mark Complete
+                                      </DropdownMenuItem>
+                                    )}
+                                    <DropdownMenuItem 
+                                      onClick={() => handleDeleteSession(session)}
+                                      className="text-red-500 hover:!text-red-500"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
+                            </div>
                           </div>
-                          <div className="space-y-2">
-                            <Label>Date</Label>
-                            <Input
-                              type="date"
-                              value={editForm.date}
-                              onChange={(e) =>
-                                setEditForm({ ...editForm, date: e.target.value })
-                              }
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label>Start Time</Label>
-                            <Input
-                              type="time"
-                              value={editForm.startTime}
-                              onChange={(e) =>
-                                setEditForm({ ...editForm, startTime: e.target.value })
-                              }
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>End Time</Label>
-                            <Input
-                              type="time"
-                              value={editForm.endTime}
-                              onChange={(e) =>
-                                setEditForm({ ...editForm, endTime: e.target.value })
-                              }
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label>Type</Label>
-                            <Select
-                              value={editForm.type}
-                              onValueChange={(value) =>
-                                setEditForm({ ...editForm, type: value })
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select type" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="personal-training">Personal Training</SelectItem>
-                                <SelectItem value="consultation">Consultation</SelectItem>
-                                <SelectItem value="assessment">Assessment</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Cost ($)</Label>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              value={editForm.cost}
-                              onChange={(e) =>
-                                setEditForm({ ...editForm, cost: e.target.value })
-                              }
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Notes</Label>
-                          <Textarea
-                            value={editForm.notes}
-                            onChange={(e) =>
-                              setEditForm({ ...editForm, notes: e.target.value })
-                            }
-                            placeholder="Add any additional notes..."
-                          />
-                        </div>
-                        <div className="flex justify-end gap-2">
-                          <Button variant="outline" onClick={cancelEditing}>
-                            <X className="h-4 w-4 mr-2" />
-                            Cancel
-                          </Button>
-                          <Button onClick={saveEdit}>
-                            <Save className="h-4 w-4 mr-2" />
-                            Save
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="font-medium">Type:</span> {session.type}
-                          </div>
-                          <div>
-                            <span className="font-medium">Cost:</span> ${session.cost}
-                          </div>
-                        </div>
-                        {session.notes && (
-                          <div className="mt-4">
-                            <span className="font-medium text-sm">Notes:</span>
-                            <p className="text-sm text-muted-foreground mt-1">{session.notes}</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                        </CardHeader>
+                        <CardContent>
+                          {editingSession === session.id ? (
+                            <div className="space-y-4 pt-4 border-t">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <Label>Client</Label>
+                                  <Select
+                                    value={editForm.clientId}
+                                    onValueChange={(value) =>
+                                      setEditForm({ ...editForm, clientId: value })
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select client" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {clients.map((client) => (
+                                        <SelectItem key={client.id} value={client.id}>
+                                          {client.name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-2">
+                                  <Label>Date</Label>
+                                  <Input
+                                    type="date"
+                                    value={editForm.date}
+                                    onChange={(e) =>
+                                      setEditForm({ ...editForm, date: e.target.value })
+                                    }
+                                  />
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <Label>Start Time</Label>
+                                  <Input
+                                    type="time"
+                                    value={editForm.startTime}
+                                    onChange={(e) =>
+                                      setEditForm({ ...editForm, startTime: e.target.value })
+                                    }
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label>End Time</Label>
+                                  <Input
+                                    type="time"
+                                    value={editForm.endTime}
+                                    onChange={(e) =>
+                                      setEditForm({ ...editForm, endTime: e.target.value })
+                                    }
+                                  />
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <Label>Type</Label>
+                                  <Select
+                                    value={editForm.type}
+                                    onValueChange={(value) =>
+                                      setEditForm({ ...editForm, type: value })
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="personal-training">Personal Training</SelectItem>
+                                      <SelectItem value="consultation">Consultation</SelectItem>
+                                      <SelectItem value="assessment">Assessment</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-2">
+                                  <Label>Cost ($)</Label>
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={editForm.cost}
+                                    onChange={(e) =>
+                                      setEditForm({ ...editForm, cost: e.target.value })
+                                    }
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Notes</Label>
+                                <Textarea
+                                  value={editForm.notes}
+                                  onChange={(e) =>
+                                    setEditForm({ ...editForm, notes: e.target.value })
+                                  }
+                                  placeholder="Add any additional notes..."
+                                />
+                              </div>
+                              <div className="flex justify-end gap-2">
+                                <Button variant="outline" onClick={cancelEditing}>
+                                  <X className="h-4 w-4 mr-2" />
+                                  Cancel
+                                </Button>
+                                <Button onClick={saveEdit}>
+                                  <Save className="h-4 w-4 mr-2" />
+                                  Save
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="pt-4 border-t flex flex-col gap-3">
+                              <div className="flex items-center gap-4 text-sm">
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                  <ClipboardList className="h-4 w-4" />
+                                  <span>{session.type}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                  <DollarSign className="h-4 w-4" />
+                                  <span>${session.cost}</span>
+                                </div>
+                              </div>
+                              {session.notes && (
+                                <div className="text-sm">
+                                  <p className="text-muted-foreground">{session.notes}</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           )}
