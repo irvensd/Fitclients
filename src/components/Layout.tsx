@@ -372,17 +372,14 @@ export const Layout = ({ children }: LayoutProps) => {
               </h1>
             </div>
 
-            <div className="flex items-center gap-2 ml-auto">
+            {/* Desktop/Tablet notifications */}
+            <div className="hidden sm:flex items-center gap-2 ml-auto">
               <GlobalSearch />
               <NotificationBell />
             </div>
 
-            {/* Mobile search icon */}
-            <div className="ml-auto flex items-center gap-2 sm:hidden">
-              <Button variant="ghost" size="icon" className="h-10 w-10">
-                <Search className="h-5 w-5" />
-                <span className="sr-only">Search</span>
-              </Button>
+            {/* Mobile notifications */}
+            <div className="flex sm:hidden items-center gap-2 ml-auto">
               <NotificationBell />
             </div>
           </div>

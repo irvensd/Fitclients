@@ -373,24 +373,26 @@ Your Personal Trainer`;
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {quickActions.map((action) => (
               <Button
                 key={action.id}
                 variant={action.variant || "outline"}
-                className="h-auto p-4 flex flex-col items-start gap-2 relative"
+                className="h-auto p-3 sm:p-4 flex flex-col items-start gap-2 relative min-h-[80px] text-left"
                 onClick={action.action}
               >
                 {action.badge && (
-                  <Badge className="absolute -top-1 -right-1 h-5 px-1 text-xs">
+                  <Badge className="absolute -top-1 -right-1 h-5 px-1 text-xs z-10">
                     {action.badge}
                   </Badge>
                 )}
-                <div className="flex items-center gap-2 w-full">
+                <div className="flex items-center gap-2 w-full pr-8">
                   {action.icon}
-                  <span className="font-medium text-sm">{action.title}</span>
+                  <span className="font-medium text-sm leading-tight break-words">
+                    {action.title}
+                  </span>
                 </div>
-                <span className="text-xs text-muted-foreground text-left">
+                <span className="text-xs text-muted-foreground text-left leading-tight">
                   {action.description}
                 </span>
               </Button>
