@@ -126,11 +126,12 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
       const paymentsCollection = collection(db, "users", user.uid, "payments");
       const progressEntriesCollection = collection(db, "users", user.uid, "progressEntries");
       
-      const unsubscribeWorkoutPlans = onSnapshot(workoutPlansCollection, (snapshot) => {
-        const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WorkoutPlan));
-        console.log("Loaded workout plans from Firestore:", plans);
-        setWorkoutPlans(plans);
-      });
+      // Disable workout plans listener for real users to avoid conflicts with Workouts page
+      // const unsubscribeWorkoutPlans = onSnapshot(workoutPlansCollection, (snapshot) => {
+      //   const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WorkoutPlan));
+      //   console.log("Loaded workout plans from Firestore:", plans);
+      //   setWorkoutPlans(plans);
+      // });
 
       const unsubscribeSessions = onSnapshot(sessionsCollection, (snapshot) => {
         const sessions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Session));
@@ -171,7 +172,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
 
       return () => {
         console.log("Cleaning up Firestore listeners");
-        unsubscribeWorkoutPlans();
+        // unsubscribeWorkoutPlans();
         unsubscribeSessions();
         unsubscribeClients();
         unsubscribePayments();
@@ -546,6 +547,12 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const addWorkoutPlan = async (plan: Omit<WorkoutPlan, "id" | "createdDate">) => {
+    // Disable for real users to avoid conflicts with Workouts page
+    if (user?.email !== "trainer@demo.com" && user?.uid !== "demo-user-123") {
+      console.log("addWorkoutPlan disabled for real users - use Workouts page instead");
+      return;
+    }
+
     const tempId = `temp-${generateId()}`;
     const newPlan = {
       ...plan,
@@ -573,6 +580,12 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updateWorkoutPlan = async (planId: string, updates: Partial<WorkoutPlan>) => {
+    // Disable for real users to avoid conflicts with Workouts page
+    if (user?.email !== "trainer@demo.com" && user?.uid !== "demo-user-123") {
+      console.log("updateWorkoutPlan disabled for real users - use Workouts page instead");
+      return;
+    }
+
     const originalPlans = workoutPlans;
     setWorkoutPlans((prev) =>
       prev.map((plan) =>
@@ -592,6 +605,12 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const deleteWorkoutPlan = async (planId: string) => {
+    // Disable for real users to avoid conflicts with Workouts page
+    if (user?.email !== "trainer@demo.com" && user?.uid !== "demo-user-123") {
+      console.log("deleteWorkoutPlan disabled for real users - use Workouts page instead");
+      return;
+    }
+
     const originalPlans = workoutPlans;
     setWorkoutPlans((prev) => prev.filter((plan) => plan.id !== planId));
 
@@ -602,7 +621,6 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       setError("Failed to delete workout plan. Please try again.");
       setWorkoutPlans(originalPlans);
-      throw error;
     }
   };
 

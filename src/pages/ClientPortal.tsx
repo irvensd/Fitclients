@@ -43,6 +43,9 @@ import {
 import { GamificationDashboard } from "@/components/GamificationDashboard";
 import { useData } from "@/contexts/DataContext";
 import { calculateGamificationData } from "@/lib/gamification";
+import { useAuth } from "@/contexts/AuthContext";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 // Mock client data - in real app this would come from API based on clientId
 const getClientData = (clientId: string) => {
@@ -990,6 +993,7 @@ const ClientPortal = () => {
   const [clientData, setClientData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!dataLoading && clientId) {
@@ -1003,26 +1007,62 @@ const ClientPortal = () => {
         // Get client's progress entries
         const progressEntries = getClientProgressEntries(clientId);
         
-        // Structure the data like the mock data format
-        const data = {
-          client: {
-            ...client,
-            trainerName: "Your Trainer", // You can get this from auth context or settings
-          },
-          upcomingSessions: clientSessions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
-          workoutPlan: {
-            id: "1",
-            name: `${client.name}'s Fitness Program`,
-            description: "Personalized fitness program designed for your goals",
-            exercises: [], // You could expand this with actual workout data
-            createdDate: client.dateJoined,
-          },
-          progress: progressEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-          payments: [] // You could add payment data here if available
+        // Load client's actual workout plan from Firestore
+        const loadClientWorkoutPlan = async () => {
+          try {
+            if (user?.uid) {
+              const workoutPlansCollection = collection(db, "users", user.uid, "workoutPlans");
+              const workoutSnapshot = await getDocs(workoutPlansCollection);
+              const clientWorkoutPlan = workoutSnapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() } as any))
+                .find(plan => plan.clientId === clientId);
+              
+              // Structure the data like the mock data format
+              const data = {
+                client: {
+                  ...client,
+                  trainerName: "Your Trainer", // You can get this from auth context or settings
+                },
+                upcomingSessions: clientSessions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+                workoutPlan: clientWorkoutPlan || {
+                  id: "default",
+                  name: `${client.name}'s Fitness Program`,
+                  description: "Personalized fitness program designed for your goals",
+                  exercises: [], // Empty if no workout plan exists
+                  createdDate: client.dateJoined,
+                },
+                progress: progressEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+                payments: [] // You could add payment data here if available
+              };
+              
+              setClientData(data);
+              setLoading(false);
+            }
+          } catch (error) {
+            console.error("Error loading client workout plan:", error);
+            // Fallback to default data
+            const data = {
+              client: {
+                ...client,
+                trainerName: "Your Trainer",
+              },
+              upcomingSessions: clientSessions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+              workoutPlan: {
+                id: "default",
+                name: `${client.name}'s Fitness Program`,
+                description: "Personalized fitness program designed for your goals",
+                exercises: [],
+                createdDate: client.dateJoined,
+              },
+              progress: progressEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+              payments: []
+            };
+            setClientData(data);
+            setLoading(false);
+          }
         };
-        
-        setClientData(data);
-        setLoading(false);
+
+        loadClientWorkoutPlan();
       } else if (clients.length > 0) {
         // Only set to null if we have clients loaded but this ID wasn't found
         setClientData(null);
@@ -1030,7 +1070,7 @@ const ClientPortal = () => {
       }
       // If clients.length === 0, keep loading until clients are loaded
     }
-  }, [clientId, clients, sessions, dataLoading, getClientProgressEntries]);
+  }, [clientId, clients, sessions, dataLoading, getClientProgressEntries, user?.uid]);
 
   const handleCancelSession = (sessionId: string, reason: string) => {
     if (!clientData) return;
