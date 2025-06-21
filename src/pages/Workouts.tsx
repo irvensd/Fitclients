@@ -961,19 +961,64 @@ const Workouts = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
+  // Show empty state for new accounts (excluding demo account)
   if (user?.email !== "trainer@demo.com" && workoutPlans.length === 0 && !loading) {
     return (
-      <div className="flex justify-center items-center h-full">
-        <EmptyState
-          Icon={Dumbbell}
-          title="No workout plans yet"
-          description="Get started by creating your first workout plan."
-          actionText="Create Workout Plan"
-          onAction={handleCreateWorkout}
-        />
+      <div className="p-6 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Workouts</h1>
+            <p className="text-muted-foreground">
+              Create and manage workout plans for your clients.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          {/* Welcome Message */}
+          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+                  <Dumbbell className="h-8 w-8 text-primary" />
+                </div>
+                <h2 className="text-2xl font-bold mb-2">Welcome to Your Workout Hub!</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  This is where you'll create personalized workout plans for your clients, track their progress, and help them achieve their fitness goals. 
+                  Get started by creating your first workout plan below.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Main Empty State */}
+          <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
+                <Dumbbell className="h-10 w-10 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">No Workout Plans Yet</h3>
+              <p className="text-muted-foreground text-center mb-6 max-w-md">
+                Start building your workout library by creating personalized plans for your clients. 
+                Track exercises, sets, reps, and progress over time.
+              </p>
+              <Button onClick={handleCreateWorkout}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Your First Workout Plan
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* The CreateWorkoutDialog needs to be available for the empty state */}
         <CreateWorkoutDialog
           isOpen={isCreateDialogOpen}
           onOpenChange={setCreateDialogOpen}
@@ -1033,13 +1078,18 @@ const Workouts = () => {
                 ))}
               </div>
             ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle>No workout plans found.</CardTitle>
-                  <CardDescription>
+              <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/5">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Dumbbell className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No workout plans found</h3>
+                  <p className="text-muted-foreground text-center mb-4">
                     Get started by creating a new workout plan for your clients.
-                  </CardDescription>
-                </CardHeader>
+                  </p>
+                  <Button onClick={handleCreateWorkout}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Workout Plan
+                  </Button>
+                </CardContent>
               </Card>
             )}
           </TabsContent>

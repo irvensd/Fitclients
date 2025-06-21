@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useData } from "@/contexts/DataContext";
 import { useToast } from "@/hooks/use-toast";
 import { Session } from "@/lib/types";
 import { db } from "@/lib/firebase";
@@ -276,6 +277,7 @@ const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) =>
 
 const Sessions = () => {
   const { user } = useAuth();
+  const { sessions: contextSessions, clients: contextClients, loading: contextLoading } = useData();
   const { toast } = useToast();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [clients, setClients] = useState<any[]>([]);
@@ -290,6 +292,16 @@ const Sessions = () => {
     cost: "",
     notes: "",
   });
+
+  // Check if this is the demo account
+  const isDemoAccount = user?.email === "trainer@demo.com" || user?.uid === "demo-user-123";
+
+  // Use DataContext data instead of direct Firestore calls
+  useEffect(() => {
+    setSessions(contextSessions);
+    setClients(contextClients);
+    setLoading(contextLoading);
+  }, [contextSessions, contextClients, contextLoading]);
 
   const groupedSessions = React.useMemo(() => {
     const sortedSessions = [...sessions].sort(
@@ -324,51 +336,6 @@ const Sessions = () => {
 
     return group;
   }, [sessions]);
-
-  // Load data once on component mount
-  useEffect(() => {
-    if (!user?.uid) return;
-
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        
-        // Load sessions
-        const sessionsSnapshot = await getDocs(collection(db, "users", user.uid, "sessions"));
-        const sessionsData = sessionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Session));
-        setSessions(sessionsData);
-        
-        // Load clients
-        const clientsSnapshot = await getDocs(collection(db, "users", user.uid, "clients"));
-        const clientsData = clientsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setClients(clientsData);
-        
-      } catch (error) {
-        console.error("Error loading data:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load sessions. Please refresh the page.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [user?.uid, toast]);
-
-  const refreshData = async () => {
-    if (!user?.uid) return;
-    
-    try {
-      const sessionsSnapshot = await getDocs(collection(db, "users", user.uid, "sessions"));
-      const sessionsData = sessionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Session));
-      setSessions(sessionsData);
-    } catch (error) {
-      console.error("Error refreshing data:", error);
-    }
-  };
 
   const startEditing = (session: Session) => {
     setEditingSession(session.id);
@@ -531,10 +498,10 @@ const Sessions = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={refreshData}>
+          <Button variant="outline" onClick={() => window.location.reload()}>
             Refresh
           </Button>
-          <AddSessionDialog onSessionAdded={refreshData} />
+          <AddSessionDialog onSessionAdded={() => window.location.reload()} />
         </div>
       </div>
 
@@ -559,7 +526,7 @@ const Sessions = () => {
                 <p className="text-muted-foreground text-center mb-4">
                   Start by scheduling your first training session.
                 </p>
-                <AddSessionDialog onSessionAdded={refreshData} />
+                <AddSessionDialog onSessionAdded={() => window.location.reload()} />
               </CardContent>
             </Card>
           ) : (
