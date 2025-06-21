@@ -43,6 +43,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { getClientLimitInfo, getPlanLimitText } from "@/lib/clientLimits";
 import { RevenueAnalytics } from "@/components/RevenueAnalytics";
 import { QuickActionsWidget } from "@/components/QuickActionsWidget";
+import { generateRecommendations } from "@/lib/recommendations";
 
 const formatTime = (time: string) => {
   const [hours, minutes] = time.split(":");
@@ -146,15 +147,20 @@ const Dashboard = () => {
     status: session.status,
   }));
 
-  const recentClients = getRecentClients(clients).map((client) => ({
-    id: client.id,
-    name: client.name,
-    joinDate: getTimeAgo(client.dateJoined),
-    level:
-      client.fitnessLevel.charAt(0).toUpperCase() +
-      client.fitnessLevel.slice(1),
-    progress: Math.floor(Math.random() * 80) + 20, // Random progress for demo
-  }));
+  const recentClients = getRecentClients(clients).map((client) => {
+    // Calculate real goal progress using AI analysis system
+    const analysis = generateRecommendations(client, sessions, payments);
+    
+    return {
+      id: client.id,
+      name: client.name,
+      joinDate: getTimeAgo(client.dateJoined),
+      level:
+        client.fitnessLevel.charAt(0).toUpperCase() +
+        client.fitnessLevel.slice(1),
+      progress: analysis.goalProgress, // Use real goal progress from AI analysis
+    };
+  });
 
   return (
     <div className="space-y-6">
@@ -401,41 +407,22 @@ const Dashboard = () => {
                   <div className="p-3 bg-white/50 rounded-lg">
                     <div className="text-lg font-bold text-purple-700">
                       {(() => {
-                        // Calculate real insights based on client data
-                        const now = new Date();
-                        const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-                        
-                        let insights = 0;
-                        
-                        // Clients with no recent sessions (need attention)
-                        const clientsNeedingAttention = clients.filter(client => {
-                          const recentSessions = sessions.filter(session => 
-                            session.clientId === client.id && 
-                            new Date(session.date) >= twoWeeksAgo &&
-                            session.status === "completed"
-                          );
-                          return recentSessions.length === 0;
-                        });
-                        insights += clientsNeedingAttention.length;
-                        
-                        // Clients ready for progression (beginners with 5+ sessions)
-                        const progressionReady = clients.filter(client => {
-                          const completedSessions = sessions.filter(session => 
-                            session.clientId === client.id && 
-                            session.status === "completed"
-                          );
-                          return client.fitnessLevel === "beginner" && completedSessions.length >= 5;
-                        });
-                        insights += progressionReady.length;
-                        
-                        // Payment follow-ups needed
-                        const overduePayments = payments.filter(payment => 
-                          payment.status === "pending" && 
-                          new Date(payment.date) < now
+                        // Use real AI recommendation system (same as AI Coach tab)
+                        const clientAnalyses = clients.map((client) =>
+                          generateRecommendations(client, sessions, payments)
                         );
-                        insights += Math.min(overduePayments.length, clients.length);
                         
-                        return Math.max(0, insights);
+                        // Get all recommendations across clients
+                        const allRecommendations = clientAnalyses.flatMap((analysis) =>
+                          analysis.recommendations.map((rec) => ({
+                            ...rec,
+                            clientName: analysis.clientName,
+                            clientId: analysis.clientId,
+                          }))
+                        );
+                        
+                        // Count active recommendations (same logic as AI Coach tab)
+                        return allRecommendations.length;
                       })()}
                     </div>
                     <p className="text-xs text-purple-600">Active Insights</p>
@@ -443,30 +430,22 @@ const Dashboard = () => {
                   <div className="p-3 bg-white/50 rounded-lg">
                     <div className="text-lg font-bold text-orange-700">
                       {(() => {
-                        // Calculate high priority items
-                        const now = new Date();
-                        let highPriorityCount = 0;
-                        
-                        // Overdue payments
-                        const overduePayments = payments.filter(payment => 
-                          payment.status === "pending" && 
-                          new Date(payment.date) < now
+                        // Use real AI recommendation system for high priority
+                        const clientAnalyses = clients.map((client) =>
+                          generateRecommendations(client, sessions, payments)
                         );
-                        highPriorityCount += overduePayments.length;
                         
-                        // Clients with no sessions in 3+ weeks (urgent attention)
-                        const threeWeeksAgo = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000);
-                        const urgentClients = clients.filter(client => {
-                          const recentSessions = sessions.filter(session => 
-                            session.clientId === client.id && 
-                            new Date(session.date) >= threeWeeksAgo &&
-                            session.status === "completed"
-                          );
-                          return sessions.some(s => s.clientId === client.id) && recentSessions.length === 0;
-                        });
-                        highPriorityCount += urgentClients.length;
+                        // Get all recommendations across clients
+                        const allRecommendations = clientAnalyses.flatMap((analysis) =>
+                          analysis.recommendations.map((rec) => ({
+                            ...rec,
+                            clientName: analysis.clientName,
+                            clientId: analysis.clientId,
+                          }))
+                        );
                         
-                        return Math.max(0, highPriorityCount);
+                        // Count high priority recommendations
+                        return allRecommendations.filter(r => r.priority === "high").length;
                       })()}
                     </div>
                     <p className="text-xs text-orange-600">High Priority</p>
@@ -480,17 +459,17 @@ const Dashboard = () => {
                       <p className="font-medium">Workout Intensity</p>
                       <p className="text-xs text-muted-foreground">
                         {(() => {
-                          // Count clients ready for progression
-                          const progressionReady = clients.filter(client => {
-                            const completedSessions = sessions.filter(session => 
-                              session.clientId === client.id && 
-                              session.status === "completed"
-                            );
-                            return client.fitnessLevel === "beginner" && completedSessions.length >= 5;
-                          });
+                          // Use real AI recommendation system
+                          const clientAnalyses = clients.map((client) =>
+                            generateRecommendations(client, sessions, payments)
+                          );
                           
-                          return progressionReady.length > 0
-                            ? `${progressionReady.length} client${progressionReady.length > 1 ? 's' : ''} ready for progression`
+                          const workoutRecommendations = clientAnalyses.flatMap((analysis) =>
+                            analysis.recommendations.filter(rec => rec.type === "workout")
+                          );
+                          
+                          return workoutRecommendations.length > 0
+                            ? `${workoutRecommendations.length} workout recommendation${workoutRecommendations.length > 1 ? 's' : ''}`
                             : clients.length > 0 
                               ? "Clients progressing well ✓"
                               : "No clients yet";
@@ -504,10 +483,22 @@ const Dashboard = () => {
                     <div className="text-sm">
                       <p className="font-medium">Progress Tracking</p>
                       <p className="text-xs text-muted-foreground">
-                        {clients.length > 0 
-                          ? `Monitoring trends across ${stats.totalClients} client${stats.totalClients > 1 ? 's' : ''}`
-                          : "Add clients to track progress"
-                        }
+                        {(() => {
+                          if (clients.length === 0) return "Add clients to track progress";
+                          
+                          // Count clients with improving progress trends from AI analysis
+                          const clientAnalyses = clients.map((client) =>
+                            generateRecommendations(client, sessions, payments)
+                          );
+                          
+                          const improvingClients = clientAnalyses.filter(
+                            analysis => analysis.progressTrend === "improving"
+                          ).length;
+                          
+                          return improvingClients > 0
+                            ? `${improvingClients}/${clients.length} clients improving`
+                            : `Monitoring ${clients.length} client${clients.length > 1 ? 's' : ''}`;
+                        })()}
                       </p>
                     </div>
                   </div>
