@@ -159,24 +159,14 @@ const ClientPortal = () => {
   const isDemoPortalRoute = window.location.pathname === '/demo-portal';
   const isDemoAccess = isDemoUser || isDemoPortalRoute;
 
-  // Debug logging
-  console.log("ClientPortal - clientId from URL:", clientId);
-  console.log("ClientPortal - isDemoUser:", isDemoUser);
-  console.log("ClientPortal - isDemoPortalRoute:", isDemoPortalRoute);
-  console.log("ClientPortal - isDemoAccess:", isDemoAccess);
-  console.log("ClientPortal - clients count:", clients.length);
-  console.log("ClientPortal - clients:", clients);
-
   // For demo users or demo portal route, use the first available client if no specific clientId is provided
   const effectiveClientId = isDemoAccess && (!clientId || clientId === 'demo') 
     ? (clients.length > 0 ? clients[0].id : null) 
     : clientId;
 
-  console.log("ClientPortal - effectiveClientId:", effectiveClientId);
-
   // Get client and related data directly from context
   const client = clients.find((c) => c.id === effectiveClientId);
-  console.log("ClientPortal - found client:", client);
+
   const clientSessions = sessions.filter((s) => s.clientId === effectiveClientId);
   const clientPayments = payments.filter((p) => p.clientId === effectiveClientId);
   const clientWorkoutPlan = workoutPlans.find((wp) => wp.clientId === effectiveClientId);
@@ -202,7 +192,6 @@ const ClientPortal = () => {
   };
 
   if (dataLoading || !dataInitialized) {
-    console.log("ClientPortal - Still loading:", { dataLoading, dataInitialized });
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -211,12 +200,10 @@ const ClientPortal = () => {
   }
 
   if (error) {
-    console.log("ClientPortal - Error:", error);
     return <div className="flex justify-center items-center min-h-screen"><p className="text-red-500">Error: {error}</p></div>;
   }
 
   if (!client) {
-    console.log("ClientPortal - No client found for ID:", effectiveClientId);
     return <div className="flex justify-center items-center min-h-screen"><p>Client Portal not found.</p></div>;
   }
 

@@ -46,15 +46,15 @@ const App = () => (
                   <Route path="/landing" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
 
-                  {/* Public Client Portal - No Authentication Required */}
-                  <Route
-                    path="/client-portal/:clientId"
-                    element={<ClientPortal />}
-                  />
-
                   {/* Demo Client Portal - No Authentication Required */}
                   <Route
                     path="/demo-portal"
+                    element={<ClientPortal />}
+                  />
+
+                  {/* Public Client Portal - No Authentication Required */}
+                  <Route
+                    path="/client-portal/:clientId"
                     element={<ClientPortal />}
                   />
 
