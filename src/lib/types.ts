@@ -39,6 +39,7 @@ export interface Session {
   recap?: SessionRecap;
   cancelledBy?: "trainer" | "client";
   cancelledAt?: string;
+  cancellationReason?: string;
 }
 
 export interface SessionRecap {
