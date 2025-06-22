@@ -19,74 +19,67 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useData } from "@/contexts/DataContext";
 import { Client, Session, Payment } from "@/lib/types";
 
+// Helper to get the last 6 months dynamically
+const getLastSixMonths = () => {
+  const months = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({
+      name: d.toLocaleString('default', { month: 'short' }),
+      month: d.getMonth(),
+      year: d.getFullYear(),
+    });
+  }
+  return months;
+};
+
 // Generate revenue data for the last 6 months from real payments
 const generateRevenueData = (payments: Payment[]) => {
-  const months = ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const now = new Date();
-
+  const sixMonths = getLastSixMonths();
+  
   if (payments.length === 0) {
-    // Return zeros for new accounts
-    return months.map((month) => ({
-      month,
-      revenue: 0,
-      sessions: 0,
-    }));
+    return sixMonths.map(m => ({ month: m.name, revenue: 0, sessions: 0 }));
   }
 
-  return months.map((month, index) => {
-    const monthNum = now.getMonth() - 5 + index;
-    const year = now.getFullYear() + (monthNum < 0 ? -1 : 0);
-    const adjustedMonth = monthNum < 0 ? 12 + monthNum : monthNum;
-
+  return sixMonths.map(m => {
     const monthlyRevenue = payments
-      .filter((payment) => {
-        const paymentDate = new Date(payment.date);
-        return (
-          paymentDate.getMonth() === adjustedMonth &&
-          paymentDate.getFullYear() === year &&
-          payment.status === "completed"
-        );
+      .filter(p => {
+        const paymentDate = new Date(p.date);
+        return paymentDate.getMonth() === m.month && paymentDate.getFullYear() === m.year && p.status === 'completed';
       })
-      .reduce((total, payment) => total + payment.amount, 0);
+      .reduce((total, p) => total + p.amount, 0);
 
     return {
-      month,
+      month: m.name,
       revenue: monthlyRevenue,
-      sessions: Math.floor(monthlyRevenue / 75), // Estimate sessions based on average cost
+      sessions: Math.floor(monthlyRevenue / 75), // Estimate sessions
     };
   });
 };
 
 // Generate client growth data from real clients
 const generateClientGrowthData = (clients: Client[]) => {
-  const months = ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const now = new Date();
+  const sixMonths = getLastSixMonths();
 
   if (clients.length === 0) {
-    return months.map((month) => ({
-      month,
-      totalClients: 0,
-      newClients: 0,
-    }));
+    return sixMonths.map(m => ({ month: m.name, totalClients: 0, newClients: 0 }));
   }
 
-  let runningTotal = 0;
-  return months.map((month, index) => {
-    const monthNum = now.getMonth() - 5 + index;
-    const year = now.getFullYear() + (monthNum < 0 ? -1 : 0);
-    const adjustedMonth = monthNum < 0 ? 12 + monthNum : monthNum;
+  // First, get the total number of clients before the 6-month window
+  const sixMonthsAgo = new Date(sixMonths[0].year, sixMonths[0].month, 1);
+  let runningTotal = clients.filter(c => new Date(c.dateJoined) < sixMonthsAgo).length;
 
-    const newClientsThisMonth = clients.filter((client) => {
-      const joinDate = new Date(client.dateJoined);
-      return (
-        joinDate.getMonth() === adjustedMonth && joinDate.getFullYear() === year
-      );
+  return sixMonths.map(m => {
+    const newClientsThisMonth = clients.filter(c => {
+      const joinDate = new Date(c.dateJoined);
+      return joinDate.getMonth() === m.month && joinDate.getFullYear() === m.year;
     }).length;
 
     runningTotal += newClientsThisMonth;
 
     return {
-      month,
+      month: m.name,
       totalClients: runningTotal,
       newClients: newClientsThisMonth,
     };
