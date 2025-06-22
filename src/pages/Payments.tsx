@@ -55,17 +55,18 @@ import {
 } from "lucide-react";
 import { Payment } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
+import { cn } from "@/lib/utils";
 
-const getStatusIcon = (status: string) => {
+const getStatusBorderColor = (status: string) => {
   switch (status) {
     case "completed":
-      return <CheckCircle className="h-4 w-4 text-green-600" />;
+      return "bg-green-500";
     case "pending":
-      return <Clock className="h-4 w-4 text-orange-600" />;
+      return "bg-orange-500";
     case "failed":
-      return <XCircle className="h-4 w-4 text-red-600" />;
+      return "bg-red-500";
     default:
-      return <AlertCircle className="h-4 w-4 text-gray-600" />;
+      return "bg-gray-500";
   }
 };
 
@@ -589,6 +590,17 @@ const Payments = () => {
           {/* Payments List */}
           <div className="space-y-4">
             {filteredPayments.map((payment) => {
+              const client = clients.find((c) => c.id === payment.clientId);
+              const clientInfo = {
+                name: client?.name || "Unknown Client",
+                avatarUrl: client?.avatar || "",
+                initials:
+                  client?.name
+                    ?.split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase() || "??",
+              };
               const isOverdue =
                 payment.status === "pending" &&
                 new Date(payment.date) < new Date();
@@ -597,58 +609,64 @@ const Payments = () => {
               return (
                 <Card
                   key={payment.id}
-                  className={`hover:shadow-md transition-shadow ${
-                    isOverdue ? "border-orange-200 bg-orange-50/30" : ""
-                  }`}
+                  className="relative overflow-hidden transition-all hover:shadow-lg"
                 >
-                  <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          {getStatusIcon(payment.status)}
-                          <Badge className={getStatusColor(payment.status)}>
-                            {payment.status}
-                            {isOverdue && " (OVERDUE)"}
-                          </Badge>
-                        </div>
+                  <div
+                    className={cn(
+                      "absolute left-0 top-0 h-full w-1.5",
+                      isOverdue
+                        ? "bg-orange-500"
+                        : getStatusBorderColor(payment.status)
+                    )}
+                  />
+                  <CardContent className="p-4 pl-6">
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                      <div className="md:col-span-3 flex items-center gap-4">
+                        <Avatar className="h-12 w-12 border">
+                          <AvatarImage
+                            src={clientInfo.avatarUrl}
+                            alt={clientInfo.name}
+                          />
+                          <AvatarFallback>{clientInfo.initials}</AvatarFallback>
+                        </Avatar>
                         <div>
-                          <h3 className="font-semibold text-lg">
+                          <p className="text-xl font-bold text-foreground">
                             ${payment.amount.toFixed(2)}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            {getClientName(payment.clientId)}
                           </p>
-                          <p className="text-sm text-muted-foreground">
-                            {payment.description}
+                          <p className="font-semibold text-muted-foreground">
+                            {clientInfo.name}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm">{methodInfo.icon}</span>
-                            <Badge
-                              variant="outline"
-                              className={methodInfo.color}
-                            >
-                              {methodInfo.label}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {isOverdue ? "Due: " : ""}
+
+                      <div className="md:col-span-2 flex items-center justify-start md:justify-end gap-4">
+                        <div className="flex flex-col items-start md:items-end gap-1 text-sm text-muted-foreground">
+                          <Badge
+                            className={cn(
+                              "text-xs",
+                              getStatusColor(payment.status)
+                            )}
+                          >
+                            {payment.status.charAt(0).toUpperCase() +
+                              payment.status.slice(1)}
+                            {isOverdue && " (Overdue)"}
+                          </Badge>
+                          <span className="flex items-center gap-2">
+                            {getMethodIcon(payment.method)} {methodInfo.label}
+                          </span>
+                          <span className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />{" "}
                             {new Date(payment.date).toLocaleDateString()}
-                          </p>
-                          {payment.sessionId && (
-                            <p className="text-xs text-muted-foreground">
-                              Session #{payment.sessionId}
-                            </p>
-                          )}
+                          </span>
                         </div>
 
-                        {/* Action Dropdown */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                            >
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -696,6 +714,11 @@ const Payments = () => {
                         </DropdownMenu>
                       </div>
                     </div>
+                    {payment.description && (
+                      <p className="text-sm text-muted-foreground mt-4 pt-4 border-t">
+                        {payment.description}
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
               );
