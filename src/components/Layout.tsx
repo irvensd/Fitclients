@@ -105,13 +105,6 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
   const { logout, isDemoUser, user } = useAuth();
 
-  // Debug logging
-  console.log("=== SIDEBAR DEBUG ===");
-  console.log("user:", user);
-  console.log("user email:", user?.email);
-  console.log("isDemoUser:", isDemoUser);
-  console.log("=== END SIDEBAR DEBUG ===");
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -131,10 +124,6 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
       icon: ExternalLink,
     }
   ] : navigation;
-
-  console.log("isDemo:", isDemo);
-  console.log("demoNavigation length:", demoNavigation.length);
-  console.log("Demo Portal in nav:", demoNavigation.find(item => item.name === "Demo Portal"));
 
   return (
     <TooltipProvider delayDuration={0}>

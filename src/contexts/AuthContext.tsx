@@ -292,43 +292,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Load user profile when user changes
   React.useEffect(() => {
     const loadUserProfile = async () => {
-      if (user?.uid && isFirebaseConfigured) {
-        // Add a small delay to ensure auth state is fully settled
-        await new Promise(resolve => setTimeout(resolve, 500));
+      if (user?.uid) {
+        // Skip Firebase for demo users
+        if (isDemoUser) {
+          // Set mock profile for demo users
+          const mockProfile: UserProfile = {
+            id: "demo-user-123",
+            email: "trainer@demo.com",
+            firstName: "Demo",
+            lastName: "Trainer",
+            displayName: "Demo Trainer",
+            createdAt: new Date().toISOString(),
+          };
+          setUserProfile(mockProfile);
+          return;
+        }
         
-        try {
-          console.log("Loading user profile for UID:", user.uid);
-          console.log("User email:", user.email);
-          console.log("User displayName:", user.displayName);
+        if (isFirebaseConfigured) {
+          // Add a small delay to ensure auth state is fully settled
+          await new Promise(resolve => setTimeout(resolve, 500));
           
-          const profile = await userProfileService.getUserProfile(user.uid);
-          console.log("Loaded user profile:", profile);
-          
-          if (profile) {
-            setUserProfile(profile);
-          } else {
-            // If profile doesn't exist, create it with basic info
-            console.log("No profile found, creating default profile");
-            if (user.email) {
-              const nameParts = user.displayName?.split(' ') || ['', ''];
-              const newProfileData = {
-                email: user.email,
-                firstName: nameParts[0] || '',
-                lastName: nameParts.slice(1).join(' ') || '',
-                displayName: user.displayName || '',
-              };
-              console.log("Creating profile with data:", newProfileData);
-              
-              await userProfileService.createUserProfile(user.uid, newProfileData);
-              
-              // Try loading again
-              const newProfile = await userProfileService.getUserProfile(user.uid);
-              console.log("Newly created profile:", newProfile);
-              setUserProfile(newProfile);
+          try {
+            console.log("Loading user profile for UID:", user.uid);
+            console.log("User email:", user.email);
+            console.log("User displayName:", user.displayName);
+            
+            const profile = await userProfileService.getUserProfile(user.uid);
+            console.log("Loaded user profile:", profile);
+            
+            if (profile) {
+              setUserProfile(profile);
+            } else {
+              // If profile doesn't exist, create it with basic info
+              console.log("No profile found, creating default profile");
+              if (user.email) {
+                const nameParts = user.displayName?.split(' ') || ['', ''];
+                const newProfileData = {
+                  email: user.email,
+                  firstName: nameParts[0] || '',
+                  lastName: nameParts.slice(1).join(' ') || '',
+                  displayName: user.displayName || '',
+                };
+                console.log("Creating profile with data:", newProfileData);
+                
+                await userProfileService.createUserProfile(user.uid, newProfileData);
+                
+                // Try loading again
+                const newProfile = await userProfileService.getUserProfile(user.uid);
+                console.log("Newly created profile:", newProfile);
+                setUserProfile(newProfile);
+              }
             }
+          } catch (error) {
+            console.error("Failed to load user profile:", error);
           }
-        } catch (error) {
-          console.error("Failed to load user profile:", error);
         }
       } else {
         setUserProfile(null);
@@ -338,7 +355,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (user) {
       loadUserProfile();
     }
-  }, [user]);
+  }, [user, isDemoUser]);
 
   const value = React.useMemo(
     () => ({

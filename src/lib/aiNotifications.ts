@@ -360,10 +360,37 @@ export const aiNotificationManager = new AINotificationManager();
 // React hook for using notifications
 export const useAINotifications = () => {
   const [notifications, setNotifications] = useState<AINotification[]>([]);
-  const { user } = useAuth(); // Assuming useAuth() gives you the user object
+  const { user, isDemoUser } = useAuth(); // Add isDemoUser
 
   useEffect(() => {
     if (user && user.uid) {
+      // Skip Firebase for demo users
+      if (isDemoUser) {
+        // Set mock notifications for demo users
+        const mockNotifications: AINotification[] = [
+          {
+            id: "demo-1",
+            type: "insight",
+            priority: "low",
+            title: "🚀 AI Coach is ready!",
+            message: "Your AI Coach is analyzing client data and will provide personalized recommendations",
+            timestamp: new Date().toISOString(),
+            read: false,
+          },
+          {
+            id: "demo-2", 
+            type: "recommendation",
+            priority: "medium",
+            title: "Schedule Optimization",
+            message: "Your Tuesday 3PM slot has been consistently popular - consider adding more",
+            timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+            read: false,
+          }
+        ];
+        setNotifications(mockNotifications);
+        return; // Don't set up Firebase listener for demo users
+      }
+      
       aiNotificationManager.setUser(user.uid);
       const unsubscribe = aiNotificationManager.subscribe(setNotifications);
       return () => {
@@ -372,7 +399,7 @@ export const useAINotifications = () => {
     } else {
       setNotifications([]); // Clear notifications if no user
     }
-  }, [user]);
+  }, [user, isDemoUser]);
 
   return {
     notifications,
