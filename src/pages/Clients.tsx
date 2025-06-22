@@ -76,7 +76,7 @@ import { useNavigate } from "react-router-dom";
 const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenChange?: (open: boolean) => void; }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { addClient, clients, getActiveClients } = useData();
+  const { addClient, addProgressEntry, clients, getActiveClients } = useData();
   const { getCurrentPlan } = useSubscription();
   const { toast } = useToast();
 
@@ -93,6 +93,7 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
     fitnessLevel: "",
     goals: "",
     notes: "",
+    initialWeight: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -111,7 +112,8 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
     setLoading(true);
 
     try {
-      await addClient({
+      // Add the client first
+      const newClient = await addClient({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -124,6 +126,37 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
         dateJoined: new Date().toISOString().split("T")[0],
       });
 
+      // If initial weight is provided, create a progress entry
+      if (formData.initialWeight && parseFloat(formData.initialWeight) > 0) {
+        try {
+          const progressData = {
+            clientId: newClient.id,
+            date: new Date().toISOString().split("T")[0],
+            weight: parseFloat(formData.initialWeight),
+            notes: "Initial weight recorded during client registration",
+          };
+
+          await addProgressEntry(progressData);
+          
+          toast({
+            title: "Client added with initial weight",
+            description: `${formData.name} has been added with initial weight of ${formData.initialWeight} lbs.`,
+          });
+        } catch (progressError) {
+          console.error("Error adding initial progress:", progressError);
+          // Still show success for client creation, but warn about progress
+          toast({
+            title: "Client added",
+            description: `${formData.name} has been added, but there was an issue recording the initial weight.`,
+          });
+        }
+      } else {
+        toast({
+          title: "Client added",
+          description: `${formData.name} has been added successfully.`,
+        });
+      }
+
       setFormData({
         name: "",
         email: "",
@@ -131,13 +164,9 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
         fitnessLevel: "",
         goals: "",
         notes: "",
+        initialWeight: "",
       });
       setOpen(false);
-
-      toast({
-        title: "Client added",
-        description: "New client has been added successfully.",
-      });
     } catch (error) {
       console.error("Error adding client:", error);
       toast({
@@ -260,6 +289,22 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
                 }
                 className="min-h-[60px]"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="initial-weight">Initial Weight (lbs) - Optional</Label>
+              <Input
+                id="initial-weight"
+                type="number"
+                step="0.1"
+                placeholder="150.0"
+                value={formData.initialWeight}
+                onChange={(e) =>
+                  setFormData({ ...formData, initialWeight: e.target.value })
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                Adding initial weight will automatically create the first progress entry, making it easier to track progress from day one.
+              </p>
             </div>
           </div>
           <div className="flex justify-end gap-2">
