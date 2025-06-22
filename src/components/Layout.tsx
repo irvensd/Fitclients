@@ -27,6 +27,7 @@ import {
   Megaphone,
   ChevronLeft,
   ChevronRight,
+  ExternalLink,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { GlobalSearch } from "@/components/GlobalSearch";
@@ -119,7 +120,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
     {
       name: "Demo Portal",
       href: "/demo-portal",
-      icon: Share2,
+      icon: ExternalLink,
     }
   ] : navigation;
 
@@ -235,7 +236,7 @@ const MobileSidebar = () => {
     {
       name: "Demo Portal",
       href: "/demo-portal",
-      icon: Share2,
+      icon: ExternalLink,
     }
   ] : navigation;
 
