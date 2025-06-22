@@ -56,6 +56,17 @@ import {
 import { Payment } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const getStatusBorderColor = (status: string) => {
   switch (status) {
@@ -100,6 +111,7 @@ const AddPaymentDialog = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { clients, addPayment } = useData();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     clientId: "",
     amount: "",
@@ -128,6 +140,13 @@ const AddPaymentDialog = () => {
         date: formData.date,
       });
 
+      toast({
+        title: "Payment Recorded",
+        description: `A payment of $${formData.amount} for ${
+          clients.find((c) => c.id === formData.clientId)?.name
+        } has been recorded.`,
+      });
+
       // Reset form and close dialog
       setFormData({
         clientId: "",
@@ -140,7 +159,11 @@ const AddPaymentDialog = () => {
       setOpen(false);
     } catch (error) {
       console.error("Error adding payment:", error);
-      alert("Failed to record payment. Please try again.");
+      toast({
+        variant: "destructive",
+        title: "Submission Error",
+        description: "Failed to record payment. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
@@ -282,6 +305,8 @@ const Payments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [methodFilter, setMethodFilter] = useState("all");
+  const [deleteTarget, setDeleteTarget] = useState<Payment | null>(null);
+  const { toast } = useToast();
   const {
     payments,
     clients,
@@ -298,12 +323,17 @@ const Payments = () => {
         status: "completed",
         date: new Date().toISOString().split("T")[0], // Update to current date when marked as paid
       });
-      alert(
-        `Payment of $${payment.amount} marked as completed for ${getClientName(payment.clientId)}`,
-      );
+      toast({
+        title: "Payment Updated",
+        description: `Payment of $${payment.amount} marked as completed.`,
+      });
     } catch (error) {
       console.error("Error updating payment:", error);
-      alert("Failed to update payment status. Please try again.");
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: "Failed to update payment status. Please try again.",
+      });
     }
   };
 
@@ -316,33 +346,50 @@ const Payments = () => {
           payment.description +
           (reason ? ` - Failed: ${reason}` : " - Payment failed"),
       });
-      alert(`Payment marked as failed for ${getClientName(payment.clientId)}`);
+      toast({
+        title: "Payment Updated",
+        description: `Payment for ${getClientName(
+          payment.clientId,
+        )} marked as failed.`,
+      });
     } catch (error) {
       console.error("Error updating payment:", error);
-      alert("Failed to update payment status. Please try again.");
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: "Failed to update payment status. Please try again.",
+      });
     }
   };
 
   const handleSendReminder = (payment: Payment) => {
     // In a real app, this would send an email/SMS reminder
-    alert(
-      `Payment reminder sent to ${getClientName(payment.clientId)}\n\nAmount: $${payment.amount}\nDue: ${new Date(payment.date).toLocaleDateString()}\nMethod: ${payment.method.replace("-", " ")}`,
-    );
+    toast({
+      title: "Reminder Sent",
+      description: `Payment reminder sent to ${getClientName(
+        payment.clientId,
+      )}.`,
+    });
   };
 
-  const handleDeletePayment = async (payment: Payment) => {
-    if (
-      confirm(
-        `Are you sure you want to delete this payment record?\n\nClient: ${getClientName(payment.clientId)}\nAmount: $${payment.amount}\n\nThis action cannot be undone.`,
-      )
-    ) {
-      try {
-        await deletePayment(payment.id);
-        alert("Payment record deleted successfully.");
-      } catch (error) {
-        console.error("Error deleting payment:", error);
-        alert("Failed to delete payment. Please try again.");
-      }
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      await deletePayment(deleteTarget.id);
+      toast({
+        title: "Payment Deleted",
+        description: "The payment record has been successfully deleted.",
+      });
+    } catch (error) {
+      console.error("Error deleting payment:", error);
+      toast({
+        variant: "destructive",
+        title: "Deletion Failed",
+        description: "Failed to delete payment. Please try again.",
+      });
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -682,7 +729,7 @@ const Payments = () => {
                         )}
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => handleDeletePayment(payment)}
+                          onClick={() => setDeleteTarget(payment)}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete Record
@@ -741,6 +788,38 @@ const Payments = () => {
               </CardContent>
             </Card>
           )}
+
+          <AlertDialog
+            open={!!deleteTarget}
+            onOpenChange={(open) => !open && setDeleteTarget(null)}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  payment record of{" "}
+                  <span className="font-semibold">
+                    ${deleteTarget?.amount.toFixed(2)}
+                  </span>{" "}
+                  for{" "}
+                  <span className="font-semibold">
+                    {deleteTarget && getClientName(deleteTarget.clientId)}
+                  </span>
+                  .
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleConfirmDelete}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </>
       )}
     </div>
