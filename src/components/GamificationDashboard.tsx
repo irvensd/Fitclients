@@ -31,32 +31,19 @@ import {
 import { Client } from "@/lib/types";
 
 interface GamificationDashboardProps {
-  client: Client;
+  data: GamificationData;
   variant?: "full" | "summary" | "widget";
   showCelebrations?: boolean;
   onSendCelebration?: (message: string) => void;
 }
 
 export const GamificationDashboard = ({
-  client,
+  data,
   variant = "full",
   showCelebrations = true,
   onSendCelebration,
 }: GamificationDashboardProps) => {
-  const [gamificationData, setGamificationData] =
-    useState<GamificationData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate API call to get gamification data
-    setTimeout(() => {
-      const data = calculateGamificationData(client, [], []);
-      setGamificationData(data);
-      setLoading(false);
-    }, 500);
-  }, [client]);
-
-  if (loading) {
+  if (!data) {
     return (
       <Card className="w-full">
         <CardContent className="pt-6">
@@ -69,18 +56,14 @@ export const GamificationDashboard = ({
     );
   }
 
-  if (!gamificationData) {
-    return null;
-  }
-
   if (variant === "widget") {
-    return <GamificationWidget data={gamificationData} />;
+    return <GamificationWidget data={data} />;
   }
 
   if (variant === "summary") {
     return (
       <GamificationSummary
-        data={gamificationData}
+        data={data}
         showCelebrations={showCelebrations}
         onSendCelebration={onSendCelebration}
       />
@@ -89,7 +72,7 @@ export const GamificationDashboard = ({
 
   return (
     <GamificationFullDashboard
-      data={gamificationData}
+      data={data}
       showCelebrations={showCelebrations}
       onSendCelebration={onSendCelebration}
     />

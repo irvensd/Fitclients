@@ -263,7 +263,7 @@ const ClientPortal = () => {
                 </CardContent>
               </Card>
 
-              {gamificationData && <GamificationDashboard client={client} />}
+              {gamificationData && <GamificationDashboard data={gamificationData} variant="summary" />}
               
               <Card className="lg:col-span-3">
                  <CardHeader>
