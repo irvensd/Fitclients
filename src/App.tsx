@@ -21,6 +21,7 @@ import Progress from "./pages/Progress";
 import Settings from "./pages/Settings";
 import Features from "./pages/Features";
 import ClientPortal from "./pages/ClientPortal";
+import DemoPortal from "./pages/DemoPortal";
 import ClientPortalManager from "./pages/ClientPortalManager";
 import AIRecommendations from "./pages/AIRecommendations";
 import Marketing from "./pages/Marketing";
@@ -49,7 +50,7 @@ const App = () => (
                   {/* Demo Client Portal - No Authentication Required */}
                   <Route
                     path="/demo-portal"
-                    element={<ClientPortal />}
+                    element={<DemoPortal />}
                   />
 
                   {/* Public Client Portal - No Authentication Required */}
