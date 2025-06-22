@@ -93,7 +93,7 @@ const NotificationBell = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link
-            to="/ai-coach" // A dedicated page for all notifications could be created
+            to="/ai-recommendations"
             className="flex items-center justify-center gap-2 p-3 text-sm text-primary"
           >
             <Brain className="h-4 w-4" />
