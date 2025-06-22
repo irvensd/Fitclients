@@ -35,7 +35,7 @@ export const BreadcrumbNav = () => {
   }
 
   return (
-    <Breadcrumb className="mb-6">
+    <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
