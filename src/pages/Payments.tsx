@@ -588,7 +588,7 @@ const Payments = () => {
           )}
 
           {/* Payments List */}
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredPayments.map((payment) => {
               const client = clients.find((c) => c.id === payment.clientId);
               const clientInfo = {
@@ -609,109 +609,113 @@ const Payments = () => {
               return (
                 <Card
                   key={payment.id}
-                  className="relative overflow-hidden transition-all hover:shadow-lg"
+                  className="relative flex flex-col overflow-hidden transition-all hover:shadow-lg"
                 >
                   <div
                     className={cn(
                       "absolute left-0 top-0 h-full w-1.5",
                       isOverdue
                         ? "bg-orange-500"
-                        : getStatusBorderColor(payment.status)
+                        : getStatusBorderColor(payment.status),
                     )}
                   />
-                  <CardContent className="p-4 pl-6">
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
-                      <div className="md:col-span-3 flex items-center gap-4">
-                        <Avatar className="h-12 w-12 border">
-                          <AvatarImage
-                            src={clientInfo.avatarUrl}
-                            alt={clientInfo.name}
-                          />
-                          <AvatarFallback>{clientInfo.initials}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-xl font-bold text-foreground">
-                            ${payment.amount.toFixed(2)}
-                          </p>
-                          <p className="font-semibold text-muted-foreground">
-                            {clientInfo.name}
-                          </p>
-                        </div>
+                  <CardHeader className="pl-6 flex flex-row items-center justify-between space-y-0 pb-2 pt-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10 border">
+                        <AvatarImage
+                          src={clientInfo.avatarUrl}
+                          alt={clientInfo.name}
+                        />
+                        <AvatarFallback>{clientInfo.initials}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <CardTitle className="text-base font-semibold">
+                          {clientInfo.name}
+                        </CardTitle>
+                        <CardDescription>
+                          ${payment.amount.toFixed(2)}
+                        </CardDescription>
                       </div>
-
-                      <div className="md:col-span-2 flex items-center justify-start md:justify-end gap-4">
-                        <div className="flex flex-col items-start md:items-end gap-1 text-sm text-muted-foreground">
-                          <Badge
-                            className={cn(
-                              "text-xs",
-                              getStatusColor(payment.status)
-                            )}
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 flex-shrink-0"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {payment.status === "pending" && (
+                          <DropdownMenuItem
+                            onClick={() => handleMarkAsPaid(payment)}
                           >
-                            {payment.status.charAt(0).toUpperCase() +
-                              payment.status.slice(1)}
-                            {isOverdue && " (Overdue)"}
-                          </Badge>
-                          <span className="flex items-center gap-2">
-                            {getMethodIcon(payment.method)} {methodInfo.label}
-                          </span>
-                          <span className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />{" "}
-                            {new Date(payment.date).toLocaleDateString()}
-                          </span>
-                        </div>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {payment.status === "pending" && (
-                              <DropdownMenuItem
-                                onClick={() => handleMarkAsPaid(payment)}
-                              >
-                                <CheckCircle className="h-4 w-4 mr-2" />
-                                Mark as Paid
-                              </DropdownMenuItem>
-                            )}
-                            {payment.status === "pending" && (
-                              <DropdownMenuItem
-                                onClick={() => handleSendReminder(payment)}
-                              >
-                                <Mail className="h-4 w-4 mr-2" />
-                                Send Reminder
-                              </DropdownMenuItem>
-                            )}
-                            {payment.status === "pending" && (
-                              <DropdownMenuItem
-                                onClick={() => handleMarkAsFailed(payment)}
-                              >
-                                <XCircle className="h-4 w-4 mr-2" />
-                                Mark as Failed
-                              </DropdownMenuItem>
-                            )}
-                            {payment.status === "failed" && (
-                              <DropdownMenuItem
-                                onClick={() => handleMarkAsPaid(payment)}
-                              >
-                                <RefreshCw className="h-4 w-4 mr-2" />
-                                Retry Payment
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => handleDeletePayment(payment)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete Record
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Mark as Paid
+                          </DropdownMenuItem>
+                        )}
+                        {payment.status === "pending" && (
+                          <DropdownMenuItem
+                            onClick={() => handleSendReminder(payment)}
+                          >
+                            <Mail className="h-4 w-4 mr-2" />
+                            Send Reminder
+                          </DropdownMenuItem>
+                        )}
+                        {payment.status === "pending" && (
+                          <DropdownMenuItem
+                            onClick={() => handleMarkAsFailed(payment)}
+                          >
+                            <XCircle className="h-4 w-4 mr-2" />
+                            Mark as Failed
+                          </DropdownMenuItem>
+                        )}
+                        {payment.status === "failed" && (
+                          <DropdownMenuItem
+                            onClick={() => handleMarkAsPaid(payment)}
+                          >
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Retry Payment
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() => handleDeletePayment(payment)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Record
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </CardHeader>
+                  <CardContent className="pl-6 pb-4 flex-grow">
+                    <div className="text-sm text-muted-foreground space-y-3 mt-4">
+                      <div className="flex items-center justify-between">
+                        <span>Status</span>
+                        <Badge
+                          className={cn(
+                            "text-xs",
+                            getStatusColor(payment.status),
+                          )}
+                        >
+                          {payment.status.charAt(0).toUpperCase() +
+                            payment.status.slice(1)}
+                          {isOverdue && " (Overdue)"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Method</span>
+                        <span className="font-medium text-foreground">
+                          {methodInfo.label}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Date</span>
+                        <span className="font-medium text-foreground">
+                          {new Date(payment.date).toLocaleDateString()}
+                        </span>
                       </div>
                     </div>
                     {payment.description && (
