@@ -19,6 +19,7 @@ interface DataContextType {
   loading: boolean;
   error: string | null;
   workoutPlans: WorkoutPlan[];
+  dataInitialized: boolean;
 
   // Client operations
   addClient: (client: Omit<Client, "id">) => Promise<Client>;
@@ -67,10 +68,13 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const [progressEntries, setProgressEntries] = useState<ProgressEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dataInitialized, setDataInitialized] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
     setLoading(true);
+    setDataInitialized(false);
+    
     if (!user?.uid) {
       // Clear all data if user logs out
       setClients([]);
@@ -96,7 +100,9 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
       setPayments(mockPayments);
       setWorkoutPlans(mockWorkoutPlans);
       setProgressEntries([]); // No mock progress entries for now
-      setLoading(false);
+      setDataInitialized(true);
+      // Add a small delay to ensure state updates are processed
+      setTimeout(() => setLoading(false), 100);
       return;
     }
 
@@ -110,6 +116,20 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
       progressEntries: collection(db, "users", user.uid, "progressEntries"),
     };
 
+    let collectionsLoaded = 0;
+    const totalCollections = 5;
+
+    const checkAllLoaded = () => {
+      collectionsLoaded++;
+      console.log(`Collection loaded. Count: ${collectionsLoaded}/${totalCollections}`);
+      if (collectionsLoaded >= totalCollections) {
+        console.log('All collections loaded, setting loading to false');
+        setDataInitialized(true);
+        // Add a small delay to ensure all state updates are processed
+        setTimeout(() => setLoading(false), 100);
+      }
+    };
+
     const unsubscribes = [
       onSnapshot(collections.clients, (snapshot) => {
         const fetchedClients = snapshot.docs.map(doc => ({
@@ -118,30 +138,38 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
           status: doc.data().status || { isActive: true },
         })) as ClientWithStatus[];
         setClients(fetchedClients);
+        console.log('Clients loaded:', fetchedClients.length, 'clients');
+        checkAllLoaded();
       }, (err) => { console.error("Clients snapshot error:", err); setError("Failed to load clients."); }),
 
       onSnapshot(collections.sessions, (snapshot) => {
         const fetchedSessions = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<Session, 'id'>), id: doc.id })) as Session[];
         setSessions(fetchedSessions);
+        console.log('Sessions loaded:', fetchedSessions.length, 'sessions');
+        checkAllLoaded();
       }, (err) => { console.error("Sessions snapshot error:", err); setError("Failed to load sessions."); }),
 
       onSnapshot(collections.payments, (snapshot) => {
         const fetchedPayments = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<Payment, 'id'>), id: doc.id })) as Payment[];
         setPayments(fetchedPayments);
+        console.log('Payments loaded:', fetchedPayments.length, 'payments');
+        checkAllLoaded();
       }, (err) => { console.error("Payments snapshot error:", err); setError("Failed to load payments."); }),
       
       onSnapshot(collections.workoutPlans, (snapshot) => {
         const fetchedPlans = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<WorkoutPlan, 'id'>), id: doc.id })) as WorkoutPlan[];
         setWorkoutPlans(fetchedPlans);
+        console.log('WorkoutPlans loaded:', fetchedPlans.length, 'plans');
+        checkAllLoaded();
       }, (err) => { console.error("WorkoutPlans snapshot error:", err); setError("Failed to load workout plans."); }),
       
       onSnapshot(collections.progressEntries, (snapshot) => {
         const fetchedEntries = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<ProgressEntry, 'id'>), id: doc.id })) as ProgressEntry[];
         setProgressEntries(fetchedEntries);
+        console.log('ProgressEntries loaded:', fetchedEntries.length, 'entries');
+        checkAllLoaded();
       }, (err) => { console.error("ProgressEntries snapshot error:", err); setError("Failed to load progress entries."); }),
     ];
-
-    setLoading(false);
 
     return () => {
       console.log(`Cleaning up Firestore listeners for user: ${user.uid}`);
@@ -335,6 +363,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
     loading,
     error,
     workoutPlans,
+    dataInitialized,
     addClient,
     updateClient,
     deleteClient,

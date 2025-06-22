@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   Card,
@@ -149,22 +149,16 @@ const ClientPortal = () => {
     progressEntries,
     loading: dataLoading,
     error,
+    dataInitialized,
     updateSession,
   } = useData();
 
-  const [client, setClient] = useState(clients.find((c) => c.id === clientId));
-  const [clientSessions, setClientSessions] = useState(sessions.filter((s) => s.clientId === clientId));
-  const [clientPayments, setClientPayments] = useState(payments.filter((p) => p.clientId === clientId));
-  const [clientWorkoutPlan, setClientWorkoutPlan] = useState(workoutPlans.find((wp) => wp.clientId === clientId));
-  const [clientProgress, setClientProgress] = useState(progressEntries.filter(pe => pe.clientId === clientId));
-
-  useEffect(() => {
-    setClient(clients.find((c) => c.id === clientId));
-    setClientSessions(sessions.filter((s) => s.clientId === clientId));
-    setClientPayments(payments.filter((p) => p.clientId === clientId));
-    setClientWorkoutPlan(workoutPlans.find((wp) => wp.clientId === clientId));
-    setClientProgress(progressEntries.filter(pe => pe.clientId === clientId));
-  }, [clientId, clients, sessions, payments, workoutPlans, progressEntries]);
+  // Get client and related data directly from context
+  const client = clients.find((c) => c.id === clientId);
+  const clientSessions = sessions.filter((s) => s.clientId === clientId);
+  const clientPayments = payments.filter((p) => p.clientId === clientId);
+  const clientWorkoutPlan = workoutPlans.find((wp) => wp.clientId === clientId);
+  const clientProgress = progressEntries.filter(pe => pe.clientId === clientId);
 
   const upcomingSessions = clientSessions.filter(s => new Date(s.date) >= new Date() && s.status === 'scheduled').sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const pastSessions = clientSessions.filter(s => new Date(s.date) < new Date() || s.status !== 'scheduled').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -185,7 +179,7 @@ const ClientPortal = () => {
     }
   };
 
-  if (dataLoading) {
+  if (dataLoading || !dataInitialized) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -198,7 +192,7 @@ const ClientPortal = () => {
   }
 
   if (!client) {
-    return <div className="flex justify-center items-center min-h-screen"><p>Client not found.</p></div>;
+    return <div className="flex justify-center items-center min-h-screen"><p>Client Portal not found.</p></div>;
   }
   
   return (
