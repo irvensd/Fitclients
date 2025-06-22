@@ -56,16 +56,6 @@ import {
 import { Payment } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
 import { cn } from "@/lib/utils";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
 const getStatusBorderColor = (status: string) => {
@@ -305,8 +295,6 @@ const Payments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [methodFilter, setMethodFilter] = useState("all");
-  const [deleteTarget, setDeleteTarget] = useState<Payment | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const {
     payments,
@@ -373,17 +361,21 @@ const Payments = () => {
     });
   };
 
-  const handleConfirmDelete = async () => {
-    if (!deleteTarget) return;
+  const handleDeletePayment = async (payment: Payment) => {
+    const confirmed = confirm(
+      `Are you sure you want to delete the payment of $${payment.amount} for ${getClientName(
+        payment.clientId,
+      )}? This action cannot be undone.`
+    );
 
-    setIsDeleting(true);
+    if (!confirmed) return;
+
     try {
-      await deletePayment(deleteTarget.id);
+      await deletePayment(payment.id);
       toast({
         title: "Payment Deleted",
         description: "The payment record has been successfully deleted.",
       });
-      setDeleteTarget(null);
     } catch (error) {
       console.error("Error deleting payment:", error);
       toast({
@@ -391,8 +383,6 @@ const Payments = () => {
         title: "Deletion Failed",
         description: "Failed to delete payment. Please try again.",
       });
-    } finally {
-      setIsDeleting(false);
     }
   };
 
@@ -732,7 +722,7 @@ const Payments = () => {
                         )}
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => setDeleteTarget(payment)}
+                          onClick={() => handleDeletePayment(payment)}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete Record
@@ -791,39 +781,6 @@ const Payments = () => {
               </CardContent>
             </Card>
           )}
-
-          <AlertDialog
-            open={!!deleteTarget}
-            onOpenChange={(open) => !open && setDeleteTarget(null)}
-          >
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the
-                  payment record of{" "}
-                  <span className="font-semibold">
-                    ${deleteTarget?.amount.toFixed(2)}
-                  </span>{" "}
-                  for{" "}
-                  <span className="font-semibold">
-                    {deleteTarget && getClientName(deleteTarget.clientId)}
-                  </span>
-                  .
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleConfirmDelete}
-                  disabled={isDeleting}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  {isDeleting ? "Deleting..." : "Delete"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </>
       )}
     </div>
