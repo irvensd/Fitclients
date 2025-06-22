@@ -52,7 +52,7 @@ import { useData } from "@/contexts/DataContext";
 import { useToast } from "@/hooks/use-toast";
 
 const AIRecommendations = () => {
-  const { clients, sessions, payments, loading } = useData();
+  const { clients, sessions, payments, loading, addAiNotesToWorkoutPlan } = useData();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("all");
@@ -759,6 +759,14 @@ const AIRecommendations = () => {
                 setAppliedRecommendationIds(
                   (prev) => new Set([...prev, recId]),
                 );
+
+                // Add action items to workout plan notes
+                if (confirmationModal.recommendation.actionItems?.length > 0) {
+                  addAiNotesToWorkoutPlan(
+                    confirmationModal.recommendation.clientId,
+                    confirmationModal.recommendation.actionItems
+                  );
+                }
 
                 // Store applied recommendation in localStorage for persistence
                 const appliedRecs = JSON.parse(

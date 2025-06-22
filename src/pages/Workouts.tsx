@@ -32,6 +32,7 @@ import {
   MoreVertical,
   Filter,
   TrendingUp,
+  Sparkles,
 } from "lucide-react";
 import { WorkoutPlan, Exercise } from "@/lib/types";
 import { useAuth } from "@/contexts/AuthContext";
@@ -211,6 +212,25 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
                         {plan.description}
                       </p>
                     )}
+
+                {plan.aiNotes && plan.aiNotes.length > 0 && (
+                  <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="p-1.5 bg-purple-100 rounded-lg">
+                        <Sparkles className="h-4 w-4 text-purple-600" />
+                      </div>
+                      <h4 className="text-sm sm:text-base font-semibold text-purple-800">AI Recommendations</h4>
+                    </div>
+                    <ul className="space-y-1.5 pl-2">
+                      {plan.aiNotes.map((note, index) => (
+                        <li key={index} className="text-xs sm:text-sm text-gray-700 flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-1.5 flex-shrink-0"></div>
+                          <span>{note}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </>
             )}
           </div>

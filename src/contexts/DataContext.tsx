@@ -56,6 +56,9 @@ interface DataContextType {
   addWorkoutPlan: (plan: Omit<WorkoutPlan, "id" | "createdDate">) => Promise<void>;
   updateWorkoutPlan: (planId: string, updates: Partial<WorkoutPlan>) => Promise<void>;
   deleteWorkoutPlan: (planId: string) => Promise<void>;
+
+  // New function
+  addAiNotesToWorkoutPlan: (clientId: string, notes: string[]) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -355,6 +358,39 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
     return clients.find((c) => c.id === id)?.name || "Unknown Client";
   }, [clients]);
 
+  const addAiNotesToWorkoutPlan = (clientId: string, notes: string[]) => {
+    // Check if workout plan exists, if not, create a default one
+    const workoutPlan = workoutPlans.find(plan => plan.clientId === clientId && plan.isActive);
+    if (!workoutPlan) {
+      console.warn(
+        `No active workout plan for client ${clientId}. Notes will be added to a new default plan.`,
+      );
+      const newPlan: WorkoutPlan = {
+        id: `wp-${Date.now()}`,
+        clientId,
+        name: `Progressive Overload Plan for ${getClientName(clientId)}`,
+        description:
+          "Default plan focusing on core compound movements. Adjust as needed.",
+        exercises: [],
+        createdDate: new Date().toISOString(),
+        isActive: true,
+        aiNotes: notes,
+      };
+      setWorkoutPlans((prev) => [...prev, newPlan]);
+    } else {
+      setWorkoutPlans((prev) =>
+        prev.map((plan) =>
+          plan.id === workoutPlan.id
+            ? {
+                ...plan,
+                aiNotes: [...(plan.aiNotes || []), ...notes],
+              }
+            : plan,
+        ),
+      );
+    }
+  };
+
   const value = {
     clients,
     sessions,
@@ -385,6 +421,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
     handlePlanDowngrade,
     getActiveClients,
     getArchivedClients,
+    addAiNotesToWorkoutPlan,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
