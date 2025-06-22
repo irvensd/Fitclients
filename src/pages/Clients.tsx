@@ -1223,12 +1223,22 @@ const Clients = () => {
 
   // Portal functions
   const openClientPortal = (clientId: string) => {
+    // For demo users, always redirect to demo portal
+    if (user?.email === 'trainer@demo.com') {
+      const portalUrl = `/demo-portal`;
+      window.open(portalUrl, "_blank");
+      return;
+    }
+    
     const portalUrl = `/client-portal/${clientId}`;
     window.open(portalUrl, "_blank");
   };
 
   const shareClientPortal = (client: any) => {
-    const portalUrl = `${window.location.origin}/client-portal/${client.id}`;
+    // For demo users, always use demo portal
+    const portalUrl = user?.email === 'trainer@demo.com' 
+      ? `${window.location.origin}/demo-portal`
+      : `${window.location.origin}/client-portal/${client.id}`;
     
     const subject = "Your Personal Fitness Portal";
     const body = `Hi ${client.name},
@@ -1253,7 +1263,11 @@ Your Personal Trainer`;
   };
 
   const copyPortalLink = async (clientId: string, clientName: string) => {
-    const portalUrl = `${window.location.origin}/client-portal/${clientId}`;
+    // For demo users, always use demo portal
+    const portalUrl = user?.email === 'trainer@demo.com'
+      ? `${window.location.origin}/demo-portal`
+      : `${window.location.origin}/client-portal/${clientId}`;
+    
     await navigator.clipboard.writeText(portalUrl);
     toast({
       title: "Portal link copied!",

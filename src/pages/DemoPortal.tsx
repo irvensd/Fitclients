@@ -231,6 +231,11 @@ const upcomingSessions = demoSessions.filter(s => new Date(s.date) >= new Date()
 const pastSessions = demoSessions.filter(s => new Date(s.date) < new Date() || s.status !== 'scheduled');
 
 const DemoPortal = () => {
+  console.log("=== DEMO PORTAL LOADED ===");
+  console.log("DemoPortal component is rendering");
+  console.log("Demo client data:", demoClient);
+  console.log("=== END DEMO PORTAL DEBUG ===");
+
   return (
     <div className="min-h-screen bg-muted/40">
       <header className="bg-background border-b sticky top-0 z-10">
@@ -239,6 +244,7 @@ const DemoPortal = () => {
             <div className="flex items-center gap-4">
               <Dumbbell className="h-8 w-8 text-primary" />
               <h1 className="text-2xl font-bold text-foreground">FitClients Portal</h1>
+              <Badge variant="secondary" className="ml-2">DEMO</Badge>
             </div>
             <div className="flex items-center gap-4">
               <Avatar>
