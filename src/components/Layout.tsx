@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import NotificationBell from "./NotificationBell";
+import { QuickActionsWidget } from "@/components/QuickActionsWidget";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -310,17 +311,14 @@ export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="flex h-screen bg-background">
       <Sidebar isCollapsed={isCollapsed} onToggleCollapse={toggleCollapse} />
-
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="flex h-16 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6">
           <div className="flex items-center gap-2">
             <MobileSidebar />
             <BreadcrumbNav />
           </div>
-
           <div className="flex items-center gap-4">
             <GlobalSearch />
-            <QuickActions />
             <NotificationBell />
           </div>
         </header>
@@ -328,6 +326,7 @@ export const Layout = ({ children }: LayoutProps) => {
           {children}
         </main>
       </div>
+      <QuickActionsWidget />
     </div>
   );
 };

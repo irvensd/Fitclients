@@ -125,7 +125,7 @@ const CancelSessionDialog = ({
               required
             />
           </div>
-        </div>
+          </div>
         <div className="flex justify-end gap-2 pt-4">
           <Button variant="outline" onClick={() => setOpen(false)} disabled={isSubmitting}>
             Keep Session
@@ -168,10 +168,10 @@ const ClientPortal = () => {
   const handleCancelSession = async (sessionId: string, reason: string) => {
     try {
       await updateSession(sessionId, {
-        status: "cancelled",
-        cancellationReason: reason,
-        cancelledAt: new Date().toISOString(),
-        cancelledBy: "client",
+          status: "cancelled",
+          cancellationReason: reason,
+          cancelledAt: new Date().toISOString(),
+          cancelledBy: "client",
       });
     } catch (err) {
       console.error("Failed to cancel session:", err);
@@ -194,7 +194,7 @@ const ClientPortal = () => {
   if (!client) {
     return <div className="flex justify-center items-center min-h-screen"><p>Client Portal not found.</p></div>;
   }
-  
+
   return (
     <div className="min-h-screen bg-muted/40">
       <header className="bg-background border-b sticky top-0 z-10">
@@ -209,13 +209,13 @@ const ClientPortal = () => {
                 <AvatarImage src={client.avatar} alt={client.name} />
                 <AvatarFallback>{client.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
               </Avatar>
-              <div>
+            <div>
                 <p className="font-semibold">{client.name}</p>
                 <p className="text-sm text-muted-foreground">Client Portal</p>
-              </div>
             </div>
           </div>
         </div>
+      </div>
       </header>
 
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
@@ -225,7 +225,7 @@ const ClientPortal = () => {
             <TabsTrigger value="workouts">Workouts</TabsTrigger>
             <TabsTrigger value="progress">Progress</TabsTrigger>
             <TabsTrigger value="payments">Payments</TabsTrigger>
-          </TabsList>
+            </TabsList>
           
           <TabsContent value="overview" className="mt-6">
             <div className="grid grid-cols-1 gap-6">
@@ -241,12 +241,12 @@ const ClientPortal = () => {
                           <div className="flex items-center gap-4">
                             <div className="bg-primary/10 text-primary p-3 rounded-lg">
                               <Calendar className="h-6 w-6" />
-                            </div>
+                         </div>
                             <div>
                               <p className="font-semibold">{new Date(session.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
                               <p className="text-sm text-muted-foreground">{session.startTime} - {session.endTime}</p>
-                            </div>
-                          </div>
+                         </div>
+                       </div>
                           <CancelSessionDialog session={session} onCancel={handleCancelSession} />
                         </li>
                       ))}
@@ -254,13 +254,13 @@ const ClientPortal = () => {
                   ) : (
                     <p className="text-muted-foreground">No upcoming sessions.</p>
                   )}
-                </CardContent>
-              </Card>
+              </CardContent>
+            </Card>
 
               {gamificationData && <GamificationDashboard data={gamificationData} variant="summary" />}
               
               <Card>
-                 <CardHeader>
+                <CardHeader>
                   <CardTitle>Session History</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -281,8 +281,8 @@ const ClientPortal = () => {
                               <td className="p-2">{session.type}</td>
                               <td className="p-2">
                                 <Badge variant={session.status === 'completed' ? 'default' : session.status === 'cancelled' ? 'destructive' : 'secondary'}>
-                                  {session.status}
-                                </Badge>
+                            {session.status}
+                        </Badge>
                               </td>
                             </tr>
                           ))}
@@ -299,12 +299,12 @@ const ClientPortal = () => {
 
           <TabsContent value="workouts" className="mt-6">
             {clientWorkoutPlan ? (
-              <Card>
-                <CardHeader>
+            <Card>
+              <CardHeader>
                   <CardTitle>{clientWorkoutPlan.name}</CardTitle>
                   <CardDescription>{clientWorkoutPlan.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
+              </CardHeader>
+              <CardContent>
                   <ul className="space-y-4">
                     {clientWorkoutPlan.exercises.map((exercise, index) => (
                       <li key={index} className="p-3 bg-muted rounded-lg">
@@ -313,22 +313,22 @@ const ClientPortal = () => {
                           {exercise.sets} sets of {exercise.reps} {exercise.weight ? ` at ${exercise.weight}lbs` : ""}
                         </p>
                         {exercise.notes && <p className="text-xs mt-1">Notes: {exercise.notes}</p>}
-                      </li>
+                                    </li>
                     ))}
                   </ul>
-                </CardContent>
-              </Card>
+              </CardContent>
+            </Card>
             ) : (
               <Card><CardContent className="pt-6"><p>No workout plan assigned.</p></CardContent></Card>
             )}
           </TabsContent>
 
           <TabsContent value="progress" className="mt-6">
-             <Card>
-                <CardHeader>
+            <Card>
+              <CardHeader>
                   <CardTitle>Progress History</CardTitle>
-                </CardHeader>
-                <CardContent>
+              </CardHeader>
+              <CardContent>
                    {clientProgress.length > 0 ? (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
@@ -349,12 +349,12 @@ const ClientPortal = () => {
                           ))}
                         </tbody>
                       </table>
-                    </div>
+                        </div>
                   ) : (
                     <p className="text-muted-foreground">No progress has been logged yet.</p>
                   )}
-                </CardContent>
-              </Card>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="payments" className="mt-6">
@@ -371,13 +371,13 @@ const ClientPortal = () => {
                         <div className="flex items-center gap-4">
                           <div className={`p-2 rounded-full ${payment.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
                             {payment.status === 'completed' ? <CheckCircle className="h-5 w-5"/> : <DollarSign className="h-5 w-5" />}
-                          </div>
-                          <div>
+                      </div>
+                                    <div>
                             <p className="font-semibold">${payment.amount.toFixed(2)} - {payment.description}</p>
-                            <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground">
                               Paid on {new Date(payment.date).toLocaleDateString()} via {payment.method}
-                            </p>
-                          </div>
+                        </p>
+                      </div>
                         </div>
                         <Badge variant={payment.status === 'completed' ? 'default' : payment.status === 'pending' ? 'secondary' : 'destructive'}>
                           {payment.status}
@@ -390,7 +390,7 @@ const ClientPortal = () => {
                     <DollarSign className="mx-auto h-12 w-12 text-muted-foreground" />
                     <h3 className="mt-2 text-sm font-medium text-gray-900">No payment history</h3>
                     <p className="mt-1 text-sm text-muted-foreground">No payments have been recorded for this client yet.</p>
-                  </div>
+                </div>
                 )}
               </CardContent>
             </Card>

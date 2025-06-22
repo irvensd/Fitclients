@@ -204,17 +204,17 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
                 </div>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
                   <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="truncate">For: {getClientName(plan.clientId) || "Unassigned"}</span>
-                </div>
-                {plan.description && (
+                      <span className="truncate">For: {getClientName(plan.clientId) || "Unassigned"}</span>
+                    </div>
+                    {plan.description && (
                   <p className="text-xs sm:text-sm text-gray-600 leading-relaxed line-clamp-2">
-                    {plan.description}
-                  </p>
-                )}
+                        {plan.description}
+                      </p>
+                    )}
               </>
             )}
           </div>
-          {!isEditing && (
+      {!isEditing && (
             <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2">
               <Button
                 variant="ghost"
@@ -223,7 +223,7 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
                 className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-primary/10 hover:text-primary"
               >
                 <Target className="h-3 w-3 sm:h-4 sm:w-4" />
-              </Button>
+                </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -231,7 +231,7 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
                 className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-primary/10 hover:text-primary"
               >
                 <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-              </Button>
+                </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -239,7 +239,7 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
                 className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-primary/10 hover:text-primary"
               >
                 <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
-              </Button>
+                    </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -256,9 +256,9 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
               >
                 <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
-            </div>
-          )}
-        </div>
+              </div>
+            )}
+                </div>
       </CardHeader>
       {!isEditing && (
         <CardContent className="pt-0">
@@ -267,16 +267,16 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
               <div className="flex items-center gap-1">
                 <Target className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span>{plan.exercises.length} exercises</span>
-              </div>
+                </div>
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span>{plan.exercises.length * 5} min est.</span>
               </div>
             </div>
             <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 text-xs">
-              Active
-            </Badge>
-          </div>
+                Active
+              </Badge>
+            </div>
         </CardContent>
       )}
     </Card>
@@ -358,25 +358,25 @@ const CreateWorkoutDialog = ({ isOpen, onClose, onWorkoutCreated, clients }) => 
     }
   };
 
-  return (
+    return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-[500px] max-h-[90vh] overflow-y-auto bg-white border-0 shadow-2xl mx-4">
         <DialogHeader className="space-y-2 sm:space-y-3">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
               <Plus className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-            </div>
+          </div>
             <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900">
               Create New Workout Plan
             </DialogTitle>
-          </div>
+        </div>
           <DialogDescription className="text-sm text-gray-600">
             Create a personalized workout plan for your client. You can add exercises later.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div className="space-y-3 sm:space-y-4">
-            <div className="space-y-2">
+        <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700">Client</label>
               <select
                 value={workoutData.clientId}
@@ -391,17 +391,17 @@ const CreateWorkoutDialog = ({ isOpen, onClose, onWorkoutCreated, clients }) => 
                   </option>
                 ))}
               </select>
-            </div>
+        </div>
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700">Workout Name</label>
-              <Input
+            <Input
                 value={workoutData.name}
                 onChange={(e) => setWorkoutData({ ...workoutData, name: e.target.value })}
                 placeholder="e.g., Upper Body Strength"
                 className="h-10 sm:h-12 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
                 required
-              />
-            </div>
+            />
+          </div>
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700">Description</label>
               <textarea
@@ -411,28 +411,28 @@ const CreateWorkoutDialog = ({ isOpen, onClose, onWorkoutCreated, clients }) => 
                 className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 rounded-lg bg-white resize-none focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all text-sm"
                 rows={3}
               />
-            </div>
+        </div>
           </div>
           <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4">
-            <Button
+          <Button
               type="button"
               variant="outline"
               onClick={onClose}
               className="px-4 sm:px-6 py-2 border-gray-200 hover:bg-gray-50 text-sm"
             >
               Cancel
-            </Button>
-            <Button
+          </Button>
+          <Button
               type="submit" 
               disabled={loading}
               className="bg-primary hover:bg-primary/90 text-white px-4 sm:px-6 py-2 shadow-lg hover:shadow-xl transition-all text-sm"
-            >
+          >
               {loading ? "Creating..." : "Create Plan"}
-            </Button>
-          </div>
+          </Button>
+        </div>
         </form>
-      </DialogContent>
-    </Dialog>
+          </DialogContent>
+        </Dialog>
   );
 };
 
@@ -470,7 +470,7 @@ const ViewWorkoutDialog = ({ workout, isOpen, onClose, onSave, getClientName }) 
 
   const handleAddExercise = () => {
     if (!newExercise.name) return;
-    
+
     const exercise = {
       id: Date.now().toString(),
       name: newExercise.name,
@@ -792,17 +792,17 @@ const Workouts = () => {
           };
         });
         setClients(clientData);
-      } catch (error) {
+    } catch (error) {
         console.error("Error loading data:", error);
-        toast({
-          title: "Error",
+      toast({
+        title: "Error",
           description: "Failed to load data.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
     loadData();
   }, [user?.uid, user?.email, toast, isDemoAccount]);
@@ -847,7 +847,7 @@ const Workouts = () => {
     
     if (confirm(`Are you sure you want to delete "${workout.name}"?`)) {
       try {
-        if (!isDemoAccount) {
+      if (!isDemoAccount) {
           const workoutDoc = doc(db, "users", user.uid, "workoutPlans", workout.id);
           await deleteDoc(workoutDoc);
           
@@ -857,18 +857,18 @@ const Workouts = () => {
           const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WorkoutPlan));
           setWorkoutPlans(plans);
         }
-        
-        toast({
+      
+      toast({
           title: "Workout deleted",
           description: "Workout plan has been successfully deleted.",
-        });
-      } catch (error) {
+      });
+    } catch (error) {
         console.error("Error deleting workout:", error);
-        toast({
-          title: "Error",
+      toast({
+        title: "Error",
           description: "Failed to delete workout. Please try again.",
-          variant: "destructive",
-        });
+        variant: "destructive",
+      });
       }
     }
   };
@@ -911,7 +911,7 @@ const Workouts = () => {
               : plan
           )
         );
-      } else {
+        } else {
         // For demo account, just update local state
         setWorkoutPlans(prev => 
           prev.map(plan => 
@@ -926,13 +926,13 @@ const Workouts = () => {
         title: "Workout updated",
         description: "Workout plan has been successfully updated.",
       });
-    } catch (error) {
+      } catch (error) {
       console.error("Error updating workout:", error);
-      toast({
-        title: "Error",
+        toast({
+          title: "Error",
         description: "Failed to update workout. Please try again.",
-        variant: "destructive",
-      });
+          variant: "destructive",
+        });
     }
   };
 
@@ -958,17 +958,17 @@ const Workouts = () => {
         )
       );
       
-      toast({
+        toast({
         title: "Workout updated",
         description: "Workout plan has been successfully updated.",
-      });
-    } catch (error) {
+        });
+      } catch (error) {
       console.error("Error updating workout:", error);
-      toast({
-        title: "Error",
+        toast({
+          title: "Error",
         description: "Failed to update workout. Please try again.",
-        variant: "destructive",
-      });
+          variant: "destructive",
+        });
     }
   };
 
@@ -1041,10 +1041,10 @@ const Workouts = () => {
   };
 
   if (loading) {
-    return (
+  return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+            </div>
     );
   }
 
@@ -1069,10 +1069,10 @@ const Workouts = () => {
         <div className="flex flex-col gap-4 sm:gap-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6">
             <div className="space-y-2">
-              <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3">
                 <div className="p-2 sm:p-3 bg-primary/10 rounded-lg sm:rounded-xl">
                   <Dumbbell className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-                </div>
+                      </div>
                 <div>
                   <h1 className="text-2xl sm:text-4xl font-bold text-gray-900">
                     Workouts
@@ -1080,16 +1080,16 @@ const Workouts = () => {
                   <p className="text-sm sm:text-lg text-gray-600">
                     Create and manage personalized workout plans
                   </p>
-                </div>
-              </div>
+                      </div>
+                    </div>
             </div>
-            <Button 
+                      <Button
               onClick={() => setShowCreateDialog(true)}
               className="bg-primary hover:bg-primary/90 text-white px-4 sm:px-6 py-2 sm:py-3 h-auto text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto"
             >
               <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               Create New Plan
-            </Button>
+                      </Button>
           </div>
         </div>
 
@@ -1104,10 +1104,10 @@ const Workouts = () => {
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Total Plans</p>
                   <p className="text-lg sm:text-2xl font-bold text-gray-900">{workoutPlans.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
           <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center gap-2 sm:gap-4">
@@ -1146,8 +1146,8 @@ const Workouts = () => {
                     {workoutPlans.length > 0 
                       ? Math.round(workoutPlans.reduce((total, plan) => total + plan.exercises.length, 0) / workoutPlans.length * 5)
                       : 0} min
-                  </p>
-                </div>
+              </p>
+            </div>
               </div>
             </CardContent>
           </Card>
@@ -1192,7 +1192,7 @@ const Workouts = () => {
                     <span className="sm:hidden">Stats</span>
                   </TabsTrigger>
                 </TabsList>
-              </div>
+        </div>
             </div>
             
             <TabsContent value="plans" className="p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -1288,7 +1288,7 @@ const Workouts = () => {
                   <div>
                     <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Workout Templates</h3>
                     <p className="text-gray-600 text-sm">Choose from proven workout templates for different goals</p>
-                  </div>
+            </div>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <select className="px-3 py-2 border border-gray-200 rounded-lg text-xs sm:text-sm bg-white focus:border-primary focus:outline-none">
                       <option value="all">All Goals</option>
@@ -1304,7 +1304,7 @@ const Workouts = () => {
                       <option value="intermediate">Intermediate</option>
                       <option value="advanced">Advanced</option>
                     </select>
-                  </div>
+          </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
@@ -1323,19 +1323,19 @@ const Workouts = () => {
                             </div>
                             <p className="text-xs sm:text-sm text-gray-600">{template.description}</p>
                             <div className="flex items-center gap-2 sm:gap-4 text-xs text-gray-500">
-                              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1">
                                 <Target className="h-3 w-3" />
                                 {template.exercises.length} exercises
-                              </span>
-                              <span className="flex items-center gap-1">
+              </span>
+              <span className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
                                 {template.duration}
-                              </span>
+              </span>
                               <Badge variant="outline" className="text-xs">
                                 {template.level}
                               </Badge>
-                            </div>
-                          </div>
+            </div>
+          </div>
                         </div>
                       </CardHeader>
                       <CardContent className="pt-0">
@@ -1377,8 +1377,8 @@ const Workouts = () => {
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10 h-10 sm:h-12 border-gray-200 focus:border-primary focus:ring-primary text-sm"
                     />
-                  </div>
                 </div>
+              </div>
                 <div className="flex items-center gap-2 sm:gap-3">
                   <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
                   <select
@@ -1417,7 +1417,7 @@ const Workouts = () => {
                         <p className="text-lg sm:text-2xl font-bold text-gray-900">
                           {workoutPlans.filter(p => p.isActive).length}
                         </p>
-                      </div>
+          </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -1427,13 +1427,13 @@ const Workouts = () => {
                     <div className="flex items-center gap-2 sm:gap-4">
                       <div className="p-2 sm:p-3 bg-green-500/10 rounded-lg">
                         <Users className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
-                      </div>
+          </div>
                       <div>
                         <p className="text-xs sm:text-sm font-medium text-gray-600">Clients with Plans</p>
                         <p className="text-lg sm:text-2xl font-bold text-gray-900">
                           {new Set(workoutPlans.map(p => p.clientId)).size}
                         </p>
-                      </div>
+        </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -1443,7 +1443,7 @@ const Workouts = () => {
                     <div className="flex items-center gap-2 sm:gap-4">
                       <div className="p-2 sm:p-3 bg-purple-500/10 rounded-lg">
                         <Dumbbell className="h-4 w-4 sm:h-6 sm:w-6 text-purple-600" />
-                      </div>
+        </div>
                       <div>
                         <p className="text-xs sm:text-sm font-medium text-gray-600">Total Exercises</p>
                         <p className="text-lg sm:text-2xl font-bold text-gray-900">
@@ -1586,4 +1586,4 @@ const Workouts = () => {
   );
 };
 
-export default Workouts;
+export default Workouts; 

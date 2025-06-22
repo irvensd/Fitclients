@@ -12,6 +12,18 @@ export interface Recommendation {
   dataPoints: string[];
   estimatedImpact: string;
   timeframe: string;
+  appliedAt?: string;
+  appliedBy?: string;
+  status: "pending" | "applied" | "completed" | "failed";
+  successMetrics?: {
+    clientFeedback?: number; // 1-5 rating
+    progressImprovement?: number; // percentage
+    attendanceChange?: number; // percentage
+    completionRate?: number; // percentage
+    notes?: string;
+  };
+  followUpDate?: string;
+  category: "retention" | "performance" | "engagement" | "safety" | "optimization";
 }
 
 export interface ClientAnalysis {
@@ -24,6 +36,21 @@ export interface ClientAnalysis {
   recommendations: Recommendation[];
   keyInsights: string[];
   nextReviewDate: string;
+  dropoutRisk: "low" | "medium" | "high";
+  dropoutRiskScore: number; // 0-100
+  predictedMilestones: MilestonePrediction[];
+  retentionProbability: number; // 0-100
+  nextOptimalSessionDate?: string;
+}
+
+export interface MilestonePrediction {
+  type: "weight" | "strength" | "endurance" | "attendance" | "goal";
+  description: string;
+  predictedDate: string;
+  confidence: number;
+  currentValue: number;
+  targetValue: number;
+  progressPercentage: number;
 }
 
 // Mock data for demonstration - in real app this would come from actual client data
@@ -153,6 +180,10 @@ export const generateRecommendations = (
       nextReviewDate: new Date(
         Date.now() + 7 * 24 * 60 * 60 * 1000,
       ).toISOString(),
+      dropoutRisk: "low",
+      dropoutRiskScore: 0,
+      predictedMilestones: [],
+      retentionProbability: 0,
     };
   }
 
@@ -168,6 +199,10 @@ export const generateRecommendations = (
     nextReviewDate: new Date(
       Date.now() + 14 * 24 * 60 * 60 * 1000,
     ).toISOString(),
+    dropoutRisk: "low",
+    dropoutRiskScore: 0,
+    predictedMilestones: [],
+    retentionProbability: 0,
   };
 
   // Generate AI recommendations based on analysis
@@ -176,12 +211,32 @@ export const generateRecommendations = (
     analysis,
     client,
     usingRealData,
-  );
+  ).map(rec => ({
+    ...rec,
+    status: "pending" as const,
+    category: getRecommendationCategory(rec.type, rec.priority),
+  }));
   analysis.keyInsights = generateKeyInsights(
     clientData,
     analysis,
     usingRealData,
   );
+
+  // Predictive Analytics Functions
+  const dropoutRisk = calculateDropoutRisk(clientData, analysis, client);
+  analysis.dropoutRisk = dropoutRisk.risk;
+  analysis.dropoutRiskScore = dropoutRisk.score;
+
+  const milestones = predictMilestones(clientData, analysis, client);
+  analysis.predictedMilestones = milestones;
+
+  const retentionProbability = calculateRetentionProbability(
+    dropoutRisk.score,
+    analysis.attendanceRate,
+    analysis.progressTrend,
+    client.fitnessLevel,
+  );
+  analysis.retentionProbability = retentionProbability;
 
   return analysis;
 };
@@ -256,6 +311,18 @@ const generateAIRecommendations = (
       ],
       estimatedImpact: "15-20% strength increase in 4 weeks",
       timeframe: "2-3 weeks",
+      appliedAt: new Date().toISOString(),
+      appliedBy: "AI",
+      status: "applied",
+      successMetrics: {
+        clientFeedback: 4.5,
+        progressImprovement: 10,
+        attendanceChange: 10,
+        completionRate: 100,
+        notes: "Great progress and adherence to recommended workouts",
+      },
+      followUpDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      category: "retention",
     });
   }
 
@@ -286,6 +353,18 @@ const generateAIRecommendations = (
       ],
       estimatedImpact: "1-2 lbs per week weight loss",
       timeframe: "2-4 weeks",
+      appliedAt: new Date().toISOString(),
+      appliedBy: "AI",
+      status: "applied",
+      successMetrics: {
+        clientFeedback: 4,
+        progressImprovement: 5,
+        attendanceChange: 5,
+        completionRate: 100,
+        notes: "Great progress and adherence to recommended workouts",
+      },
+      followUpDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      category: "retention",
     });
   }
 
@@ -313,6 +392,18 @@ const generateAIRecommendations = (
       ],
       estimatedImpact: "Prevent plateaus and optimize long-term gains",
       timeframe: "4-8 weeks",
+      appliedAt: new Date().toISOString(),
+      appliedBy: "AI",
+      status: "applied",
+      successMetrics: {
+        clientFeedback: 4.5,
+        progressImprovement: 10,
+        attendanceChange: 10,
+        completionRate: 100,
+        notes: "Great progress and adherence to recommended workouts",
+      },
+      followUpDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      category: "retention",
     });
   }
 
@@ -347,6 +438,18 @@ const generateAIRecommendations = (
         ],
         estimatedImpact: "Sustained motivation and continued progress",
         timeframe: "1-2 weeks",
+        appliedAt: new Date().toISOString(),
+        appliedBy: "AI",
+        status: "applied",
+        successMetrics: {
+          clientFeedback: 4.5,
+          progressImprovement: 10,
+          attendanceChange: 10,
+          completionRate: 100,
+          notes: "Great progress and adherence to recommended workouts",
+        },
+        followUpDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        category: "retention",
       });
     } else if (recentPerformance < 75) {
       recommendations.push({
@@ -371,6 +474,18 @@ const generateAIRecommendations = (
         ],
         estimatedImpact: "Restore performance and prevent burnout",
         timeframe: "Immediate",
+        appliedAt: new Date().toISOString(),
+        appliedBy: "AI",
+        status: "applied",
+        successMetrics: {
+          clientFeedback: 3,
+          progressImprovement: 0,
+          attendanceChange: 0,
+          completionRate: 0,
+          notes: "Performance decline observed",
+        },
+        followUpDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        category: "retention",
       });
     }
   }
@@ -403,6 +518,18 @@ const generateAIRecommendations = (
       ],
       estimatedImpact: "Resume 1-2 lbs weight loss per week",
       timeframe: "2-3 weeks",
+      appliedAt: new Date().toISOString(),
+      appliedBy: "AI",
+      status: "applied",
+      successMetrics: {
+        clientFeedback: 4,
+        progressImprovement: 5,
+        attendanceChange: 5,
+        completionRate: 100,
+        notes: "Great progress and adherence to recommended workouts",
+      },
+      followUpDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      category: "retention",
     });
   }
 
@@ -434,6 +561,18 @@ const generateAIRecommendations = (
       ],
       estimatedImpact: "Increase calorie burn by 300-400 per week",
       timeframe: "1-2 weeks",
+      appliedAt: new Date().toISOString(),
+      appliedBy: "AI",
+      status: "applied",
+      successMetrics: {
+        clientFeedback: 4,
+        progressImprovement: 5,
+        attendanceChange: 5,
+        completionRate: 100,
+        notes: "Great progress and adherence to recommended workouts",
+      },
+      followUpDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      category: "retention",
     });
   }
 
@@ -462,6 +601,18 @@ const generateAIRecommendations = (
       ],
       estimatedImpact: "Prevent overtraining and improve performance",
       timeframe: "Immediate",
+      appliedAt: new Date().toISOString(),
+      appliedBy: "AI",
+      status: "applied",
+      successMetrics: {
+        clientFeedback: 4,
+        progressImprovement: 0,
+        attendanceChange: 0,
+        completionRate: 100,
+        notes: "Great progress and adherence to recommended workouts",
+      },
+      followUpDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      category: "retention",
     });
   }
 
@@ -496,6 +647,18 @@ const generateAIRecommendations = (
       ],
       estimatedImpact: "Renewed progress and motivation",
       timeframe: "Next session",
+      appliedAt: new Date().toISOString(),
+      appliedBy: "AI",
+      status: "applied",
+      successMetrics: {
+        clientFeedback: 4.5,
+        progressImprovement: 5,
+        attendanceChange: 5,
+        completionRate: 100,
+        notes: "Great progress and adherence to recommended workouts",
+      },
+      followUpDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      category: "retention",
     });
   }
 
@@ -524,6 +687,18 @@ const generateAIRecommendations = (
       ],
       estimatedImpact: "Sustained long-term motivation",
       timeframe: "Next goal review meeting",
+      appliedAt: new Date().toISOString(),
+      appliedBy: "AI",
+      status: "applied",
+      successMetrics: {
+        clientFeedback: 4,
+        progressImprovement: 5,
+        attendanceChange: 5,
+        completionRate: 100,
+        notes: "Great progress and adherence to recommended workouts",
+      },
+      followUpDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      category: "retention",
     });
   }
 
@@ -633,4 +808,150 @@ export const getTypeIcon = (type: Recommendation["type"]) => {
     default:
       return "💡";
   }
+};
+
+// Predictive Analytics Functions
+const calculateDropoutRisk = (
+  clientData: any,
+  analysis: ClientAnalysis,
+  client: Client,
+): { risk: "low" | "medium" | "high"; score: number } => {
+  let riskScore = 0;
+  
+  // Attendance-based risk factors
+  if (analysis.attendanceRate < 60) riskScore += 30;
+  else if (analysis.attendanceRate < 80) riskScore += 15;
+  
+  // Recent session patterns
+  const recentSessions = clientData.recentSessions.slice(-3);
+  const missedSessions = recentSessions.filter((s: any) => !s.attended).length;
+  if (missedSessions >= 2) riskScore += 25;
+  else if (missedSessions === 1) riskScore += 10;
+  
+  // Progress trend impact
+  if (analysis.progressTrend === "declining") riskScore += 20;
+  else if (analysis.progressTrend === "plateauing") riskScore += 10;
+  
+  // Fitness level considerations
+  if (client.fitnessLevel === "beginner" && analysis.attendanceRate < 70) riskScore += 15;
+  
+  // Goal progress impact
+  if (analysis.goalProgress < 30) riskScore += 15;
+  
+  // Determine risk level
+  if (riskScore >= 60) return { risk: "high", score: riskScore };
+  if (riskScore >= 30) return { risk: "medium", score: riskScore };
+  return { risk: "low", score: riskScore };
+};
+
+const predictMilestones = (
+  clientData: any,
+  analysis: ClientAnalysis,
+  client: Client,
+): MilestonePrediction[] => {
+  const milestones: MilestonePrediction[] = [];
+  const today = new Date();
+  
+  // Weight milestone prediction
+  if (clientData.progressEntries.length >= 2) {
+    const recentWeight = clientData.progressEntries[0].weight;
+    const previousWeight = clientData.progressEntries[1].weight;
+    const weightChange = recentWeight - previousWeight;
+    
+    if (client.goals.toLowerCase().includes("weight")) {
+      const targetWeight = clientData.goals?.targetWeight || (recentWeight * 0.9);
+      const weightToLose = recentWeight - targetWeight;
+      const weeksToGoal = Math.abs(weightToLose / (weightChange / 2)); // Assuming 2 weeks between entries
+      
+      if (weeksToGoal > 0 && weeksToGoal < 52) { // Within a year
+        milestones.push({
+          type: "weight",
+          description: `Reach ${targetWeight} lbs`,
+          predictedDate: new Date(today.getTime() + weeksToGoal * 7 * 24 * 60 * 60 * 1000).toISOString(),
+          confidence: Math.min(85, 100 - Math.abs(weeksToGoal - 12) * 2), // Higher confidence for realistic timelines
+          currentValue: recentWeight,
+          targetValue: targetWeight,
+          progressPercentage: Math.max(0, Math.min(100, ((recentWeight - targetWeight) / (previousWeight - targetWeight)) * 100)),
+        });
+      }
+    }
+  }
+  
+  // Attendance milestone
+  const attendanceTarget = 90;
+  const currentAttendance = analysis.attendanceRate;
+  if (currentAttendance < attendanceTarget) {
+    const sessionsToTarget = Math.ceil((attendanceTarget - currentAttendance) / 5); // Assuming 5% improvement per week
+    milestones.push({
+      type: "attendance",
+      description: `Achieve ${attendanceTarget}% attendance rate`,
+      predictedDate: new Date(today.getTime() + sessionsToTarget * 7 * 24 * 60 * 60 * 1000).toISOString(),
+      confidence: 70,
+      currentValue: currentAttendance,
+      targetValue: attendanceTarget,
+      progressPercentage: (currentAttendance / attendanceTarget) * 100,
+    });
+  }
+  
+  // Strength milestone (estimated based on fitness level and attendance)
+  if (analysis.attendanceRate > 80) {
+    const strengthTarget = client.fitnessLevel === "beginner" ? 3 : client.fitnessLevel === "intermediate" ? 6 : 12;
+    const weeksToStrength = strengthTarget;
+    milestones.push({
+      type: "strength",
+      description: `Increase major lifts by ${strengthTarget}%`,
+      predictedDate: new Date(today.getTime() + weeksToStrength * 7 * 24 * 60 * 60 * 1000).toISOString(),
+      confidence: 75,
+      currentValue: 0,
+      targetValue: strengthTarget,
+      progressPercentage: 0,
+    });
+  }
+  
+  return milestones;
+};
+
+const calculateRetentionProbability = (
+  dropoutRisk: number,
+  attendanceRate: number,
+  progressTrend: string,
+  clientLevel: string,
+): number => {
+  let probability = 85; // Base retention probability
+  
+  // Adjust based on dropout risk
+  probability -= dropoutRisk * 0.5;
+  
+  // Attendance impact
+  if (attendanceRate > 90) probability += 10;
+  else if (attendanceRate > 80) probability += 5;
+  else if (attendanceRate < 60) probability -= 15;
+  
+  // Progress trend impact
+  if (progressTrend === "improving") probability += 10;
+  else if (progressTrend === "declining") probability -= 10;
+  
+  // Fitness level impact
+  if (clientLevel === "advanced") probability += 5;
+  else if (clientLevel === "beginner") probability -= 5;
+  
+  return Math.max(0, Math.min(100, probability));
+};
+
+const getRecommendationCategory = (
+  type: Recommendation["type"],
+  priority: Recommendation["priority"],
+): Recommendation["category"] => {
+  if (priority === "high") {
+    if (type === "recovery") return "safety";
+    if (type === "schedule") return "retention";
+    return "performance";
+  }
+  
+  if (type === "workout" || type === "cardio") return "performance";
+  if (type === "nutrition") return "optimization";
+  if (type === "schedule") return "engagement";
+  if (type === "recovery") return "safety";
+  
+  return "optimization";
 };
