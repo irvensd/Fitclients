@@ -45,11 +45,19 @@ import {
   Search,
   TrendingUp,
   Ruler,
+  Trash2,
+  MoreVertical,
 } from "lucide-react";
 import { Client, ProgressEntry } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
 import { SmartRecommendations } from "@/components/SmartRecommendations";
 import { useToast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const AddProgressDialog = () => {
   const [open, setOpen] = useState(false);
@@ -244,7 +252,11 @@ const AddProgressDialog = () => {
 };
 
 const ClientProgressCard = ({ client }: { client: Client }) => {
-  const { progressEntries } = useData();
+  const { progressEntries, deleteProgressEntry } = useData();
+  const { toast } = useToast();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletingEntry, setDeletingEntry] = useState<string | null>(null);
+  
   const clientProgress = progressEntries
     .filter((entry) => entry.clientId === client.id)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -258,60 +270,125 @@ const ClientProgressCard = ({ client }: { client: Client }) => {
   const weightChange = latestEntry.weight && firstEntry.weight ? latestEntry.weight - firstEntry.weight : 0;
   const bodyFatChange = latestEntry.bodyFat && firstEntry.bodyFat ? latestEntry.bodyFat - firstEntry.bodyFat : 0;
 
+  const handleDelete = async (entryId: string) => {
+    setDeletingEntry(entryId);
+    try {
+      await deleteProgressEntry(entryId);
+      toast({
+        title: "Progress Deleted",
+        description: `Progress entry for ${client.name} has been successfully deleted.`,
+      });
+      setShowDeleteDialog(false);
+    } catch (error) {
+      console.error("Error deleting progress:", error);
+      toast({
+        variant: "destructive",
+        title: "Deletion Error",
+        description: "Failed to delete progress. Please try again.",
+      });
+    } finally {
+      setDeletingEntry(null);
+    }
+  };
+
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={client.avatar} />
-              <AvatarFallback className="text-xs font-medium">
-                {client.name.split(" ").map((n) => n[0]).join("")}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <CardTitle className="text-sm truncate">{client.name}</CardTitle>
-              <p className="text-xs text-muted-foreground capitalize">{client.fitnessLevel}</p>
+    <>
+      <Card className="overflow-hidden hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={client.avatar} />
+                <AvatarFallback className="text-xs font-medium">
+                  {client.name.split(" ").map((n) => n[0]).join("")}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-sm truncate">{client.name}</CardTitle>
+                <p className="text-xs text-muted-foreground capitalize">{client.fitnessLevel}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              <Badge variant="outline" className="text-xs">
+                {clientProgress.length}
+              </Badge>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <MoreVertical className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem 
+                    onClick={() => setShowDeleteDialog(true)}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Latest Entry
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
-          <Badge variant="outline" className="text-xs">
-            {clientProgress.length}
-          </Badge>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="pt-0 pb-3">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="text-center p-2 bg-muted/30 rounded">
-            <p className={`text-lg font-bold ${weightChange <= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {weightChange.toFixed(1)}
-            </p>
-            <p className="text-xs text-muted-foreground">lbs</p>
+        </CardHeader>
+        
+        <CardContent className="pt-0 pb-3">
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="text-center p-2 bg-muted/30 rounded">
+              <p className={`text-lg font-bold ${weightChange <= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {weightChange.toFixed(1)}
+              </p>
+              <p className="text-xs text-muted-foreground">lbs</p>
+            </div>
+            <div className="text-center p-2 bg-muted/30 rounded">
+              <p className={`text-lg font-bold ${bodyFatChange <= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {bodyFatChange.toFixed(1)}
+              </p>
+              <p className="text-xs text-muted-foreground">%</p>
+            </div>
           </div>
-          <div className="text-center p-2 bg-muted/30 rounded">
-            <p className={`text-lg font-bold ${bodyFatChange <= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {bodyFatChange.toFixed(1)}
-            </p>
-            <p className="text-xs text-muted-foreground">%</p>
-          </div>
-        </div>
 
-        {/* Latest Weight */}
-        {latestEntry.weight && (
-          <div className="text-center p-2 bg-blue-50 rounded mb-2">
-            <p className="text-sm font-semibold text-blue-700">{latestEntry.weight} lbs</p>
-            <p className="text-xs text-blue-600">Current Weight</p>
-          </div>
-        )}
+          {/* Latest Weight */}
+          {latestEntry.weight && (
+            <div className="text-center p-2 bg-blue-50 rounded mb-2">
+              <p className="text-sm font-semibold text-blue-700">{latestEntry.weight} lbs</p>
+              <p className="text-xs text-blue-600">Current Weight</p>
+            </div>
+          )}
 
-        {/* Progress Trend */}
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>Last: {new Date(latestEntry.date).toLocaleDateString()}</span>
-          <span>{clientProgress.length} entries</span>
-        </div>
-      </CardContent>
-    </Card>
+          {/* Progress Trend */}
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>Last: {new Date(latestEntry.date).toLocaleDateString()}</span>
+            <span>{clientProgress.length} entries</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Progress Entry</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the latest progress entry for {client.name}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => handleDelete(latestEntry.id)}
+              disabled={deletingEntry === latestEntry.id}
+            >
+              {deletingEntry === latestEntry.id ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
