@@ -234,8 +234,8 @@ const ClientPortal = () => {
           </TabsList>
           
           <TabsContent value="overview" className="mt-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="lg:col-span-2">
+            <div className="grid grid-cols-1 gap-6">
+              <Card>
                 <CardHeader>
                   <CardTitle>Upcoming Sessions</CardTitle>
                 </CardHeader>
@@ -265,7 +265,7 @@ const ClientPortal = () => {
 
               {gamificationData && <GamificationDashboard data={gamificationData} variant="summary" />}
               
-              <Card className="lg:col-span-3">
+              <Card>
                  <CardHeader>
                   <CardTitle>Session History</CardTitle>
                 </CardHeader>
