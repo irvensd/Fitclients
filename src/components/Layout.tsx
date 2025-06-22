@@ -102,7 +102,7 @@ const navigation = [
 
 const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, isDemoUser } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -112,6 +112,16 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
       window.location.href = "/login";
     }
   };
+
+  // Add demo portal to navigation for demo users
+  const demoNavigation = isDemoUser ? [
+    ...navigation,
+    {
+      name: "Demo Portal",
+      href: "/demo-portal",
+      icon: Share2,
+    }
+  ] : navigation;
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -133,7 +143,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
         </div>
 
         <nav className="flex-1 px-4 py-4 space-y-2">
-          {navigation.map((item) => (
+          {demoNavigation.map((item) => (
             <SidebarNavItem
               key={item.name}
               item={item}
@@ -208,7 +218,7 @@ const SidebarNavItem = ({ item, isActive, isCollapsed }) => (
 
 const MobileSidebar = () => {
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, isDemoUser } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -218,6 +228,16 @@ const MobileSidebar = () => {
       window.location.href = "/login";
     }
   };
+
+  // Add demo portal to navigation for demo users
+  const demoNavigation = isDemoUser ? [
+    ...navigation,
+    {
+      name: "Demo Portal",
+      href: "/demo-portal",
+      icon: Share2,
+    }
+  ] : navigation;
 
   return (
     <Sheet>
@@ -239,7 +259,7 @@ const MobileSidebar = () => {
           </div>
 
           <nav className="flex-1 px-4 py-4 space-y-2">
-            {navigation.map((item) => (
+            {demoNavigation.map((item) => (
               <SheetClose key={item.name} asChild>
                 <Link
                   to={item.href}

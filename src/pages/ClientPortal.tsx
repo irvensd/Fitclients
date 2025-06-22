@@ -44,6 +44,7 @@ import { GamificationDashboard } from "@/components/GamificationDashboard";
 import { useData } from "@/contexts/DataContext";
 import { calculateGamificationData } from "@/lib/gamification";
 import { Client, Session, Payment, WorkoutPlan, ProgressEntry } from "@/lib/types";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CancelSessionDialog = ({
   session,
@@ -152,13 +153,19 @@ const ClientPortal = () => {
     dataInitialized,
     updateSession,
   } = useData();
+  const { isDemoUser } = useAuth();
+
+  // For demo users, use the first available client if no specific clientId is provided
+  const effectiveClientId = isDemoUser && (!clientId || clientId === 'demo') 
+    ? (clients.length > 0 ? clients[0].id : null) 
+    : clientId;
 
   // Get client and related data directly from context
-  const client = clients.find((c) => c.id === clientId);
-  const clientSessions = sessions.filter((s) => s.clientId === clientId);
-  const clientPayments = payments.filter((p) => p.clientId === clientId);
-  const clientWorkoutPlan = workoutPlans.find((wp) => wp.clientId === clientId);
-  const clientProgress = progressEntries.filter(pe => pe.clientId === clientId);
+  const client = clients.find((c) => c.id === effectiveClientId);
+  const clientSessions = sessions.filter((s) => s.clientId === effectiveClientId);
+  const clientPayments = payments.filter((p) => p.clientId === effectiveClientId);
+  const clientWorkoutPlan = workoutPlans.find((wp) => wp.clientId === effectiveClientId);
+  const clientProgress = progressEntries.filter(pe => pe.clientId === effectiveClientId);
 
   const upcomingSessions = clientSessions.filter(s => new Date(s.date) >= new Date() && s.status === 'scheduled').sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const pastSessions = clientSessions.filter(s => new Date(s.date) < new Date() || s.status !== 'scheduled').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());

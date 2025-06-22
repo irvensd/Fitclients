@@ -52,6 +52,12 @@ const App = () => (
                     element={<ClientPortal />}
                   />
 
+                  {/* Demo Client Portal - No Authentication Required */}
+                  <Route
+                    path="/demo-portal"
+                    element={<ClientPortal />}
+                  />
+
                   {/* Protected Admin Routes */}
                   <Route
                     path="/admin"
