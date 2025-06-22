@@ -103,7 +103,14 @@ const navigation = [
 
 const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
-  const { logout, isDemoUser } = useAuth();
+  const { logout, isDemoUser, user } = useAuth();
+
+  // Debug logging
+  console.log("=== SIDEBAR DEBUG ===");
+  console.log("user:", user);
+  console.log("user email:", user?.email);
+  console.log("isDemoUser:", isDemoUser);
+  console.log("=== END SIDEBAR DEBUG ===");
 
   const handleLogout = async () => {
     try {
@@ -115,7 +122,8 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
   };
 
   // Add demo portal to navigation for demo users
-  const demoNavigation = isDemoUser ? [
+  const isDemo = isDemoUser || user?.email === 'trainer@demo.com';
+  const demoNavigation = isDemo ? [
     ...navigation,
     {
       name: "Demo Portal",
@@ -123,6 +131,10 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
       icon: ExternalLink,
     }
   ] : navigation;
+
+  console.log("isDemo:", isDemo);
+  console.log("demoNavigation length:", demoNavigation.length);
+  console.log("Demo Portal in nav:", demoNavigation.find(item => item.name === "Demo Portal"));
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -219,7 +231,7 @@ const SidebarNavItem = ({ item, isActive, isCollapsed }) => (
 
 const MobileSidebar = () => {
   const location = useLocation();
-  const { logout, isDemoUser } = useAuth();
+  const { logout, isDemoUser, user } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -231,7 +243,8 @@ const MobileSidebar = () => {
   };
 
   // Add demo portal to navigation for demo users
-  const demoNavigation = isDemoUser ? [
+  const isDemo = isDemoUser || user?.email === 'trainer@demo.com';
+  const demoNavigation = isDemo ? [
     ...navigation,
     {
       name: "Demo Portal",
