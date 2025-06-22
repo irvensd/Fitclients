@@ -291,11 +291,60 @@ const AddPaymentDialog = () => {
   );
 };
 
+const CustomDeleteConfirmationDialog = ({
+  open,
+  onClose,
+  onConfirm,
+  payment,
+  getClientName,
+  isDeleting,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  payment: Payment | null;
+  getClientName: (id: string) => string;
+  isDeleting: boolean;
+}) => {
+  if (!open || !payment) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center">
+      <div className="bg-card p-6 rounded-lg shadow-xl w-full max-w-md mx-4">
+        <h2 className="text-lg font-bold text-foreground">Are you absolutely sure?</h2>
+        <p className="text-sm text-muted-foreground mt-2">
+          This action cannot be undone. This will permanently delete the payment
+          record of{" "}
+          <span className="font-semibold text-foreground">${payment.amount.toFixed(2)}</span> for{" "}
+          <span className="font-semibold text-foreground">
+            {getClientName(payment.clientId)}
+          </span>
+          .
+        </p>
+        <div className="flex justify-end gap-3 mt-6">
+          <Button variant="outline" onClick={onClose} disabled={isDeleting}>
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            disabled={isDeleting}
+          >
+            {isDeleting ? "Deleting..." : "Delete"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Payments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [methodFilter, setMethodFilter] = useState("all");
   const { toast } = useToast();
+  const [deleteTarget, setDeleteTarget] = useState<Payment | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const {
     payments,
     clients,
@@ -361,17 +410,16 @@ const Payments = () => {
     });
   };
 
-  const handleDeletePayment = async (payment: Payment) => {
-    const confirmed = confirm(
-      `Are you sure you want to delete the payment of $${payment.amount} for ${getClientName(
-        payment.clientId,
-      )}? This action cannot be undone.`
-    );
+  const handleDeleteRequest = (payment: Payment) => {
+    setDeleteTarget(payment);
+  };
 
-    if (!confirmed) return;
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
 
+    setIsDeleting(true);
     try {
-      await deletePayment(payment.id);
+      await deletePayment(deleteTarget.id);
       toast({
         title: "Payment Deleted",
         description: "The payment record has been successfully deleted.",
@@ -383,6 +431,9 @@ const Payments = () => {
         title: "Deletion Failed",
         description: "Failed to delete payment. Please try again.",
       });
+    } finally {
+      setIsDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -722,7 +773,7 @@ const Payments = () => {
                         )}
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => handleDeletePayment(payment)}
+                          onClick={() => handleDeleteRequest(payment)}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete Record
@@ -781,6 +832,15 @@ const Payments = () => {
               </CardContent>
             </Card>
           )}
+
+          <CustomDeleteConfirmationDialog
+            open={!!deleteTarget}
+            onClose={() => setDeleteTarget(null)}
+            onConfirm={handleConfirmDelete}
+            payment={deleteTarget}
+            getClientName={getClientName}
+            isDeleting={isDeleting}
+          />
         </>
       )}
     </div>
