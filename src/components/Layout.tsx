@@ -28,6 +28,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  HelpCircle,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { GlobalSearch } from "@/components/GlobalSearch";
@@ -159,6 +160,11 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
           <SidebarNavItem
             item={{ name: "Settings", href: "/settings", icon: Settings }}
             isActive={location.pathname.startsWith("/settings")}
+            isCollapsed={isCollapsed}
+          />
+          <SidebarNavItem
+            item={{ name: "Help & Support", href: "/help-support", icon: HelpCircle }}
+            isActive={location.pathname.startsWith("/help-support")}
             isCollapsed={isCollapsed}
           />
           <Tooltip>
@@ -293,6 +299,20 @@ const MobileSidebar = () => {
               >
                 <Settings className="h-5 w-5" />
                 Settings
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                to="/help-support"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-all duration-200",
+                  location.pathname.startsWith("/help-support")
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                    : "hover:bg-sidebar-accent"
+                )}
+              >
+                <HelpCircle className="h-5 w-5" />
+                Help & Support
               </Link>
             </SheetClose>
             <Button
