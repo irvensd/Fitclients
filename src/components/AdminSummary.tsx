@@ -75,7 +75,7 @@ export const AdminSummary = ({
           <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="text-xl sm:text-2xl font-bold text-blue-700">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-700">
             {totalClients}
           </div>
           <p className="text-xs text-blue-600 hidden sm:block">
@@ -93,7 +93,7 @@ export const AdminSummary = ({
           <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="text-xl sm:text-2xl font-bold text-green-700">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700">
             {upcomingSessions}
           </div>
           <p className="text-xs text-green-600 hidden sm:block">Next 7 days</p>
@@ -103,11 +103,11 @@ export const AdminSummary = ({
       {/* Monthly Revenue */}
       <Card className="border-emerald-200 bg-emerald-50/50">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
-          <DollarSign className="h-4 w-4 text-emerald-600" />
+          <CardTitle className="text-xs sm:text-sm font-medium">Monthly Revenue</CardTitle>
+          <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
         </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-emerald-700">
+        <CardContent className="pt-0">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-emerald-700">
             ${monthlyRevenue}
           </div>
           <p className="text-xs text-emerald-600">{revenueChange.text}</p>
@@ -117,19 +117,19 @@ export const AdminSummary = ({
       {/* Unpaid Invoices */}
       <Card className="border-orange-200 bg-orange-50/50">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Unpaid Invoices</CardTitle>
-          <AlertTriangle className="h-4 w-4 text-orange-600" />
+          <CardTitle className="text-xs sm:text-sm font-medium">Unpaid Invoices</CardTitle>
+          <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
         </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-orange-700">
+        <CardContent className="pt-0">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-700">
             {unpaidInvoices}
           </div>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-1">
             <p className="text-xs text-orange-600">
               ${outstandingAmount} outstanding
             </p>
             {unpaidInvoices > 0 && (
-              <Badge variant="destructive" className="text-xs">
+              <Badge variant="destructive" className="text-xs w-fit">
                 Action Needed
               </Badge>
             )}
