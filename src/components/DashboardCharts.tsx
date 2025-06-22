@@ -235,6 +235,41 @@ export const SessionTypeChart = () => {
   const { sessions } = useData();
   const data = generateSessionTypeData(sessions);
 
+  const RADIAN = Math.PI / 180;
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    // Position label outside for small slices
+    const labelRadius = outerRadius + 20;
+    const lx = cx + labelRadius * Math.cos(-midAngle * RADIAN);
+    const ly = cy + labelRadius * Math.sin(-midAngle * RADIAN);
+    
+    // Line from slice to label
+    const lineStartX = cx + (outerRadius + 5) * Math.cos(-midAngle * RADIAN);
+    const lineStartY = cy + (outerRadius + 5) * Math.sin(-midAngle * RADIAN);
+
+    if (percent === 0) return null;
+
+    if (percent < 0.1) {
+      return (
+        <>
+          <path d={`M${lineStartX},${lineStartY}L${lx},${ly}`} stroke="#666" fill="none" />
+          <text x={lx} y={ly} textAnchor={lx > cx ? 'start' : 'end'} dominantBaseline="central" fill="#333" fontSize={12}>
+            {`${name} ${(percent * 100).toFixed(0)}%`}
+          </text>
+        </>
+      );
+    }
+    
+    return (
+      <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight="bold">
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    );
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -242,26 +277,24 @@ export const SessionTypeChart = () => {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
+          <PieChart margin={{ top: 20, right: 30, left: 30, bottom: 20 }}>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }) =>
-                data.some((d) => d.value > 0)
-                  ? `${name} ${percent.toFixed(0)}%`
-                  : ""
-              }
+              label={renderCustomizedLabel}
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
+              nameKey="name"
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip />
+            <Tooltip formatter={(value, name) => [value, name]} />
+            <Legend wrapperStyle={{ fontSize: '12px' }}/>
           </PieChart>
         </ResponsiveContainer>
         {sessions.length === 0 && (
