@@ -163,8 +163,25 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
         };
       }
     } else {
-      setLoading(false);
-      setDataInitialized(true);
+      // Check if we're on the demo portal route
+      const isDemoPortalRoute = window.location.pathname === '/demo-portal';
+      if (isDemoPortalRoute) {
+        // Load mock data for demo portal even without authentication
+        const clientsWithStatus: ClientWithStatus[] = mockClients.map((client) => ({
+            ...client,
+            status: { isActive: true },
+        }));
+        setClients(clientsWithStatus);
+        setSessions(mockSessions);
+        setPayments(mockPayments);
+        setWorkoutPlans(mockWorkoutPlans);
+        setProgressEntries(mockProgressEntries);
+        setLoading(false);
+        setDataInitialized(true);
+      } else {
+        setLoading(false);
+        setDataInitialized(true);
+      }
     }
   }, [user, isDemoUser]);
 
