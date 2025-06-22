@@ -306,6 +306,7 @@ const Payments = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [methodFilter, setMethodFilter] = useState("all");
   const [deleteTarget, setDeleteTarget] = useState<Payment | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const {
     payments,
@@ -375,12 +376,14 @@ const Payments = () => {
   const handleConfirmDelete = async () => {
     if (!deleteTarget) return;
 
+    setIsDeleting(true);
     try {
       await deletePayment(deleteTarget.id);
       toast({
         title: "Payment Deleted",
         description: "The payment record has been successfully deleted.",
       });
+      setDeleteTarget(null);
     } catch (error) {
       console.error("Error deleting payment:", error);
       toast({
@@ -389,7 +392,7 @@ const Payments = () => {
         description: "Failed to delete payment. Please try again.",
       });
     } finally {
-      setDeleteTarget(null);
+      setIsDeleting(false);
     }
   };
 
@@ -813,9 +816,10 @@ const Payments = () => {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleConfirmDelete}
+                  disabled={isDeleting}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Delete
+                  {isDeleting ? "Deleting..." : "Delete"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
