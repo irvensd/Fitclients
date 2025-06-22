@@ -11,10 +11,11 @@ import { auth, isFirebaseConfigured, diagnoseFirebaseConnection } from "@/lib/fi
 import { userProfileService } from "@/lib/firebaseService";
 import { UserProfile } from "@/lib/types";
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
+  isDemoUser: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (
     email: string,
@@ -49,6 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [authError, setAuthError] = React.useState<string | null>(null);
 
   const isDevMode = !isFirebaseConfigured;
+  const isDemoUser = user?.email === 'trainer@demo.com';
 
   React.useEffect(() => {
     // Set a timeout to prevent infinite loading
@@ -350,6 +352,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         : user,
       userProfile,
       loading,
+      isDemoUser,
       login,
       register,
       logout,
@@ -362,6 +365,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       user,
       userProfile,
       loading,
+      isDemoUser,
       login,
       register,
       logout,

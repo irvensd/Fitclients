@@ -1,4 +1,4 @@
-import { Client, Session, Payment, WorkoutPlan, Exercise } from "./types";
+import { Client, Session, Payment, WorkoutPlan, Exercise, ProgressEntry } from "./types";
 
 // Comprehensive exercise library for workout creation
 export const mockExercises = [
@@ -938,6 +938,13 @@ export const mockWorkoutPlans: WorkoutPlan[] = [
     createdDate: new Date().toISOString().split("T")[0],
     isActive: true,
   },
+];
+
+export const mockProgressEntries: ProgressEntry[] = [
+  { id: "pe1", clientId: "1", date: "2023-10-01", weight: 180, bodyFat: 20 },
+  { id: "pe2", clientId: "1", date: "2023-10-15", weight: 178, bodyFat: 19.5 },
+  { id: "pe3", clientId: "2", date: "2023-10-05", weight: 150, bodyFat: 25 },
+  { id: "pe4", clientId: "2", date: "2023-10-20", weight: 148, bodyFat: 24 },
 ];
 
 // Centralized mock data for the application
