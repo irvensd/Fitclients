@@ -270,14 +270,36 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   };
   
   const addProgressEntry = async (entry: Omit<ProgressEntry, "id">): Promise<ProgressEntry> => {
+    console.log("addProgressEntry called with:", entry);
+    console.log("isDemo:", isDemo);
+    console.log("user:", user);
+    
     if (isDemo) {
+      console.log("Adding progress entry to demo state");
       const newEntry = { ...entry, id: `mock-${Date.now()}` };
-      setProgressEntries(prev => [...prev, newEntry]);
+      setProgressEntries(prev => {
+        console.log("Previous progress entries:", prev);
+        const updated = [...prev, newEntry];
+        console.log("Updated progress entries:", updated);
+        return updated;
+      });
       return newEntry;
     }
-    if (!user) throw new Error("User not authenticated for addProgressEntry");
-    const docRef = await addDoc(collection(db, "users", user.uid, "progressEntries"), entry);
-    return { ...entry, id: docRef.id };
+    
+    if (!user) {
+      console.error("User not authenticated for addProgressEntry");
+      throw new Error("User not authenticated for addProgressEntry");
+    }
+    
+    try {
+      console.log("Adding progress entry to Firestore");
+      const docRef = await addDoc(collection(db, "users", user.uid, "progressEntries"), entry);
+      console.log("Progress entry added to Firestore with ID:", docRef.id);
+      return { ...entry, id: docRef.id };
+    } catch (error) {
+      console.error("Firestore error in addProgressEntry:", error);
+      throw error;
+    }
   };
 
   const getClientProgressEntries = (clientId: string) => {
