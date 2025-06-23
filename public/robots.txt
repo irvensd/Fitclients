@@ -1,14 +1,13 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
+# https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
+
+# Sitemap
+Sitemap: https://fitclients-4c5f2.web.app/sitemap.xml
+
+# Crawl-delay (seconds)
+Crawl-delay: 1
+
+# Disallow admin/support areas
+Disallow: /support-portal
+Disallow: /api/
