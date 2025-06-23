@@ -298,3 +298,54 @@ export const useDemoData = () => {
     payments: [],
   };
 };
+
+// === SUPPORT TICKETS SERVICES ===
+export const supportTicketsService = {
+  // Get all support tickets (optionally with query/filters)
+  getSupportTickets: async () => {
+    const q = query(collection(db, "supportTickets"), orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  },
+
+  // Add a new support ticket
+  addSupportTicket: async (ticket) => {
+    const docRef = await addDoc(collection(db, "supportTickets"), {
+      ...ticket,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      status: ticket.status || "open",
+      comments: ticket.comments || [],
+      tags: ticket.tags || [],
+      attachments: ticket.attachments || [],
+    });
+    return docRef.id;
+  },
+
+  // Update a support ticket
+  updateSupportTicket: async (ticketId, updates) => {
+    const ticketRef = doc(db, "supportTickets", ticketId);
+    return updateDoc(ticketRef, {
+      ...updates,
+      updatedAt: serverTimestamp(),
+    });
+  },
+
+  // Delete a support ticket
+  deleteSupportTicket: async (ticketId) => {
+    const ticketRef = doc(db, "supportTickets", ticketId);
+    return deleteDoc(ticketRef);
+  },
+
+  // Subscribe to real-time updates for all support tickets
+  subscribeToSupportTickets: (callback, errorCallback) => {
+    const q = query(collection(db, "supportTickets"), orderBy("createdAt", "desc"));
+    return onSnapshot(q, (snapshot) => {
+      const tickets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      callback(tickets);
+    }, (error) => {
+      console.error("Firestore supportTickets subscription error:", error);
+      if (errorCallback) errorCallback(error);
+    });
+  },
+};

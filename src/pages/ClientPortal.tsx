@@ -39,12 +39,15 @@ import {
   Trophy,
   Star,
   Sparkles,
+  MessageCircle,
+  HelpCircle,
 } from "lucide-react";
 import { GamificationDashboard } from "@/components/GamificationDashboard";
 import { useData } from "@/contexts/DataContext";
 import { calculateGamificationData } from "@/lib/gamification";
 import { Client, Session, Payment, WorkoutPlan, ProgressEntry } from "@/lib/types";
 import { useAuth } from "@/contexts/AuthContext";
+import { Input } from "@/components/ui/input";
 
 const CancelSessionDialog = ({
   session,
@@ -232,12 +235,12 @@ const ClientPortal = () => {
 
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="workouts">Workouts</TabsTrigger>
             <TabsTrigger value="progress">Progress</TabsTrigger>
             <TabsTrigger value="payments">Payments</TabsTrigger>
-            </TabsList>
+          </TabsList>
           
           <TabsContent value="overview" className="mt-6">
             <div className="grid grid-cols-1 gap-6">

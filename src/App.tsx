@@ -27,6 +27,7 @@ import AIRecommendations from "./pages/AIRecommendations";
 import Marketing from "./pages/Marketing";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
+import SupportPortal from "./pages/SupportPortal";
 
 const queryClient = new QueryClient();
 
@@ -193,7 +194,12 @@ const App = () => (
                     }
                   />
 
-                  {/* Catch all route - must be last */}
+                  <Route
+                    path="/support-portal"
+                    element={<SupportPortal />}
+                  />
+
+                  {/* 404 Route */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
