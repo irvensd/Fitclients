@@ -58,82 +58,63 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 220 13% 18%;
-
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 18%;
-
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 18%;
-
-    --primary: 142 76% 36%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 210 20% 96%;
-    --secondary-foreground: 220 13% 18%;
-
-    --muted: 210 20% 96%;
-    --muted-foreground: 220 9% 46%;
-
-    --accent: 142 76% 36%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 142 76% 36%;
-
-    --radius: 0.75rem;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 15%;
-    --sidebar-primary: 142 76% 36%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 90%;
-    --sidebar-accent-foreground: 0 0% 10%;
-    --sidebar-border: 0 0% 88%;
-    --sidebar-ring: 142 76% 36%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 142.1 76.2% 36.3%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 142.1 76.2% 36.3%;
+    --radius: 0.5rem;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222.2 84% 4.9%;
+    --sidebar-primary: 142.1 76.2% 36.3%;
+    --sidebar-primary-foreground: 355.7 100% 97.3%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222.2 84% 4.9%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 142.1 76.2% 36.3%;
   }
 
   .dark {
-    --background: 220 27% 8%;
-    --foreground: 220 9% 85%;
-
-    --card: 220 24% 12%;
-    --card-foreground: 220 9% 85%;
-
-    --popover: 220 24% 12%;
-    --popover-foreground: 220 9% 85%;
-
-    --primary: 142 76% 42%;
-    --primary-foreground: 220 27% 8%;
-
-    --secondary: 220 20% 16%;
-    --secondary-foreground: 220 9% 85%;
-
-    --muted: 220 20% 16%;
-    --muted-foreground: 220 9% 65%;
-
-    --accent: 142 76% 42%;
-    --accent-foreground: 220 27% 8%;
-
-    --destructive: 0 84% 65%;
-    --destructive-foreground: 220 27% 8%;
-
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 142 76% 42%;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 15%;
-    --sidebar-primary: 142 76% 42%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 90%;
-    --sidebar-accent-foreground: 0 0% 10%;
-    --sidebar-border: 0 0% 88%;
-    --sidebar-ring: 142 76% 42%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 142.1 70.6% 45.3%;
+    --primary-foreground: 144.9 80.4% 10%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 142.1 76.2% 36.3%;
+    --sidebar-background: 222.2 84% 4.9%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 142.1 70.6% 45.3%;
+    --sidebar-primary-foreground: 144.9 80.4% 10%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 142.1 76.2% 36.3%;
   }
 }
 
@@ -144,5 +125,64 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Mobile-specific improvements */
+  @media (max-width: 640px) {
+    /* Ensure minimum touch target size */
+    button, [role="button"], a {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Improve text readability on mobile */
+    .text-xs {
+      font-size: 0.75rem;
+      line-height: 1rem;
+    }
+    
+    /* Better spacing for mobile cards */
+    .card {
+      @apply p-3;
+    }
+    
+    /* Improve table responsiveness */
+    table {
+      @apply text-xs;
+    }
+    
+    /* Better mobile navigation */
+    .mobile-nav {
+      @apply fixed inset-0 z-50 bg-background;
+    }
+  }
+  
+  /* Tablet improvements */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .card {
+      @apply p-4;
+    }
+  }
+  
+  /* Ensure charts are responsive */
+  .recharts-wrapper {
+    @apply w-full h-full;
+  }
+  
+  /* Improve dropdown positioning on mobile */
+  .dropdown-content {
+    @apply max-h-[60vh] overflow-y-auto;
+  }
+  
+  /* Better mobile form inputs */
+  input, textarea, select {
+    @apply text-base;
+  }
+  
+  /* Improve mobile scrolling */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
   }
 }

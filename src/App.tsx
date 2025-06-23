@@ -28,6 +28,7 @@ import Marketing from "./pages/Marketing";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
 import SupportPortal from "./pages/SupportPortal";
+import Onboarding from "./pages/Onboarding";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
                   {/* Public Routes */}
                   <Route path="/landing" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/onboarding" element={<Onboarding />} />
 
                   {/* Demo Client Portal - No Authentication Required */}
                   <Route

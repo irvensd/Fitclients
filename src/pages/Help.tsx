@@ -101,10 +101,10 @@ const Help = () => {
     {
       category: "Client Management",
       questions: [
-        {
-          question: "How do I add a new client?",
-          answer: "Navigate to the Clients page and click the 'Add Client' button. Fill in the required information including name, email, phone number, and fitness goals. You can also set up their initial assessment and workout preferences."
-        },
+    {
+      question: "How do I add a new client?",
+      answer: "Navigate to the Clients page and click the 'Add Client' button. Fill in the required information including name, email, phone number, and fitness goals. You can also set up their initial assessment and workout preferences."
+    },
         {
           question: "How do I manage client permissions?",
           answer: "Go to the Client Portal Manager to control what information each client can see and edit. You can customize access to progress tracking, workout plans, payment history, and communication features."
@@ -118,10 +118,10 @@ const Help = () => {
     {
       category: "Sessions & Scheduling",
       questions: [
-        {
-          question: "How do I schedule a session?",
-          answer: "Go to the Sessions page and click 'Schedule Session'. Select the client, choose a date and time, and specify the session type (consultation, workout, assessment, etc.). The system will automatically send confirmation emails."
-        },
+    {
+      question: "How do I schedule a session?",
+      answer: "Go to the Sessions page and click 'Schedule Session'. Select the client, choose a date and time, and specify the session type (consultation, workout, assessment, etc.). The system will automatically send confirmation emails."
+    },
         {
           question: "Can clients book sessions themselves?",
           answer: "Yes! Clients can book sessions through their portal if you enable this feature. You can set your availability, session types, and pricing. Clients will receive automatic confirmations and reminders."
@@ -135,10 +135,10 @@ const Help = () => {
     {
       category: "Progress Tracking",
       questions: [
-        {
-          question: "How do I track client progress?",
-          answer: "Use the Progress page to log client measurements, weight, body composition, and performance metrics. You can also add progress photos and notes. The system will generate progress reports and trends over time."
-        },
+    {
+      question: "How do I track client progress?",
+      answer: "Use the Progress page to log client measurements, weight, body composition, and performance metrics. You can also add progress photos and notes. The system will generate progress reports and trends over time."
+    },
         {
           question: "What metrics can I track?",
           answer: "You can track weight, body measurements, body fat percentage, muscle mass, performance metrics (strength, endurance, flexibility), and custom metrics you define. The system creates visual charts and trends."
@@ -152,10 +152,10 @@ const Help = () => {
     {
       category: "Workouts & Programs",
       questions: [
-        {
-          question: "How do I create workout plans?",
-          answer: "Navigate to the Workouts page and click 'Create Workout Plan'. You can build custom workouts with exercises, sets, reps, and rest periods. Save templates for reuse and assign them to specific clients."
-        },
+    {
+      question: "How do I create workout plans?",
+      answer: "Navigate to the Workouts page and click 'Create Workout Plan'. You can build custom workouts with exercises, sets, reps, and rest periods. Save templates for reuse and assign them to specific clients."
+    },
         {
           question: "Can I import exercises from a library?",
           answer: "Yes! We have a comprehensive exercise library with videos and descriptions. You can also add your own custom exercises and create exercise categories that match your training style."
@@ -169,10 +169,10 @@ const Help = () => {
     {
       category: "Payments & Billing",
       questions: [
-        {
-          question: "How do I process payments?",
-          answer: "Go to the Payments page to view all client payments. You can manually record payments, set up recurring billing, and track payment history. The system integrates with Stripe for secure online payments."
-        },
+    {
+      question: "How do I process payments?",
+      answer: "Go to the Payments page to view all client payments. You can manually record payments, set up recurring billing, and track payment history. The system integrates with Stripe for secure online payments."
+    },
         {
           question: "Can I set up automatic billing?",
           answer: "Yes! You can set up recurring payments for clients on subscription plans. The system will automatically charge clients on their billing cycle and send them receipts and payment reminders."
@@ -186,11 +186,11 @@ const Help = () => {
     {
       category: "AI Features",
       questions: [
-        {
-          question: "How do I use the AI Coach feature?",
-          answer: "The AI Coach provides personalized recommendations based on client data. Access it through the AI Recommendations page to get workout suggestions, nutrition advice, and progress insights tailored to each client."
-        },
-        {
+    {
+      question: "How do I use the AI Coach feature?",
+      answer: "The AI Coach provides personalized recommendations based on client data. Access it through the AI Recommendations page to get workout suggestions, nutrition advice, and progress insights tailored to each client."
+    },
+    {
           question: "What data does the AI use?",
           answer: "The AI analyzes client progress, workout history, goals, and preferences to provide personalized recommendations. All data is kept secure and private, and you control what information is shared."
         },
@@ -773,16 +773,16 @@ const Help = () => {
 
           {searchQuery ? (
             // Show filtered results
-            <Card>
-              <CardHeader>
+          <Card>
+            <CardHeader>
                 <CardTitle>Search Results</CardTitle>
-                <CardDescription>
+              <CardDescription>
                   Questions matching "{searchQuery}"
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Accordion type="single" collapsible className="w-full">
-                  {filteredFaqs.map((faq, index) => (
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Accordion type="single" collapsible className="w-full">
+                {filteredFaqs.map((faq, index) => (
                     <AccordionItem key={index} value={`search-item-${index}`}>
                       <AccordionTrigger className="text-left">
                         {faq.question}
@@ -810,17 +810,17 @@ const Help = () => {
                     <Accordion type="single" collapsible className="w-full">
                       {category.questions.map((faq, index) => (
                         <AccordionItem key={index} value={`${categoryIndex}-${index}`}>
-                          <AccordionTrigger className="text-left">
-                            {faq.question}
-                          </AccordionTrigger>
-                          <AccordionContent className="text-muted-foreground">
-                            {faq.answer}
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </CardContent>
-                </Card>
+                    <AccordionTrigger className="text-left">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </CardContent>
+          </Card>
               ))}
             </div>
           )}
@@ -842,7 +842,7 @@ const Help = () => {
                       <div className="flex items-center gap-3 mb-3">
                         <option.icon className="h-6 w-6 text-primary" />
                         <div className="flex-1">
-                          <h3 className="font-semibold">{option.title}</h3>
+                        <h3 className="font-semibold">{option.title}</h3>
                           {option.primary && (
                             <Badge variant="secondary" className="text-xs mt-1">Primary Method</Badge>
                           )}
@@ -980,7 +980,7 @@ const Help = () => {
                   <Button variant="outline" size="sm" onClick={() => setActiveTab("faq")}>
                     Browse FAQ
                   </Button>
-                </div>
+                      </div>
                 <div className="p-4 border rounded-lg">
                   <h4 className="font-semibold mb-2 flex items-center gap-2">
                     <Mail className="h-4 w-4" />
@@ -991,7 +991,7 @@ const Help = () => {
                   </p>
                   <Button variant="outline" size="sm" onClick={() => window.location.href = 'mailto:support@fitclients.com'}>
                     Contact Support
-                  </Button>
+                      </Button>
                 </div>
               </div>
             </CardContent>
@@ -1199,7 +1199,7 @@ const Help = () => {
                           support@fitclients.com
                         </a>
                       </p>
-                    </div>
+                  </div>
                   </form>
                 );
               })()}

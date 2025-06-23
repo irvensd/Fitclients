@@ -612,6 +612,166 @@ const Landing = () => {
           </div>
         </section>
 
+        {/* Testimonials Section */}
+        <section className="py-20 px-4 bg-muted/30">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
+                <Star className="h-4 w-4" />
+                Trusted by Personal Trainers
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Real Results from Real Trainers
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                See how FitClient is helping personal trainers transform their business operations and client relationships.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Testimonial 1 - Focus on Time Saving */}
+              <Card className="border-2 hover:border-primary/20 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground mb-6 italic">
+                    "FitClient has given me back 10+ hours every week. The automated scheduling and payment tracking means I can focus on what I do best - training my clients. The gamification features keep my clients more engaged than ever!"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-gradient-to-br from-blue-500 to-purple-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold">
+                      SM
+                    </div>
+                    <div>
+                      <p className="font-semibold">Sarah Mitchell</p>
+                      <p className="text-sm text-muted-foreground">Personal Trainer, NYC</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Testimonial 2 - Focus on Client Portals */}
+              <Card className="border-2 hover:border-primary/20 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground mb-6 italic">
+                    "The no-login client portal is a game-changer! My older clients love how easy it is to track their progress without remembering passwords. It's professional, simple, and my retention rate has improved by 30%."
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-gradient-to-br from-green-500 to-emerald-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold">
+                      JR
+                    </div>
+                    <div>
+                      <p className="font-semibold">James Rodriguez</p>
+                      <p className="text-sm text-muted-foreground">Fitness Coach, Miami</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Testimonial 3 - Focus on Business Growth */}
+              <Card className="border-2 hover:border-primary/20 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground mb-6 italic">
+                    "Since switching to FitClient, I've doubled my client base. The professional image it gives my business and the AI recommendations help me provide personalized service at scale. Worth every penny!"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-gradient-to-br from-orange-500 to-red-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold">
+                      ET
+                    </div>
+                    <div>
+                      <p className="font-semibold">Emma Thompson</p>
+                      <p className="text-sm text-muted-foreground">Online PT, Los Angeles</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Additional testimonials row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+              {/* Testimonial 4 - Focus on AI Features */}
+              <Card className="border-2 hover:border-primary/20 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground mb-6 italic">
+                    "The AI-powered session recaps save me 30 minutes after each session. My clients love receiving personalized summaries, and the smart recommendations help me adjust their programs perfectly. It's like having an assistant!"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-gradient-to-br from-purple-500 to-pink-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold">
+                      MK
+                    </div>
+                    <div>
+                      <p className="font-semibold">Marcus King</p>
+                      <p className="text-sm text-muted-foreground">Strength Coach, Chicago</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Testimonial 5 - Focus on Payment Tracking */}
+              <Card className="border-2 hover:border-primary/20 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground mb-6 italic">
+                    "Managing payments used to be my biggest headache. FitClient makes it crystal clear who's paid and who hasn't. The revenue analytics help me make better business decisions. I've increased my income by 40% this year!"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-gradient-to-br from-indigo-500 to-blue-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold">
+                      AL
+                    </div>
+                    <div>
+                      <p className="font-semibold">Amanda Liu</p>
+                      <p className="text-sm text-muted-foreground">Boutique Trainer, Boston</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Trust indicators */}
+            <div className="mt-16 text-center">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+                <div>
+                  <div className="text-3xl font-bold text-primary">500+</div>
+                  <p className="text-sm text-muted-foreground mt-1">Active Trainers</p>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-primary">15,000+</div>
+                  <p className="text-sm text-muted-foreground mt-1">Clients Managed</p>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-primary">4.8/5</div>
+                  <p className="text-sm text-muted-foreground mt-1">Average Rating</p>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-primary">98%</div>
+                  <p className="text-sm text-muted-foreground mt-1">Would Recommend</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Benefits Section */}
         <section className="py-20 px-4">
           <div className="container mx-auto max-w-6xl">

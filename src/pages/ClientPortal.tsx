@@ -240,7 +240,7 @@ const ClientPortal = () => {
             <TabsTrigger value="workouts">Workouts</TabsTrigger>
             <TabsTrigger value="progress">Progress</TabsTrigger>
             <TabsTrigger value="payments">Payments</TabsTrigger>
-          </TabsList>
+            </TabsList>
           
           <TabsContent value="overview" className="mt-6">
             <div className="grid grid-cols-1 gap-6">

@@ -72,7 +72,7 @@ export const AdminSummary = ({
           <CardTitle className="text-xs sm:text-sm font-medium">
             Total Clients
           </CardTitle>
-          <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+          <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600 flex-shrink-0" />
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-700">
@@ -90,7 +90,7 @@ export const AdminSummary = ({
           <CardTitle className="text-xs sm:text-sm font-medium">
             Sessions
           </CardTitle>
-          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 flex-shrink-0" />
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700">
@@ -104,13 +104,13 @@ export const AdminSummary = ({
       <Card className="border-emerald-200 bg-emerald-50/50">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-xs sm:text-sm font-medium">Monthly Revenue</CardTitle>
-          <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
+          <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 flex-shrink-0" />
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-lg sm:text-xl lg:text-2xl font-bold text-emerald-700">
             ${monthlyRevenue}
           </div>
-          <p className="text-xs text-emerald-600">{revenueChange.text}</p>
+          <p className="text-xs text-emerald-600 truncate">{revenueChange.text}</p>
         </CardContent>
       </Card>
 
@@ -118,14 +118,14 @@ export const AdminSummary = ({
       <Card className="border-orange-200 bg-orange-50/50">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-xs sm:text-sm font-medium">Unpaid Invoices</CardTitle>
-          <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
+          <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600 flex-shrink-0" />
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-700">
             {unpaidInvoices}
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-1">
-            <p className="text-xs text-orange-600">
+            <p className="text-xs text-orange-600 truncate">
               ${outstandingAmount} outstanding
             </p>
             {unpaidInvoices > 0 && (

@@ -182,18 +182,18 @@ export const RevenueAnalytics = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Revenue Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-xs sm:text-sm font-medium">
               Monthly Revenue
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="pt-0">
+            <div className="text-lg sm:text-2xl font-bold">
               {formatCurrency(monthlyRevenue)}
             </div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -209,20 +209,20 @@ export const RevenueAnalytics = () => {
               >
                 {formatPercentage(monthlyGrowth)}
               </span>
-              <span>vs last month</span>
+              <span className="hidden sm:inline">vs last month</span>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-xs sm:text-sm font-medium">
               Avg Session Value
             </CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
+            <Target className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="pt-0">
+            <div className="text-lg sm:text-2xl font-bold">
               {formatCurrency(averageSessionValue)}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -233,13 +233,13 @@ export const RevenueAnalytics = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-xs sm:text-sm font-medium">
               Active Clients
             </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activeClients}</div>
+          <CardContent className="pt-0">
+            <div className="text-lg sm:text-2xl font-bold">{activeClients}</div>
             <p className="text-xs text-muted-foreground">
               {clientRetentionRate}% retention rate
             </p>
@@ -248,11 +248,11 @@ export const RevenueAnalytics = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Goal</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-xs sm:text-sm font-medium">Monthly Goal</CardTitle>
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{goalProgress}%</div>
+          <CardContent className="pt-0">
+            <div className="text-lg sm:text-2xl font-bold">{goalProgress}%</div>
             <div className="mt-2">
               <Progress value={goalProgress} className="h-2" />
             </div>
@@ -264,29 +264,29 @@ export const RevenueAnalytics = () => {
       </div>
 
       {/* Revenue Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-green-600" />
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               Revenue Insights
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Key performance indicators for your business
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="pt-0 space-y-4">
             {monthlyRevenue === 0 ? (
               // New account with no revenue
-              <div className="text-center py-8">
-                <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h4 className="font-medium text-muted-foreground mb-2">
+              <div className="text-center py-6 sm:py-8">
+                <TrendingUp className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+                <h4 className="font-medium text-muted-foreground mb-2 text-sm sm:text-base">
                   Ready to Start Earning
                 </h4>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                   Complete your first sessions and add payments to see revenue insights and projections.
                 </p>
-                <Badge className="bg-green-100 text-green-800">
+                <Badge className="bg-green-100 text-green-800 text-xs">
                   Add sessions to track revenue
                 </Badge>
               </div>
@@ -295,18 +295,18 @@ export const RevenueAnalytics = () => {
               <>
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                   <div>
-                    <p className="font-medium text-green-800">
+                    <p className="font-medium text-green-800 text-sm sm:text-base">
                       Projected Monthly Revenue
                     </p>
-                    <p className="text-sm text-green-600">
+                    <p className="text-xs sm:text-sm text-green-600">
                       Based on current trends
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-green-800">
+                    <p className="text-base sm:text-lg font-bold text-green-800">
                       {formatCurrency(projectedMonthlyRevenue)}
                     </p>
-                    <Badge className="bg-green-100 text-green-800">
+                    <Badge className="bg-green-100 text-green-800 text-xs">
                       +{formatCurrency(projectedMonthlyRevenue - monthlyRevenue)}
                     </Badge>
                   </div>
@@ -314,8 +314,8 @@ export const RevenueAnalytics = () => {
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Client Retention</span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-xs sm:text-sm font-medium">Client Retention</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">
                       {clientRetentionRate.toFixed(0)}%
                     </span>
                   </div>
@@ -324,10 +324,10 @@ export const RevenueAnalytics = () => {
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">
+                    <span className="text-xs sm:text-sm font-medium">
                       Capacity Utilization
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-xs sm:text-sm text-muted-foreground">
                       {Math.min(Math.floor((totalSessions / 30) * 100), 100)}%
                     </span>
                   </div>
@@ -339,14 +339,14 @@ export const RevenueAnalytics = () => {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-blue-600" />
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Target className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
               Business Opportunities
             </CardTitle>
-            <CardDescription>Areas for growth and improvement</CardDescription>
+            <CardDescription className="text-sm">Areas for growth and improvement</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="pt-0 space-y-4">
             {activeClients === 0 ? (
               // New account with no clients
               <div className="text-center py-8">

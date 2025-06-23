@@ -161,15 +161,15 @@ export const RevenueChart = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Revenue Trend</CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg">Revenue Trend</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+      <CardContent className="pt-0">
+        <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
           <AreaChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
+            <XAxis dataKey="month" fontSize={12} />
+            <YAxis fontSize={12} />
             <Tooltip formatter={(value, name) => [`$${value}`, "Revenue"]} />
             <Area
               type="monotone"
@@ -191,17 +191,17 @@ export const ClientGrowthChart = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Client Growth</CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg">Client Growth</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+      <CardContent className="pt-0">
+        <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
+            <XAxis dataKey="month" fontSize={12} />
+            <YAxis fontSize={12} />
             <Tooltip />
-            <Legend />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
             <Line
               type="monotone"
               dataKey="totalClients"
@@ -249,7 +249,7 @@ export const SessionTypeChart = () => {
       return (
         <>
           <path d={`M${lineStartX},${lineStartY}L${lx},${ly}`} stroke="#666" fill="none" />
-          <text x={lx} y={ly} textAnchor={lx > cx ? 'start' : 'end'} dominantBaseline="central" fill="#333" fontSize={12}>
+          <text x={lx} y={ly} textAnchor={lx > cx ? 'start' : 'end'} dominantBaseline="central" fill="#333" fontSize={10}>
             {`${name} ${(percent * 100).toFixed(0)}%`}
           </text>
         </>
@@ -257,7 +257,7 @@ export const SessionTypeChart = () => {
     }
     
     return (
-      <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight="bold">
+      <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight="bold">
         {`${(percent * 100).toFixed(0)}%`}
       </text>
     );
@@ -265,11 +265,11 @@ export const SessionTypeChart = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Session Distribution</CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg">Session Distribution</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+      <CardContent className="pt-0">
+        <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
           <PieChart margin={{ top: 20, right: 30, left: 30, bottom: 20 }}>
             <Pie
               data={data}
@@ -277,7 +277,7 @@ export const SessionTypeChart = () => {
               cy="50%"
               labelLine={false}
               label={renderCustomizedLabel}
-              outerRadius={80}
+              outerRadius={60}
               fill="#8884d8"
               dataKey="value"
               nameKey="name"
@@ -287,7 +287,7 @@ export const SessionTypeChart = () => {
               ))}
             </Pie>
             <Tooltip formatter={(value, name) => [value, name]} />
-            <Legend wrapperStyle={{ fontSize: '12px' }}/>
+            <Legend wrapperStyle={{ fontSize: '11px' }}/>
           </PieChart>
         </ResponsiveContainer>
         {sessions.length === 0 && (
@@ -306,18 +306,18 @@ export const WeeklyActivityChart = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Weekly Activity</CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg">Weekly Activity</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+      <CardContent className="pt-0">
+        <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="day" />
-            <YAxis yAxisId="left" />
-            <YAxis yAxisId="right" orientation="right" />
+            <XAxis dataKey="day" fontSize={12} />
+            <YAxis yAxisId="left" fontSize={12} />
+            <YAxis yAxisId="right" orientation="right" fontSize={12} />
             <Tooltip />
-            <Legend />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
             <Bar
               yAxisId="left"
               dataKey="sessions"

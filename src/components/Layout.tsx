@@ -355,17 +355,17 @@ export const Layout = ({ children }: LayoutProps) => {
     <div className="flex h-screen bg-background">
       <Sidebar isCollapsed={isCollapsed} onToggleCollapse={toggleCollapse} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="flex h-16 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6">
+        <header className="flex h-16 items-center justify-between gap-2 sm:gap-4 border-b bg-background px-3 sm:px-4 lg:px-6">
           <div className="flex items-center gap-2">
             <MobileSidebar />
             <BreadcrumbNav />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <GlobalSearch />
             <NotificationBell />
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
           {children}
         </main>
       </div>
