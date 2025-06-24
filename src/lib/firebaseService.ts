@@ -15,7 +15,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { Client, Session, Payment, UserProfile } from "./types";
+import { Client, Session, Payment, UserProfile, BillingHistory } from "./types";
 
 // Helper to get user's collection path
 const getUserCollection = (userId: string, collectionName: string) => {
@@ -347,5 +347,197 @@ export const supportTicketsService = {
       console.error("Firestore supportTickets subscription error:", error);
       if (errorCallback) errorCallback(error);
     });
+  },
+};
+
+// === BILLING HISTORY SERVICES ===
+export const billingHistoryService = {
+  // Get billing history for a user
+  getBillingHistory: async (userId: string): Promise<BillingHistory[]> => {
+    try {
+      const q = query(
+        getUserCollection(userId, "billingHistory"),
+        orderBy("date", "desc")
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as BillingHistory[];
+    } catch (error) {
+      console.error("Error fetching billing history:", error);
+      return [];
+    }
+  },
+
+  // Add billing history item (called when subscription is created/updated)
+  addBillingHistoryItem: async (userId: string, billingItem: Omit<BillingHistory, "id">) => {
+    try {
+      const docRef = await addDoc(getUserCollection(userId, "billingHistory"), {
+        ...billingItem,
+        createdAt: serverTimestamp(),
+      });
+      return docRef.id;
+    } catch (error) {
+      console.error("Error adding billing history item:", error);
+      throw error;
+    }
+  },
+
+  // Update billing history item
+  updateBillingHistoryItem: async (
+    userId: string,
+    billingId: string,
+    updates: Partial<BillingHistory>
+  ) => {
+    try {
+      const billingRef = doc(getUserCollection(userId, "billingHistory"), billingId);
+      return updateDoc(billingRef, updates);
+    } catch (error) {
+      console.error("Error updating billing history item:", error);
+      throw error;
+    }
+  },
+
+  // Subscribe to billing history changes
+  subscribeToBillingHistory: (
+    userId: string,
+    callback: (billingHistory: BillingHistory[]) => void,
+    errorCallback?: (error: Error) => void,
+  ) => {
+    const q = query(
+      getUserCollection(userId, "billingHistory"),
+      orderBy("date", "desc"),
+    );
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const billingHistory = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as BillingHistory[];
+        callback(billingHistory);
+      },
+      (error) => {
+        console.error("Firestore billing history subscription error:", error);
+        if (errorCallback) errorCallback(error);
+      },
+    );
+  },
+
+  // Initialize billing history for new users (creates sample data if needed)
+  initializeBillingHistory: async (userId: string, planId: string = "free") => {
+    try {
+      // Only create sample data for non-free plans
+      if (planId === "free") {
+        return;
+      }
+
+      const existingHistory = await billingHistoryService.getBillingHistory(userId);
+      if (existingHistory.length > 0) {
+        return; // Already has billing history
+      }
+
+      // Create sample billing history for new paid subscribers
+      const sampleHistory: Omit<BillingHistory, "id">[] = [
+        {
+          date: new Date().toISOString().split("T")[0],
+          amount: planId === "professional" ? 29 : 79,
+          status: "paid",
+          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Initial Subscription`,
+          planId,
+          planName: planId === "professional" ? "Professional" : "Gold",
+          customerId: `cus_${userId}`,
+          paymentMethod: "card",
+          currency: "USD",
+          createdAt: new Date().toISOString(),
+        },
+        // Add a few more sample entries for better UX
+        {
+          date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 1 month ago
+          amount: planId === "professional" ? 29 : 79,
+          status: "paid",
+          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Monthly Subscription`,
+          planId,
+          planName: planId === "professional" ? "Professional" : "Gold",
+          customerId: `cus_${userId}`,
+          paymentMethod: "card",
+          currency: "USD",
+          createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+        {
+          date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 2 months ago
+          amount: planId === "professional" ? 29 : 79,
+          status: "paid",
+          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Monthly Subscription`,
+          planId,
+          planName: planId === "professional" ? "Professional" : "Gold",
+          customerId: `cus_${userId}`,
+          paymentMethod: "card",
+          currency: "USD",
+          createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+      ];
+
+      // Add sample billing history items
+      for (const item of sampleHistory) {
+        await billingHistoryService.addBillingHistoryItem(userId, item);
+      }
+    } catch (error) {
+      console.error("Error initializing billing history:", error);
+    }
+  },
+
+  // Manually add sample billing history for existing users (for demo purposes)
+  addSampleBillingHistory: async (userId: string, planId: string = "professional") => {
+    try {
+      const sampleHistory: Omit<BillingHistory, "id">[] = [
+        {
+          date: new Date().toISOString().split("T")[0],
+          amount: planId === "professional" ? 29 : 79,
+          status: "paid",
+          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Current Month`,
+          planId,
+          planName: planId === "professional" ? "Professional" : "Gold",
+          customerId: `cus_${userId}`,
+          paymentMethod: "card",
+          currency: "USD",
+          createdAt: new Date().toISOString(),
+        },
+        {
+          date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 1 month ago
+          amount: planId === "professional" ? 29 : 79,
+          status: "paid",
+          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Previous Month`,
+          planId,
+          planName: planId === "professional" ? "Professional" : "Gold",
+          customerId: `cus_${userId}`,
+          paymentMethod: "card",
+          currency: "USD",
+          createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+        {
+          date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 2 months ago
+          amount: planId === "professional" ? 29 : 79,
+          status: "paid",
+          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Monthly Subscription`,
+          planId,
+          planName: planId === "professional" ? "Professional" : "Gold",
+          customerId: `cus_${userId}`,
+          paymentMethod: "card",
+          currency: "USD",
+          createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+      ];
+
+      // Add sample billing history items
+      for (const item of sampleHistory) {
+        await billingHistoryService.addBillingHistoryItem(userId, item);
+      }
+
+      console.log("Sample billing history added for user:", userId);
+    } catch (error) {
+      console.error("Error adding sample billing history:", error);
+    }
   },
 };

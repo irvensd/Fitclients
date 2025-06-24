@@ -39,11 +39,15 @@ import {
   CreditCard,
   Sparkles,
   RefreshCw,
+  Clock,
+  Loader2,
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { SubscriptionManager } from "@/components/SubscriptionManager";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import { userProfileService } from "@/lib/firebaseService";
+import { UserProfile, OperatingHours } from "@/lib/types";
 
 const Settings = () => {
   const [notifications, setNotifications] = useState({
@@ -86,6 +90,23 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const { toast } = useToast();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [operatingHours, setOperatingHours] = useState<OperatingHours[]>([
+    { day: "Monday", isOpen: true, startTime: "09:00", endTime: "17:00" },
+    { day: "Tuesday", isOpen: true, startTime: "09:00", endTime: "17:00" },
+    { day: "Wednesday", isOpen: true, startTime: "09:00", endTime: "17:00" },
+    { day: "Thursday", isOpen: true, startTime: "09:00", endTime: "17:00" },
+    { day: "Friday", isOpen: true, startTime: "09:00", endTime: "17:00" },
+    { day: "Saturday", isOpen: true, startTime: "09:00", endTime: "14:00" },
+    { day: "Sunday", isOpen: false, startTime: "09:00", endTime: "17:00" },
+  ]);
+  const [socialMedia, setSocialMedia] = useState({
+    instagram: "",
+    facebook: "",
+    tiktok: "",
+    youtube: "",
+  });
 
   // Manual refresh profile function
   const refreshProfile = async () => {
@@ -105,6 +126,26 @@ const Settings = () => {
           phone: profile.phone || "",
           bio: profile.bio || "",
         });
+        setProfile(profile);
+        setOperatingHours(profile.operatingHours || [
+          { day: "Monday", isOpen: true, startTime: "09:00", endTime: "17:00" },
+          { day: "Tuesday", isOpen: true, startTime: "09:00", endTime: "17:00" },
+          { day: "Wednesday", isOpen: true, startTime: "09:00", endTime: "17:00" },
+          { day: "Thursday", isOpen: true, startTime: "09:00", endTime: "17:00" },
+          { day: "Friday", isOpen: true, startTime: "09:00", endTime: "17:00" },
+          { day: "Saturday", isOpen: true, startTime: "09:00", endTime: "14:00" },
+          { day: "Sunday", isOpen: false, startTime: "09:00", endTime: "17:00" },
+        ]);
+        // Load existing social media if it exists
+        if (profile.socialMedia) {
+          console.log("Settings page - Loading existing social media:", profile.socialMedia);
+          setSocialMedia({
+            instagram: profile.socialMedia.instagram || "",
+            facebook: profile.socialMedia.facebook || "",
+            tiktok: profile.socialMedia.tiktok || "",
+            youtube: profile.socialMedia.youtube || "",
+          });
+        }
         alert("Profile refreshed successfully!");
       } else {
         alert("No profile found. Please try saving your information.");
@@ -130,6 +171,25 @@ const Settings = () => {
         phone: userProfile.phone || "",
         bio: userProfile.bio || "",
       });
+      setProfile(userProfile);
+      
+      // Load existing operating hours if they exist
+      if (userProfile.operatingHours && userProfile.operatingHours.length > 0) {
+        console.log("Settings page - Loading existing operating hours:", userProfile.operatingHours);
+        setOperatingHours(userProfile.operatingHours);
+      }
+      
+      // Load existing social media if it exists
+      if (userProfile.socialMedia) {
+        console.log("Settings page - Loading existing social media:", userProfile.socialMedia);
+        setSocialMedia({
+          instagram: userProfile.socialMedia.instagram || "",
+          facebook: userProfile.socialMedia.facebook || "",
+          tiktok: userProfile.socialMedia.tiktok || "",
+          youtube: userProfile.socialMedia.youtube || "",
+        });
+      }
+      
       setProfileLoading(false);
     } else if (user?.email) {
       // If no profile but we have user, at least set the email
@@ -144,49 +204,62 @@ const Settings = () => {
 
   const handleSaveProfile = async () => {
     if (!user?.uid) {
-      alert("You must be logged in to save profile changes.");
+      alert("You must be logged in to save changes.");
       return;
     }
     
     setLoading(true);
     try {
-      // First check if profile exists
-      const existingProfile = await userProfileService.getUserProfile(user.uid);
+      // Create the updated profile with all form data and operating hours
+      const updatedProfile = {
+        // Preserve existing fields first
+        ...profile,
+        // Override with new data
+        id: user.uid,
+        email: user.email || profileForm.email,
+        firstName: profileForm.firstName,
+        lastName: profileForm.lastName,
+        displayName: `${profileForm.firstName} ${profileForm.lastName}`.trim(),
+        phone: profileForm.phone,
+        bio: profileForm.bio,
+        createdAt: profile?.createdAt || new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        operatingHours: operatingHours,
+        socialMedia: socialMedia,
+      };
+
+      console.log("Settings page - Saving profile with operating hours:", updatedProfile);
+      console.log("Settings page - Operating hours to save:", operatingHours);
+
+      await userProfileService.updateUserProfile(user.uid, updatedProfile);
       
-      if (existingProfile) {
-        // Update existing profile
-        await updateUserProfile({
-          firstName: profileForm.firstName,
-          lastName: profileForm.lastName,
-          phone: profileForm.phone,
-          bio: profileForm.bio,
-          displayName: `${profileForm.firstName} ${profileForm.lastName}`.trim(),
-        });
-        console.log("Profile updated successfully");
-      } else {
-        // Create new profile
-        console.log("No existing profile found, creating new one");
-        await userProfileService.createUserProfile(user.uid, {
-          email: user.email || profileForm.email,
-          firstName: profileForm.firstName,
-          lastName: profileForm.lastName,
-          displayName: `${profileForm.firstName} ${profileForm.lastName}`.trim(),
-          phone: profileForm.phone,
-          bio: profileForm.bio,
-        });
-        console.log("Profile created successfully");
-      }
+      // Update local state
+      setProfile(updatedProfile);
       
-      alert("Profile saved successfully!");
-      
-      // Refresh the profile data
-      await refreshProfile();
+      toast({
+        title: "Profile updated",
+        description: "Your profile and business settings have been saved successfully.",
+      });
     } catch (error) {
-      console.error("Failed to save profile:", error);
-      alert("Failed to save profile. Please check the console for details.");
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOperatingHoursChange = (day: string, field: keyof OperatingHours, value: any) => {
+    setOperatingHours(prev => 
+      prev.map(hour => 
+        hour.day === day 
+          ? { ...hour, [field]: value }
+          : hour
+      )
+    );
   };
 
   return (
@@ -425,28 +498,48 @@ const Settings = () => {
               <Separator />
 
               <div className="space-y-4">
-                <h3 className="font-medium">Operating Hours</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium">Operating Hours</h3>
+                  <Button 
+                    size="sm" 
+                    onClick={handleSaveProfile}
+                    disabled={loading}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {loading ? "Saving..." : "Save Hours"}
+                  </Button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday",
-                    "Saturday",
-                    "Sunday",
-                  ].map((day) => (
-                    <div key={day} className="flex items-center gap-4">
+                  {operatingHours.map((hour) => (
+                    <div key={hour.day} className="flex items-center gap-4">
                       <div className="w-20">
-                        <span className="text-sm font-medium">{day}</span>
+                        <span className="text-sm font-medium">{hour.day}</span>
                       </div>
-                      <Switch defaultChecked={day !== "Sunday"} />
-                      <Input className="w-20" defaultValue="9:00" type="time" />
+                      <Switch 
+                        checked={hour.isOpen}
+                        onCheckedChange={(checked) => 
+                          handleOperatingHoursChange(hour.day, 'isOpen', checked)
+                        }
+                      />
+                      <Input 
+                        className="w-20" 
+                        value={hour.startTime}
+                        type="time"
+                        onChange={(e) => 
+                          handleOperatingHoursChange(hour.day, 'startTime', e.target.value)
+                        }
+                        disabled={!hour.isOpen}
+                      />
                       <span className="text-muted-foreground">to</span>
                       <Input
                         className="w-20"
-                        defaultValue="17:00"
+                        value={hour.endTime}
                         type="time"
+                        onChange={(e) => 
+                          handleOperatingHoursChange(hour.day, 'endTime', e.target.value)
+                        }
+                        disabled={!hour.isOpen}
                       />
                     </div>
                   ))}
@@ -460,19 +553,39 @@ const Settings = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="instagram">Instagram</Label>
-                    <Input id="instagram" placeholder="@yourusername" />
+                    <Input 
+                      id="instagram" 
+                      placeholder="@yourusername"
+                      value={socialMedia.instagram}
+                      onChange={(e) => setSocialMedia(prev => ({ ...prev, instagram: e.target.value }))}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="facebook">Facebook</Label>
-                    <Input id="facebook" placeholder="facebook.com/yourpage" />
+                    <Input 
+                      id="facebook" 
+                      placeholder="facebook.com/yourpage"
+                      value={socialMedia.facebook}
+                      onChange={(e) => setSocialMedia(prev => ({ ...prev, facebook: e.target.value }))}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="tiktok">TikTok</Label>
-                    <Input id="tiktok" placeholder="@yourusername" />
+                    <Input 
+                      id="tiktok" 
+                      placeholder="@yourusername"
+                      value={socialMedia.tiktok}
+                      onChange={(e) => setSocialMedia(prev => ({ ...prev, tiktok: e.target.value }))}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="youtube">YouTube</Label>
-                    <Input id="youtube" placeholder="youtube.com/yourchannel" />
+                    <Input 
+                      id="youtube" 
+                      placeholder="youtube.com/yourchannel"
+                      value={socialMedia.youtube}
+                      onChange={(e) => setSocialMedia(prev => ({ ...prev, youtube: e.target.value }))}
+                    />
                   </div>
                 </div>
               </div>

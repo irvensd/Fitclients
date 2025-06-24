@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   Card,
@@ -41,13 +41,18 @@ import {
   Sparkles,
   MessageCircle,
   HelpCircle,
+  Instagram,
+  Facebook,
+  Youtube,
 } from "lucide-react";
 import { GamificationDashboard } from "@/components/GamificationDashboard";
+import { BusinessHours } from "@/components/BusinessHours";
 import { useData } from "@/contexts/DataContext";
 import { calculateGamificationData } from "@/lib/gamification";
-import { Client, Session, Payment, WorkoutPlan, ProgressEntry } from "@/lib/types";
+import { Client, Session, Payment, WorkoutPlan, ProgressEntry, UserProfile } from "@/lib/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
+import { userProfileService } from "@/lib/firebaseService";
 
 const CancelSessionDialog = ({
   session,
@@ -157,6 +162,7 @@ const ClientPortal = () => {
     updateSession,
   } = useData();
   const { isDemoUser, user } = useAuth();
+  const [trainerProfile, setTrainerProfile] = useState<UserProfile | null>(null);
 
   // Check if we're on the demo portal route (public access)
   const isDemoPortalRoute = window.location.pathname === '/demo-portal';
@@ -179,6 +185,24 @@ const ClientPortal = () => {
   const pastSessions = clientSessions.filter(s => new Date(s.date) < new Date() || s.status !== 'scheduled').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const gamificationData = client ? calculateGamificationData(client, clientSessions, clientPayments) : null;
+
+  // Fetch trainer profile for operating hours
+  useEffect(() => {
+    const fetchTrainerProfile = async () => {
+      if (user?.uid) {
+        try {
+          const profile = await userProfileService.getUserProfile(user.uid);
+          console.log("ClientPortal - Trainer profile loaded:", profile);
+          console.log("ClientPortal - Operating hours:", profile?.operatingHours);
+          setTrainerProfile(profile);
+        } catch (error) {
+          console.error("Error fetching trainer profile:", error);
+        }
+      }
+    };
+
+    fetchTrainerProfile();
+  }, [user?.uid]);
 
   const handleCancelSession = async (sessionId: string, reason: string) => {
     try {
@@ -211,204 +235,419 @@ const ClientPortal = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/40">
-      <header className="bg-background border-b sticky top-0 z-10">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <header className="bg-white border-b shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-4">
-              <Dumbbell className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">FitClients Portal</h1>
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 p-2 rounded-lg">
+                <Dumbbell className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">FitClients Portal</h1>
+                <p className="text-xs text-gray-500">Client Dashboard</p>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <Avatar>
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <p className="font-semibold text-gray-900">{client.name}</p>
+                <p className="text-xs text-gray-500">Welcome back!</p>
+              </div>
+              <Avatar className="h-10 w-10 border-2 border-primary/20">
                 <AvatarImage src={client.avatar} alt={client.name} />
-                <AvatarFallback>{client.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  {client.name.split(" ").map(n => n[0]).join("")}
+                </AvatarFallback>
               </Avatar>
-            <div>
-                <p className="font-semibold">{client.name}</p>
-                <p className="text-sm text-muted-foreground">Client Portal</p>
             </div>
           </div>
         </div>
-      </div>
       </header>
 
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="workouts">Workouts</TabsTrigger>
-            <TabsTrigger value="progress">Progress</TabsTrigger>
-            <TabsTrigger value="payments">Payments</TabsTrigger>
-            </TabsList>
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-6 h-auto p-1 bg-white shadow-sm border">
+            <TabsTrigger value="overview" className="text-xs md:text-sm">Overview</TabsTrigger>
+            <TabsTrigger value="workouts" className="text-xs md:text-sm">Workouts</TabsTrigger>
+            <TabsTrigger value="progress" className="text-xs md:text-sm">Progress</TabsTrigger>
+            <TabsTrigger value="payments" className="text-xs md:text-sm">Payments</TabsTrigger>
+            <TabsTrigger value="business" className="text-xs md:text-sm hidden md:block">Business</TabsTrigger>
+          </TabsList>
           
-          <TabsContent value="overview" className="mt-6">
-            <div className="grid grid-cols-1 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Upcoming Sessions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {upcomingSessions.length > 0 ? (
-                    <ul className="space-y-4">
-                      {upcomingSessions.map((session) => (
-                        <li key={session.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                          <div className="flex items-center gap-4">
-                            <div className="bg-primary/10 text-primary p-3 rounded-lg">
-                              <Calendar className="h-6 w-6" />
-                         </div>
-                            <div>
-                              <p className="font-semibold">{new Date(session.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-                              <p className="text-sm text-muted-foreground">{session.startTime} - {session.endTime}</p>
-                         </div>
-                       </div>
-                          <CancelSessionDialog session={session} onCancel={handleCancelSession} />
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-muted-foreground">No upcoming sessions.</p>
-                  )}
-              </CardContent>
-            </Card>
+          <TabsContent value="overview" className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              {/* Left Column - Sessions */}
+              <div className="xl:col-span-2 space-y-6">
+                <Card className="shadow-sm border-0 bg-white">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Calendar className="h-5 w-5 text-primary" />
+                      Upcoming Sessions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {upcomingSessions.length > 0 ? (
+                      <div className="space-y-3">
+                        {upcomingSessions.map((session) => (
+                          <div key={session.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                            <div className="flex items-center gap-4">
+                              <div className="bg-primary text-white p-3 rounded-xl shadow-sm">
+                                <Calendar className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <p className="font-semibold text-gray-900">
+                                  {new Date(session.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                                </p>
+                                <p className="text-sm text-gray-600">{session.startTime} - {session.endTime}</p>
+                                <p className="text-xs text-primary font-medium">{session.type}</p>
+                              </div>
+                            </div>
+                            <CancelSessionDialog session={session} onCancel={handleCancelSession} />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Calendar className="mx-auto h-12 w-12 text-gray-300" />
+                        <p className="mt-2 text-gray-500">No upcoming sessions</p>
+                        <p className="text-sm text-gray-400">Your trainer will schedule sessions for you</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
 
-              {gamificationData && <GamificationDashboard data={gamificationData} variant="summary" />}
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Session History</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {pastSessions.length > 0 ? (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead className="text-left text-muted-foreground">
-                          <tr>
-                            <th className="p-2">Date</th>
-                            <th className="p-2">Type</th>
-                            <th className="p-2">Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {pastSessions.map((session) => (
-                            <tr key={session.id} className="border-t">
-                              <td className="p-2">{new Date(session.date).toLocaleDateString()}</td>
-                              <td className="p-2">{session.type}</td>
-                              <td className="p-2">
-                                <Badge variant={session.status === 'completed' ? 'default' : session.status === 'cancelled' ? 'destructive' : 'secondary'}>
-                            {session.status}
-                        </Badge>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground">No past sessions.</p>
-                  )}
-                </CardContent>
-              </Card>
+              {/* Right Column - Recent Sessions */}
+              <div className="space-y-6">
+                <Card className="shadow-sm border-0 bg-white">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Clock className="h-5 w-5 text-primary" />
+                      Recent Sessions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {pastSessions.length > 0 ? (
+                      <div className="space-y-3">
+                        {pastSessions.slice(0, 5).map((session) => (
+                          <div key={session.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                              <p className="font-medium text-gray-900">
+                                {new Date(session.date).toLocaleDateString()}
+                              </p>
+                              <p className="text-sm text-gray-600">{session.type}</p>
+                            </div>
+                            <Badge 
+                              variant={session.status === 'completed' ? 'default' : session.status === 'cancelled' ? 'destructive' : 'secondary'}
+                              className="text-xs"
+                            >
+                              {session.status}
+                            </Badge>
+                          </div>
+                        ))}
+                        {pastSessions.length > 5 && (
+                          <p className="text-xs text-gray-500 text-center pt-2">
+                            +{pastSessions.length - 5} more sessions
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6">
+                        <Clock className="mx-auto h-8 w-8 text-gray-300" />
+                        <p className="mt-2 text-gray-500 text-sm">No past sessions</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </div>
+
+            {/* Full Width Gamification Dashboard */}
+            {gamificationData && (
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+                <GamificationDashboard data={gamificationData} variant="summary" />
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="workouts" className="mt-6">
             {clientWorkoutPlan ? (
-            <Card>
-              <CardHeader>
-                  <CardTitle>{clientWorkoutPlan.name}</CardTitle>
-                  <CardDescription>{clientWorkoutPlan.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                  <ul className="space-y-4">
+              <Card className="shadow-sm border-0 bg-white">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Dumbbell className="h-5 w-5 text-primary" />
+                    {clientWorkoutPlan.name}
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">{clientWorkoutPlan.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {clientWorkoutPlan.exercises.map((exercise, index) => (
-                      <li key={index} className="p-3 bg-muted rounded-lg">
-                        <p className="font-semibold">{exercise.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {exercise.sets} sets of {exercise.reps} {exercise.weight ? ` at ${exercise.weight}lbs` : ""}
+                      <div key={index} className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100">
+                        <p className="font-semibold text-gray-900 mb-2">{exercise.name}</p>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {exercise.sets} sets × {exercise.reps} reps
+                          {exercise.weight && <span className="text-primary font-medium"> @ {exercise.weight}lbs</span>}
                         </p>
-                        {exercise.notes && <p className="text-xs mt-1">Notes: {exercise.notes}</p>}
-                                    </li>
+                        {exercise.notes && (
+                          <p className="text-xs text-gray-500 bg-white/50 p-2 rounded border">
+                            💡 {exercise.notes}
+                          </p>
+                        )}
+                      </div>
                     ))}
-                  </ul>
-              </CardContent>
-            </Card>
+                  </div>
+                </CardContent>
+              </Card>
             ) : (
-              <Card><CardContent className="pt-6"><p>No workout plan assigned.</p></CardContent></Card>
+              <Card className="shadow-sm border-0 bg-white">
+                <CardContent className="pt-6 text-center">
+                  <Dumbbell className="mx-auto h-12 w-12 text-gray-300" />
+                  <p className="mt-2 text-gray-500">No workout plan assigned</p>
+                  <p className="text-sm text-gray-400">Your trainer will create a personalized plan for you</p>
+                </CardContent>
+              </Card>
             )}
           </TabsContent>
 
           <TabsContent value="progress" className="mt-6">
-            <Card>
+            <Card className="shadow-sm border-0 bg-white">
               <CardHeader>
-                  <CardTitle>Progress History</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  Progress History
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                   {clientProgress.length > 0 ? (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead className="text-left text-muted-foreground">
-                          <tr>
-                            <th className="p-2">Date</th>
-                            <th className="p-2">Weight (lbs)</th>
-                            <th className="p-2">Body Fat %</th>
+                {clientProgress.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="text-left text-gray-500 border-b">
+                        <tr>
+                          <th className="p-3 font-medium">Date</th>
+                          <th className="p-3 font-medium">Weight (lbs)</th>
+                          <th className="p-3 font-medium">Body Fat %</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {clientProgress.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((entry) => (
+                          <tr key={entry.id} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="p-3 font-medium">{new Date(entry.date).toLocaleDateString()}</td>
+                            <td className="p-3">{entry.weight}</td>
+                            <td className="p-3">{entry.bodyFat}</td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {clientProgress.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((entry) => (
-                            <tr key={entry.id} className="border-t">
-                              <td className="p-2">{new Date(entry.date).toLocaleDateString()}</td>
-                              <td className="p-2">{entry.weight}</td>
-                              <td className="p-2">{entry.bodyFat}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                        </div>
-                  ) : (
-                    <p className="text-muted-foreground">No progress has been logged yet.</p>
-                  )}
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <TrendingUp className="mx-auto h-12 w-12 text-gray-300" />
+                    <p className="mt-2 text-gray-500">No progress data yet</p>
+                    <p className="text-sm text-gray-400">Your trainer will log your progress here</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="payments" className="mt-6">
-            <Card>
+            <Card className="shadow-sm border-0 bg-white">
               <CardHeader>
-                <CardTitle>Payment History</CardTitle>
-                <CardDescription>View all recorded payments.</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-primary" />
+                  Payment History
+                </CardTitle>
+                <CardDescription>View all recorded payments</CardDescription>
               </CardHeader>
               <CardContent>
                 {clientPayments.length > 0 ? (
-                  <ul className="space-y-4">
+                  <div className="space-y-4">
                     {clientPayments.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((payment) => (
-                      <li key={payment.id} className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                      <div key={payment.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
                         <div className="flex items-center gap-4">
-                          <div className={`p-2 rounded-full ${payment.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                          <div className={`p-3 rounded-xl ${payment.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
                             {payment.status === 'completed' ? <CheckCircle className="h-5 w-5"/> : <DollarSign className="h-5 w-5" />}
-                      </div>
-                                    <div>
-                            <p className="font-semibold">${payment.amount.toFixed(2)} - {payment.description}</p>
-                        <p className="text-sm text-muted-foreground">
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900">${payment.amount.toFixed(2)} - {payment.description}</p>
+                            <p className="text-sm text-gray-600">
                               Paid on {new Date(payment.date).toLocaleDateString()} via {payment.method}
-                        </p>
-                      </div>
+                            </p>
+                          </div>
                         </div>
-                        <Badge variant={payment.status === 'completed' ? 'default' : payment.status === 'pending' ? 'secondary' : 'destructive'}>
+                        <Badge 
+                          variant={payment.status === 'completed' ? 'default' : payment.status === 'pending' ? 'secondary' : 'destructive'}
+                          className="bg-white border"
+                        >
                           {payment.status}
                         </Badge>
-                      </li>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 ) : (
-                  <div className="text-center py-12">
-                    <DollarSign className="mx-auto h-12 w-12 text-muted-foreground" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No payment history</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">No payments have been recorded for this client yet.</p>
-                </div>
+                  <div className="text-center py-8">
+                    <DollarSign className="mx-auto h-12 w-12 text-gray-300" />
+                    <p className="mt-2 text-gray-500">No payment history</p>
+                    <p className="text-sm text-gray-400">Payment records will appear here</p>
+                  </div>
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="business" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <BusinessHours 
+                operatingHours={trainerProfile?.operatingHours}
+                trainerName={trainerProfile?.displayName || "Your Trainer"}
+              />
+              
+              <Card className="shadow-sm border-0 bg-white">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageCircle className="h-5 w-5 text-primary" />
+                    Contact Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {trainerProfile?.businessName && (
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                      <Label className="text-xs font-medium text-blue-700">Business Name</Label>
+                      <p className="font-semibold text-blue-900">{trainerProfile.businessName}</p>
+                    </div>
+                  )}
+                  
+                  {trainerProfile?.phone && (
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+                      <Label className="text-xs font-medium text-green-700">Phone</Label>
+                      <p className="font-semibold text-green-900">{trainerProfile.phone}</p>
+                    </div>
+                  )}
+                  
+                  {trainerProfile?.email && (
+                    <div className="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                      <Label className="text-xs font-medium text-purple-700">Email</Label>
+                      <p className="font-semibold text-purple-900">{trainerProfile.email}</p>
+                    </div>
+                  )}
+                  
+                  {trainerProfile?.website && (
+                    <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
+                      <Label className="text-xs font-medium text-orange-700">Website</Label>
+                      <a 
+                        href={trainerProfile.website} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="font-semibold text-orange-900 hover:underline"
+                      >
+                        {trainerProfile.website}
+                      </a>
+                    </div>
+                  )}
+                  
+                  {trainerProfile?.address && (
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                      <Label className="text-xs font-medium text-gray-700">Address</Label>
+                      <p className="font-semibold text-gray-900">{trainerProfile.address}</p>
+                    </div>
+                  )}
+                  
+                  {trainerProfile?.bio && (
+                    <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                      <Label className="text-xs font-medium text-indigo-700">About</Label>
+                      <p className="text-sm text-indigo-900">{trainerProfile.bio}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Social Media Section - Full Width */}
+            {trainerProfile?.socialMedia && (
+              Object.values(trainerProfile.socialMedia).some(value => value && value.trim() !== "")
+            ) && (
+              <Card className="shadow-sm border-0 bg-white mt-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Star className="h-5 w-5 text-primary" />
+                    Follow {trainerProfile?.displayName || "Your Trainer"}
+                  </CardTitle>
+                  <CardDescription>
+                    Stay connected and get fitness tips, motivation, and updates
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {trainerProfile.socialMedia.instagram && (
+                      <a
+                        href={`https://instagram.com/${trainerProfile.socialMedia.instagram.replace('@', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100 hover:shadow-md transition-shadow"
+                      >
+                        <Instagram className="h-6 w-6 text-pink-600" />
+                        <div>
+                          <p className="font-semibold text-pink-900">Instagram</p>
+                          <p className="text-sm text-pink-700">{trainerProfile.socialMedia.instagram}</p>
+                        </div>
+                      </a>
+                    )}
+
+                    {trainerProfile.socialMedia.facebook && (
+                      <a
+                        href={trainerProfile.socialMedia.facebook.startsWith('http') 
+                          ? trainerProfile.socialMedia.facebook 
+                          : `https://facebook.com/${trainerProfile.socialMedia.facebook}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:shadow-md transition-shadow"
+                      >
+                        <Facebook className="h-6 w-6 text-blue-600" />
+                        <div>
+                          <p className="font-semibold text-blue-900">Facebook</p>
+                          <p className="text-sm text-blue-700">Visit Page</p>
+                        </div>
+                      </a>
+                    )}
+
+                    {trainerProfile.socialMedia.youtube && (
+                      <a
+                        href={trainerProfile.socialMedia.youtube.startsWith('http') 
+                          ? trainerProfile.socialMedia.youtube 
+                          : `https://youtube.com/${trainerProfile.socialMedia.youtube}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl border border-red-100 hover:shadow-md transition-shadow"
+                      >
+                        <Youtube className="h-6 w-6 text-red-600" />
+                        <div>
+                          <p className="font-semibold text-red-900">YouTube</p>
+                          <p className="text-sm text-red-700">Watch Videos</p>
+                        </div>
+                      </a>
+                    )}
+
+                    {trainerProfile.socialMedia.tiktok && (
+                      <a
+                        href={`https://tiktok.com/@${trainerProfile.socialMedia.tiktok.replace('@', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl border border-gray-100 hover:shadow-md transition-shadow"
+                      >
+                        <div className="h-6 w-6 bg-black rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">T</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">TikTok</p>
+                          <p className="text-sm text-gray-700">{trainerProfile.socialMedia.tiktok}</p>
+                        </div>
+                      </a>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </main>

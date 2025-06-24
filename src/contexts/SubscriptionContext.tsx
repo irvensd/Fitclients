@@ -6,6 +6,7 @@ import {
   getSubscriptionStatus,
   canExceedLimit,
 } from "@/lib/stripe";
+import { billingHistoryService } from "@/lib/firebaseService";
 
 interface SubscriptionData {
   status: "trialing" | "active" | "canceled" | "past_due" | "unpaid";
@@ -24,6 +25,7 @@ interface SubscriptionContextType {
   refreshSubscription: () => Promise<void>;
   updateSubscriptionPlan: (
     planId: string,
+    userId?: string,
     onDowngradeClients?: (newLimit: number, selectedIds: string[]) => void,
   ) => void;
 }
@@ -113,8 +115,9 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
     console.log("Refreshing subscription data...");
   };
 
-  const updateSubscriptionPlan = (
+  const updateSubscriptionPlan = async (
     planId: string,
+    userId?: string,
     onDowngradeClients?: (newLimit: number, selectedIds: string[]) => void,
   ) => {
     const newSubscription: SubscriptionData = {
@@ -129,6 +132,15 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
     // Persist to localStorage
     localStorage.setItem("subscription_data", JSON.stringify(newSubscription));
     console.log(`Subscription updated to ${planId} plan`);
+
+    // Initialize billing history for new paid subscribers
+    try {
+      if (userId && planId !== "free") {
+        await billingHistoryService.initializeBillingHistory(userId, planId);
+      }
+    } catch (error) {
+      console.error("Error initializing billing history:", error);
+    }
 
     // Handle client downgrade if callback provided
     if (onDowngradeClients) {

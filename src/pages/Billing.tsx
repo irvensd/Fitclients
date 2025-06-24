@@ -53,6 +53,9 @@ import { useToast } from "@/hooks/use-toast";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { useNavigate } from "react-router-dom";
 import { DemoCheckoutModal } from "@/components/DemoCheckoutModal";
+import { billingHistoryService } from "@/lib/firebaseService";
+import { useAuth } from "@/contexts/AuthContext";
+import { BillingHistory as BillingHistoryType } from "@/lib/types";
 import "@/lib/resetSubscription"; // Import for console access
 
 // Mock payment methods - in real app, these would come from Stripe
@@ -401,9 +404,9 @@ const PlanCard = ({
             className="w-full"
             variant={isPro ? "default" : "outline"}
             onClick={() => onUpgrade(plan.id)}
-            disabled={loading || plan.id === "free"}
+            disabled={loading}
           >
-            {loading ? "Processing..." : "Upgrade to " + plan.name}
+            {loading ? "Processing..." : "Switch to " + plan.name}
           </Button>
         )}
 
@@ -475,34 +478,121 @@ const TrialStatus = () => {
   );
 };
 
-const BillingHistory = () => {
-  // Mock billing history - in real app, fetch from Stripe/backend
-  const billingHistory = [
-    {
-      id: "inv_001",
-      date: "2024-01-15",
-      amount: 29,
-      status: "paid",
-      description: "Professional Plan - January 2024",
-      invoiceUrl: "#",
-    },
-    {
-      id: "inv_002",
-      date: "2023-12-15",
-      amount: 29,
-      status: "paid",
-      description: "Professional Plan - December 2023",
-      invoiceUrl: "#",
-    },
-    {
-      id: "inv_003",
-      date: "2023-11-15",
-      amount: 29,
-      status: "paid",
-      description: "Professional Plan - November 2023",
-      invoiceUrl: "#",
-    },
-  ];
+const BillingHistoryComponent = () => {
+  const { user } = useAuth();
+  const [billingHistory, setBillingHistory] = useState<BillingHistoryType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    const unsubscribe = billingHistoryService.subscribeToBillingHistory(
+      user.uid,
+      (history) => {
+        setBillingHistory(history);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error loading billing history:", error);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [user?.uid]);
+
+  const handleAddSampleData = async () => {
+    if (!user?.uid) return;
+    
+    try {
+      await billingHistoryService.addSampleBillingHistory(user.uid, "professional");
+      toast({
+        title: "Sample data added",
+        description: "Sample billing history has been added for testing purposes.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add sample billing history.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "paid":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "failed":
+        return "bg-red-100 text-red-800";
+      case "refunded":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5" />
+            Billing History
+          </CardTitle>
+          <CardDescription>View your past invoices and payments</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center justify-between p-3 border rounded-lg animate-pulse">
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-48"></div>
+                  <div className="h-3 bg-gray-200 rounded w-24"></div>
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-16"></div>
+                  <div className="h-6 bg-gray-200 rounded w-20"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (billingHistory.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5" />
+            Billing History
+          </CardTitle>
+          <CardDescription>View your past invoices and payments</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500">No billing history found</p>
+            <p className="text-sm text-gray-400 mb-4">Your billing history will appear here once you have active subscriptions</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleAddSampleData}
+              className="text-xs"
+            >
+              Add Sample Data (Demo)
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -525,18 +615,25 @@ const BillingHistory = () => {
                 <p className="text-sm text-muted-foreground">
                   {new Date(invoice.date).toLocaleDateString()}
                 </p>
+                {invoice.planName && (
+                  <p className="text-xs text-muted-foreground">
+                    Plan: {invoice.planName}
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <div className="text-right">
                   <p className="font-medium">{formatPrice(invoice.amount)}</p>
-                  <Badge className="bg-green-100 text-green-800">
+                  <Badge className={getStatusBadgeVariant(invoice.status)}>
                     {invoice.status}
                   </Badge>
                 </div>
-                <Button size="sm" variant="outline" className="h-8">
-                  <Download className="h-3 w-3 mr-1" />
-                  Download
-                </Button>
+                {invoice.invoiceUrl && (
+                  <Button size="sm" variant="outline" className="h-8">
+                    <Download className="h-3 w-3 mr-1" />
+                    Download
+                  </Button>
+                )}
               </div>
             </div>
           ))}
@@ -561,11 +658,20 @@ const Billing = () => {
   const [paymentMethods, setPaymentMethods] = useState(mockPaymentMethods);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const currentPlan = getCurrentPlan();
 
   const handleUpgrade = async (planId: string) => {
-    if (planId === "free") return;
+    if (planId === "free") {
+      // Handle switching to free plan directly
+      updateSubscriptionPlan(planId, user?.uid);
+      toast({
+        title: "Switched to Starter Plan",
+        description: "You've been switched to the free Starter plan. Some features may be limited.",
+      });
+      return;
+    }
 
     setSelectedPlanId(planId);
     setCheckoutModalOpen(true);
@@ -575,15 +681,21 @@ const Billing = () => {
     if (!selectedPlanId) return;
 
     // Actually update the subscription plan
-    updateSubscriptionPlan(selectedPlanId);
+    updateSubscriptionPlan(selectedPlanId, user?.uid);
 
     const planKey =
       selectedPlanId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
     const selectedPlan = SUBSCRIPTION_PLANS[planKey];
+    const isUpgrade = selectedPlan.price > currentPlan.price;
+    const isDowngrade = selectedPlan.price < currentPlan.price;
 
     toast({
       title: "Subscription updated!",
-      description: `Successfully upgraded to ${selectedPlan?.name || selectedPlanId} plan.`,
+      description: isUpgrade
+        ? `Successfully upgraded to ${selectedPlan?.name || selectedPlanId} plan.`
+        : isDowngrade
+        ? `Successfully downgraded to ${selectedPlan?.name || selectedPlanId} plan.`
+        : `You are now on the ${selectedPlan?.name || selectedPlanId} plan.`,
     });
 
     setCheckoutModalOpen(false);
@@ -824,7 +936,7 @@ const Billing = () => {
       </div>
 
       {/* Billing History */}
-      {currentPlan.id !== "free" && <BillingHistory />}
+      <BillingHistoryComponent />
 
       {/* Security & Trust */}
       <Card>

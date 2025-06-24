@@ -10,6 +10,13 @@ export interface Client {
   avatar?: string;
 }
 
+export interface OperatingHours {
+  day: string;
+  isOpen: boolean;
+  startTime: string;
+  endTime: string;
+}
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -24,6 +31,13 @@ export interface UserProfile {
   address?: string;
   createdAt: string;
   lastLogin?: string;
+  operatingHours?: OperatingHours[];
+  socialMedia?: {
+    instagram?: string;
+    facebook?: string;
+    tiktok?: string;
+    youtube?: string;
+  };
 }
 
 export interface Session {
@@ -126,4 +140,20 @@ export interface DashboardStats {
   monthlyRevenue: number;
   activeWorkoutPlans: number;
   pendingPayments: number;
+}
+
+export interface BillingHistory {
+  id: string;
+  date: string;
+  amount: number;
+  status: "paid" | "pending" | "failed" | "refunded";
+  description: string;
+  invoiceUrl?: string;
+  subscriptionId?: string;
+  planId?: string;
+  planName?: string;
+  customerId?: string;
+  paymentMethod?: string;
+  currency?: string;
+  createdAt: string;
 }
