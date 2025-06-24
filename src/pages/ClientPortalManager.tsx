@@ -330,11 +330,7 @@ const ClientPortalManager = () => {
   const { clients, loading } = useData();
   const navigate = useNavigate();
 
-  // Function to test portal
-  const testPortal = (clientId: string) => {
-    const portalUrl = `/client-portal/${clientId}`;
-    window.open(portalUrl, "_blank");
-  };
+
 
   // Add portal-specific properties for mock purposes
   const clientsWithPortalData = clients.map((client) => ({
@@ -374,26 +370,7 @@ const ClientPortalManager = () => {
             Generate and manage shareable client portals with no login required.
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <Button
-            variant="outline"
-            onClick={() => testPortal("1")}
-            size="sm"
-            className="w-full sm:w-auto justify-center"
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            <span className="text-sm">Test Portal (Sarah)</span>
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => testPortal("2")}
-            size="sm"
-            className="w-full sm:w-auto justify-center"
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            <span className="text-sm">Test Portal (Mike)</span>
-          </Button>
-        </div>
+
       </div>
 
       {/* Stats */}
@@ -553,16 +530,6 @@ const ClientPortalManager = () => {
                   <SharePortalDialog client={client} />
                   <PortalSettingsDialog client={client} />
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => testPortal(client.id)}
-                  title="Test Portal"
-                  className="sm:w-auto w-full justify-center"
-                >
-                  <Eye className="h-4 w-4" />
-                  <span className="ml-2 sm:hidden">Test Portal</span>
-                </Button>
               </div>
             </CardContent>
           </Card>
