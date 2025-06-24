@@ -29,6 +29,9 @@ import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
 import SupportPortal from "./pages/SupportPortal";
 import Onboarding from "./pages/Onboarding";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import { CookieConsent } from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -38,10 +41,11 @@ const App = () => (
       <SubscriptionProvider>
         <DataProvider>
           <MarketingProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
+                          <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <CookieConsent />
+                <BrowserRouter>
                 <Routes>
                   {/* Home route - shows landing or redirects to admin if authenticated */}
                   <Route path="/" element={<LandingRedirect />} />
@@ -50,6 +54,8 @@ const App = () => (
                   <Route path="/landing" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/onboarding" element={<Onboarding />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
 
                   {/* Demo Client Portal - No Authentication Required */}
                   <Route

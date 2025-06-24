@@ -11,7 +11,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Zap, ArrowLeft } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Zap, ArrowLeft, Check, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isFirebaseConfigured } from "@/lib/firebase";
 
@@ -21,7 +22,9 @@ const Login = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [mode, setMode] = useState<"login" | "register" | "reset">("login");
 
   const { login, register, user, isDevMode, authError, clearError } = useAuth();
 
@@ -48,9 +51,59 @@ const Login = () => {
     }
   };
 
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      // Handle error - email required
+      return;
+    }
+    
+    setResetLoading(true);
+    try {
+      // For demo purposes, we'll simulate sending a reset email
+      // In a real implementation, this would call Firebase Auth's sendPasswordResetEmail
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setResetEmailSent(true);
+    } catch (error) {
+      console.error("Password reset error:", error);
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const getPasswordStrength = (password: string) => {
+    let score = 0;
+    const checks = {
+      length: password.length >= 8,
+      lowercase: /[a-z]/.test(password),
+      uppercase: /[A-Z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+
+    Object.values(checks).forEach(check => {
+      if (check) score += 20;
+    });
+
+    return {
+      score: Math.min(score, 100),
+      checks,
+      level: score < 40 ? 'weak' : score < 80 ? 'medium' : 'strong'
+    };
+  };
+
+  const passwordStrength = mode === "register" ? getPasswordStrength(password) : null;
+
   const switchMode = () => {
-    setMode(mode === "login" ? "register" : "login");
+    if (mode === "login") {
+      setMode("register");
+    } else if (mode === "register") {
+      setMode("login");
+    } else {
+      setMode("login");
+    }
     clearError();
+    setResetEmailSent(false);
   };
 
   return (
@@ -72,12 +125,14 @@ const Login = () => {
             <span className="text-2xl font-bold">FitClient</span>
           </div>
           <h1 className="text-2xl font-bold">
-            {mode === "login" ? "Trainer Login" : "Create Trainer Account"}
+            {mode === "login" ? "Trainer Login" : mode === "register" ? "Create Trainer Account" : "Reset Password"}
           </h1>
           <p className="text-muted-foreground">
             {mode === "login"
               ? "Access your personal training dashboard"
-              : "Set up your FitClient trainer account"}
+              : mode === "register"
+              ? "Set up your FitClient trainer account"
+              : "Enter your email to receive a password reset link"}
           </p>
         </div>
 
@@ -85,16 +140,73 @@ const Login = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              {mode === "login" ? "Welcome Back" : "Create Your Account"}
+              {mode === "login" ? "Welcome Back" : mode === "register" ? "Create Your Account" : "Reset Your Password"}
             </CardTitle>
             <CardDescription>
               {mode === "login"
                 ? "Sign in to manage your clients and sessions"
-                : "Join FitClient and start managing your training business"}
+                : mode === "register"
+                ? "Join FitClient and start managing your training business"
+                : "We'll send you a link to reset your password"}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {mode === "reset" ? (
+              <form onSubmit={handlePasswordReset} className="space-y-4">
+                {resetEmailSent ? (
+                  <div className="text-center space-y-4">
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <h3 className="font-semibold text-green-800 mb-2">Email Sent!</h3>
+                      <p className="text-sm text-green-700">
+                        We've sent a password reset link to <strong>{email}</strong>. 
+                        Check your email and click the link to reset your password.
+                      </p>
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => setMode("login")}
+                      className="w-full"
+                    >
+                      Back to Login
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="reset-email">Email Address</Label>
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        placeholder="trainer@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={resetLoading || !email}
+                    >
+                      {resetLoading ? "Sending Reset Link..." : "Send Reset Link"}
+                    </Button>
+
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => setMode("login")}
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Back to Login
+                      </button>
+                    </div>
+                  </>
+                )}
+              </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
               {authError && (
                 <Alert variant="destructive">
                   <AlertDescription>{authError}</AlertDescription>
@@ -155,11 +267,50 @@ const Login = () => {
                 <Input
                   id="password"
                   type="password"
-                  placeholder={mode === "register" ? "Min. 6 characters" : ""}
+                  placeholder={mode === "register" ? "Min. 8 characters" : ""}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                
+                {mode === "register" && password && passwordStrength && (
+                  <div className="space-y-2 mt-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">Password strength:</span>
+                      <span className={`text-xs font-medium ${
+                        passwordStrength.level === 'weak' ? 'text-red-600' :
+                        passwordStrength.level === 'medium' ? 'text-yellow-600' : 'text-green-600'
+                      }`}>
+                        {passwordStrength.level.charAt(0).toUpperCase() + passwordStrength.level.slice(1)}
+                      </span>
+                    </div>
+                    <Progress 
+                      value={passwordStrength.score} 
+                      className={`h-2 ${
+                        passwordStrength.level === 'weak' ? '[&>div]:bg-red-500' :
+                        passwordStrength.level === 'medium' ? '[&>div]:bg-yellow-500' : '[&>div]:bg-green-500'
+                      }`}
+                    />
+                    <div className="grid grid-cols-2 gap-1 text-xs">
+                      <div className={`flex items-center gap-1 ${passwordStrength.checks.length ? 'text-green-600' : 'text-gray-400'}`}>
+                        {passwordStrength.checks.length ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                        8+ characters
+                      </div>
+                      <div className={`flex items-center gap-1 ${passwordStrength.checks.lowercase ? 'text-green-600' : 'text-gray-400'}`}>
+                        {passwordStrength.checks.lowercase ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                        Lowercase
+                      </div>
+                      <div className={`flex items-center gap-1 ${passwordStrength.checks.uppercase ? 'text-green-600' : 'text-gray-400'}`}>
+                        {passwordStrength.checks.uppercase ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                        Uppercase
+                      </div>
+                      <div className={`flex items-center gap-1 ${passwordStrength.checks.number ? 'text-green-600' : 'text-gray-400'}`}>
+                        {passwordStrength.checks.number ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                        Number
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <Button
@@ -177,7 +328,20 @@ const Login = () => {
                     ? "Sign In"
                     : "Create Account"}
               </Button>
+
+              {mode === "login" && (
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => setMode("reset")}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Forgot your password?
+                  </button>
+                </div>
+              )}
             </form>
+            )}
 
             {/* Demo Credentials - Always Available */}
             <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg">
