@@ -267,12 +267,12 @@ const ClientPortal = () => {
 
       <main className="container mx-auto p-3 sm:p-4 lg:p-8">
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-5 h-auto p-1 bg-white shadow-sm border">
+          <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-white shadow-sm border">
             <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-1">Overview</TabsTrigger>
             <TabsTrigger value="workouts" className="text-xs sm:text-sm py-2 px-1">Workouts</TabsTrigger>
             <TabsTrigger value="progress" className="text-xs sm:text-sm py-2 px-1">Progress</TabsTrigger>
             <TabsTrigger value="payments" className="text-xs sm:text-sm py-2 px-1">Payments</TabsTrigger>
-            <TabsTrigger value="business" className="text-xs sm:text-sm py-2 px-1 hidden lg:block">Business</TabsTrigger>
+            <TabsTrigger value="business" className="text-xs sm:text-sm py-2 px-1">Business</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="mt-6 space-y-6">
