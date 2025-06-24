@@ -183,7 +183,7 @@ const Landing = () => {
         </header>
 
         {/* Hero Section */}
-        <section className="py-20 px-4">
+        <section id="demo" className="py-20 px-4">
           <div className="container mx-auto text-center max-w-4xl">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-6">
               <Star className="h-4 w-4" />
@@ -1052,9 +1052,9 @@ const Landing = () => {
                     </div>
                   </div>
 
-                  <Link to="/login" className="block">
+                  <Link to="/login" className="block mt-6">
                     <Button variant="outline" className="w-full">
-                      Contact Sales
+                      Start 14-Day Free Trial
                     </Button>
                   </Link>
                 </CardContent>

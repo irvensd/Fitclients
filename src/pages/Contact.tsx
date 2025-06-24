@@ -392,7 +392,7 @@ const Contact = () => {
                     Start Free Trial
                   </Button>
                 </Link>
-                <Link to="/demo-portal">
+                <Link to="/landing#demo">
                   <Button variant="outline" size="lg" className="w-full sm:w-auto">
                     View Demo
                   </Button>
