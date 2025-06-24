@@ -820,7 +820,7 @@ const Landing = () => {
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold">Today's Overview</h3>
                     <span className="text-sm text-muted-foreground">
-                      March 15, 2024
+                      March 15, 2025
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-4 mb-6">
@@ -1149,7 +1149,7 @@ const Landing = () => {
               <span className="font-bold">FitClient</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 FitClient. Simple CRM for Personal Trainers.
+              © 2025 FitClient. Simple CRM for Personal Trainers.
             </p>
             <nav className="mt-4" aria-label="Footer navigation">
               <ul className="flex flex-wrap justify-center gap-4 text-sm">

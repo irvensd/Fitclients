@@ -647,7 +647,7 @@ const SupportPortal = () => {
     e.preventDefault();
     
     // Production support credentials - in real app, this would validate against backend
-    if (loginCredentials.username === "support" && loginCredentials.password === "fitclients2024") {
+    if (loginCredentials.username === "support" && loginCredentials.password === "fitclients2025") {
       setIsAuthenticated(true);
       setSupportAgent({
         name: "Production Support",
