@@ -1,27 +1,59 @@
 {
-  "name": "FitClient - Personal Trainer CRM",
-  "short_name": "FitClient",
-  "description": "Simple CRM software for personal trainers. Manage clients, schedule sessions, track payments and monitor progress.",
+  "name": "FitClients - Personal Training Portal",
+  "short_name": "FitClients",
+  "description": "Your personal training portal for sessions, progress tracking, and trainer communication",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "src": "favicon.ico",
+      "sizes": "48x48",
       "type": "image/x-icon"
     },
     {
-      "src": "/logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
+      "src": "placeholder.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
     {
-      "src": "/logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "src": "placeholder.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ],
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#10b981",
+  "theme_color": "#2563eb",
   "background_color": "#ffffff",
-  "categories": ["business", "fitness", "productivity"]
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["fitness", "health", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "My Sessions",
+      "short_name": "Sessions",
+      "description": "View upcoming and past training sessions",
+      "url": "/client-portal",
+      "icons": [
+        {
+          "src": "placeholder.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "My Progress",
+      "short_name": "Progress",
+      "description": "Track your fitness progress",
+      "url": "/client-portal",
+      "icons": [
+        {
+          "src": "placeholder.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
 } 
