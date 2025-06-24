@@ -1,5 +1,21 @@
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from './firebase';
+// Lazy import Firebase to prevent blocking app initialization
+let firestoreImports: any = null;
+let db: any = null;
+
+const getFirestore = async () => {
+  if (!firestoreImports) {
+    try {
+      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+      const { db: database } = await import('./firebase');
+      firestoreImports = { collection, addDoc, serverTimestamp };
+      db = database;
+    } catch (error) {
+      console.warn('Firebase not available for error logging:', error);
+      return null;
+    }
+  }
+  return { ...firestoreImports, db };
+};
 
 // Global error capture for production debugging
 export class ErrorCapture {
@@ -78,6 +94,15 @@ export class ErrorCapture {
     if (!this.isEnabled) return;
 
     try {
+      // Get Firebase services
+      const firestore = await getFirestore();
+      if (!firestore) {
+        console.warn('Firebase not available, skipping error logging');
+        return;
+      }
+
+      const { collection, addDoc, serverTimestamp, db } = firestore;
+
       // Get user context if available
       const userId = localStorage.getItem('userId') || 'anonymous';
       const sessionId = sessionStorage.getItem('sessionId') || this.generateSessionId();

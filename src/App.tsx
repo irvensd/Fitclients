@@ -31,6 +31,7 @@ import SupportPortal from "./pages/SupportPortal";
 import Onboarding from "./pages/Onboarding";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
 import { CookieConsent } from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
@@ -44,7 +45,7 @@ const App = () => (
                           <TooltipProvider>
                 <Toaster />
                 <Sonner />
-                <CookieConsent />
+                {/* <CookieConsent /> Temporarily disabled to debug */}
                 <BrowserRouter>
                 <Routes>
                   {/* Home route - shows landing or redirects to admin if authenticated */}
@@ -56,6 +57,7 @@ const App = () => (
                   <Route path="/onboarding" element={<Onboarding />} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/contact" element={<Contact />} />
 
                   {/* Demo Client Portal - No Authentication Required */}
                   <Route
