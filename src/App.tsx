@@ -42,11 +42,11 @@ const App = () => (
       <SubscriptionProvider>
         <DataProvider>
           <MarketingProvider>
-                          <TooltipProvider>
-                <Toaster />
-                <Sonner />
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
                 {/* <CookieConsent /> Temporarily disabled to debug */}
-                <BrowserRouter>
+              <BrowserRouter>
                 <Routes>
                   {/* Home route - shows landing or redirects to admin if authenticated */}
                   <Route path="/" element={<LandingRedirect />} />

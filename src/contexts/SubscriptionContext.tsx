@@ -6,7 +6,10 @@ import {
   getSubscriptionStatus,
   canExceedLimit,
 } from "@/lib/stripe";
-import { billingHistoryService } from "@/lib/firebaseService";
+import { billingHistoryService, referralService } from "@/lib/firebaseService";
+import { userProfileService } from "@/lib/firebaseService";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 interface SubscriptionData {
   status: "trialing" | "active" | "canceled" | "past_due" | "unpaid";
@@ -137,6 +140,32 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       if (userId && planId !== "free") {
         await billingHistoryService.initializeBillingHistory(userId, planId);
+        
+        // Check if user was referred and complete the referral
+        if (userId) {
+          try {
+            const userProfile = await userProfileService.getUserProfile(userId);
+            if (userProfile?.referredBy) {
+              // Find the referral record and complete it
+              const referralsRef = collection(db, "referrals");
+              const q = query(
+                referralsRef,
+                where("referrerId", "==", userProfile.referredBy),
+                where("referredUserId", "==", userId)
+              );
+              const querySnapshot = await getDocs(q);
+              
+              if (!querySnapshot.empty) {
+                const referralDoc = querySnapshot.docs[0];
+                await referralService.completeReferral(referralDoc.id, planId);
+                console.log("Referral completed and rewards granted");
+              }
+            }
+          } catch (referralError) {
+            console.error("Error processing referral completion:", referralError);
+            // Don't fail subscription update if referral processing fails
+          }
+        }
       }
     } catch (error) {
       console.error("Error initializing billing history:", error);

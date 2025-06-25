@@ -190,7 +190,7 @@ const demoPayments = [
     id: "2",
     date: "2024-01-01",
     amount: 300,
-    description: "Monthly Training Package", 
+    description: "Monthly Training Package",
     method: "Credit Card",
     status: "completed"
   },
@@ -366,11 +366,11 @@ const DemoPortal = () => {
                       <Calendar className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
                       Upcoming Sessions
                     </CardTitle>
-                  </CardHeader>
+                </CardHeader>
                   <CardContent className="px-3 lg:px-6">
-                    {upcomingSessions.length > 0 ? (
+                  {upcomingSessions.length > 0 ? (
                       <div className="space-y-3">
-                        {upcomingSessions.map((session) => (
+                      {upcomingSessions.map((session) => (
                           <div key={session.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 lg:p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
                             <div className="flex items-center gap-3 lg:gap-4 mb-3 sm:mb-0">
                               <div className="bg-primary text-white p-2 lg:p-3 rounded-xl shadow-sm flex-shrink-0">
@@ -386,18 +386,18 @@ const DemoPortal = () => {
                                 </p>
                                 <p className="text-xs lg:text-sm text-gray-600">{session.startTime} - {session.endTime}</p>
                                 <p className="text-xs text-primary font-medium">{session.type}</p>
-                              </div>
+                            </div>
                             </div>
                             <div className="flex-shrink-0">
-                              <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
-                                <XCircle className="h-4 w-4 mr-1" />
-                                Cancel Session
-                              </Button>
+                          <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
+                            <XCircle className="h-4 w-4 mr-1" />
+                            Cancel Session
+                          </Button>
                             </div>
                           </div>
-                        ))}
+                      ))}
                       </div>
-                    ) : (
+                  ) : (
                       <div className="text-center py-6 lg:py-8">
                         <Calendar className="mx-auto h-10 w-10 lg:h-12 lg:w-12 text-gray-300" />
                         <p className="mt-2 text-gray-500 text-sm lg:text-base">No upcoming sessions</p>
@@ -447,16 +447,16 @@ const DemoPortal = () => {
                         <Clock className="mx-auto h-6 w-6 lg:h-8 lg:w-8 text-gray-300" />
                         <p className="mt-2 text-gray-500 text-xs lg:text-sm">No past sessions</p>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                  )}
+                </CardContent>
+              </Card>
               </div>
             </div>
 
             {/* Full Width Gamification Dashboard */}
             {demoGamificationData && (
               <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 lg:p-6 border border-purple-100">
-                <GamificationDashboard data={demoGamificationData} variant="summary" />
+              <GamificationDashboard data={demoGamificationData} variant="summary" />
               </div>
             )}
           </TabsContent>
@@ -493,13 +493,13 @@ const DemoPortal = () => {
 
           <TabsContent value="progress" className="mt-6">
             <Card className="shadow-sm border-0 bg-white">
-              <CardHeader>
+                <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-primary" />
                   Progress History
                 </CardTitle>
-              </CardHeader>
-              <CardContent>
+                </CardHeader>
+                <CardContent>
                 {demoProgress.length > 0 ? (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
@@ -526,7 +526,7 @@ const DemoPortal = () => {
                     <TrendingUp className="mx-auto h-12 w-12 text-gray-300" />
                     <p className="mt-2 text-gray-500">No progress data yet</p>
                     <p className="text-sm text-gray-400">Your trainer will log your progress here</p>
-                  </div>
+            </div>
                 )}
               </CardContent>
             </Card>
@@ -534,14 +534,14 @@ const DemoPortal = () => {
 
           <TabsContent value="payments" className="mt-6">
             <Card className="shadow-sm border-0 bg-white">
-              <CardHeader>
+                <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5 text-primary" />
                   Payment History
                 </CardTitle>
                 <CardDescription>View all recorded payments</CardDescription>
-              </CardHeader>
-              <CardContent>
+                </CardHeader>
+                <CardContent>
                 {demoPayments.length > 0 ? (
                   <div className="space-y-4">
                     {demoPayments.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((payment) => (
@@ -573,8 +573,8 @@ const DemoPortal = () => {
                     <p className="text-sm text-gray-400">Payment records will appear here</p>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
           </TabsContent>
 
           <TabsContent value="business" className="mt-6">
@@ -632,7 +632,7 @@ const DemoPortal = () => {
                   <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
                     <Label className="text-xs font-medium text-gray-700">Address</Label>
                     <p className="font-semibold text-gray-900 text-sm lg:text-base">{demoTrainerProfile.address}</p>
-                  </div>
+                      </div>
                   
                   <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
                     <Label className="text-xs font-medium text-indigo-700">About</Label>

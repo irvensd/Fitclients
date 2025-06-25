@@ -13,9 +13,10 @@ import {
   writeBatch,
   getDoc,
   setDoc,
+  increment,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { Client, Session, Payment, UserProfile, BillingHistory } from "./types";
+import { Client, Session, Payment, UserProfile, BillingHistory, ReferralData, ReferralStats } from "./types";
 
 // Helper to get user's collection path
 const getUserCollection = (userId: string, collectionName: string) => {
@@ -538,6 +539,262 @@ export const billingHistoryService = {
       console.log("Sample billing history added for user:", userId);
     } catch (error) {
       console.error("Error adding sample billing history:", error);
+    }
+  },
+};
+
+// === REFERRAL SERVICES ===
+export const referralService = {
+  // Generate a unique referral code for a user
+  generateReferralCode: (userId: string): string => {
+    // Create a 6-character code from the last 6 characters of userId
+    const baseCode = userId.slice(-6).toUpperCase();
+    // Add a random 2-character suffix for uniqueness
+    const randomSuffix = Math.random().toString(36).substring(2, 4).toUpperCase();
+    return `${baseCode}${randomSuffix}`;
+  },
+
+  // Create or get user's referral code
+  getOrCreateReferralCode: async (userId: string): Promise<string> => {
+    try {
+      const userRef = doc(db, "users", userId);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.referralCode) {
+          return userData.referralCode;
+        }
+      }
+
+      // Generate new referral code
+      const referralCode = referralService.generateReferralCode(userId);
+      
+      // Update user profile with referral code
+      await updateDoc(userRef, {
+        referralCode,
+        totalReferrals: 0,
+        referralEarnings: 0,
+      });
+
+      return referralCode;
+    } catch (error) {
+      console.error("Error getting/creating referral code:", error);
+      throw error;
+    }
+  },
+
+  // Get referral stats for a user
+  getReferralStats: async (userId: string) => {
+    try {
+      // Get user's referral code
+      const referralCode = await referralService.getOrCreateReferralCode(userId);
+      
+      // Get all referrals where this user is the referrer
+      const referralsRef = collection(db, "referrals");
+      const q = query(
+        referralsRef,
+        where("referrerId", "==", userId)
+      );
+      const querySnapshot = await getDocs(q);
+      
+      const referrals = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as ReferralData[];
+
+      const totalReferrals = referrals.length;
+      const completedReferrals = referrals.filter(r => r.status === "completed" || r.status === "rewarded").length;
+      const pendingReferrals = referrals.filter(r => r.status === "pending").length;
+      const totalEarnings = referrals
+        .filter(r => r.rewardAmount)
+        .reduce((sum, r) => sum + (r.rewardAmount || 0), 0);
+
+      const referralLink = `${window.location.origin}/login?ref=${referralCode}`;
+
+      return {
+        totalReferrals,
+        completedReferrals,
+        pendingReferrals,
+        totalEarnings,
+        referralCode,
+        referralLink,
+      } as ReferralStats;
+    } catch (error) {
+      console.error("Error getting referral stats:", error);
+      throw error;
+    }
+  },
+
+  // Create a new referral record
+  createReferral: async (referrerId: string, referredUserId: string, referrerEmail: string, referredUserEmail: string) => {
+    try {
+      const referralData: Omit<ReferralData, "id"> = {
+        referrerId,
+        referredUserId,
+        referrerEmail,
+        referredUserEmail,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      };
+
+      const docRef = await addDoc(collection(db, "referrals"), referralData);
+      
+      // Update referrer's total referrals count
+      const referrerRef = doc(db, "users", referrerId);
+      await updateDoc(referrerRef, {
+        totalReferrals: increment(1),
+      });
+
+      return {
+        id: docRef.id,
+        ...referralData,
+      } as ReferralData;
+    } catch (error) {
+      console.error("Error creating referral:", error);
+      throw error;
+    }
+  },
+
+  // Complete a referral when the referred user subscribes
+  completeReferral: async (referralId: string, planSubscribed: string) => {
+    try {
+      const referralRef = doc(db, "referrals", referralId);
+      const referralDoc = await getDoc(referralRef);
+      
+      if (!referralDoc.exists()) {
+        throw new Error("Referral not found");
+      }
+
+      const referralData = referralDoc.data() as ReferralData;
+      
+      // Update referral status
+      await updateDoc(referralRef, {
+        status: "completed",
+        completedAt: new Date().toISOString(),
+        planSubscribed,
+      });
+
+      // Grant rewards to both users
+      await referralService.grantReferralRewards(referralData.referrerId, referralData.referredUserId, planSubscribed);
+
+      return true;
+    } catch (error) {
+      console.error("Error completing referral:", error);
+      throw error;
+    }
+  },
+
+  // Grant rewards to both referrer and referred user
+  grantReferralRewards: async (referrerId: string, referredUserId: string, planSubscribed: string) => {
+    try {
+      const batch = writeBatch(db);
+      
+      // Calculate reward amount based on plan
+      const rewardAmount = planSubscribed === "gold" ? 79 : 29; // One month of the subscribed plan
+      
+      // Update referrer's profile
+      const referrerRef = doc(db, "users", referrerId);
+      batch.update(referrerRef, {
+        referralEarnings: increment(rewardAmount),
+      });
+
+      // Update referred user's profile
+      const referredUserRef = doc(db, "users", referredUserId);
+      batch.update(referredUserRef, {
+        referralRewardGranted: true,
+        referralRewardGrantedAt: new Date().toISOString(),
+      });
+
+      // Update referral record
+      const referralsRef = collection(db, "referrals");
+      const q = query(
+        referralsRef,
+        where("referrerId", "==", referrerId),
+        where("referredUserId", "==", referredUserId)
+      );
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        const referralRef = doc(db, "referrals", querySnapshot.docs[0].id);
+        batch.update(referralRef, {
+          status: "rewarded",
+          rewardGrantedAt: new Date().toISOString(),
+          rewardAmount,
+        });
+      }
+
+      await batch.commit();
+      
+      return true;
+    } catch (error) {
+      console.error("Error granting referral rewards:", error);
+      throw error;
+    }
+  },
+
+  // Get all referrals for a user (as referrer)
+  getUserReferrals: (userId: string) => {
+    const referralsRef = collection(db, "referrals");
+    const q = query(
+      referralsRef,
+      where("referrerId", "==", userId),
+      orderBy("createdAt", "desc")
+    );
+    return getDocs(q);
+  },
+
+  // Subscribe to referrals changes
+  subscribeToReferrals: (
+    userId: string,
+    callback: (referrals: ReferralData[]) => void,
+    errorCallback?: (error: Error) => void,
+  ) => {
+    const referralsRef = collection(db, "referrals");
+    const q = query(
+      referralsRef,
+      where("referrerId", "==", userId),
+      orderBy("createdAt", "desc")
+    );
+    
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const referrals = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as ReferralData[];
+        callback(referrals);
+      },
+      (error) => {
+        console.error("Firestore referrals subscription error:", error);
+        if (errorCallback) errorCallback(error);
+      },
+    );
+  },
+
+  // Validate referral code
+  validateReferralCode: async (referralCode: string): Promise<{ valid: boolean; referrerId?: string; referrerEmail?: string }> => {
+    try {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("referralCode", "==", referralCode));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        return { valid: false };
+      }
+
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+      
+      return {
+        valid: true,
+        referrerId: userDoc.id,
+        referrerEmail: userData.email,
+      };
+    } catch (error) {
+      console.error("Error validating referral code:", error);
+      return { valid: false };
     }
   },
 };

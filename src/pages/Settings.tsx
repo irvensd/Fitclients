@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -41,15 +42,20 @@ import {
   RefreshCw,
   Clock,
   Loader2,
+  Share2,
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { SubscriptionManager } from "@/components/SubscriptionManager";
+import { ReferralProgram } from "@/components/ReferralProgram";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { userProfileService } from "@/lib/firebaseService";
 import { UserProfile, OperatingHours } from "@/lib/types";
 
 const Settings = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState("profile");
+
   const [notifications, setNotifications] = useState({
     emailReminders: true,
     smsReminders: false,
@@ -107,6 +113,19 @@ const Settings = () => {
     tiktok: "",
     youtube: "",
   });
+
+  // Handle tab changes from URL parameters
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSearchParams({ tab: value });
+  };
 
   // Manual refresh profile function
   const refreshProfile = async () => {
@@ -216,12 +235,12 @@ const Settings = () => {
         ...profile,
         // Override with new data
         id: user.uid,
-        email: user.email || profileForm.email,
-        firstName: profileForm.firstName,
-        lastName: profileForm.lastName,
-        displayName: `${profileForm.firstName} ${profileForm.lastName}`.trim(),
-        phone: profileForm.phone,
-        bio: profileForm.bio,
+          email: user.email || profileForm.email,
+          firstName: profileForm.firstName,
+          lastName: profileForm.lastName,
+          displayName: `${profileForm.firstName} ${profileForm.lastName}`.trim(),
+          phone: profileForm.phone,
+          bio: profileForm.bio,
         createdAt: profile?.createdAt || new Date().toISOString(),
         lastLogin: new Date().toISOString(),
         operatingHours: operatingHours,
@@ -266,34 +285,29 @@ const Settings = () => {
     <div className="p-6 space-y-6">
       <DevModeNotice />
 
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+          <h1 className="text-3xl font-bold">Settings</h1>
           <p className="text-muted-foreground">
-            Manage your account preferences and business settings.
+            Manage your account, business settings, and preferences
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={refreshProfile} 
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshProfile}
             disabled={refreshing}
-            title="Refresh profile data from server"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? "Refreshing..." : "Refresh"}
           </Button>
-          <Button onClick={handleSaveProfile} disabled={loading}>
-            <Save className="h-4 w-4 mr-2" />
-            {loading ? "Saving..." : "Save Changes"}
-          </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <div className="overflow-x-auto">
-          <TabsList className="grid w-full grid-cols-6 min-w-[600px] lg:min-w-0">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
             <TabsTrigger value="profile" className="text-xs sm:text-sm">
               Profile
             </TabsTrigger>
@@ -305,6 +319,9 @@ const Settings = () => {
             </TabsTrigger>
             <TabsTrigger value="billing" className="text-xs sm:text-sm">
               Billing
+            </TabsTrigger>
+            <TabsTrigger value="referrals" className="text-xs sm:text-sm">
+              Referrals
             </TabsTrigger>
             <TabsTrigger value="notifications" className="text-xs sm:text-sm">
               Notifications
@@ -499,7 +516,7 @@ const Settings = () => {
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-medium">Operating Hours</h3>
+                <h3 className="font-medium">Operating Hours</h3>
                   <Button 
                     size="sm" 
                     onClick={handleSaveProfile}
@@ -754,6 +771,10 @@ const Settings = () => {
 
         <TabsContent value="billing" className="space-y-6">
           <SubscriptionManager />
+        </TabsContent>
+
+        <TabsContent value="referrals" className="space-y-6">
+          <ReferralProgram />
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6">

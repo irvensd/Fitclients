@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Zap, ArrowLeft, Check, X } from "lucide-react";
+import { Zap, ArrowLeft, Check, X, Gift } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isFirebaseConfigured } from "@/lib/firebase";
 
@@ -25,8 +25,22 @@ const Login = () => {
   const [resetLoading, setResetLoading] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [mode, setMode] = useState<"login" | "register" | "reset">("login");
+  const [searchParams] = useSearchParams();
+  const [referralCode, setReferralCode] = useState("");
 
   const { login, register, user, isDevMode, authError, clearError } = useAuth();
+
+  // Get referral code from URL parameters
+  useEffect(() => {
+    const refParam = searchParams.get("ref");
+    if (refParam) {
+      setReferralCode(refParam);
+      // If there's a referral code, switch to register mode
+      if (mode === "login") {
+        setMode("register");
+      }
+    }
+  }, [searchParams, mode]);
 
   // Redirect if already logged in
   if (user) {
@@ -42,7 +56,7 @@ const Login = () => {
       if (mode === "login") {
         await login(email, password);
       } else {
-        await register(email, password, firstName, lastName);
+        await register(email, password, firstName, lastName, referralCode);
       }
     } catch (err: any) {
       // Error is handled in AuthContext
@@ -206,7 +220,7 @@ const Login = () => {
                 )}
               </form>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {authError && (
                 <Alert variant="destructive">
                   <AlertDescription>{authError}</AlertDescription>
@@ -247,6 +261,26 @@ const Login = () => {
                     onChange={(e) => setLastName(e.target.value)}
                     required
                   />
+                </div>
+              )}
+
+              {mode === "register" && referralCode && (
+                <div className="space-y-2">
+                  <Label htmlFor="referralCode">Referral Code</Label>
+                  <div className="relative">
+                    <Input
+                      id="referralCode"
+                      type="text"
+                      placeholder="Referral code"
+                      value={referralCode}
+                      onChange={(e) => setReferralCode(e.target.value)}
+                      className="pr-10"
+                    />
+                    <Gift className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-600" />
+                  </div>
+                  <p className="text-xs text-green-600">
+                    🎉 You'll both get a free month when you subscribe!
+                  </p>
                 </div>
               )}
 

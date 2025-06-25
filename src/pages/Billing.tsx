@@ -629,10 +629,10 @@ const BillingHistoryComponent = () => {
                   </Badge>
                 </div>
                 {invoice.invoiceUrl && (
-                  <Button size="sm" variant="outline" className="h-8">
-                    <Download className="h-3 w-3 mr-1" />
-                    Download
-                  </Button>
+                <Button size="sm" variant="outline" className="h-8">
+                  <Download className="h-3 w-3 mr-1" />
+                  Download
+                </Button>
                 )}
               </div>
             </div>

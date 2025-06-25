@@ -1,5 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import {
+  Users,
+  Calendar,
+  DollarSign,
+  TrendingUp,
+  Plus,
+  Settings,
+  BarChart3,
+  FileText,
+  MessageSquare,
+  Zap,
+  Target,
+  Award,
+  Share2,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -17,12 +31,49 @@ import { useNavigate } from "react-router-dom";
 export const QuickActionsWidget = () => {
   const navigate = useNavigate();
 
-  const actions = [
-    { name: "Dashboard", path: "/admin" },
-    { name: "Add New Client", path: "/clients" },
-    { name: "Schedule Session", path: "/sessions" },
-    { name: "Record Payment", path: "/payments" },
-    { name: "Add Progress", path: "/progress" },
+  const quickActions = [
+    {
+      title: "Add Client",
+      description: "Register a new client",
+      icon: Users,
+      href: "/clients",
+      color: "bg-blue-500",
+    },
+    {
+      title: "Schedule Session",
+      description: "Book a training session",
+      icon: Calendar,
+      href: "/sessions",
+      color: "bg-green-500",
+    },
+    {
+      title: "Record Payment",
+      description: "Log a payment received",
+      icon: DollarSign,
+      href: "/payments",
+      color: "bg-emerald-500",
+    },
+    {
+      title: "View Analytics",
+      description: "Check your business metrics",
+      icon: BarChart3,
+      href: "/admin",
+      color: "bg-purple-500",
+    },
+    {
+      title: "Create Workout",
+      description: "Design a new workout plan",
+      icon: Target,
+      href: "/workouts",
+      color: "bg-orange-500",
+    },
+    {
+      title: "Referral Program",
+      description: "Invite trainers & earn rewards",
+      icon: Share2,
+      href: "/settings?tab=referrals",
+      color: "bg-pink-500",
+    },
   ];
 
   return (
@@ -46,9 +97,9 @@ export const QuickActionsWidget = () => {
           </Tooltip>
         </TooltipProvider>
         <DropdownMenuContent side="top" align="end" className="w-48 sm:w-56">
-          {actions.map((action) => (
-            <DropdownMenuItem key={action.name} onClick={() => navigate(action.path)}>
-              <span className="text-sm sm:text-base">{action.name}</span>
+          {quickActions.map((action) => (
+            <DropdownMenuItem key={action.title} onClick={() => navigate(action.href)}>
+              <span className="text-sm sm:text-base">{action.title}</span>
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>

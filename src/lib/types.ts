@@ -38,6 +38,12 @@ export interface UserProfile {
     tiktok?: string;
     youtube?: string;
   };
+  referralCode?: string;
+  referredBy?: string;
+  referralRewardGranted?: boolean;
+  referralRewardGrantedAt?: string;
+  totalReferrals?: number;
+  referralEarnings?: number;
 }
 
 export interface Session {
@@ -156,4 +162,27 @@ export interface BillingHistory {
   paymentMethod?: string;
   currency?: string;
   createdAt: string;
+}
+
+export interface ReferralData {
+  id: string;
+  referrerId: string;
+  referredUserId: string;
+  referrerEmail: string;
+  referredUserEmail: string;
+  status: "pending" | "completed" | "rewarded";
+  createdAt: string;
+  completedAt?: string;
+  rewardGrantedAt?: string;
+  rewardAmount?: number;
+  planSubscribed?: string;
+}
+
+export interface ReferralStats {
+  totalReferrals: number;
+  completedReferrals: number;
+  pendingReferrals: number;
+  totalEarnings: number;
+  referralCode: string;
+  referralLink: string;
 }

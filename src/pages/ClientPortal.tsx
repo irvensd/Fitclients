@@ -260,9 +260,9 @@ const ClientPortal = () => {
                   {client.name.split(" ").map(n => n[0]).join("")}
                 </AvatarFallback>
               </Avatar>
-            </div>
           </div>
         </div>
+      </div>
       </header>
 
       <main className="container mx-auto p-3 sm:p-4 lg:p-8">
@@ -273,7 +273,7 @@ const ClientPortal = () => {
             <TabsTrigger value="progress" className="text-xs sm:text-sm py-2 px-1">Progress</TabsTrigger>
             <TabsTrigger value="payments" className="text-xs sm:text-sm py-2 px-1">Payments</TabsTrigger>
             <TabsTrigger value="business" className="text-xs sm:text-sm py-2 px-1">Business</TabsTrigger>
-          </TabsList>
+            </TabsList>
           
           <TabsContent value="overview" className="mt-6 space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
@@ -285,16 +285,16 @@ const ClientPortal = () => {
                       <Calendar className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
                       Upcoming Sessions
                     </CardTitle>
-                  </CardHeader>
+                </CardHeader>
                   <CardContent className="px-3 lg:px-6">
-                    {upcomingSessions.length > 0 ? (
+                  {upcomingSessions.length > 0 ? (
                       <div className="space-y-3">
-                        {upcomingSessions.map((session) => (
+                      {upcomingSessions.map((session) => (
                           <div key={session.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 lg:p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
                             <div className="flex items-center gap-3 lg:gap-4 mb-3 sm:mb-0">
                               <div className="bg-primary text-white p-2 lg:p-3 rounded-xl shadow-sm flex-shrink-0">
                                 <Calendar className="h-4 w-4 lg:h-5 lg:w-5" />
-                              </div>
+                         </div>
                               <div className="min-w-0 flex-1">
                                 <p className="font-semibold text-gray-900 text-sm lg:text-base truncate">
                                   {new Date(session.date).toLocaleDateString('en-US', { 
@@ -305,23 +305,23 @@ const ClientPortal = () => {
                                 </p>
                                 <p className="text-xs lg:text-sm text-gray-600">{session.startTime} - {session.endTime}</p>
                                 <p className="text-xs text-primary font-medium">{session.type}</p>
-                              </div>
-                            </div>
+                         </div>
+                       </div>
                             <div className="flex-shrink-0">
-                              <CancelSessionDialog session={session} onCancel={handleCancelSession} />
+                          <CancelSessionDialog session={session} onCancel={handleCancelSession} />
                             </div>
                           </div>
-                        ))}
+                      ))}
                       </div>
-                    ) : (
+                  ) : (
                       <div className="text-center py-6 lg:py-8">
                         <Calendar className="mx-auto h-10 w-10 lg:h-12 lg:w-12 text-gray-300" />
                         <p className="mt-2 text-gray-500 text-sm lg:text-base">No upcoming sessions</p>
                         <p className="text-xs lg:text-sm text-gray-400">Your trainer will schedule sessions for you</p>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                  )}
+              </CardContent>
+            </Card>
               </div>
 
               {/* Right Column - Recent Sessions */}
@@ -332,9 +332,9 @@ const ClientPortal = () => {
                       <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
                       Recent Sessions
                     </CardTitle>
-                  </CardHeader>
+                </CardHeader>
                   <CardContent className="px-3 lg:px-6">
-                    {pastSessions.length > 0 ? (
+                  {pastSessions.length > 0 ? (
                       <div className="space-y-2 lg:space-y-3">
                         {pastSessions.slice(0, 5).map((session) => (
                           <div key={session.id} className="flex items-center justify-between p-2 lg:p-3 bg-gray-50 rounded-lg">
@@ -348,25 +348,25 @@ const ClientPortal = () => {
                               variant={session.status === 'completed' ? 'default' : session.status === 'cancelled' ? 'destructive' : 'secondary'}
                               className="text-xs flex-shrink-0 ml-2"
                             >
-                              {session.status}
-                            </Badge>
+                            {session.status}
+                        </Badge>
                           </div>
-                        ))}
+                          ))}
                         {pastSessions.length > 5 && (
                           <p className="text-xs text-gray-500 text-center pt-2">
                             +{pastSessions.length - 5} more sessions
                           </p>
                         )}
-                      </div>
-                    ) : (
+                    </div>
+                  ) : (
                       <div className="text-center py-4 lg:py-6">
                         <Clock className="mx-auto h-6 w-6 lg:h-8 lg:w-8 text-gray-300" />
                         <p className="mt-2 text-gray-500 text-xs lg:text-sm">No past sessions</p>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
             </div>
 
             {/* Full Width Gamification Dashboard */}
@@ -380,14 +380,14 @@ const ClientPortal = () => {
           <TabsContent value="workouts" className="mt-6">
             {clientWorkoutPlan ? (
               <Card className="shadow-sm border-0 bg-white">
-                <CardHeader>
+              <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Dumbbell className="h-5 w-5 text-primary" />
                     {clientWorkoutPlan.name}
                   </CardTitle>
                   <CardDescription className="text-gray-600">{clientWorkoutPlan.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
+              </CardHeader>
+              <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {clientWorkoutPlan.exercises.map((exercise, index) => (
                       <div key={index} className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100">
@@ -404,8 +404,8 @@ const ClientPortal = () => {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+              </CardContent>
+            </Card>
             ) : (
               <Card className="shadow-sm border-0 bg-white">
                 <CardContent className="pt-6 text-center">
@@ -426,34 +426,34 @@ const ClientPortal = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {clientProgress.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                   {clientProgress.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
                       <thead className="text-left text-gray-500 border-b">
-                        <tr>
+                          <tr>
                           <th className="p-3 font-medium">Date</th>
                           <th className="p-3 font-medium">Weight (lbs)</th>
                           <th className="p-3 font-medium">Body Fat %</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {clientProgress.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((entry) => (
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {clientProgress.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((entry) => (
                           <tr key={entry.id} className="border-b border-gray-100 hover:bg-gray-50">
                             <td className="p-3 font-medium">{new Date(entry.date).toLocaleDateString()}</td>
                             <td className="p-3">{entry.weight}</td>
                             <td className="p-3">{entry.bodyFat}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                        </div>
+                  ) : (
                   <div className="text-center py-8">
                     <TrendingUp className="mx-auto h-12 w-12 text-gray-300" />
                     <p className="mt-2 text-gray-500">No progress data yet</p>
                     <p className="text-sm text-gray-400">Your trainer will log your progress here</p>
                   </div>
-                )}
+                  )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -475,13 +475,13 @@ const ClientPortal = () => {
                         <div className="flex items-center gap-4">
                           <div className={`p-3 rounded-xl ${payment.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
                             {payment.status === 'completed' ? <CheckCircle className="h-5 w-5"/> : <DollarSign className="h-5 w-5" />}
-                          </div>
-                          <div>
+                      </div>
+                                    <div>
                             <p className="font-semibold text-gray-900">${payment.amount.toFixed(2)} - {payment.description}</p>
                             <p className="text-sm text-gray-600">
                               Paid on {new Date(payment.date).toLocaleDateString()} via {payment.method}
-                            </p>
-                          </div>
+                        </p>
+                      </div>
                         </div>
                         <Badge 
                           variant={payment.status === 'completed' ? 'default' : payment.status === 'pending' ? 'secondary' : 'destructive'}
@@ -497,7 +497,7 @@ const ClientPortal = () => {
                     <DollarSign className="mx-auto h-12 w-12 text-gray-300" />
                     <p className="mt-2 text-gray-500">No payment history</p>
                     <p className="text-sm text-gray-400">Payment records will appear here</p>
-                  </div>
+                </div>
                 )}
               </CardContent>
             </Card>

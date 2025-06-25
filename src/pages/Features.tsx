@@ -250,9 +250,8 @@ const Features = () => {
           </h1>
         </div>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          The complete personal training management platform powered by AI to
-          help you deliver exceptional client experiences and grow your
-          business.
+          The complete AI-Powered personal training management platform to deliver enhanced, innovative 
+          client expereinces to help grow your business. 
         </p>
       </div>
 

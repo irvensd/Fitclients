@@ -8,7 +8,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth, isFirebaseConfigured, diagnoseFirebaseConnection } from "@/lib/firebase";
-import { userProfileService } from "@/lib/firebaseService";
+import { userProfileService, referralService } from "@/lib/firebaseService";
 import { UserProfile } from "@/lib/types";
 
 export interface AuthContextType {
@@ -22,6 +22,7 @@ export interface AuthContextType {
     password: string,
     firstName: string,
     lastName: string,
+    referralCode?: string
   ) => Promise<void>;
   logout: () => Promise<void>;
   isDevMode: boolean;
@@ -143,7 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const register = React.useCallback(
-    async (email: string, password: string, firstName: string, lastName: string) => {
+    async (email: string, password: string, firstName: string, lastName: string, referralCode?: string) => {
       setAuthError(null);
       
       // Retry logic for network issues
@@ -181,6 +182,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               const createdProfile = await userProfileService.createUserProfile(userCredential.user.uid, profileData);
               
               console.log("User profile created successfully:", createdProfile);
+              
+              // Handle referral code if provided
+              if (referralCode) {
+                try {
+                  const validation = await referralService.validateReferralCode(referralCode);
+                  if (validation.valid && validation.referrerId && validation.referrerEmail) {
+                    // Create referral record
+                    await referralService.createReferral(
+                      validation.referrerId,
+                      userCredential.user.uid,
+                      validation.referrerEmail,
+                      email
+                    );
+                    
+                    // Update user profile with referral info
+                    await userProfileService.updateUserProfile(userCredential.user.uid, {
+                      referredBy: validation.referrerId,
+                    });
+                    
+                    console.log("Referral created successfully for:", referralCode);
+                  } else {
+                    console.warn("Invalid referral code:", referralCode);
+                  }
+                } catch (referralError) {
+                  console.error("Error processing referral code:", referralError);
+                  // Don't fail registration if referral processing fails
+                }
+              }
               
               // Set the profile immediately after creation
               setUserProfile(createdProfile);
