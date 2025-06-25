@@ -610,30 +610,176 @@
 @keyframes flameFlicker {
   0%, 100% {
     transform: scale(1) rotate(0deg);
+    opacity: 1;
   }
   25% {
-    transform: scale(1.05) rotate(1deg);
+    transform: scale(1.1) rotate(1deg);
+    opacity: 0.9;
   }
   50% {
-    transform: scale(0.95) rotate(-1deg);
+    transform: scale(0.9) rotate(-1deg);
+    opacity: 1;
   }
   75% {
-    transform: scale(1.02) rotate(0.5deg);
+    transform: scale(1.05) rotate(0.5deg);
+    opacity: 0.95;
   }
 }
 
-.animate-pulseGlow {
-  animation: pulseGlow 2s ease-in-out infinite;
+/* Chart-specific animations */
+@keyframes chartEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
-.animate-fadeInUp {
-  animation: fadeInUp 0.6s ease-out;
+@keyframes progressFill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--progress-width);
+  }
 }
 
-.animate-confettiFall {
-  animation: confettiFall 3s linear forwards;
+@keyframes dataPointPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes achievementUnlock {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .animate-flameFlicker {
-  animation: flameFlicker 0.5s ease-in-out infinite;
+  animation: flameFlicker 2s ease-in-out infinite;
+}
+
+.animate-chartEntrance {
+  animation: chartEntrance 0.8s ease-out forwards;
+}
+
+.animate-progressFill {
+  animation: progressFill 1.5s ease-out forwards;
+}
+
+.animate-dataPointPulse {
+  animation: dataPointPulse 2s ease-in-out infinite;
+}
+
+.animate-achievementUnlock {
+  animation: achievementUnlock 0.6s ease-out forwards;
+}
+
+.animate-gradientFlow {
+  background-size: 200% 200%;
+  animation: gradientFlow 3s ease infinite;
+}
+
+/* Chart hover effects */
+.chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.progress-bar-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.progress-bar-container:hover::before {
+  transform: translateX(100%);
+}
+
+/* Interactive data points */
+.recharts-dot {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.recharts-dot:hover {
+  transform: scale(1.3);
+  filter: brightness(1.2);
+}
+
+/* Achievement tree animations */
+.achievement-tree-item {
+  transition: all 0.3s ease;
+}
+
+.achievement-tree-item:hover {
+  transform: scale(1.1);
+}
+
+.achievement-tree-line {
+  transition: all 0.5s ease;
+}
+
+/* Chart tooltip enhancements */
+.chart-tooltip {
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile optimizations for charts */
+@media (max-width: 640px) {
+  .chart-card {
+    margin-bottom: 1rem;
+  }
+  
+  .progress-bar-container {
+    height: 8px;
+  }
+  
+  .achievement-tree-item {
+    font-size: 1.5rem;
+  }
 }
