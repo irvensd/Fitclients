@@ -33,6 +33,7 @@ import {
   MessageSquare,
   Dumbbell,
   Scale,
+  Gift,
 } from "lucide-react";
 import { NavigationButton } from "@/components/NavigationButton";
 
@@ -89,6 +90,19 @@ const Features = () => {
         "Instant access",
       ],
       badge: "No Login Required",
+    },
+    {
+      icon: Gift,
+      title: "Referral Program",
+      description:
+        "Invite other trainers and both get a free month when they subscribe. Give a month, get a month!",
+      highlights: [
+        "Unique referral links",
+        "Automatic rewards",
+        "Track earnings",
+        "Real-time stats",
+      ],
+      badge: "NEW",
     },
     {
       icon: Trophy,
