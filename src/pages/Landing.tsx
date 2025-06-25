@@ -28,6 +28,9 @@ import {
   FileText,
   Gift,
 } from "lucide-react";
+import AnimatedHero from "@/components/AnimatedHero";
+import MotivationalElements from "@/components/MotivationalElements";
+import ColorPsychology from "@/components/ColorPsychology";
 
 const Landing = () => {
   // Structured data for SEO
@@ -184,14 +187,15 @@ const Landing = () => {
         </header>
 
         {/* Hero Section */}
-        <section id="demo" className="py-20 px-4">
-          <div className="container mx-auto text-center max-w-4xl">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-6">
+        <section id="demo" className="py-20 px-4 relative">
+          <AnimatedHero />
+          <div className="container mx-auto text-center max-w-4xl relative z-10">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">
               <Star className="h-4 w-4" />
               Simple CRM for Personal Trainers
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-              Manage Your <span className="text-primary">Fitness Business</span>{" "}
+              Manage Your <span className="bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 bg-clip-text text-transparent">Fitness Business</span>{" "}
               Effortlessly
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -201,7 +205,7 @@ const Landing = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/login">
-                <Button size="lg" className="text-lg px-8">
+                <Button size="lg" className="text-lg px-8 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white border-0">
                   Start Free Trial
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -214,12 +218,31 @@ const Landing = () => {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8"
+                  className="text-lg px-8 border-2 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-transparent transition-all duration-300"
                 >
                   Watch Demo
                 </Button>
               </a>
             </div>
+          </div>
+        </section>
+
+        {/* Motivational Elements Section */}
+        <section className="py-20 px-4 bg-gradient-to-br from-green-50 to-blue-50">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <Trophy className="h-4 w-4" />
+                Motivation & Achievement
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Celebrate Every <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Victory</span>
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                Transform your training business with motivational elements that inspire both you and your clients to achieve greatness.
+              </p>
+            </div>
+            <MotivationalElements />
           </div>
         </section>
 
@@ -645,6 +668,25 @@ const Landing = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Color Psychology Section (after Core Features) */}
+        <section className="py-20 px-4 bg-gradient-to-br from-orange-50 to-purple-50">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <Zap className="h-4 w-4" />
+                Color Psychology
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Colors That <span className="bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent">Motivate</span>
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                Harness the power of color psychology to create an inspiring and motivating experience for your fitness business.
+              </p>
+            </div>
+            <ColorPsychology />
           </div>
         </section>
 

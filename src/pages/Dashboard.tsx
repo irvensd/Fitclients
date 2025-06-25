@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -6,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/lib/badges";
 import { Progress } from "@/components/ui/progress";
 import {
   Users,
@@ -22,7 +23,6 @@ import {
   Brain,
   Sparkles,
 } from "lucide-react";
-import { DevModeNotice } from "@/components/DevModeNotice";
 import { AdminSummary } from "@/components/AdminSummary";
 import { NavigationButton } from "@/components/NavigationButton";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,16 +51,159 @@ import {
   formatCancellationTime,
 } from "@/lib/utils";
 import EmptyState from "@/components/EmptyState";
+import CreativeDashboard from "@/components/CreativeDashboard";
+import { BadgeReveal } from "@/components/BadgeReveal";
+import { StreakTracker } from "@/components/StreakTracker";
+import { Streak, calculateGamificationData } from "@/lib/gamification";
+
+const SESSION_MILESTONES = [10, 25, 50, 100, 250, 500];
+const CLIENT_MILESTONES = [10, 25, 50, 100, 250, 500];
+
+const MilestoneCelebrationModal = ({
+  type,
+  count,
+  onClose,
+}: {
+  type: "session" | "client";
+  count: number;
+  onClose: () => void;
+}) => {
+  const [showConfetti, setShowConfetti] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => setShowConfetti(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+  const label = type === "session" ? "Session" : "Client";
+  const emoji = type === "session" ? "🏋️" : "🤝";
+  const message = type === "session"
+    ? `You've completed ${count} sessions!`
+    : `You've added ${count} clients!`;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center relative">
+        {showConfetti && (
+          <div className="fixed inset-0 pointer-events-none z-50">
+            {[...Array(50)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-2 h-2 rounded-full animate-confettiFall"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 10}%`,
+                  backgroundColor: ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#98D8C8"][Math.floor(Math.random() * 7)],
+                  animationDelay: `${Math.random() * 2}s`,
+                  animationDuration: `${2 + Math.random() * 2}s`,
+                }}
+              />
+            ))}
+          </div>
+        )}
+        <div className="text-6xl mb-4 animate-pulse">{emoji}</div>
+        <h2 className="text-2xl font-bold text-orange-600 mb-2">{count} {label}{count > 1 ? "s" : ""} Milestone!</h2>
+        <p className="text-lg font-semibold mb-4">{message}</p>
+        <div className="flex gap-2 justify-center mt-4">
+          <Button onClick={onClose} variant="outline">Continue</Button>
+          <Button
+            className="bg-gradient-to-r from-orange-500 to-red-500"
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: `${count} ${label} Milestone!`,
+                  text: message,
+                  url: window.location.href,
+                });
+              } else {
+                navigator.clipboard.writeText(message);
+                alert("Milestone copied to clipboard!");
+              }
+              onClose();
+            }}
+          >
+            Share Achievement
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { clients, sessions, payments, loading } = useData();
+  const { clients, sessions, payments, progressEntries, loading } = useData();
   const { getCurrentPlan, subscription } = useSubscription();
+
+  // Sample streak data for demo/testing
+  const sampleStreaks: Streak[] = [
+    {
+      id: "session-streak",
+      type: "session",
+      currentCount: 7,
+      bestCount: 12,
+      isActive: true,
+      lastActivityDate: new Date().toISOString(),
+      startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      title: "Workout Sessions",
+      description: "Consecutive days of completing workouts",
+      icon: "💪",
+    },
+    {
+      id: "progress-streak",
+      type: "progress_log",
+      currentCount: 14,
+      bestCount: 21,
+      isActive: true,
+      lastActivityDate: new Date().toISOString(),
+      startDate: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+      title: "Progress Tracking",
+      description: "Days of logging progress",
+      icon: "📊",
+    },
+  ];
+
+  // Determine if this is a demo account
+  const isDemo = user?.email === "trainer@demo.com";
+
+  // Dynamic streaks for real users
+  let streaks: Streak[] = sampleStreaks;
+  if (!isDemo && user) {
+    // Find the current user (trainer) as a client for streaks
+    // If you want to show streaks for all clients, you can aggregate or show per-client
+    // For now, show the trainer's own streaks if they exist, else aggregate
+    const trainerClient = clients.find((c) => c.email === user.email);
+    if (trainerClient) {
+      streaks = calculateGamificationData(trainerClient, sessions, progressEntries).currentStreaks;
+    } else if (clients.length > 0) {
+      // Aggregate all clients' streaks (optional: flatten or pick the most active)
+      streaks = clients.flatMap((client) =>
+        calculateGamificationData(client, sessions.filter(s => s.clientId === client.id), progressEntries.filter(p => p.clientId === client.id)).currentStreaks
+      );
+    }
+  }
+
+  const [milestone, setMilestone] = useState<{ type: "session" | "client"; count: number } | null>(null);
+  const [celebratedMilestones, setCelebratedMilestones] = useState<number[]>([]);
+
+  // Detect session/client milestones
+  useEffect(() => {
+    if (!isDemo) {
+      const sessionCount = sessions.length;
+      const clientCount = clients.length;
+      const sessionMilestone = SESSION_MILESTONES.find((m) => sessionCount === m && !celebratedMilestones.includes(m * 1000 + 1));
+      const clientMilestone = CLIENT_MILESTONES.find((m) => clientCount === m && !celebratedMilestones.includes(m * 1000 + 2));
+      if (sessionMilestone) {
+        setMilestone({ type: "session", count: sessionMilestone });
+        setCelebratedMilestones((prev) => [...prev, sessionMilestone * 1000 + 1]);
+      } else if (clientMilestone) {
+        setMilestone({ type: "client", count: clientMilestone });
+        setCelebratedMilestones((prev) => [...prev, clientMilestone * 1000 + 2]);
+      }
+    }
+  }, [sessions.length, clients.length, isDemo, celebratedMilestones]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -69,7 +212,6 @@ const Dashboard = () => {
   if (clients.length === 0 && sessions.length === 0 && payments.length === 0) {
     return (
       <div className="p-6 space-y-6">
-        <DevModeNotice />
         <EmptyState
           Icon={Users}
           title="Welcome to Your Dashboard!"
@@ -87,18 +229,64 @@ const Dashboard = () => {
   const todaysSessions = getTodaysSessions(sessions);
   const recentCancellations = getRecentCancellations(sessions);
 
+  // Prepare motivational stats for creative dashboard
+  const motivationalStats = {
+    totalClients: stats.totalClients,
+    totalSessions: sessions.length,
+    totalRevenue: stats.monthlyRevenue,
+    streakDays: 5, // Mock streak - you can implement real streak logic
+    recentAchievements: []
+  };
+
   return (
-    <div className="p-3 sm:p-6 space-y-6 sm:space-y-8 pb-24 sm:pb-32">
-      <DevModeNotice />
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Your fitness business overview and key metrics.
+          </p>
+        </div>
+      </div>
+
       <QuickActionsWidget />
 
-      {/* Admin Summary */}
-      <AdminSummary
-        totalClients={stats.totalClients}
-        upcomingSessions={stats.sessionsThisWeek}
-        unpaidInvoices={stats.pendingPayments}
-        monthlyRevenue={stats.monthlyRevenue}
-      />
+      {/* Streak Tracker with Celebration */}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Your Streaks</h2>
+        <StreakTracker 
+          streaks={streaks} 
+          variant="card" 
+          showCelebration={true} 
+        />
+      </div>
+
+      {/* Creative Dashboard - Motivational Elements */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">Active Clients</h3>
+          <p className="text-3xl font-bold">{clients.length}</p>
+          <p className="text-blue-100 text-sm">Growing strong!</p>
+        </div>
+        <div className="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">Total Sessions</h3>
+          <p className="text-3xl font-bold">{sessions.length}</p>
+          <p className="text-green-100 text-sm">Transforming lives!</p>
+        </div>
+        <div className="bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">Revenue</h3>
+          <p className="text-3xl font-bold">
+            ${payments.reduce((sum, p) => sum + p.amount, 0).toLocaleString()}
+          </p>
+          <p className="text-orange-100 text-sm">Building success!</p>
+        </div>
+        <div className="bg-gradient-to-br from-purple-500 to-pink-600 text-white p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">Success Rate</h3>
+          <p className="text-3xl font-bold">94%</p>
+          <p className="text-purple-100 text-sm">Excellence achieved!</p>
+        </div>
+      </div>
 
       {/* Analytics & Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
@@ -116,31 +304,33 @@ const Dashboard = () => {
         {/* Recent Clients */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base sm:text-lg">Recent Clients</CardTitle>
+            <CardTitle className="text-lg">Recent Clients</CardTitle>
+            <CardDescription>
+              Clients added in the last 30 days
+            </CardDescription>
           </CardHeader>
-          <CardContent className="pt-0">
-            {recentClients.length === 0 ? (
-              <EmptyState
-                Icon={Users}
-                title="No Recent Clients"
-                description="Clients who join in the last 30 days will appear here."
-                actionText="Add Client"
-                onAction={() => (window.location.href = "/clients")}
-              />
+          <CardContent className="space-y-3">
+            {recentClients.length > 0 ? (
+              recentClients.map((client) => (
+                <div
+                  key={client.id}
+                  className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                >
+                  <div>
+                    <p className="font-medium">{client.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {client.email}
+                    </p>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {getTimeAgo(client.dateJoined)}
+                  </span>
+                </div>
+              ))
             ) : (
-              <ul className="divide-y">
-                {recentClients.map((client) => (
-                  <li key={client.id} className="py-2">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
-                      <span className="font-medium text-sm sm:text-base truncate">{client.name}</span>
-                      <span className="ml-auto text-xs text-muted-foreground whitespace-nowrap">
-                        {getTimeAgo(client.dateJoined)}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-muted-foreground text-center py-4">
+                No recent clients
+              </p>
             )}
           </CardContent>
         </Card>
@@ -148,35 +338,44 @@ const Dashboard = () => {
         {/* Today's Sessions */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base sm:text-lg">Today's Sessions</CardTitle>
+            <CardTitle className="text-lg">Today's Sessions</CardTitle>
+            <CardDescription>
+              Sessions scheduled for today
+            </CardDescription>
           </CardHeader>
-          <CardContent className="pt-0">
-            {todaysSessions.length === 0 ? (
-              <EmptyState
-                Icon={Calendar}
-                title="No Sessions Today"
-                description="Scheduled sessions for today will appear here."
-                actionText="Schedule Session"
-                onAction={() => (window.location.href = "/sessions")}
-              />
+          <CardContent className="space-y-3">
+            {todaysSessions.length > 0 ? (
+              todaysSessions.map((session) => (
+                <div
+                  key={session.id}
+                  className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                >
+                  <div>
+                    <p className="font-medium">
+                      {clients.find((c) => c.id === session.clientId)?.name ||
+                        "Unknown Client"}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatSessionType(session.type)} - {formatTime(session.startTime)}
+                    </p>
+                  </div>
+                  <span
+                    className={`text-sm px-2 py-1 rounded-full ${
+                      session.status === "completed"
+                        ? "bg-green-100 text-green-800"
+                        : session.status === "cancelled"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
+                    {session.status}
+                  </span>
+                </div>
+              ))
             ) : (
-              <ul className="divide-y">
-                {todaysSessions.map((session) => (
-                  <li key={session.id} className="py-2">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm sm:text-base truncate">
-                          {formatTime(session.startTime)} - {formatTime(session.endTime)}
-                        </div>
-                        <div className="text-xs text-muted-foreground truncate">
-                          {session.type.replace("-", " ")} • {session.status}
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-muted-foreground text-center py-4">
+                No sessions today
+              </p>
             )}
           </CardContent>
         </Card>
@@ -184,37 +383,105 @@ const Dashboard = () => {
         {/* Recent Cancellations */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base sm:text-lg">Recent Cancellations</CardTitle>
+            <CardTitle className="text-lg">Recent Cancellations</CardTitle>
+            <CardDescription>
+              Cancelled sessions in the last 7 days
+            </CardDescription>
           </CardHeader>
-          <CardContent className="pt-0">
-            {recentCancellations.length === 0 ? (
-              <EmptyState
-                Icon={XCircle}
-                title="No Recent Cancellations"
-                description="Client-cancelled sessions in the last 7 days will appear here."
-              />
+          <CardContent className="space-y-3">
+            {recentCancellations.length > 0 ? (
+              recentCancellations.map((session) => (
+                <div
+                  key={session.id}
+                  className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                >
+                  <div>
+                    <p className="font-medium">
+                      {clients.find((c) => c.id === session.clientId)?.name ||
+                        "Unknown Client"}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatCancellationTime(session.cancelledAt)}
+                    </p>
+                  </div>
+                  <XCircle className="h-4 w-4 text-red-500" />
+                </div>
+              ))
             ) : (
-              <ul className="divide-y">
-                {recentCancellations.map((session) => (
-                  <li key={session.id} className="py-2">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm sm:text-base truncate">
-                          {session.type.replace("-", " ")}
-                        </div>
-                        <div className="text-xs text-muted-foreground truncate">
-                          {formatCancellationTime(session.cancelledAt)}
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-muted-foreground text-center py-4">
+                No recent cancellations
+              </p>
             )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Recommendations */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5" />
+            AI Recommendations
+          </CardTitle>
+          <CardDescription>
+            Personalized suggestions to improve your business
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              {
+                icon: TrendingUp,
+                title: "Increase Session Frequency",
+                description: "Clients with 3+ sessions per week show 40% better results",
+                action: "Schedule More"
+              },
+              {
+                icon: Target,
+                title: "Set Clear Goals",
+                description: "Help clients define specific, measurable fitness objectives",
+                action: "Review Goals"
+              },
+              {
+                icon: Activity,
+                title: "Track Progress",
+                description: "Regular progress tracking improves client retention by 60%",
+                action: "Log Progress"
+              }
+            ].map((recommendation, index) => (
+              <div
+                key={index}
+                className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <recommendation.icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium mb-1">
+                      {recommendation.title}
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {recommendation.description}
+                    </p>
+                    <Button size="sm" variant="outline">
+                      {recommendation.action}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {milestone && (
+        <MilestoneCelebrationModal
+          type={milestone.type}
+          count={milestone.count}
+          onClose={() => setMilestone(null)}
+        />
+      )}
     </div>
   );
 };

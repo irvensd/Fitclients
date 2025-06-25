@@ -5,6 +5,88 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom Animations for Creative Elements */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(34, 197, 94, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animation Classes */
+.animate-slideIn {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-pulseGlow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
 /* Custom Calendar Theme */
 .rbc-calendar {
   @apply bg-background text-foreground;
@@ -63,7 +145,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
+    --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96%;
     --secondary-foreground: 222.2 84% 4.9%;
@@ -75,7 +157,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 222.2 84% 4.9%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -99,8 +181,8 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -111,7 +193,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
+    --ring: 212.7 26.8% 83.9%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -343,4 +425,215 @@
     align-items: center;
     justify-content: center;
   }
+}
+
+/* Mobile Responsiveness for Creative Components */
+@media (max-width: 640px) {
+  /* Creative Dashboard Mobile Optimizations */
+  .creative-card {
+    @apply p-3;
+  }
+  
+  .creative-grid {
+    @apply grid-cols-1 gap-3;
+  }
+  
+  .creative-text {
+    @apply text-sm;
+  }
+  
+  .creative-icon {
+    @apply h-5 w-5;
+  }
+  
+  /* Achievement Cards Mobile */
+  .achievement-card {
+    @apply p-3;
+  }
+  
+  .achievement-icon {
+    @apply h-4 w-4;
+  }
+  
+  /* Progress Bars Mobile */
+  .progress-mobile {
+    @apply h-1.5;
+  }
+  
+  /* Stats Grid Mobile */
+  .stats-grid-mobile {
+    @apply grid-cols-2 gap-2;
+  }
+  
+  /* Color Psychology Mobile */
+  .color-psychology-grid {
+    @apply grid-cols-1 gap-3;
+  }
+  
+  .color-psychology-card {
+    @apply p-3;
+  }
+  
+  /* Motivational Elements Mobile */
+  .motivational-grid {
+    @apply grid-cols-2 gap-2;
+  }
+  
+  .motivational-card {
+    @apply p-2;
+  }
+  
+  /* Animated Hero Mobile */
+  .hero-progress {
+    @apply h-0.5;
+  }
+  
+  .hero-particles {
+    @apply w-0.5 h-0.5;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Tablet Optimizations */
+  .creative-grid {
+    @apply grid-cols-2 gap-4;
+  }
+  
+  .color-psychology-grid {
+    @apply grid-cols-2 gap-4;
+  }
+  
+  .motivational-grid {
+    @apply grid-cols-3 gap-3;
+  }
+}
+
+/* Touch-friendly interactions for creative elements */
+.creative-touch {
+  @apply touch-manipulation;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Smooth transitions for creative animations */
+.creative-transition {
+  @apply transition-all duration-300 ease-out;
+}
+
+/* Optimized animations for mobile */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulseGlow,
+  .animate-float,
+  .animate-sparkle {
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .creative-card {
+    @apply border-2 border-gray-900;
+  }
+  
+  .achievement-card {
+    @apply border-2 border-gray-900;
+  }
+}
+
+/* Dark mode optimizations for creative elements */
+.dark .creative-card {
+  @apply bg-gray-800 border-gray-700;
+}
+
+.dark .achievement-card {
+  @apply bg-gray-800 border-gray-700;
+}
+
+.dark .color-psychology-card {
+  @apply bg-gray-800 border-gray-700;
+}
+
+/* Focus states for accessibility */
+.creative-card:focus-visible,
+.achievement-card:focus-visible,
+.color-psychology-card:focus-visible {
+  @apply outline-none ring-2 ring-primary ring-offset-2;
+}
+
+/* Print styles for creative elements */
+@media print {
+  .creative-card,
+  .achievement-card,
+  .color-psychology-card {
+    @apply shadow-none border border-gray-300;
+  }
+  
+  .animate-pulseGlow,
+  .animate-float,
+  .animate-sparkle {
+    animation: none;
+  }
+}
+
+/* Streak and Gamification Animations */
+@keyframes pulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px orange) brightness(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 16px orange) brightness(1.2);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flameFlicker {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.05) rotate(1deg);
+  }
+  50% {
+    transform: scale(0.95) rotate(-1deg);
+  }
+  75% {
+    transform: scale(1.02) rotate(0.5deg);
+  }
+}
+
+.animate-pulseGlow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-confettiFall {
+  animation: confettiFall 3s linear forwards;
+}
+
+.animate-flameFlicker {
+  animation: flameFlicker 0.5s ease-in-out infinite;
 }

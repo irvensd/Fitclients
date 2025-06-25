@@ -477,20 +477,16 @@ const Sessions = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading sessions...</p>
-          </div>
-        </div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Sessions</h1>
           <p className="text-muted-foreground">
@@ -689,35 +685,53 @@ const Sessions = () => {
                                   onChange={(e) =>
                                     setEditForm({ ...editForm, notes: e.target.value })
                                   }
-                                  placeholder="Add any additional notes..."
+                                  placeholder="Add session notes..."
                                 />
                               </div>
-                              <div className="flex justify-end gap-2">
-                                <Button variant="outline" onClick={cancelEditing}>
+                              <div className="flex gap-2 pt-4">
+                                <Button onClick={saveEdit} className="flex-1">
+                                  <Save className="h-4 w-4 mr-2" />
+                                  Save Changes
+                                </Button>
+                                <Button variant="outline" onClick={cancelEditing} className="flex-1">
                                   <X className="h-4 w-4 mr-2" />
                                   Cancel
-                                </Button>
-                                <Button onClick={saveEdit}>
-                                  <Save className="h-4 w-4 mr-2" />
-                                  Save
                                 </Button>
                               </div>
                             </div>
                           ) : (
-                            <div className="pt-4 border-t flex flex-col gap-3">
-                              <div className="flex items-center gap-4 text-sm">
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                  <ClipboardList className="h-4 w-4" />
-                                  <span>{session.type}</span>
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="text-center p-3 bg-muted rounded-lg">
+                                  <div className="text-lg font-bold text-blue-600">
+                                    ${session.cost}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">Cost</div>
                                 </div>
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                  <DollarSign className="h-4 w-4" />
-                                  <span>${session.cost}</span>
+                                <div className="text-center p-3 bg-muted rounded-lg">
+                                  <div className="text-lg font-bold text-green-600">
+                                    {session.type.replace('-', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">Type</div>
+                                </div>
+                                <div className="text-center p-3 bg-muted rounded-lg">
+                                  <div className="text-lg font-bold text-purple-600">
+                                    {format(parseISO(session.date), 'MMM dd')}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">Date</div>
+                                </div>
+                                <div className="text-center p-3 bg-muted rounded-lg">
+                                  <div className="text-lg font-bold text-orange-600">
+                                    {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">Status</div>
                                 </div>
                               </div>
                               {session.notes && (
-                                <div className="text-sm">
-                                  <p className="text-muted-foreground">{session.notes}</p>
+                                <div className="p-3 bg-muted/50 rounded-lg">
+                                  <p className="text-sm text-muted-foreground">
+                                    <strong>Notes:</strong> {session.notes}
+                                  </p>
                                 </div>
                               )}
                             </div>
@@ -733,17 +747,7 @@ const Sessions = () => {
         </TabsContent>
 
         <TabsContent value="calendar" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CalendarDays className="h-5 w-5" />
-                Training Calendar
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <SessionCalendar />
-            </CardContent>
-          </Card>
+          <SessionCalendar />
         </TabsContent>
       </Tabs>
     </div>

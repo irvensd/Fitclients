@@ -58,7 +58,6 @@ import {
   Archive,
   RotateCcw,
 } from "lucide-react";
-import { DevModeNotice } from "@/components/DevModeNotice";
 import { useData } from "@/contexts/DataContext";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import {
@@ -1338,8 +1337,6 @@ Your Personal Trainer`;
   if (user?.email !== "trainer@demo.com" && clients.length === 0 && !loading) {
     return (
       <div className="p-6 space-y-6">
-        <DevModeNotice />
-
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -1471,8 +1468,6 @@ Your Personal Trainer`;
 
   return (
     <div className="p-6 space-y-6">
-      <DevModeNotice />
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
