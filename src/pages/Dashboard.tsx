@@ -434,24 +434,49 @@ const Dashboard = () => {
                 icon: TrendingUp,
                 title: "Increase Session Frequency",
                 description: "Clients with 3+ sessions per week show 40% better results",
-                action: "Schedule More"
+                action: "Schedule More",
+                onClick: () => window.location.href = "/sessions"
               },
               {
                 icon: Target,
                 title: "Set Clear Goals",
                 description: "Help clients define specific, measurable fitness objectives",
-                action: "Review Goals"
+                action: "Review Goals",
+                onClick: () => window.location.href = "/clients"
               },
               {
                 icon: Activity,
                 title: "Track Progress",
                 description: "Regular progress tracking improves client retention by 60%",
-                action: "Log Progress"
+                action: "Log Progress",
+                onClick: () => window.location.href = "/progress"
+              },
+              {
+                icon: Brain,
+                title: "Get AI Insights",
+                description: "View detailed AI-powered recommendations for each client",
+                action: "View Insights",
+                onClick: () => window.location.href = "/ai-recommendations"
+              },
+              {
+                icon: Users,
+                title: "Client Engagement",
+                description: "Engaged clients are 3x more likely to achieve their goals",
+                action: "Engage Clients",
+                onClick: () => window.location.href = "/clients"
+              },
+              {
+                icon: DollarSign,
+                title: "Revenue Optimization",
+                description: "Optimize pricing and payment collection for better revenue",
+                action: "View Payments",
+                onClick: () => window.location.href = "/payments"
               }
             ].map((recommendation, index) => (
               <div
                 key={index}
-                className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                onClick={recommendation.onClick}
               >
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-primary/10 rounded-lg">
@@ -464,7 +489,14 @@ const Dashboard = () => {
                     <p className="text-sm text-muted-foreground mb-2">
                       {recommendation.description}
                     </p>
-                    <Button size="sm" variant="outline">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        recommendation.onClick();
+                      }}
+                    >
                       {recommendation.action}
                     </Button>
                   </div>
