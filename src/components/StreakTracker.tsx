@@ -75,7 +75,12 @@ export const StreakTracker = ({
     if (showCelebration && activeStreaks.length > 0) {
       const milestoneStreak = activeStreaks.find(streak => {
         const milestones = [7, 14, 30, 60, 100];
-        return milestones.includes(streak.currentCount) && !celebratedMilestones.includes(streak.currentCount);
+        const key = `streak-celebrated-${streak.id}-${streak.currentCount}`;
+        return (
+          milestones.includes(streak.currentCount) &&
+          !celebratedMilestones.includes(streak.currentCount) &&
+          !localStorage.getItem(key)
+        );
       });
       if (milestoneStreak) {
         setCelebratingStreak(milestoneStreak);
@@ -84,6 +89,10 @@ export const StreakTracker = ({
   }, [activeStreaks, showCelebration, celebratedMilestones]);
 
   const handleMilestoneClose = (count: number) => {
+    if (celebratingStreak) {
+      const key = `streak-celebrated-${celebratingStreak.id}-${celebratingStreak.currentCount}`;
+      localStorage.setItem(key, 'true');
+    }
     setCelebratingStreak(null);
     setCelebratedMilestones((prev) => [...prev, count]);
   };
@@ -301,7 +310,7 @@ const StreakDetailedView = ({
   const inactiveStreaks = streaks.filter((s) => !s.isActive);
   const bestStreak = streaks.reduce(
     (max, streak) => (streak.bestCount > max.bestCount ? streak : max),
-    streaks[0] || { bestCount: 0 },
+    streaks[0] || { bestCount: 0, title: "" }
   );
 
   return (
