@@ -218,7 +218,7 @@ const AnimatedProgressBar = ({ value, max, label, icon, color }: {
 // Progress Tree Component
 const ProgressTree = ({ achievements }: { achievements: Array<{ name: string; unlocked: boolean; icon: string }> }) => {
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className="flex flex-row items-center justify-center space-x-4">
       {achievements.map((achievement, index) => (
         <div key={index} className="flex items-center">
           <div className={`text-2xl transition-all duration-500 achievement-tree-item ${
@@ -227,7 +227,7 @@ const ProgressTree = ({ achievements }: { achievements: Array<{ name: string; un
             {achievement.icon}
           </div>
           {index < achievements.length - 1 && (
-            <div className={`w-0.5 h-8 mx-2 transition-all duration-500 achievement-tree-line ${
+            <div className={`h-0.5 w-8 mx-2 transition-all duration-500 achievement-tree-line ${
               achievement.unlocked ? 'bg-green-400' : 'bg-gray-300'
             }`} />
           )}
