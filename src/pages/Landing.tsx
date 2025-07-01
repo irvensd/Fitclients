@@ -167,6 +167,27 @@ const Landing = () => {
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-background to-muted">
+        {/* Mobile Sticky CTA */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t shadow-lg p-4">
+          <div className="flex gap-3">
+            <Link to="/login" className="flex-1">
+              <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white">
+                Start Free Trial
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <a
+              href="https://app.storylane.io/share/dvcmg9nwour6"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1"
+            >
+              <Button variant="outline" className="w-full">
+                Watch Demo
+              </Button>
+            </a>
+          </div>
+        </div>
         {/* Header */}
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <nav className="container mx-auto px-4 h-16 flex items-center justify-between" aria-label="Main navigation">
@@ -249,22 +270,22 @@ const Landing = () => {
             </div>
             
             {/* Social Proof Numbers */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">1,000+</div>
-                <div className="text-sm text-muted-foreground">Active Trainers</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-3xl mx-auto">
+              <div className="text-center p-3 md:p-0">
+                <div className="text-xl md:text-2xl font-bold text-primary">1,000+</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Active Trainers</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">50,000+</div>
-                <div className="text-sm text-muted-foreground">Clients Managed</div>
+              <div className="text-center p-3 md:p-0">
+                <div className="text-xl md:text-2xl font-bold text-primary">50,000+</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Clients Managed</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">10+ hrs</div>
-                <div className="text-sm text-muted-foreground">Saved Per Week</div>
+              <div className="text-center p-3 md:p-0">
+                <div className="text-xl md:text-2xl font-bold text-primary">10+ hrs</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Saved Per Week</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">4.9★</div>
-                <div className="text-sm text-muted-foreground">Average Rating</div>
+              <div className="text-center p-3 md:p-0">
+                <div className="text-xl md:text-2xl font-bold text-primary">4.9★</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Average Rating</div>
               </div>
             </div>
           </div>
@@ -285,43 +306,43 @@ const Landing = () => {
                 See FitClient in action and get our "5-Step Guide to Growing Your Fitness Business" - completely free!
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="text-left">
-                  <h4 className="font-semibold mb-3">What you'll get:</h4>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-600" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div className="text-left order-2 lg:order-1">
+                  <h4 className="font-semibold mb-3 text-lg">What you'll get:</h4>
+                  <ul className="space-y-3 text-sm md:text-base text-muted-foreground">
+                    <li className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                       <span>15-minute personalized demo</span>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-600" />
+                    <li className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                       <span>5-step business growth guide</span>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-600" />
+                    <li className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                       <span>Client retention strategies</span>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-600" />
+                    <li className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                       <span>Pricing optimization tips</span>
                     </li>
                   </ul>
                 </div>
                 
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
-                  <h4 className="font-semibold mb-4">Get Your Free Demo</h4>
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 md:p-6 order-1 lg:order-2">
+                  <h4 className="font-semibold mb-4 text-lg">Get Your Free Demo</h4>
                   <div className="space-y-3">
                     <input
                       type="email"
                       placeholder="Enter your email address"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                     />
                     <input
                       type="text"
                       placeholder="Your name"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                     />
-                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 text-base">
                       Get Free Demo & Guide
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -742,7 +763,8 @@ const Landing = () => {
               </p>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b-2 border-gray-200">
@@ -844,6 +866,72 @@ const Landing = () => {
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile Comparison Cards */}
+            <div className="md:hidden space-y-6">
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 border-2 border-green-200">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <Star className="h-6 w-6 text-green-600" />
+                  <h3 className="text-xl font-bold text-green-800">FitClient</h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">AI-Powered Recommendations</span>
+                    <Check className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">No-Login Client Portal</span>
+                    <Check className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Gamification & Streaks</span>
+                    <Check className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Free Forever Plan</span>
+                    <Check className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Setup Time</span>
+                    <span className="text-green-600 font-semibold">5 minutes</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Monthly Cost (5 clients)</span>
+                    <span className="text-green-600 font-semibold">$0</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-6 border-2 border-gray-200">
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Other CRM Tools</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">AI-Powered Recommendations</span>
+                    <X className="h-5 w-5 text-red-500" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">No-Login Client Portal</span>
+                    <X className="h-5 w-5 text-red-500" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Gamification & Streaks</span>
+                    <X className="h-5 w-5 text-red-500" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Free Forever Plan</span>
+                    <X className="h-5 w-5 text-red-500" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Setup Time</span>
+                    <span className="text-muted-foreground">2-4 hours</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Monthly Cost (5 clients)</span>
+                    <span className="text-muted-foreground">$29-79</span>
+                  </div>
+                </div>
+              </div>
             </div>
             
             <div className="text-center mt-8">
@@ -2073,6 +2161,8 @@ const Landing = () => {
             </nav>
           </div>
         </footer>
+        {/* Bottom spacing for mobile sticky CTA */}
+        <div className="md:hidden h-20"></div>
       </div>
     </>
   );
