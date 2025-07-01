@@ -36,187 +36,53 @@ import { CookieConsent } from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <SubscriptionProvider>
-        <DataProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-              {/* <CookieConsent /> Temporarily disabled to debug */}
-            <BrowserRouter>
-                <Routes>
-                  {/* Home route - shows landing or redirects to admin if authenticated */}
-                  <Route path="/" element={<LandingRedirect />} />
 
-                  {/* Public Routes */}
+
+const App = () => {
+  console.log('App component rendering...');
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <SubscriptionProvider>
+          <DataProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <CookieConsent />
+                <Routes>
+                  <Route path="/" element={<LandingRedirect />} />
                   <Route path="/landing" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/onboarding" element={<Onboarding />} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/contact" element={<Contact />} />
-
-                  {/* Demo Client Portal - No Authentication Required */}
-                  <Route
-                    path="/demo-portal"
-                    element={<DemoPortal />}
-                  />
-
-                  {/* Public Client Portal - No Authentication Required */}
-                  <Route
-                    path="/client-portal/:clientId"
-                    element={<ClientPortal />}
-                  />
-
-                  {/* Protected Admin Routes */}
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <Dashboard />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/clients"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <Clients />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/sessions"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <Sessions />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/workouts"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <Workouts />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/payments"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <Payments />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/progress"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <Progress />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/settings"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <Settings />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/client-portals"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <ClientPortalManager />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/ai-recommendations"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <AIRecommendations />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/features"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <Features />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/marketing"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <Marketing />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/help-support"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <Help />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/support-portal"
-                    element={<SupportPortal />}
-                  />
-
-                  {/* 404 Route */}
+                  <Route path="/demo-portal" element={<DemoPortal />} />
+                  <Route path="/client-portal/:clientId" element={<ClientPortal />} />
+                  <Route path="/admin" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+                  <Route path="/clients" element={<ProtectedRoute><Layout><Clients /></Layout></ProtectedRoute>} />
+                  <Route path="/sessions" element={<ProtectedRoute><Layout><Sessions /></Layout></ProtectedRoute>} />
+                  <Route path="/workouts" element={<ProtectedRoute><Layout><Workouts /></Layout></ProtectedRoute>} />
+                  <Route path="/payments" element={<ProtectedRoute><Layout><Payments /></Layout></ProtectedRoute>} />
+                  <Route path="/progress" element={<ProtectedRoute><Layout><Progress /></Layout></ProtectedRoute>} />
+                  <Route path="/settings" element={<ProtectedRoute><Layout><Settings /></Layout></ProtectedRoute>} />
+                  <Route path="/client-portals" element={<ProtectedRoute><Layout><ClientPortalManager /></Layout></ProtectedRoute>} />
+                  <Route path="/ai-recommendations" element={<ProtectedRoute><Layout><AIRecommendations /></Layout></ProtectedRoute>} />
+                  <Route path="/features" element={<ProtectedRoute><Layout><Features /></Layout></ProtectedRoute>} />
+                  <Route path="/marketing" element={<ProtectedRoute><Layout><Marketing /></Layout></ProtectedRoute>} />
+                  <Route path="/help-support" element={<ProtectedRoute><Layout><Help /></Layout></ProtectedRoute>} />
+                  <Route path="/support-portal" element={<SupportPortal />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
             </TooltipProvider>
-        </DataProvider>
-      </SubscriptionProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+          </DataProvider>
+        </SubscriptionProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
