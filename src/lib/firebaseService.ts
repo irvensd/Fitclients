@@ -14,9 +14,10 @@ import {
   getDoc,
   setDoc,
   increment,
+  arrayUnion,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { Client, Session, Payment, UserProfile, BillingHistory, ReferralData, ReferralStats } from "./types";
+import { Client, Session, Payment, UserProfile, BillingHistory, ReferralData, ReferralStats, MarketingCampaign, Lead, SocialPost, EmailCampaign, MarketingAsset, Testimonial, ReferralLink, LeadNote } from "./types";
 
 // Helper to get user's collection path
 const getUserCollection = (userId: string, collectionName: string) => {
@@ -798,3 +799,497 @@ export const referralService = {
     }
   },
 };
+
+// === MARKETING SERVICES ===
+export const marketingService = {
+  // Campaign Management
+  getCampaigns: async (trainerId: string) => {
+    const campaignsRef = collection(db, "trainers", trainerId, "campaigns");
+    const snapshot = await getDocs(campaignsRef);
+    const campaigns = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    // If no campaigns exist, create some sample data
+    if (campaigns.length === 0) {
+      const sampleCampaigns = [
+        {
+          id: "sample-1",
+          title: "New Year Transformation",
+          description: "Get 20% off first month + free assessment",
+          type: "referral" as const,
+          status: "active" as const,
+          createdAt: new Date().toISOString(),
+          startDate: new Date().toISOString(),
+          targetAudience: "New clients looking for weight loss",
+          discountType: "percentage" as const,
+          discountValue: 20,
+          referralReward: 50,
+          metrics: {
+            views: 245,
+            clicks: 89,
+            conversions: 12,
+            shares: 34,
+            revenue: 2400,
+            cost: 200,
+            roi: 1100,
+          },
+          settings: {
+            autoShare: true,
+            trackingEnabled: true,
+            emailReminders: true,
+            smsNotifications: false,
+            socialPlatforms: ["facebook", "instagram"],
+          },
+        },
+        {
+          id: "sample-2",
+          title: "Friend Referral Program",
+          description: "Both you and your friend get $50 credit",
+          type: "referral" as const,
+          status: "active" as const,
+          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          targetAudience: "Existing clients",
+          discountType: "fixed" as const,
+          discountValue: 50,
+          referralReward: 50,
+          metrics: {
+            views: 178,
+            clicks: 67,
+            conversions: 8,
+            shares: 23,
+            revenue: 1600,
+            cost: 150,
+            roi: 966,
+          },
+          settings: {
+            autoShare: false,
+            trackingEnabled: true,
+            emailReminders: true,
+            smsNotifications: true,
+            socialPlatforms: ["instagram"],
+          },
+        },
+      ];
+      
+      // Add sample campaigns to Firestore
+      for (const campaign of sampleCampaigns) {
+        await addDoc(campaignsRef, campaign);
+      }
+      
+      return sampleCampaigns;
+    }
+    
+    return campaigns;
+  },
+
+  createCampaign: async (trainerId: string, campaignData: Omit<MarketingCampaign, "id" | "createdAt" | "metrics">) => {
+    const campaignsRef = collection(db, "trainers", trainerId, "campaigns");
+    const newCampaign: Omit<MarketingCampaign, "id"> = {
+      ...campaignData,
+      createdAt: new Date().toISOString(),
+      metrics: {
+        views: 0,
+        clicks: 0,
+        conversions: 0,
+        shares: 0,
+        revenue: 0,
+        cost: 0,
+        roi: 0,
+      },
+    };
+    
+    const docRef = await addDoc(campaignsRef, newCampaign);
+    return { id: docRef.id, ...newCampaign };
+  },
+
+  updateCampaign: async (trainerId: string, campaignId: string, updates: Partial<MarketingCampaign>) => {
+    const campaignRef = doc(db, "trainers", trainerId, "campaigns", campaignId);
+    return updateDoc(campaignRef, updates);
+  },
+
+  deleteCampaign: async (trainerId: string, campaignId: string) => {
+    const campaignRef = doc(db, "trainers", trainerId, "campaigns", campaignId);
+    return deleteDoc(campaignRef);
+  },
+
+  // Lead Management
+  getLeads: async (trainerId: string) => {
+    const leadsRef = collection(db, "trainers", trainerId, "leads");
+    const snapshot = await getDocs(leadsRef);
+    const leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    // If no leads exist, create some sample data
+    if (leads.length === 0) {
+      const sampleLeads = [
+        {
+          id: "sample-lead-1",
+          name: "Sarah Johnson",
+          email: "sarah.j@email.com",
+          phone: "(555) 123-4567",
+          source: "referral" as const,
+          sourceDetails: "Friend Referral Program",
+          status: "consultation_scheduled" as const,
+          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          lastContactAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          notes: [
+            {
+              id: "note-1",
+              content: "Interested in weight loss. Prefers morning sessions.",
+              createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+              type: "call" as const,
+            },
+          ],
+          interests: ["weight loss", "strength training"],
+          budget: "$150-200/month",
+          preferredTime: "Morning",
+        },
+        {
+          id: "sample-lead-2",
+          name: "Mike Chen",
+          email: "mike.chen@email.com",
+          phone: "(555) 987-6543",
+          source: "website" as const,
+          sourceDetails: "Contact form",
+          status: "new" as const,
+          createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+          notes: [],
+          interests: ["muscle building", "nutrition"],
+          budget: "$200-300/month",
+          preferredTime: "Evening",
+        },
+        {
+          id: "sample-lead-3",
+          name: "Lisa Rodriguez",
+          email: "lisa.r@email.com",
+          source: "social" as const,
+          sourceDetails: "Instagram ad",
+          status: "converted" as const,
+          createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+          conversionDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          conversionValue: 1800,
+          notes: [],
+          interests: ["cardio", "flexibility"],
+          budget: "$100-150/month",
+          preferredTime: "Afternoon",
+        },
+      ];
+      
+      // Add sample leads to Firestore
+      for (const lead of sampleLeads) {
+        await addDoc(leadsRef, lead);
+      }
+      
+      return sampleLeads;
+    }
+    
+    return leads;
+  },
+
+  createLead: async (trainerId: string, leadData: Omit<Lead, "id" | "createdAt" | "notes">) => {
+    const leadsRef = collection(db, "trainers", trainerId, "leads");
+    const newLead: Omit<Lead, "id"> = {
+      ...leadData,
+      createdAt: new Date().toISOString(),
+      notes: [],
+    };
+    
+    const docRef = await addDoc(leadsRef, newLead);
+    return { id: docRef.id, ...newLead };
+  },
+
+  updateLead: async (trainerId: string, leadId: string, updates: Partial<Lead>) => {
+    const leadRef = doc(db, "trainers", trainerId, "leads", leadId);
+    return updateDoc(leadRef, updates);
+  },
+
+  addLeadNote: async (trainerId: string, leadId: string, note: Omit<LeadNote, "id" | "createdAt">) => {
+    const leadRef = doc(db, "trainers", trainerId, "leads", leadId);
+    const newNote: LeadNote = {
+      ...note,
+      id: generateId(),
+      createdAt: new Date().toISOString(),
+    };
+    
+    return updateDoc(leadRef, {
+      notes: arrayUnion(newNote),
+    });
+  },
+
+  // Referral Links
+  getReferralLinks: async (trainerId: string) => {
+    const referralsRef = collection(db, "trainers", trainerId, "referralLinks");
+    const snapshot = await getDocs(referralsRef);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  },
+
+  createReferralLink: async (trainerId: string, campaignId: string, referrerId?: string, maxUses?: number) => {
+    const referralsRef = collection(db, "trainers", trainerId, "referralLinks");
+    const code = Math.random().toString(36).substr(2, 8).toUpperCase();
+    
+    const newReferral: Omit<ReferralLink, "id"> = {
+      campaignId,
+      referrerId,
+      code,
+      url: `https://fitclient.app/ref/${code}`,
+      createdAt: new Date().toISOString(),
+      uses: 0,
+      maxUses,
+    };
+    
+    const docRef = await addDoc(referralsRef, newReferral);
+    return { id: docRef.id, ...newReferral };
+  },
+
+  trackReferralClick: async (trainerId: string, code: string) => {
+    const referralsRef = collection(db, "trainers", trainerId, "referralLinks");
+    const q = query(referralsRef, where("code", "==", code));
+    const snapshot = await getDocs(q);
+    
+    if (!snapshot.empty) {
+      const referralDoc = snapshot.docs[0];
+      const referralData = referralDoc.data();
+      
+      if (referralData.maxUses && referralData.uses >= referralData.maxUses) {
+        return false; // Max uses reached
+      }
+      
+      await updateDoc(referralDoc.ref, {
+        uses: increment(1),
+      });
+      
+      return true;
+    }
+    
+    return false;
+  },
+
+  // Social Media Posts
+  getSocialPosts: async (trainerId: string) => {
+    const postsRef = collection(db, "trainers", trainerId, "socialPosts");
+    const snapshot = await getDocs(postsRef);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  },
+
+  createSocialPost: async (trainerId: string, postData: Omit<SocialPost, "id" | "metrics">) => {
+    const postsRef = collection(db, "trainers", trainerId, "socialPosts");
+    const newPost: Omit<SocialPost, "id"> = {
+      ...postData,
+      metrics: {
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        reach: 0,
+        engagement: 0,
+      },
+    };
+    
+    const docRef = await addDoc(postsRef, newPost);
+    return { id: docRef.id, ...newPost };
+  },
+
+  updateSocialPost: async (trainerId: string, postId: string, updates: Partial<SocialPost>) => {
+    const postRef = doc(db, "trainers", trainerId, "socialPosts", postId);
+    return updateDoc(postRef, updates);
+  },
+
+  // Email Campaigns
+  getEmailCampaigns: async (trainerId: string) => {
+    const campaignsRef = collection(db, "trainers", trainerId, "emailCampaigns");
+    const snapshot = await getDocs(campaignsRef);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  },
+
+  createEmailCampaign: async (trainerId: string, campaignData: Omit<EmailCampaign, "id" | "metrics">) => {
+    const campaignsRef = collection(db, "trainers", trainerId, "emailCampaigns");
+    const newCampaign: Omit<EmailCampaign, "id"> = {
+      ...campaignData,
+      metrics: {
+        sent: 0,
+        delivered: 0,
+        opened: 0,
+        clicked: 0,
+        bounced: 0,
+        unsubscribed: 0,
+      },
+    };
+    
+    const docRef = await addDoc(campaignsRef, newCampaign);
+    return { id: docRef.id, ...newCampaign };
+  },
+
+  // Marketing Assets
+  getMarketingAssets: async (trainerId: string) => {
+    const assetsRef = collection(db, "trainers", trainerId, "marketingAssets");
+    const snapshot = await getDocs(assetsRef);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  },
+
+  createMarketingAsset: async (trainerId: string, assetData: Omit<MarketingAsset, "id" | "createdAt" | "useCount">) => {
+    const assetsRef = collection(db, "trainers", trainerId, "marketingAssets");
+    const newAsset: Omit<MarketingAsset, "id"> = {
+      ...assetData,
+      createdAt: new Date().toISOString(),
+      useCount: 0,
+    };
+    
+    const docRef = await addDoc(assetsRef, newAsset);
+    return { id: docRef.id, ...newAsset };
+  },
+
+  // Testimonials
+  getTestimonials: async (trainerId: string) => {
+    const testimonialsRef = collection(db, "trainers", trainerId, "testimonials");
+    const snapshot = await getDocs(testimonialsRef);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  },
+
+  createTestimonial: async (trainerId: string, testimonialData: Omit<Testimonial, "id" | "createdAt" | "isApproved">) => {
+    const testimonialsRef = collection(db, "trainers", trainerId, "testimonials");
+    const newTestimonial: Omit<Testimonial, "id"> = {
+      ...testimonialData,
+      createdAt: new Date().toISOString(),
+      isApproved: false,
+    };
+    
+    const docRef = await addDoc(testimonialsRef, newTestimonial);
+    return { id: docRef.id, ...newTestimonial };
+  },
+
+  approveTestimonial: async (trainerId: string, testimonialId: string) => {
+    const testimonialRef = doc(db, "trainers", trainerId, "testimonials", testimonialId);
+    return updateDoc(testimonialRef, {
+      isApproved: true,
+      approvedAt: new Date().toISOString(),
+    });
+  },
+
+  // Marketing Metrics
+  getMarketingMetrics: async (trainerId: string, period: "week" | "month" | "quarter" | "year" = "month") => {
+    try {
+      // Calculate metrics from existing data
+      const [campaigns, leads, referrals] = await Promise.all([
+        this.getCampaigns(trainerId),
+        this.getLeads(trainerId),
+        this.getReferralLinks(trainerId),
+      ]);
+
+      // Ensure we have valid arrays
+      const validCampaigns = Array.isArray(campaigns) ? campaigns : [];
+      const validLeads = Array.isArray(leads) ? leads : [];
+      const validReferrals = Array.isArray(referrals) ? referrals : [];
+
+      const totalLeads = validLeads.length;
+      const convertedLeads = validLeads.filter(lead => lead && lead.status === "converted").length;
+      const conversionRate = totalLeads > 0 ? (convertedLeads / totalLeads) * 100 : 0;
+      
+      // Safely calculate revenue and cost from campaigns
+      const totalRevenue = validCampaigns.reduce((sum, campaign) => {
+        if (campaign && campaign.metrics && typeof campaign.metrics.revenue === 'number') {
+          return sum + campaign.metrics.revenue;
+        }
+        return sum;
+      }, 0);
+      
+      const marketingCost = validCampaigns.reduce((sum, campaign) => {
+        if (campaign && campaign.metrics && typeof campaign.metrics.cost === 'number') {
+          return sum + campaign.metrics.cost;
+        }
+        return sum;
+      }, 0);
+      
+      const roi = marketingCost > 0 ? ((totalRevenue - marketingCost) / marketingCost) * 100 : 0;
+
+      // Calculate top sources with proper validation
+      const sourceStats = validLeads.reduce((acc, lead) => {
+        if (!lead || !lead.source) return acc;
+        
+        if (!acc[lead.source]) {
+          acc[lead.source] = { leads: 0, conversions: 0, revenue: 0 };
+        }
+        acc[lead.source].leads++;
+        if (lead.status === "converted") {
+          acc[lead.source].conversions++;
+          acc[lead.source].revenue += (lead.conversionValue || 0);
+        }
+        return acc;
+      }, {} as Record<string, { leads: number; conversions: number; revenue: number }>);
+
+      const topSources = Object.entries(sourceStats)
+        .map(([source, stats]) => ({ 
+          source, 
+          leads: stats.leads, 
+          conversions: stats.conversions, 
+          revenue: stats.revenue 
+        }))
+        .sort((a, b) => b.leads - a.leads)
+        .slice(0, 5);
+
+      // Safely map campaign performance
+      const campaignPerformance = validCampaigns.map(campaign => ({
+        campaignId: campaign.id || '',
+        name: campaign.title || 'Untitled Campaign',
+        clicks: (campaign.metrics && typeof campaign.metrics.clicks === 'number') ? campaign.metrics.clicks : 0,
+        conversions: (campaign.metrics && typeof campaign.metrics.conversions === 'number') ? campaign.metrics.conversions : 0,
+        cost: (campaign.metrics && typeof campaign.metrics.cost === 'number') ? campaign.metrics.cost : 0,
+        revenue: (campaign.metrics && typeof campaign.metrics.revenue === 'number') ? campaign.metrics.revenue : 0,
+        roi: (campaign.metrics && typeof campaign.metrics.roi === 'number') ? campaign.metrics.roi : 0,
+      }));
+
+      return {
+        period,
+        totalLeads,
+        convertedLeads,
+        conversionRate,
+        averageLeadValue: convertedLeads > 0 ? totalRevenue / convertedLeads : 0,
+        totalRevenue,
+        marketingCost,
+        roi,
+        topSources,
+        campaignPerformance,
+      };
+    } catch (error) {
+      console.error('Error calculating marketing metrics:', error);
+      // Return default metrics structure on error
+      return {
+        period,
+        totalLeads: 0,
+        convertedLeads: 0,
+        conversionRate: 0,
+        averageLeadValue: 0,
+        totalRevenue: 0,
+        marketingCost: 0,
+        roi: 0,
+        topSources: [],
+        campaignPerformance: [],
+      };
+    }
+  },
+
+  // Real-time subscriptions
+  subscribeToCampaigns: (trainerId: string, callback: (campaigns: MarketingCampaign[]) => void) => {
+    const campaignsRef = collection(db, "trainers", trainerId, "campaigns");
+    return onSnapshot(campaignsRef, (snapshot) => {
+      const campaigns = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as MarketingCampaign[];
+      callback(campaigns);
+    });
+  },
+
+  subscribeToLeads: (trainerId: string, callback: (leads: Lead[]) => void) => {
+    const leadsRef = collection(db, "trainers", trainerId, "leads");
+    return onSnapshot(leadsRef, (snapshot) => {
+      const leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Lead[];
+      callback(leads);
+    });
+  },
+
+  subscribeToSocialPosts: (trainerId: string, callback: (posts: SocialPost[]) => void) => {
+    const postsRef = collection(db, "trainers", trainerId, "socialPosts");
+    return onSnapshot(postsRef, (snapshot) => {
+      const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as SocialPost[];
+      callback(posts);
+    });
+  },
+};
+
+// Utility function for generating unique IDs
+const generateId = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);

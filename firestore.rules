@@ -15,6 +15,54 @@ service cloud.firestore {
       }
     }
 
+    // Trainers collection - authenticated trainers can access their own data
+    match /trainers/{trainerId} {
+      allow read, write, create: if request.auth != null &&
+        (request.auth.uid == trainerId || request.auth.token.email == trainerId);
+
+      // Marketing subcollections for trainers
+      match /campaigns/{campaignId} {
+        allow read, write, create, delete: if request.auth != null &&
+          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
+      }
+
+      match /leads/{leadId} {
+        allow read, write, create, delete: if request.auth != null &&
+          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
+      }
+
+      match /referralLinks/{referralId} {
+        allow read, write, create, delete: if request.auth != null &&
+          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
+      }
+
+      match /socialPosts/{postId} {
+        allow read, write, create, delete: if request.auth != null &&
+          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
+      }
+
+      match /emailCampaigns/{campaignId} {
+        allow read, write, create, delete: if request.auth != null &&
+          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
+      }
+
+      match /marketingAssets/{assetId} {
+        allow read, write, create, delete: if request.auth != null &&
+          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
+      }
+
+      match /testimonials/{testimonialId} {
+        allow read, write, create, delete: if request.auth != null &&
+          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
+      }
+
+      // Other existing subcollections
+      match /{collection}/{document} {
+        allow read, write, create, delete: if request.auth != null &&
+          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
+      }
+    }
+
     // Referrals collection - authenticated users can read/write
     match /referrals/{referralId} {
       allow read, write, create: if request.auth != null;

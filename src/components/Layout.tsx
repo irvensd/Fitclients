@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useData } from "@/contexts/DataContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
   SheetContent,
@@ -217,10 +218,30 @@ const SidebarNavItem = ({ item, isActive, isCollapsed }) => (
         )}
       >
         <item.icon className="h-5 w-5 flex-shrink-0" />
-        {!isCollapsed && <span>{item.name}</span>}
+        {!isCollapsed && (
+          <div className="flex items-center gap-2 flex-1">
+            <span>{item.name}</span>
+            {item.soon && (
+              <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                Soon
+              </Badge>
+            )}
+          </div>
+        )}
       </Link>
     </TooltipTrigger>
-    {isCollapsed && <TooltipContent side="right">{item.name}</TooltipContent>}
+    {isCollapsed && (
+      <TooltipContent side="right">
+        <div className="flex items-center gap-2">
+          <span>{item.name}</span>
+          {item.soon && (
+            <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+              Soon
+            </Badge>
+          )}
+        </div>
+      </TooltipContent>
+    )}
   </Tooltip>
 );
 
@@ -280,7 +301,14 @@ const MobileSidebar = () => {
                   )}
                 >
                   <item.icon className="h-5 w-5" />
-                  {item.name}
+                  <div className="flex items-center gap-2 flex-1">
+                    <span>{item.name}</span>
+                    {item.soon && (
+                      <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                        Soon
+                      </Badge>
+                    )}
+                  </div>
                 </Link>
               </SheetClose>
             ))}

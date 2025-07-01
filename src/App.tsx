@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { DataProvider } from "./contexts/DataContext";
 import { SubscriptionProvider } from "./contexts/SubscriptionContext";
-import { MarketingProvider } from "./contexts/MarketingContext";
+
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LandingRedirect } from "./components/LandingRedirect";
 import { Layout } from "./components/Layout";
@@ -41,12 +41,11 @@ const App = () => (
     <AuthProvider>
       <SubscriptionProvider>
         <DataProvider>
-          <MarketingProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-                {/* <CookieConsent /> Temporarily disabled to debug */}
-              <BrowserRouter>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+              {/* <CookieConsent /> Temporarily disabled to debug */}
+            <BrowserRouter>
                 <Routes>
                   {/* Home route - shows landing or redirects to admin if authenticated */}
                   <Route path="/" element={<LandingRedirect />} />
@@ -214,7 +213,6 @@ const App = () => (
                 </Routes>
               </BrowserRouter>
             </TooltipProvider>
-          </MarketingProvider>
         </DataProvider>
       </SubscriptionProvider>
     </AuthProvider>

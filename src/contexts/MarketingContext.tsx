@@ -9,8 +9,9 @@ import {
   Testimonial,
   MarketingMetrics,
 } from "@/lib/marketingTypes";
-import { MarketingService } from "@/lib/marketingService";
+import { marketingService } from "@/lib/firebaseService";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "./AuthContext";
 
 interface MarketingContextType {
   // State
@@ -96,6 +97,7 @@ export const useMarketing = () => {
 export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const { user } = useAuth();
   const [campaigns, setCampaigns] = useState<MarketingCampaign[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [referralLinks, setReferralLinks] = useState<ReferralLink[]>([]);
@@ -119,18 +121,58 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const { toast } = useToast();
 
+  // Get trainer ID from user
+  const getTrainerId = () => {
+    if (!user) throw new Error("User not authenticated");
+    return user.uid || user.email || "demo-trainer";
+  };
+
   // Load initial data
   useEffect(() => {
     const loadData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        setCampaigns(MarketingService.getCampaigns());
-        setLeads(MarketingService.getLeads());
-        setReferralLinks(MarketingService.getReferralLinks());
-        setSocialPosts(MarketingService.getSocialPosts());
-        setEmailCampaigns(MarketingService.getEmailCampaigns());
-        setMarketingAssets(MarketingService.getMarketingAssets());
-        setTestimonials(MarketingService.getTestimonials());
-        setMetrics(MarketingService.getMarketingMetrics());
+        const trainerId = getTrainerId();
+        console.log('Loading marketing data for trainer:', trainerId);
+        
+        const [
+          campaignsData,
+          leadsData,
+          referralLinksData,
+          socialPostsData,
+          emailCampaignsData,
+          marketingAssetsData,
+          testimonialsData,
+          metricsData,
+        ] = await Promise.all([
+          marketingService.getCampaigns(trainerId),
+          marketingService.getLeads(trainerId),
+          marketingService.getReferralLinks(trainerId),
+          marketingService.getSocialPosts(trainerId),
+          marketingService.getEmailCampaigns(trainerId),
+          marketingService.getMarketingAssets(trainerId),
+          marketingService.getTestimonials(trainerId),
+          marketingService.getMarketingMetrics(trainerId),
+        ]);
+
+        console.log('Data loaded:', {
+          campaigns: campaignsData,
+          leads: leadsData,
+          metrics: metricsData
+        });
+
+        setCampaigns(campaignsData as MarketingCampaign[]);
+        setLeads(leadsData as Lead[]);
+        setReferralLinks(referralLinksData as ReferralLink[]);
+        setSocialPosts(socialPostsData as SocialPost[]);
+        setEmailCampaigns(emailCampaignsData as EmailCampaign[]);
+        setMarketingAssets(marketingAssetsData as MarketingAsset[]);
+        setTestimonials(testimonialsData as Testimonial[]);
+        setMetrics(metricsData as MarketingMetrics);
       } catch (error) {
         console.error("Failed to load marketing data:", error);
         toast({
@@ -144,15 +186,43 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     loadData();
-  }, [toast]);
+  }, [user, toast]);
+
+  // Set up real-time subscriptions
+  useEffect(() => {
+    if (!user) return;
+
+    const trainerId = getTrainerId();
+    
+    const unsubscribeCampaigns = marketingService.subscribeToCampaigns(
+      trainerId,
+      (campaignsData) => setCampaigns(campaignsData)
+    );
+
+    const unsubscribeLeads = marketingService.subscribeToLeads(
+      trainerId,
+      (leadsData) => setLeads(leadsData)
+    );
+
+    const unsubscribeSocialPosts = marketingService.subscribeToSocialPosts(
+      trainerId,
+      (postsData) => setSocialPosts(postsData)
+    );
+
+    return () => {
+      unsubscribeCampaigns();
+      unsubscribeLeads();
+      unsubscribeSocialPosts();
+    };
+  }, [user]);
 
   // Campaign operations
   const createCampaign = async (
     campaignData: Omit<MarketingCampaign, "id" | "createdAt" | "metrics">,
   ) => {
     try {
-      const newCampaign = MarketingService.createCampaign(campaignData);
-      setCampaigns((prev) => [...prev, newCampaign]);
+      const trainerId = getTrainerId();
+      await marketingService.createCampaign(trainerId, campaignData);
       toast({
         title: "Success",
         description: "Campaign created successfully",
@@ -171,12 +241,8 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
     updates: Partial<MarketingCampaign>,
   ) => {
     try {
-      MarketingService.updateCampaign(id, updates);
-      setCampaigns((prev) =>
-        prev.map((campaign) =>
-          campaign.id === id ? { ...campaign, ...updates } : campaign,
-        ),
-      );
+      const trainerId = getTrainerId();
+      await marketingService.updateCampaign(trainerId, id, updates);
       toast({
         title: "Success",
         description: "Campaign updated successfully",
@@ -192,8 +258,8 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const deleteCampaign = async (id: string) => {
     try {
-      MarketingService.deleteCampaign(id);
-      setCampaigns((prev) => prev.filter((campaign) => campaign.id !== id));
+      const trainerId = getTrainerId();
+      await marketingService.deleteCampaign(trainerId, id);
       toast({
         title: "Success",
         description: "Campaign deleted successfully",
@@ -208,10 +274,19 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const toggleCampaignStatus = async (id: string) => {
-    const campaign = campaigns.find((c) => c.id === id);
-    if (campaign) {
+    try {
+      const campaign = campaigns.find(c => c.id === id);
+      if (!campaign) return;
+
       const newStatus = campaign.status === "active" ? "paused" : "active";
-      await updateCampaign(id, { status: newStatus });
+      const trainerId = getTrainerId();
+      await marketingService.updateCampaign(trainerId, id, { status: newStatus });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to toggle campaign status",
+        variant: "destructive",
+      });
     }
   };
 
@@ -220,27 +295,11 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
     leadData: Omit<Lead, "id" | "createdAt" | "notes">,
   ) => {
     try {
-      const newLead = MarketingService.createLead(leadData);
-      setLeads((prev) => [...prev, newLead]);
-
-      // Auto-track campaign metrics if from referral
-      if (leadData.source === "referral" && leadData.sourceDetails) {
-        const campaign = campaigns.find(
-          (c) => c.title === leadData.sourceDetails,
-        );
-        if (campaign) {
-          await updateCampaign(campaign.id, {
-            metrics: {
-              ...campaign.metrics,
-              conversions: campaign.metrics.conversions + 1,
-            },
-          });
-        }
-      }
-
+      const trainerId = getTrainerId();
+      await marketingService.createLead(trainerId, leadData);
       toast({
         title: "Success",
-        description: "New lead added successfully",
+        description: "Lead created successfully",
       });
     } catch (error) {
       toast({
@@ -253,10 +312,8 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const updateLeadStatus = async (id: string, status: Lead["status"]) => {
     try {
-      MarketingService.updateLead(id, { status });
-      setLeads((prev) =>
-        prev.map((lead) => (lead.id === id ? { ...lead, status } : lead)),
-      );
+      const trainerId = getTrainerId();
+      await marketingService.updateLead(trainerId, id, { status });
       toast({
         title: "Success",
         description: "Lead status updated",
@@ -275,12 +332,11 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
     note: Omit<Lead["notes"][0], "id" | "createdAt">,
   ) => {
     try {
-      MarketingService.addLeadNote(leadId, note);
-      const updatedLeads = MarketingService.getLeads();
-      setLeads(updatedLeads);
+      const trainerId = getTrainerId();
+      await marketingService.addLeadNote(trainerId, leadId, note);
       toast({
         title: "Success",
-        description: "Note added successfully",
+        description: "Note added to lead",
       });
     } catch (error) {
       toast({
@@ -293,27 +349,15 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const convertLead = async (leadId: string, conversionValue: number) => {
     try {
-      MarketingService.updateLead(leadId, {
+      const trainerId = getTrainerId();
+      await marketingService.updateLead(trainerId, leadId, {
         status: "converted",
         conversionDate: new Date().toISOString(),
         conversionValue,
       });
-      setLeads((prev) =>
-        prev.map((lead) =>
-          lead.id === leadId
-            ? {
-                ...lead,
-                status: "converted" as const,
-                conversionDate: new Date().toISOString(),
-                conversionValue,
-              }
-            : lead,
-        ),
-      );
-      refreshMetrics();
       toast({
         title: "Success",
-        description: "Lead converted successfully!",
+        description: "Lead converted successfully",
       });
     } catch (error) {
       toast({
@@ -330,38 +374,44 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
     referrerId?: string,
     maxUses?: number,
   ): Promise<ReferralLink> => {
-    const newLink = MarketingService.createReferralLink(
-      campaignId,
-      referrerId,
-      maxUses,
-    );
-    setReferralLinks((prev) => [...prev, newLink]);
-    return newLink;
+    try {
+      const trainerId = getTrainerId();
+      const referralLink = await marketingService.createReferralLink(trainerId, campaignId, referrerId, maxUses);
+      toast({
+        title: "Success",
+        description: "Referral link created",
+      });
+      return referralLink as ReferralLink;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create referral link",
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
   const trackReferralClick = async (code: string): Promise<boolean> => {
-    const success = MarketingService.trackReferralClick(code);
-    if (success) {
-      setReferralLinks(MarketingService.getReferralLinks());
+    try {
+      const trainerId = getTrainerId();
+      return await marketingService.trackReferralClick(trainerId, code);
+    } catch (error) {
+      console.error("Failed to track referral click:", error);
+      return false;
     }
-    return success;
   };
 
   const copyReferralLink = async (campaignId: string) => {
     try {
-      let existingLink = referralLinks.find(
-        (link) => link.campaignId === campaignId,
-      );
-
-      if (!existingLink) {
-        existingLink = await createReferralLink(campaignId);
+      const referralLink = referralLinks.find(r => r.campaignId === campaignId);
+      if (referralLink) {
+        await navigator.clipboard.writeText(referralLink.url);
+        toast({
+          title: "Success",
+          description: "Referral link copied to clipboard",
+        });
       }
-
-      await navigator.clipboard.writeText(existingLink.url);
-      toast({
-        title: "Success",
-        description: "Referral link copied to clipboard!",
-      });
     } catch (error) {
       toast({
         title: "Error",
@@ -376,11 +426,11 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
     postData: Omit<SocialPost, "id" | "metrics">,
   ) => {
     try {
-      const newPost = MarketingService.createSocialPost(postData);
-      setSocialPosts((prev) => [...prev, newPost]);
+      const trainerId = getTrainerId();
+      await marketingService.createSocialPost(trainerId, postData);
       toast({
         title: "Success",
-        description: "Social post created successfully",
+        description: "Social post created",
       });
     } catch (error) {
       toast({
@@ -393,26 +443,19 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const publishSocialPost = async (id: string) => {
     try {
-      MarketingService.publishSocialPost(id);
-      setSocialPosts((prev) =>
-        prev.map((post) =>
-          post.id === id
-            ? {
-                ...post,
-                status: "published" as const,
-                publishedAt: new Date().toISOString(),
-              }
-            : post,
-        ),
-      );
+      const trainerId = getTrainerId();
+      await marketingService.updateSocialPost(trainerId, id, {
+        status: "published",
+        publishedAt: new Date().toISOString(),
+      });
       toast({
         title: "Success",
-        description: "Post published successfully!",
+        description: "Social post published",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to publish post",
+        description: "Failed to publish social post",
         variant: "destructive",
       });
     }
@@ -420,18 +463,19 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const scheduleSocialPost = async (id: string, scheduledFor: string) => {
     try {
-      const updates = { scheduledFor, status: "scheduled" as const };
-      setSocialPosts((prev) =>
-        prev.map((post) => (post.id === id ? { ...post, ...updates } : post)),
-      );
+      const trainerId = getTrainerId();
+      await marketingService.updateSocialPost(trainerId, id, {
+        status: "scheduled",
+        scheduledFor,
+      });
       toast({
         title: "Success",
-        description: "Post scheduled successfully",
+        description: "Social post scheduled",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to schedule post",
+        description: "Failed to schedule social post",
         variant: "destructive",
       });
     }
@@ -442,11 +486,11 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
     campaignData: Omit<EmailCampaign, "id" | "metrics">,
   ) => {
     try {
-      const newCampaign = MarketingService.createEmailCampaign(campaignData);
-      setEmailCampaigns((prev) => [...prev, newCampaign]);
+      const trainerId = getTrainerId();
+      await marketingService.createEmailCampaign(trainerId, campaignData);
       toast({
         title: "Success",
-        description: "Email campaign created successfully",
+        description: "Email campaign created",
       });
     } catch (error) {
       toast({
@@ -459,28 +503,11 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const sendEmailCampaign = async (id: string) => {
     try {
-      // Simulate sending email
-      setEmailCampaigns((prev) =>
-        prev.map((campaign) =>
-          campaign.id === id
-            ? {
-                ...campaign,
-                status: "sent" as const,
-                sentAt: new Date().toISOString(),
-                metrics: {
-                  ...campaign.metrics,
-                  sent: campaign.recipients.length,
-                  delivered: Math.floor(campaign.recipients.length * 0.95),
-                  opened: Math.floor(campaign.recipients.length * 0.25),
-                  clicked: Math.floor(campaign.recipients.length * 0.05),
-                },
-              }
-            : campaign,
-        ),
-      );
+      const trainerId = getTrainerId();
+      // This would integrate with a real email service like SendGrid
       toast({
         title: "Success",
-        description: "Email campaign sent successfully!",
+        description: "Email campaign sent",
       });
     } catch (error) {
       toast({
@@ -492,38 +519,60 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   // Asset operations
-  const generateQRCode = async (
-    data: string,
-    name: string,
-  ): Promise<MarketingAsset> => {
-    const qrUrl = MarketingService.generateQRCode(data);
-    const asset = MarketingService.createMarketingAsset({
-      name,
-      type: "qr_code",
-      url: qrUrl,
-      downloadUrl: MarketingService.generateQRCode(data, 400),
-    });
-    setMarketingAssets((prev) => [...prev, asset]);
-    toast({
-      title: "Success",
-      description: "QR code generated successfully",
-    });
-    return asset;
+  const generateQRCode = async (data: string, name: string): Promise<MarketingAsset> => {
+    try {
+      const trainerId = getTrainerId();
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data)}`;
+      
+      const asset = await marketingService.createMarketingAsset(trainerId, {
+        name,
+        type: "qr_code",
+        url: qrCodeUrl,
+        downloadUrl: qrCodeUrl,
+      });
+      
+      toast({
+        title: "Success",
+        description: "QR code generated",
+      });
+      
+      return asset as MarketingAsset;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to generate QR code",
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
   const createBookingWidget = async (name: string): Promise<MarketingAsset> => {
-    const widgetCode = `<iframe src="https://fitclient.app/widget/book" width="100%" height="400" frameborder="0"></iframe>`;
-    const asset = MarketingService.createMarketingAsset({
-      name,
-      type: "booking_widget",
-      url: widgetCode,
-    });
-    setMarketingAssets((prev) => [...prev, asset]);
-    toast({
-      title: "Success",
-      description: "Booking widget created successfully",
-    });
-    return asset;
+    try {
+      const trainerId = getTrainerId();
+      const widgetUrl = "https://fitclient.app/widget/book";
+      
+      const asset = await marketingService.createMarketingAsset(trainerId, {
+        name,
+        type: "booking_widget",
+        url: widgetUrl,
+        downloadUrl: `<iframe src="${widgetUrl}" width="100%" height="400"></iframe>`,
+      });
+      
+      toast({
+        title: "Success",
+        description: "Booking widget created",
+      });
+      
+      return asset as MarketingAsset;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create booking widget",
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
   // Testimonial operations
@@ -531,12 +580,11 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
     testimonialData: Omit<Testimonial, "id" | "createdAt" | "isApproved">,
   ) => {
     try {
-      const newTestimonial =
-        MarketingService.createTestimonial(testimonialData);
-      setTestimonials((prev) => [...prev, newTestimonial]);
+      const trainerId = getTrainerId();
+      await marketingService.createTestimonial(trainerId, testimonialData);
       toast({
         title: "Success",
-        description: "Testimonial created successfully",
+        description: "Testimonial created",
       });
     } catch (error) {
       toast({
@@ -549,21 +597,11 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const approveTestimonial = async (id: string) => {
     try {
-      MarketingService.approveTestimonial(id);
-      setTestimonials((prev) =>
-        prev.map((testimonial) =>
-          testimonial.id === id
-            ? {
-                ...testimonial,
-                isApproved: true,
-                approvedAt: new Date().toISOString(),
-              }
-            : testimonial,
-        ),
-      );
+      const trainerId = getTrainerId();
+      await marketingService.approveTestimonial(trainerId, id);
       toast({
         title: "Success",
-        description: "Testimonial approved successfully",
+        description: "Testimonial approved",
       });
     } catch (error) {
       toast({
@@ -577,23 +615,39 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
   // Analytics
   const refreshMetrics = async () => {
     try {
-      const newMetrics = MarketingService.getMarketingMetrics();
-      setMetrics(newMetrics);
+      const trainerId = getTrainerId();
+      console.log('Refreshing metrics for trainer:', trainerId);
+      const metricsData = await marketingService.getMarketingMetrics(trainerId);
+      console.log('Metrics data received:', metricsData);
+      setMetrics(metricsData as MarketingMetrics);
     } catch (error) {
-      console.error("Failed to refresh metrics:", error);
+      console.error('Error refreshing metrics:', error);
+      toast({
+        title: "Error",
+        description: "Failed to refresh metrics",
+        variant: "destructive",
+      });
     }
   };
 
   const getMetricsByPeriod = async (
     period: "week" | "month" | "quarter" | "year",
   ): Promise<MarketingMetrics> => {
-    const newMetrics = MarketingService.getMarketingMetrics(period);
-    setMetrics(newMetrics);
-    return newMetrics;
+    try {
+      const trainerId = getTrainerId();
+      const metricsData = await marketingService.getMarketingMetrics(trainerId, period);
+      return metricsData as MarketingMetrics;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to get metrics",
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
   const value: MarketingContextType = {
-    // State
     campaigns,
     leads,
     referralLinks,
@@ -603,42 +657,26 @@ export const MarketingProvider: React.FC<{ children: React.ReactNode }> = ({
     testimonials,
     metrics,
     loading,
-
-    // Campaign operations
     createCampaign,
     updateCampaign,
     deleteCampaign,
     toggleCampaignStatus,
-
-    // Lead operations
     createLead,
     updateLeadStatus,
     addLeadNote,
     convertLead,
-
-    // Referral operations
     createReferralLink,
     trackReferralClick,
     copyReferralLink,
-
-    // Social media operations
     createSocialPost,
     publishSocialPost,
     scheduleSocialPost,
-
-    // Email operations
     createEmailCampaign,
     sendEmailCampaign,
-
-    // Asset operations
     generateQRCode,
     createBookingWidget,
-
-    // Testimonial operations
     createTestimonial,
     approveTestimonial,
-
-    // Analytics
     refreshMetrics,
     getMetricsByPeriod,
   };
