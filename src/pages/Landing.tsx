@@ -1,3 +1,4 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,6 +35,21 @@ import MotivationalElements from "@/components/MotivationalElements";
 import ColorPsychology from "@/components/ColorPsychology";
 
 const Landing = () => {
+  // Scroll progress state
+  const [scrollProgress, setScrollProgress] = React.useState(0);
+
+  // Update scroll progress
+  React.useEffect(() => {
+    const updateScrollProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', updateScrollProgress);
+    return () => window.removeEventListener('scroll', updateScrollProgress);
+  }, []);
   // Structured data for SEO
   const structuredData = {
     "@context": "https://schema.org",
@@ -189,7 +205,14 @@ const Landing = () => {
           </div>
         </div>
         {/* Header */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-30">
+          {/* Progress Bar */}
+          <div className="h-1 bg-gray-200">
+            <div 
+              className="h-full bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-300"
+              style={{ width: `${scrollProgress}%` }}
+            />
+          </div>
           <nav className="container mx-auto px-4 h-16 flex items-center justify-between" aria-label="Main navigation">
             <Link to="/" className="flex items-center gap-2" aria-label="FitClient Home">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground" aria-hidden="true">
@@ -1946,6 +1969,104 @@ const Landing = () => {
           </div>
         </section>
 
+        {/* Advanced Features Showcase */}
+        <section className="py-20 px-4 bg-gradient-to-br from-purple-50 to-blue-50">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <Sparkles className="h-4 w-4" />
+                Advanced Features
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Built for <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Modern Trainers</span>
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                Discover the advanced features that set FitClient apart from traditional fitness software
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Feature 1 */}
+              <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white hover:shadow-lg transition-all group">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-r from-purple-500 to-blue-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Brain className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-3">AI Session Analysis</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Get instant insights from every training session with AI-powered analysis and personalized recommendations.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Feature 2 */}
+              <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition-all group">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-r from-blue-500 to-green-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Trophy className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-3">Gamification Engine</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Boost client engagement with streaks, badges, and achievement systems that keep clients motivated.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Feature 3 */}
+              <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-white hover:shadow-lg transition-all group">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-r from-green-500 to-yellow-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Smartphone className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-3">Mobile-First Design</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Access your business from anywhere with our responsive design that works perfectly on all devices.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Feature 4 */}
+              <Card className="border-2 border-yellow-200 bg-gradient-to-br from-yellow-50 to-white hover:shadow-lg transition-all group">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-r from-yellow-500 to-orange-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <BarChart3 className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-3">Advanced Analytics</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Track business growth with detailed analytics, revenue insights, and performance metrics.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Feature 5 */}
+              <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-white hover:shadow-lg transition-all group">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-r from-orange-500 to-red-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Share2 className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-3">Seamless Integration</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Connect with your favorite tools and platforms for a unified fitness business ecosystem.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Feature 6 */}
+              <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50 to-white hover:shadow-lg transition-all group">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-r from-red-500 to-pink-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Shield className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-3">Enterprise Security</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Bank-level security with SOC 2 compliance, 256-bit SSL encryption, and daily backups.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ Section */}
         <section className="py-20 px-4 bg-muted/30">
           <div className="container mx-auto max-w-4xl">
@@ -2161,6 +2282,17 @@ const Landing = () => {
             </nav>
           </div>
         </footer>
+        {/* Floating Action Button */}
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className={`fixed bottom-20 md:bottom-8 right-4 md:right-8 z-40 bg-primary text-primary-foreground rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 ${
+            scrollProgress > 20 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
+          }`}
+          aria-label="Scroll to top"
+        >
+          <ArrowRight className="h-5 w-5 rotate-[-90deg]" />
+        </button>
+
         {/* Bottom spacing for mobile sticky CTA */}
         <div className="md:hidden h-20"></div>
       </div>
