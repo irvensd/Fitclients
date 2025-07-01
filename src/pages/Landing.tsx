@@ -184,24 +184,22 @@ const Landing = () => {
 
       <div className="min-h-screen bg-gradient-to-br from-background to-muted">
         {/* Mobile Sticky CTA */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t shadow-lg p-4">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t shadow-lg p-4 safe-bottom">
           <div className="flex gap-3">
-            <Link to="/login" className="flex-1">
-              <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white">
-                Start Free Trial
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <a
-              href="https://app.storylane.io/share/dvcmg9nwour6"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1"
+            <Button 
+              className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white"
+              onClick={() => window.location.href = '/login'}
             >
-              <Button variant="outline" className="w-full">
-                Watch Demo
-              </Button>
-            </a>
+              Start Free Trial
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Button 
+              variant="outline" 
+              className="flex-1"
+              onClick={() => window.open('https://app.storylane.io/share/dvcmg9nwour6', '_blank')}
+            >
+              Watch Demo
+            </Button>
           </div>
         </div>
         {/* Header */}

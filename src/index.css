@@ -783,3 +783,22 @@
     font-size: 1.5rem;
   }
 }
+
+/* Mobile Safe Area Support */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* Ensure proper touch targets on mobile */
+@media (max-width: 768px) {
+  button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 44px; /* iOS recommended touch target size */
+  }
+  
+  /* Prevent iOS bounce effect that might interfere with fixed bottom buttons */
+  body {
+    overscroll-behavior-y: none;
+  }
+}
