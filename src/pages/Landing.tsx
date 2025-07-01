@@ -375,6 +375,81 @@ const Landing = () => {
                   <Zap className="h-5 w-5 text-yellow-600" />
                   <span className="text-sm font-medium">99.9% Uptime</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-purple-600" />
+                  <span className="text-sm font-medium">PCI DSS Compliant</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Trust Badges & Press Section */}
+        <section className="py-16 px-4 bg-white border-y">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-12">
+              <h3 className="text-xl font-semibold mb-4">Trusted by Industry Leaders</h3>
+              <p className="text-muted-foreground">Your data security and business success are our top priorities</p>
+            </div>
+            
+            {/* Trust Badges Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Shield className="h-8 w-8 text-white" />
+                </div>
+                <h4 className="font-semibold text-sm mb-1">SOC 2 Type II</h4>
+                <p className="text-xs text-muted-foreground">Security Certified</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Check className="h-8 w-8 text-white" />
+                </div>
+                <h4 className="font-semibold text-sm mb-1">256-bit SSL</h4>
+                <p className="text-xs text-muted-foreground">Bank-Level Security</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <DollarSign className="h-8 w-8 text-white" />
+                </div>
+                <h4 className="font-semibold text-sm mb-1">PCI DSS</h4>
+                <p className="text-xs text-muted-foreground">Payment Security</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Zap className="h-8 w-8 text-white" />
+                </div>
+                <h4 className="font-semibold text-sm mb-1">99.9% Uptime</h4>
+                <p className="text-xs text-muted-foreground">Reliable Service</p>
+              </div>
+            </div>
+            
+            {/* Money-Back Guarantee */}
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 text-center border-2 border-green-200">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Shield className="h-8 w-8 text-green-600" />
+                <h3 className="text-2xl font-bold text-green-800">30-Day Money-Back Guarantee</h3>
+              </div>
+              <p className="text-lg text-muted-foreground mb-4">
+                Try FitClient risk-free. If you're not completely satisfied within 30 days, 
+                we'll refund your subscription - no questions asked.
+              </p>
+              <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  <span>Full refund guarantee</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  <span>No setup fees</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  <span>Cancel anytime</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1563,6 +1638,121 @@ const Landing = () => {
                 <Button variant="outline" size="sm">
                   Contact Our Team
                 </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-20 px-4 bg-muted/30">
+          <div className="container mx-auto max-w-4xl">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <FileText className="h-4 w-4" />
+                Frequently Asked Questions
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Everything You Need to <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Know</span>
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Get answers to the most common questions about FitClient
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              {/* FAQ Item 1 */}
+              <Card className="border-2 hover:border-primary/20 transition-colors">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-lg mb-3">How much does FitClient cost?</h3>
+                  <p className="text-muted-foreground">
+                    FitClient offers three plans: <strong>Starter (Free forever for up to 5 clients)</strong>, 
+                    Professional ($29/month for up to 50 clients), and Gold ($79/month for unlimited clients). 
+                    All paid plans include a 14-day free trial with no credit card required.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* FAQ Item 2 */}
+              <Card className="border-2 hover:border-primary/20 transition-colors">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-lg mb-3">Do my clients need to create accounts?</h3>
+                  <p className="text-muted-foreground">
+                    <strong>No!</strong> FitClient's unique client portal feature allows you to share secure links 
+                    with clients that work instantly - no passwords or account creation required. Your clients 
+                    can access their workouts, progress, and schedule directly through their personalized link.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* FAQ Item 3 */}
+              <Card className="border-2 hover:border-primary/20 transition-colors">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-lg mb-3">Can I try FitClient before purchasing?</h3>
+                  <p className="text-muted-foreground">
+                    <strong>Absolutely!</strong> You can start with our free Starter plan that supports up to 5 clients forever. 
+                    For Professional and Gold plans, we offer a 14-day free trial with no credit card required. 
+                    You can upgrade, downgrade, or cancel anytime.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* FAQ Item 4 */}
+              <Card className="border-2 hover:border-primary/20 transition-colors">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-lg mb-3">What makes FitClient different from other fitness software?</h3>
+                  <p className="text-muted-foreground">
+                    FitClient stands out with its <strong>AI-powered features</strong> including smart recommendations 
+                    and session recaps, <strong>no-login client portals</strong>, gamification with streaks and badges, 
+                    and a simple, intuitive interface designed specifically for personal trainers.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* FAQ Item 5 */}
+              <Card className="border-2 hover:border-primary/20 transition-colors">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-lg mb-3">Is my data secure?</h3>
+                  <p className="text-muted-foreground">
+                    <strong>Yes!</strong> We take security seriously. FitClient is SOC 2 Type II compliant, 
+                    uses 256-bit SSL encryption, and is PCI DSS compliant for payment processing. 
+                    Your data is backed up daily and stored in secure, enterprise-grade data centers.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* FAQ Item 6 */}
+              <Card className="border-2 hover:border-primary/20 transition-colors">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-lg mb-3">What if I'm not satisfied?</h3>
+                  <p className="text-muted-foreground">
+                    We offer a <strong>30-day money-back guarantee</strong>. If you're not completely satisfied 
+                    within 30 days, we'll refund your subscription - no questions asked. We also provide 
+                    free data migration from other platforms and dedicated support to ensure your success.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Contact CTA */}
+            <div className="text-center mt-12">
+              <p className="text-muted-foreground mb-4">
+                Still have questions? We're here to help!
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/contact">
+                  <Button variant="outline" size="lg">
+                    Contact Our Team
+                  </Button>
+                </Link>
+                <a
+                  href="https://app.storylane.io/share/dvcmg9nwour6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button size="lg">
+                    Watch Demo
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
