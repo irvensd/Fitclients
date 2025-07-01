@@ -51,24 +51,31 @@ service cloud.firestore {
 
     // System Alerts - for support portal monitoring
     match /systemAlerts/{alertId} {
-      // TEMPORARY: Allow all operations for support portal
-      // TODO: Implement proper Firebase auth for support portal
-      allow read, write: if true;
+      // Only admin users with supportAdmin role can access system alerts
+      allow read, write: if request.auth != null && 
+        request.auth.token.supportAdmin == true;
+      // Allow authenticated users to create alerts for error reporting
+      allow create: if request.auth != null;
     }
 
     // Client Environments - for support portal client monitoring
     match /clientEnvironments/{environmentId} {
-      // TEMPORARY: Allow reads for support portal
-      // TODO: Implement proper Firebase auth for support portal
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.token.isSupport == true;
+      // Only support staff can read environment data
+      allow read: if request.auth != null && 
+        (request.auth.token.isSupport == true || request.auth.token.supportAdmin == true);
+      // Only support admins can modify environment data
+      allow write: if request.auth != null && request.auth.token.supportAdmin == true;
     }
 
     // Error Logs - for support portal debugging
     match /errorLogs/{logId} {
-      // TEMPORARY: Allow all operations for support portal
-      // TODO: Implement proper Firebase auth for support portal
-      allow read, write: if true;
+      // Support staff can read error logs
+      allow read: if request.auth != null && 
+        (request.auth.token.isSupport == true || request.auth.token.supportAdmin == true);
+      // Any authenticated user can create error logs
+      allow create: if request.auth != null;
+      // Only support admins can modify or delete error logs
+      allow update, delete: if request.auth != null && request.auth.token.supportAdmin == true;
     }
 
     // Deny all other access

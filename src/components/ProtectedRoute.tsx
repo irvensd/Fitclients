@@ -1,6 +1,6 @@
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -14,30 +14,49 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
-  useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      if (!user || isDemoUser) {
-        setCheckingOnboarding(false);
-        return;
-      }
+  // Memoize user ID to prevent unnecessary re-renders
+  const userId = useMemo(() => user?.uid, [user?.uid]);
 
-      try {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        const userData = userDoc.data();
-        
-        // Check if user has completed onboarding
-        if (!userData?.onboardingCompleted) {
-          setNeedsOnboarding(true);
-        }
-      } catch (error) {
-        console.error("Error checking onboarding status:", error);
-      } finally {
-        setCheckingOnboarding(false);
+  // Use useCallback to memoize the async function
+  const checkOnboardingStatus = useCallback(async () => {
+    if (!user || !userId || isDemoUser) {
+      setCheckingOnboarding(false);
+      setNeedsOnboarding(false);
+      return;
+    }
+
+    try {
+      setCheckingOnboarding(true);
+      const userDoc = await getDoc(doc(db, "users", userId));
+      const userData = userDoc.data();
+      
+      // Check if user has completed onboarding
+      setNeedsOnboarding(!userData?.onboardingCompleted);
+    } catch (error) {
+      console.error("Error checking onboarding status:", error);
+      // On error, don't block access but log the issue
+      setNeedsOnboarding(false);
+    } finally {
+      setCheckingOnboarding(false);
+    }
+  }, [user, userId, isDemoUser]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const runCheck = async () => {
+      if (isMounted) {
+        await checkOnboardingStatus();
       }
     };
 
-    checkOnboardingStatus();
-  }, [user, isDemoUser]);
+    runCheck();
+
+    // Cleanup function to prevent state updates if component unmounts
+    return () => {
+      isMounted = false;
+    };
+  }, [checkOnboardingStatus]);
 
   if (loading || checkingOnboarding) {
     return (
