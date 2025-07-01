@@ -37,208 +37,36 @@ export interface ClientAnalysis {
   keyInsights: string[];
   nextReviewDate: string;
   dropoutRisk: "low" | "medium" | "high";
-  dropoutRiskScore: number; // 0-100
-  predictedMilestones: MilestonePrediction[];
-  retentionProbability: number; // 0-100
-  nextOptimalSessionDate?: string;
+  dropoutRiskScore: number;
+  predictedMilestones: any[];
+  retentionProbability: number;
 }
 
-export interface MilestonePrediction {
-  type: "weight" | "strength" | "endurance" | "attendance" | "goal";
-  description: string;
-  predictedDate: string;
-  confidence: number;
-  currentValue: number;
-  targetValue: number;
-  progressPercentage: number;
-}
-
-// Mock data for demonstration - in real app this would come from actual client data
-const getClientProgressData = (clientId: string) => {
-  const mockData = {
-    "1": {
-      recentSessions: [
-        { date: "2024-03-15", attended: true, performance: 85 },
-        { date: "2024-03-13", attended: true, performance: 88 },
-        { date: "2024-03-11", attended: false, performance: 0 },
-        { date: "2024-03-08", attended: true, performance: 82 },
-        { date: "2024-03-06", attended: true, performance: 90 },
-      ],
-      progressEntries: [
-        { date: "2024-03-15", weight: 165, bodyFat: 18.5 },
-        { date: "2024-03-01", weight: 168, bodyFat: 19.2 },
-        { date: "2024-02-15", weight: 170, bodyFat: 19.8 },
-      ],
-      currentWorkout: {
-        intensity: "moderate",
-        frequency: 3,
-        lastUpdated: "2024-02-01",
-        focus: "weight-loss",
-      },
-      goals: {
-        targetWeight: 160,
-        targetBodyFat: 16,
-        targetDate: "2024-06-01",
-      },
-    },
-    "2": {
-      recentSessions: [
-        { date: "2024-03-15", attended: true, performance: 75 },
-        { date: "2024-03-13", attended: true, performance: 78 },
-        { date: "2024-03-11", attended: true, performance: 80 },
-        { date: "2024-03-08", attended: true, performance: 70 },
-        { date: "2024-03-06", attended: true, performance: 72 },
-      ],
-      progressEntries: [
-        { date: "2024-03-15", weight: 185, bodyFat: 15.8 },
-        { date: "2024-03-01", weight: 183, bodyFat: 16.2 },
-        { date: "2024-02-15", weight: 181, bodyFat: 16.8 },
-      ],
-      currentWorkout: {
-        intensity: "high",
-        frequency: 4,
-        lastUpdated: "2024-01-15",
-        focus: "strength",
-      },
-      goals: {
-        targetWeight: 190,
-        targetBodyFat: 12,
-        targetDate: "2024-08-01",
-      },
-    },
-  };
-
-  return mockData[clientId as keyof typeof mockData] || null;
+// Helper functions for analysis
+const calculateAttendanceRate = (sessions: any[]): number => {
+  if (sessions.length === 0) return 0;
+  const completed = sessions.filter((s) => s.attended).length;
+  return Math.round((completed / sessions.length) * 100);
 };
 
-export const generateRecommendations = (
-  client: Client,
-  recentSessions: Session[],
-  progressEntries: ProgressEntry[],
-  currentWorkout?: WorkoutPlan,
-): ClientAnalysis => {
-  // Try to use real data first, fall back to mock data for demo
-  let clientData = getClientProgressData(client.id);
-  let usingRealData = false;
-
-  // Check if we have real session data for this client
-  const clientSessions = recentSessions.filter((s) => s.clientId === client.id);
-  const clientProgress = progressEntries.filter(
-    (p) => p.clientId === client.id,
-  );
-
-  if (clientSessions.length > 0 || clientProgress.length > 0) {
-    // Use real data
-    usingRealData = true;
-    clientData = {
-      recentSessions: clientSessions.slice(-5).map((session) => ({
-        date: session.date,
-        attended: session.status === "completed",
-        performance:
-          session.status === "completed" ? 85 + Math.random() * 15 : 0,
-      })),
-      progressEntries: clientProgress.slice(-3).map((entry) => ({
-        date: entry.date,
-        weight: entry.weight || 170,
-        bodyFat: entry.bodyFat || 20,
-      })),
-      currentWorkout: {
-        intensity:
-          client.fitnessLevel === "advanced"
-            ? "high"
-            : client.fitnessLevel === "intermediate"
-              ? "moderate"
-              : "low",
-        frequency: 3,
-        lastUpdated: client.dateJoined,
-        focus: client.goals.toLowerCase().includes("weight")
-          ? "weight-loss"
-          : "strength",
-      },
-      goals: {
-        targetWeight: 160,
-        targetBodyFat: 16,
-        targetDate: new Date(
-          Date.now() + 90 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-      },
-    };
+const calculateGoalProgress = (data: any): number => {
+  if (!data.goals || !data.progressEntries || data.progressEntries.length < 2) {
+    return 0;
   }
 
-  if (!clientData) {
-    return {
-      clientId: client.id,
-      clientName: client.name,
-      analysisDate: new Date().toISOString(),
-      progressTrend: "plateauing",
-      attendanceRate: 0,
-      goalProgress: 0,
-      recommendations: [],
-      keyInsights: [
-        "Insufficient data for analysis - Add sessions and progress data to get AI recommendations",
-      ],
-      nextReviewDate: new Date(
-        Date.now() + 7 * 24 * 60 * 60 * 1000,
-      ).toISOString(),
-      dropoutRisk: "low",
-      dropoutRiskScore: 0,
-      predictedMilestones: [],
-      retentionProbability: 0,
-    };
+  const currentWeight = data.progressEntries[0].weight;
+  const startingWeight = data.progressEntries[data.progressEntries.length - 1].weight;
+  const targetWeight = data.goals.targetWeight;
+
+  if (data.currentWorkout.focus === "weight-loss") {
+    const totalToLose = startingWeight - targetWeight;
+    const lostSoFar = startingWeight - currentWeight;
+    return Math.max(0, Math.min(100, (lostSoFar / totalToLose) * 100));
+  } else {
+    const totalToGain = targetWeight - startingWeight;
+    const gainedSoFar = currentWeight - startingWeight;
+    return Math.max(0, Math.min(100, (gainedSoFar / totalToGain) * 100));
   }
-
-  const analysis: ClientAnalysis = {
-    clientId: client.id,
-    clientName: client.name,
-    analysisDate: new Date().toISOString(),
-    progressTrend: analyzeProgressTrend(clientData),
-    attendanceRate: calculateAttendanceRate(clientData.recentSessions),
-    goalProgress: calculateGoalProgress(clientData),
-    recommendations: [],
-    keyInsights: [],
-    nextReviewDate: new Date(
-      Date.now() + 14 * 24 * 60 * 60 * 1000,
-    ).toISOString(),
-    dropoutRisk: "low",
-    dropoutRiskScore: 0,
-    predictedMilestones: [],
-    retentionProbability: 0,
-  };
-
-  // Generate AI recommendations based on analysis
-  analysis.recommendations = generateAIRecommendations(
-    clientData,
-    analysis,
-    client,
-    usingRealData,
-  ).map(rec => ({
-    ...rec,
-    status: "pending" as const,
-    category: getRecommendationCategory(rec.type, rec.priority),
-  }));
-  analysis.keyInsights = generateKeyInsights(
-    clientData,
-    analysis,
-    usingRealData,
-  );
-
-  // Predictive Analytics Functions
-  const dropoutRisk = calculateDropoutRisk(clientData, analysis, client);
-  analysis.dropoutRisk = dropoutRisk.risk;
-  analysis.dropoutRiskScore = dropoutRisk.score;
-
-  const milestones = predictMilestones(clientData, analysis, client);
-  analysis.predictedMilestones = milestones;
-
-  const retentionProbability = calculateRetentionProbability(
-    dropoutRisk.score,
-    analysis.attendanceRate,
-    analysis.progressTrend,
-    client.fitnessLevel,
-  );
-  analysis.retentionProbability = retentionProbability;
-
-  return analysis;
 };
 
 const analyzeProgressTrend = (
@@ -261,22 +89,81 @@ const analyzeProgressTrend = (
   return "plateauing";
 };
 
-const calculateAttendanceRate = (sessions: any[]): number => {
-  const attendedSessions = sessions.filter((s) => s.attended).length;
-  return Math.round((attendedSessions / sessions.length) * 100);
+const calculateDropoutRisk = (
+  data: any,
+  analysis: ClientAnalysis,
+  client: Client,
+): { risk: "low" | "medium" | "high"; score: number } => {
+  let score = 0;
+
+  // Attendance rate impact
+  if (analysis.attendanceRate < 60) score += 40;
+  else if (analysis.attendanceRate < 80) score += 20;
+
+  // Progress trend impact
+  if (analysis.progressTrend === "declining") score += 30;
+  else if (analysis.progressTrend === "plateauing") score += 15;
+
+  // Session frequency impact
+  const recentSessions = data.recentSessions.filter((s: any) => s.attended);
+  if (recentSessions.length < 2) score += 25;
+
+  // Fitness level impact
+  if (client.fitnessLevel === "beginner") score += 10;
+
+  // Determine risk level
+  if (score >= 70) return { risk: "high", score };
+  if (score >= 40) return { risk: "medium", score };
+  return { risk: "low", score };
 };
 
-const calculateGoalProgress = (data: any): number => {
-  const currentWeight = data.progressEntries[0]?.weight || 0;
-  const startWeight =
-    data.progressEntries[data.progressEntries.length - 1]?.weight ||
-    currentWeight;
-  const targetWeight = data.goals.targetWeight;
+const generateKeyInsights = (
+  data: any,
+  analysis: ClientAnalysis,
+  usingRealData: boolean,
+): string[] => {
+  const insights: string[] = [];
 
-  const totalChange = Math.abs(targetWeight - startWeight);
-  const currentChange = Math.abs(currentWeight - startWeight);
+  if (!usingRealData) {
+    insights.push("Add more session and progress data to get personalized insights");
+    return insights;
+  }
 
-  return Math.min(Math.round((currentChange / totalChange) * 100), 100);
+  // Attendance insights
+  if (analysis.attendanceRate >= 90) {
+    insights.push("Excellent attendance rate - client is highly motivated");
+  } else if (analysis.attendanceRate < 70) {
+    insights.push("Attendance rate needs improvement - consider schedule adjustments");
+  }
+
+  // Progress insights
+  if (analysis.progressTrend === "improving") {
+    insights.push("Strong progress trend - current program is working well");
+  } else if (analysis.progressTrend === "plateauing") {
+    insights.push("Progress has plateaued - may need program adjustments");
+  } else if (analysis.progressTrend === "declining") {
+    insights.push("Progress declining - immediate intervention recommended");
+  }
+
+  // Goal progress insights
+  if (analysis.goalProgress > 75) {
+    insights.push("Excellent progress toward goals - consider setting new targets");
+  } else if (analysis.goalProgress < 25) {
+    insights.push("Slow progress toward goals - review program effectiveness");
+  }
+
+  return insights;
+};
+
+const getRecommendationCategory = (
+  type: string,
+  priority: string,
+): "retention" | "performance" | "engagement" | "safety" | "optimization" => {
+  if (priority === "high") return "retention";
+  if (type === "workout" || type === "cardio") return "performance";
+  if (type === "recovery") return "safety";
+  if (type === "nutrition" || type === "schedule") return "engagement";
+  return "optimization";
 };
 
 const generateAIRecommendations = (
@@ -286,6 +173,33 @@ const generateAIRecommendations = (
   usingRealData: boolean,
 ): Recommendation[] => {
   const recommendations: Recommendation[] = [];
+
+  // If no real data, return basic recommendations
+  if (!usingRealData) {
+    recommendations.push({
+      id: "add-data",
+      type: "schedule",
+      priority: "high",
+      title: "Add Session and Progress Data",
+      description: "Start tracking sessions and progress to get personalized AI recommendations",
+      reasoning: "AI recommendations require real data to provide meaningful insights",
+      actionItems: [
+        "Complete and log training sessions",
+        "Track client progress measurements",
+        "Record workout performance",
+        "Add progress photos and notes",
+      ],
+      confidence: 95,
+      dataPoints: ["No session data available", "No progress tracking"],
+      estimatedImpact: "Enable personalized AI coaching",
+      timeframe: "Immediate",
+      appliedAt: new Date().toISOString(),
+      appliedBy: "AI",
+      status: "pending",
+      category: "engagement",
+    });
+    return recommendations;
+  }
 
   // Beginner-specific recommendations
   if (client.fitnessLevel === "beginner" && analysis.attendanceRate > 70) {
@@ -451,7 +365,7 @@ const generateAIRecommendations = (
         followUpDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         category: "retention",
       });
-    } else if (recentPerformance < 75) {
+    } else if (recentPerformance < 60) {
       recommendations.push({
         id: "performance-support",
         type: "recovery",
@@ -708,178 +622,38 @@ const generateAIRecommendations = (
   });
 };
 
-const generateKeyInsights = (
+const predictMilestones = (
   data: any,
   analysis: ClientAnalysis,
-  usingRealData: boolean,
-): string[] => {
-  const insights: string[] = [];
-
-  // Data source insight
-  if (usingRealData) {
-    insights.push("✨ Analysis based on your actual session and progress data");
-  } else {
-    insights.push(
-      "📊 Using demo data - add real sessions for personalized insights",
-    );
-  }
-
-  if (analysis.attendanceRate >= 90) {
-    insights.push(
-      "🎯 Exceptional attendance shows high motivation and commitment",
-    );
-  } else if (analysis.attendanceRate >= 70) {
-    insights.push(
-      "✅ Good attendance rate, minor schedule optimization opportunities",
-    );
-  } else {
-    insights.push(
-      "⚠️ Attendance below optimal - consider scheduling adjustments",
-    );
-  }
-
-  if (analysis.progressTrend === "improving") {
-    insights.push(
-      "📈 Progress trending positively - current approach is working well",
-    );
-  } else if (analysis.progressTrend === "plateauing") {
-    insights.push(
-      "🔄 Progress has plateaued - program adjustments recommended",
-    );
-  } else {
-    insights.push("📉 Progress declining - immediate program review needed");
-  }
-
-  if (analysis.goalProgress > 50) {
-    insights.push(
-      `🏆 ${analysis.goalProgress}% goal completion - excellent trajectory`,
-    );
-  } else {
-    insights.push(
-      "🎯 Goal progress slower than expected - strategy review recommended",
-    );
-  }
-
-  const avgPerformance =
-    data.recentSessions.reduce(
-      (sum: number, session: any) => sum + session.performance,
-      0,
-    ) / data.recentSessions.length;
-
-  if (avgPerformance > 85) {
-    insights.push(
-      "💪 High session performance indicates client is ready for new challenges",
-    );
-  } else if (avgPerformance < 70) {
-    insights.push(
-      "⚡ Performance scores suggest need for program modification or recovery",
-    );
-  }
-
-  return insights;
-};
-
-// Utility function to get priority color for UI
-export const getPriorityColor = (priority: Recommendation["priority"]) => {
-  switch (priority) {
-    case "high":
-      return "bg-red-100 text-red-800 border-red-200";
-    case "medium":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    case "low":
-      return "bg-blue-100 text-blue-800 border-blue-200";
-    default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
-  }
-};
-
-export const getTypeIcon = (type: Recommendation["type"]) => {
-  switch (type) {
-    case "workout":
-      return "🏋️";
-    case "cardio":
-      return "🏃";
-    case "recovery":
-      return "😴";
-    case "nutrition":
-      return "🥗";
-    case "schedule":
-      return "📅";
-    default:
-      return "💡";
-  }
-};
-
-// Predictive Analytics Functions
-const calculateDropoutRisk = (
-  clientData: any,
-  analysis: ClientAnalysis,
   client: Client,
-): { risk: "low" | "medium" | "high"; score: number } => {
-  let riskScore = 0;
-  
-  // Attendance-based risk factors
-  if (analysis.attendanceRate < 60) riskScore += 30;
-  else if (analysis.attendanceRate < 80) riskScore += 15;
-  
-  // Recent session patterns
-  const recentSessions = clientData.recentSessions.slice(-3);
-  const missedSessions = recentSessions.filter((s: any) => !s.attended).length;
-  if (missedSessions >= 2) riskScore += 25;
-  else if (missedSessions === 1) riskScore += 10;
-  
-  // Progress trend impact
-  if (analysis.progressTrend === "declining") riskScore += 20;
-  else if (analysis.progressTrend === "plateauing") riskScore += 10;
-  
-  // Fitness level considerations
-  if (client.fitnessLevel === "beginner" && analysis.attendanceRate < 70) riskScore += 15;
-  
-  // Goal progress impact
-  if (analysis.goalProgress < 30) riskScore += 15;
-  
-  // Determine risk level
-  if (riskScore >= 60) return { risk: "high", score: riskScore };
-  if (riskScore >= 30) return { risk: "medium", score: riskScore };
-  return { risk: "low", score: riskScore };
-};
-
-const predictMilestones = (
-  clientData: any,
-  analysis: ClientAnalysis,
-  client: Client,
-): MilestonePrediction[] => {
-  const milestones: MilestonePrediction[] = [];
+): any[] => {
+  const milestones: any[] = [];
   const today = new Date();
   
-  // Weight milestone prediction
-  if (clientData.progressEntries.length >= 2) {
-    const recentWeight = clientData.progressEntries[0].weight;
-    const previousWeight = clientData.progressEntries[1].weight;
-    const weightChange = recentWeight - previousWeight;
+  // Weight milestone (if weight loss goal)
+  if (data.currentWorkout.focus === "weight-loss" && data.goals.targetWeight) {
+    const currentWeight = data.progressEntries[0]?.weight || 170;
+    const targetWeight = data.goals.targetWeight;
+    const weightToLose = currentWeight - targetWeight;
     
-    if (client.goals.toLowerCase().includes("weight")) {
-      const targetWeight = clientData.goals?.targetWeight || (recentWeight * 0.9);
-      const weightToLose = recentWeight - targetWeight;
-      const weeksToGoal = Math.abs(weightToLose / (weightChange / 2)); // Assuming 2 weeks between entries
-      
-      if (weeksToGoal > 0 && weeksToGoal < 52) { // Within a year
+    if (weightToLose > 5) {
+      const weeksToTarget = Math.ceil(weightToLose / 2); // Assuming 2 lbs per week
         milestones.push({
           type: "weight",
           description: `Reach ${targetWeight} lbs`,
-          predictedDate: new Date(today.getTime() + weeksToGoal * 7 * 24 * 60 * 60 * 1000).toISOString(),
-          confidence: Math.min(85, 100 - Math.abs(weeksToGoal - 12) * 2), // Higher confidence for realistic timelines
-          currentValue: recentWeight,
+        predictedDate: new Date(today.getTime() + weeksToTarget * 7 * 24 * 60 * 60 * 1000).toISOString(),
+        confidence: 75,
+        currentValue: currentWeight,
           targetValue: targetWeight,
-          progressPercentage: Math.max(0, Math.min(100, ((recentWeight - targetWeight) / (previousWeight - targetWeight)) * 100)),
+        progressPercentage: ((currentWeight - targetWeight) / weightToLose) * 100,
         });
-      }
     }
   }
   
   // Attendance milestone
   const attendanceTarget = 90;
   const currentAttendance = analysis.attendanceRate;
+  
   if (currentAttendance < attendanceTarget) {
     const sessionsToTarget = Math.ceil((attendanceTarget - currentAttendance) / 5); // Assuming 5% improvement per week
     milestones.push({
@@ -911,47 +685,162 @@ const predictMilestones = (
   return milestones;
 };
 
-const calculateRetentionProbability = (
-  dropoutRisk: number,
-  attendanceRate: number,
-  progressTrend: string,
-  clientLevel: string,
-): number => {
-  let probability = 85; // Base retention probability
+export const generateRecommendations = (
+  client: Client,
+  recentSessions: Session[],
+  progressEntries: ProgressEntry[],
+  currentWorkout?: WorkoutPlan,
+): ClientAnalysis => {
+  // Use real data from DataContext
+  const clientSessions = recentSessions.filter((s) => s.clientId === client.id);
+  const clientProgress = progressEntries.filter(
+    (p) => p.clientId === client.id,
+  );
   
-  // Adjust based on dropout risk
-  probability -= dropoutRisk * 0.5;
+  // Check if we have sufficient real data
+  const hasRealData = clientSessions.length > 0 || clientProgress.length > 0;
   
-  // Attendance impact
-  if (attendanceRate > 90) probability += 10;
-  else if (attendanceRate > 80) probability += 5;
-  else if (attendanceRate < 60) probability -= 15;
-  
-  // Progress trend impact
-  if (progressTrend === "improving") probability += 10;
-  else if (progressTrend === "declining") probability -= 10;
-  
-  // Fitness level impact
-  if (clientLevel === "advanced") probability += 5;
-  else if (clientLevel === "beginner") probability -= 5;
-  
-  return Math.max(0, Math.min(100, probability));
+  if (!hasRealData) {
+    return {
+      clientId: client.id,
+      clientName: client.name,
+      analysisDate: new Date().toISOString(),
+      progressTrend: "plateauing",
+      attendanceRate: 0,
+      goalProgress: 0,
+      recommendations: [],
+      keyInsights: [
+        "Insufficient data for analysis - Add sessions and progress data to get AI recommendations",
+      ],
+      nextReviewDate: new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000,
+      ).toISOString(),
+      dropoutRisk: "low",
+      dropoutRiskScore: 0,
+      predictedMilestones: [],
+      retentionProbability: 0,
+    };
+  }
+
+  // Build client data from real session and progress data
+  const clientData = {
+    recentSessions: clientSessions.slice(-5).map((session) => ({
+      date: session.date,
+      attended: session.status === "completed",
+      performance:
+        session.status === "completed" ? 85 + Math.random() * 15 : 0,
+    })),
+    progressEntries: clientProgress.slice(-3).map((entry) => ({
+      date: entry.date,
+      weight: entry.weight || 170,
+      bodyFat: entry.bodyFat || 20,
+    })),
+    currentWorkout: {
+      intensity:
+        client.fitnessLevel === "advanced"
+          ? "high"
+          : client.fitnessLevel === "intermediate"
+            ? "moderate"
+            : "low",
+      frequency: 3,
+      lastUpdated: client.dateJoined,
+      focus: client.goals.toLowerCase().includes("weight")
+        ? "weight-loss"
+        : "strength",
+    },
+    goals: {
+      targetWeight: 160,
+      targetBodyFat: 16,
+      targetDate: new Date(
+        Date.now() + 90 * 24 * 60 * 60 * 1000,
+      ).toISOString(),
+    },
 };
 
-const getRecommendationCategory = (
-  type: Recommendation["type"],
-  priority: Recommendation["priority"],
-): Recommendation["category"] => {
-  if (priority === "high") {
-    if (type === "recovery") return "safety";
-    if (type === "schedule") return "retention";
-    return "performance";
+  const analysis: ClientAnalysis = {
+    clientId: client.id,
+    clientName: client.name,
+    analysisDate: new Date().toISOString(),
+    progressTrend: analyzeProgressTrend(clientData),
+    attendanceRate: calculateAttendanceRate(clientData.recentSessions),
+    goalProgress: calculateGoalProgress(clientData),
+    recommendations: [],
+    keyInsights: [],
+    nextReviewDate: new Date(
+      Date.now() + 14 * 24 * 60 * 60 * 1000,
+    ).toISOString(),
+    dropoutRisk: "low",
+    dropoutRiskScore: 0,
+    predictedMilestones: [],
+    retentionProbability: 0,
+  };
+
+  // Generate AI recommendations based on analysis
+  analysis.recommendations = generateAIRecommendations(
+    clientData,
+    analysis,
+    client,
+    hasRealData,
+  ).map(rec => ({
+    ...rec,
+    status: "pending" as const,
+    category: getRecommendationCategory(rec.type, rec.priority),
+  }));
+  analysis.keyInsights = generateKeyInsights(
+    clientData,
+    analysis,
+    hasRealData,
+  );
+
+  // Predictive Analytics Functions
+  const dropoutRisk = calculateDropoutRisk(clientData, analysis, client);
+  analysis.dropoutRisk = dropoutRisk.risk;
+  analysis.dropoutRiskScore = dropoutRisk.score;
+
+  const milestones = predictMilestones(clientData, analysis, client);
+  analysis.predictedMilestones = milestones;
+
+  // Calculate retention probability based on various factors
+  const retentionFactors = [
+    analysis.attendanceRate / 100,
+    analysis.goalProgress / 100,
+    analysis.dropoutRisk === "low" ? 0.9 : analysis.dropoutRisk === "medium" ? 0.7 : 0.4,
+    clientSessions.length > 5 ? 0.8 : 0.5,
+  ];
+  analysis.retentionProbability = Math.round(
+    (retentionFactors.reduce((sum, factor) => sum + factor, 0) / retentionFactors.length) * 100,
+  );
+
+  return analysis;
+};
+
+// Utility functions for UI
+export const getPriorityColor = (priority: string): string => {
+  switch (priority) {
+    case "high":
+      return "text-red-600 bg-red-50 border-red-200";
+    case "medium":
+      return "text-yellow-600 bg-yellow-50 border-yellow-200";
+    case "low":
+      return "text-green-600 bg-green-50 border-green-200";
+    default:
+      return "text-gray-600 bg-gray-50 border-gray-200";
   }
-  
-  if (type === "workout" || type === "cardio") return "performance";
-  if (type === "nutrition") return "optimization";
-  if (type === "schedule") return "engagement";
-  if (type === "recovery") return "safety";
-  
-  return "optimization";
+};
+
+export const getTypeIcon = (type: string): string => {
+  switch (type) {
+    case "workout":
+      return "💪";
+    case "cardio":
+      return "🏃";
+    case "recovery":
+      return "🧘";
+    case "nutrition":
+      return "🥗";
+    case "schedule":
+      return "📅";
+    default:
+      return "🎯";
+  }
 };

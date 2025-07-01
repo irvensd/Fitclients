@@ -43,10 +43,12 @@ import {
   Clock,
   Loader2,
   Share2,
+  Database,
 } from "lucide-react";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { SubscriptionManager } from "@/components/SubscriptionManager";
-import { ReferralProgram } from "@/components/ReferralProgram";
+import { BackupManager } from "@/components/BackupManager";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { userProfileService } from "@/lib/firebaseService";
@@ -328,6 +330,9 @@ const Settings = () => {
             </TabsTrigger>
             <TabsTrigger value="security" className="text-xs sm:text-sm">
               Security
+            </TabsTrigger>
+            <TabsTrigger value="backup" className="text-xs sm:text-sm">
+              Backup
             </TabsTrigger>
           </TabsList>
         </div>
@@ -774,7 +779,27 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="referrals" className="space-y-6">
-          <ReferralProgram />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Share2 className="h-5 w-5" />
+                Referral Program
+              </CardTitle>
+              <CardDescription>
+                Coming soon - Track referrals and earn rewards
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <Share2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Referral Program</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Track referrals, manage rewards, and grow your business through word-of-mouth marketing.
+                </p>
+                <Badge variant="secondary">Coming Soon</Badge>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6">
@@ -954,14 +979,20 @@ const Settings = () => {
               <div className="space-y-4">
                 <h3 className="font-medium">Data & Privacy</h3>
                 <div className="space-y-4">
-                  <Button variant="outline" className="justify-start">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export My Data
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Import Data
-                  </Button>
+                  <div className="p-4 border rounded-lg bg-blue-50">
+                    <h4 className="font-medium text-blue-800 mb-2">Backup & Recovery</h4>
+                    <p className="text-sm text-blue-700 mb-3">
+                      Export your data, create automated backups, and restore from previous backups.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      className="justify-start"
+                      onClick={() => setActiveTab("backup")}
+                    >
+                      <Database className="h-4 w-4 mr-2" />
+                      Manage Backups
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -985,6 +1016,13 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="backup" className="space-y-6">
+          <BackupManager onDataChange={() => {
+            // Trigger data refresh if needed
+            console.log("Data changed, refreshing...");
+          }} />
         </TabsContent>
       </Tabs>
     </div>
