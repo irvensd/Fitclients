@@ -27,6 +27,7 @@ import {
   Scale,
   FileText,
   Gift,
+  X,
 } from "lucide-react";
 import AnimatedHero from "@/components/AnimatedHero";
 import MotivationalElements from "@/components/MotivationalElements";
@@ -264,6 +265,86 @@ const Landing = () => {
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary">4.9★</div>
                 <div className="text-sm text-muted-foreground">Average Rating</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Email Capture Section */}
+        <section className="py-16 px-4 bg-gradient-to-r from-blue-50 to-purple-50 border-y">
+          <div className="container mx-auto max-w-4xl text-center">
+            <div className="bg-white rounded-lg shadow-lg p-8 border-2 border-blue-200">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <Gift className="h-4 w-4" />
+                Free Demo & Resources
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                Get Your <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Free Demo</span> & Training Guide
+              </h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                See FitClient in action and get our "5-Step Guide to Growing Your Fitness Business" - completely free!
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="text-left">
+                  <h4 className="font-semibold mb-3">What you'll get:</h4>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span>15-minute personalized demo</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span>5-step business growth guide</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span>Client retention strategies</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span>Pricing optimization tips</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
+                  <h4 className="font-semibold mb-4">Get Your Free Demo</h4>
+                  <div className="space-y-3">
+                    <input
+                      type="email"
+                      placeholder="Enter your email address"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Your name"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                      Get Free Demo & Guide
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3">
+                    No spam. Unsubscribe anytime. We respect your privacy.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-green-600" />
+                  <span>100% free, no obligation</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-blue-600" />
+                  <span>Instant access to guide</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-purple-600" />
+                  <span>Demo scheduled within 24h</span>
+                </div>
               </div>
             </div>
           </div>
@@ -641,6 +722,140 @@ const Landing = () => {
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 Stop losing money and start growing your fitness business with the complete solution.
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Comparison Table */}
+        <section className="py-20 px-4 bg-white">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <BarChart3 className="h-4 w-4" />
+                Why Choose FitClient
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                FitClient vs <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Other Solutions</span>
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                See how FitClient stacks up against other fitness business management tools
+              </p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-gray-200">
+                    <th className="text-left p-4 font-semibold">Features</th>
+                    <th className="text-center p-4 font-semibold bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-t-lg">
+                      <div className="flex items-center justify-center gap-2">
+                        <Star className="h-5 w-5 text-green-600" />
+                        FitClient
+                      </div>
+                    </th>
+                    <th className="text-center p-4 font-semibold">Other CRM Tools</th>
+                    <th className="text-center p-4 font-semibold">Spreadsheets</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  <tr className="hover:bg-gray-50">
+                    <td className="p-4 font-medium">AI-Powered Recommendations</td>
+                    <td className="text-center p-4 bg-green-50">
+                      <Check className="h-5 w-5 text-green-600 mx-auto" />
+                    </td>
+                    <td className="text-center p-4">
+                      <X className="h-5 w-5 text-red-500 mx-auto" />
+                    </td>
+                    <td className="text-center p-4">
+                      <X className="h-5 w-5 text-red-500 mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50">
+                    <td className="p-4 font-medium">No-Login Client Portal</td>
+                    <td className="text-center p-4 bg-green-50">
+                      <Check className="h-5 w-5 text-green-600 mx-auto" />
+                    </td>
+                    <td className="text-center p-4">
+                      <X className="h-5 w-5 text-red-500 mx-auto" />
+                    </td>
+                    <td className="text-center p-4">
+                      <X className="h-5 w-5 text-red-500 mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50">
+                    <td className="p-4 font-medium">Gamification & Streaks</td>
+                    <td className="text-center p-4 bg-green-50">
+                      <Check className="h-5 w-5 text-green-600 mx-auto" />
+                    </td>
+                    <td className="text-center p-4">
+                      <X className="h-5 w-5 text-red-500 mx-auto" />
+                    </td>
+                    <td className="text-center p-4">
+                      <X className="h-5 w-5 text-red-500 mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50">
+                    <td className="p-4 font-medium">Free Forever Plan</td>
+                    <td className="text-center p-4 bg-green-50">
+                      <Check className="h-5 w-5 text-green-600 mx-auto" />
+                    </td>
+                    <td className="text-center p-4">
+                      <X className="h-5 w-5 text-red-500 mx-auto" />
+                    </td>
+                    <td className="text-center p-4">
+                      <Check className="h-5 w-5 text-green-600 mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50">
+                    <td className="p-4 font-medium">Setup Time</td>
+                    <td className="text-center p-4 bg-green-50">
+                      <span className="text-green-600 font-semibold">5 minutes</span>
+                    </td>
+                    <td className="text-center p-4">
+                      <span className="text-muted-foreground">2-4 hours</span>
+                    </td>
+                    <td className="text-center p-4">
+                      <span className="text-muted-foreground">1-2 hours</span>
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50">
+                    <td className="p-4 font-medium">Client Onboarding</td>
+                    <td className="text-center p-4 bg-green-50">
+                      <span className="text-green-600 font-semibold">Instant</span>
+                    </td>
+                    <td className="text-center p-4">
+                      <span className="text-muted-foreground">Account creation required</span>
+                    </td>
+                    <td className="text-center p-4">
+                      <span className="text-muted-foreground">Manual sharing</span>
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50">
+                    <td className="p-4 font-medium">Monthly Cost (5 clients)</td>
+                    <td className="text-center p-4 bg-green-50">
+                      <span className="text-green-600 font-semibold">$0</span>
+                    </td>
+                    <td className="text-center p-4">
+                      <span className="text-muted-foreground">$29-79</span>
+                    </td>
+                    <td className="text-center p-4">
+                      <span className="text-green-600 font-semibold">$0</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="text-center mt-8">
+              <p className="text-muted-foreground mb-4">
+                Ready to see the difference?
+              </p>
+              <Link to="/login">
+                <Button size="lg" className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
