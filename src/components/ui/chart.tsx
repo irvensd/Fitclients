@@ -65,6 +65,25 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = "Chart";
 
+// Helper function to sanitize CSS color values
+const sanitizeColor = (color: string): string => {
+  // Only allow valid color formats: hex, rgb, hsl, named colors
+  const colorRegex = /^(#[0-9a-fA-F]{3,6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[\d.]+\s*\)|hsl\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*\)|hsla\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*,\s*[\d.]+\s*\)|[a-zA-Z]+)$/;
+  
+  if (!colorRegex.test(color)) {
+    console.warn(`Invalid color value detected: ${color}. Using fallback.`);
+    return '#000000'; // Safe fallback
+  }
+  
+  return color;
+};
+
+// Helper function to sanitize CSS identifiers
+const sanitizeIdentifier = (id: string): string => {
+  // Only allow alphanumeric characters, hyphens, and underscores
+  return id.replace(/[^a-zA-Z0-9\-_]/g, '');
+};
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([_, config]) => config.theme || config.color,
@@ -74,20 +93,31 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null;
   }
 
+  // Sanitize the chart ID to prevent injection
+  const sanitizedId = sanitizeIdentifier(id);
+
   return (
     <style
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
           .map(
             ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
+${prefix} [data-chart="${sanitizedId}"] {
 ${colorConfig
   .map(([key, itemConfig]) => {
     const color =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
+    
+    if (!color) return null;
+    
+    // Sanitize color value and key
+    const sanitizedColor = sanitizeColor(color);
+    const sanitizedKey = sanitizeIdentifier(key);
+    
+    return `  --color-${sanitizedKey}: ${sanitizedColor};`;
   })
+  .filter(Boolean)
   .join("\n")}
 }
 `,
