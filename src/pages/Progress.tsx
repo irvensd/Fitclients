@@ -65,8 +65,7 @@ const AddProgressDialog = () => {
   const { clients, addProgressEntry } = useData();
   const { toast } = useToast();
   
-  console.log("AddProgressDialog - clients:", clients);
-  console.log("AddProgressDialog - clients length:", clients.length);
+
   
   const [formData, setFormData] = useState({
     clientId: "",
@@ -83,18 +82,42 @@ const AddProgressDialog = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    console.log("Form submitted with data:", formData);
-
+    
+    // Enhanced validation
     if (!formData.clientId) {
       toast({
         variant: "destructive",
         title: "Client Not Selected",
         description: "Please select a client to record progress for.",
       });
-      setLoading(false);
       return;
     }
+    
+    // Validate measurement values
+    const measurements = [
+      { field: 'weight', value: formData.weight, min: 50, max: 500, unit: 'lbs' },
+      { field: 'bodyFat', value: formData.bodyFat, min: 3, max: 50, unit: '%' },
+      { field: 'chest', value: formData.chest, min: 20, max: 80, unit: 'inches' },
+      { field: 'waist', value: formData.waist, min: 20, max: 80, unit: 'inches' },
+      { field: 'hips', value: formData.hips, min: 20, max: 80, unit: 'inches' },
+      { field: 'arms', value: formData.arms, min: 8, max: 30, unit: 'inches' },
+      { field: 'thighs', value: formData.thighs, min: 15, max: 40, unit: 'inches' },
+    ];
+    
+    for (const measurement of measurements) {
+      if (measurement.value && (parseFloat(measurement.value) < measurement.min || parseFloat(measurement.value) > measurement.max)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid Measurement",
+          description: `${measurement.field.charAt(0).toUpperCase() + measurement.field.slice(1)} must be between ${measurement.min} and ${measurement.max} ${measurement.unit}.`,
+        });
+        return;
+      }
+    }
+    
+    setLoading(true);
+
+
 
     try {
       const progressData: Omit<ProgressEntry, 'id'> = {
@@ -129,9 +152,7 @@ const AddProgressDialog = () => {
         })
       );
 
-      console.log("Calling addProgressEntry with:", cleanProgressData);
       const result = await addProgressEntry(cleanProgressData as Omit<ProgressEntry, 'id'>);
-      console.log("addProgressEntry result:", result);
 
       toast({
         title: "Progress Recorded",
@@ -146,10 +167,6 @@ const AddProgressDialog = () => {
       setOpen(false);
     } catch (error) {
       console.error("Error recording progress:", error);
-      console.error("Error details:", {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
-      });
       toast({
         variant: "destructive",
         title: "Submission Error",
@@ -203,11 +220,31 @@ const AddProgressDialog = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="weight">Weight (lbs)</Label>
-              <Input id="weight" type="number" step="0.1" value={formData.weight} onChange={(e) => setFormData({ ...formData, weight: e.target.value })} placeholder="150.5" />
+              <Input 
+                id="weight" 
+                type="number" 
+                step="0.1" 
+                min="50" 
+                max="500"
+                value={formData.weight} 
+                onChange={(e) => setFormData({ ...formData, weight: e.target.value })} 
+                placeholder="150.5"
+                aria-label="Weight in pounds"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="bodyFat">Body Fat (%)</Label>
-              <Input id="bodyFat" type="number" step="0.1" value={formData.bodyFat} onChange={(e) => setFormData({ ...formData, bodyFat: e.target.value })} placeholder="15.2" />
+              <Input 
+                id="bodyFat" 
+                type="number" 
+                step="0.1" 
+                min="3" 
+                max="50"
+                value={formData.bodyFat} 
+                onChange={(e) => setFormData({ ...formData, bodyFat: e.target.value })} 
+                placeholder="15.2"
+                aria-label="Body fat percentage"
+              />
             </div>
           </div>
           <div className="space-y-4 border-t pt-4">
@@ -215,31 +252,88 @@ const AddProgressDialog = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="chest">Chest</Label>
-                <Input id="chest" type="number" step="0.1" value={formData.chest} onChange={(e) => setFormData({ ...formData, chest: e.target.value })} placeholder="40.0" />
+                <Input 
+                  id="chest" 
+                  type="number" 
+                  step="0.1" 
+                  min="20" 
+                  max="80"
+                  value={formData.chest} 
+                  onChange={(e) => setFormData({ ...formData, chest: e.target.value })} 
+                  placeholder="40.0"
+                  aria-label="Chest measurement in inches"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="waist">Waist</Label>
-                <Input id="waist" type="number" step="0.1" value={formData.waist} onChange={(e) => setFormData({ ...formData, waist: e.target.value })} placeholder="32.0" />
+                <Input 
+                  id="waist" 
+                  type="number" 
+                  step="0.1" 
+                  min="20" 
+                  max="80"
+                  value={formData.waist} 
+                  onChange={(e) => setFormData({ ...formData, waist: e.target.value })} 
+                  placeholder="32.0"
+                  aria-label="Waist measurement in inches"
+                />
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="hips">Hips</Label>
-                <Input id="hips" type="number" step="0.1" value={formData.hips} onChange={(e) => setFormData({ ...formData, hips: e.target.value })} placeholder="38.0" />
+                <Input 
+                  id="hips" 
+                  type="number" 
+                  step="0.1" 
+                  min="20" 
+                  max="80"
+                  value={formData.hips} 
+                  onChange={(e) => setFormData({ ...formData, hips: e.target.value })} 
+                  placeholder="38.0"
+                  aria-label="Hips measurement in inches"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="arms">Arms</Label>
-                <Input id="arms" type="number" step="0.1" value={formData.arms} onChange={(e) => setFormData({ ...formData, arms: e.target.value })} placeholder="14.0" />
+                <Input 
+                  id="arms" 
+                  type="number" 
+                  step="0.1" 
+                  min="8" 
+                  max="30"
+                  value={formData.arms} 
+                  onChange={(e) => setFormData({ ...formData, arms: e.target.value })} 
+                  placeholder="14.0"
+                  aria-label="Arms measurement in inches"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="thighs">Thighs</Label>
-                <Input id="thighs" type="number" step="0.1" value={formData.thighs} onChange={(e) => setFormData({ ...formData, thighs: e.target.value })} placeholder="22.0" />
+                <Input 
+                  id="thighs" 
+                  type="number" 
+                  step="0.1" 
+                  min="15" 
+                  max="40"
+                  value={formData.thighs} 
+                  onChange={(e) => setFormData({ ...formData, thighs: e.target.value })} 
+                  placeholder="22.0"
+                  aria-label="Thighs measurement in inches"
+                />
               </div>
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} placeholder="How the client is feeling, observations..." className="min-h-[80px]" />
+            <Textarea 
+              id="notes" 
+              value={formData.notes} 
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })} 
+              placeholder="How the client is feeling, observations..." 
+              className="min-h-[80px]"
+              aria-label="Progress notes and observations"
+            />
           </div>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
@@ -284,7 +378,7 @@ const ClientProgressCard = ({ client }: { client: Client }) => {
       toast({
         variant: "destructive",
         title: "Deletion Error",
-        description: "Failed to delete progress. Please try again.",
+        description: "Failed to delete progress. Please check your connection and try again.",
       });
     } finally {
       setDeletingEntry(null);
@@ -293,7 +387,18 @@ const ClientProgressCard = ({ client }: { client: Client }) => {
 
   return (
     <>
-      <Card className="overflow-hidden hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
+      <Card 
+        className="overflow-hidden hover:shadow-md transition-all duration-200 hover:scale-[1.02]"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            // Could open progress details dialog here
+          }
+        }}
+        role="button"
+        aria-label={`Progress for ${client.name} - ${clientProgress.length} entries, weight change: ${weightChange.toFixed(1)} lbs, body fat change: ${bodyFatChange.toFixed(1)}%`}
+      >
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -314,7 +419,13 @@ const ClientProgressCard = ({ client }: { client: Client }) => {
               </Badge>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-6 w-6"
+                    aria-label={`Progress actions for ${client.name}`}
+                    title="Progress actions"
+                  >
                     <MoreVertical className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -322,6 +433,7 @@ const ClientProgressCard = ({ client }: { client: Client }) => {
                   <DropdownMenuItem 
                     onClick={() => setShowDeleteDialog(true)}
                     className="text-red-600 focus:text-red-600"
+                    aria-label={`Delete latest progress entry for ${client.name}`}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Delete Latest Entry
@@ -442,7 +554,13 @@ const ProgressPage = () => {
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search clients..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
+        <Input 
+          placeholder="Search clients..." 
+          value={searchTerm} 
+          onChange={(e) => setSearchTerm(e.target.value)} 
+          className="pl-10"
+          aria-label="Search clients by name"
+        />
       </div>
 
       <Tabs defaultValue="overview">

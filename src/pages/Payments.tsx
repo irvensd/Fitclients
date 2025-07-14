@@ -113,6 +113,44 @@ const AddPaymentDialog = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Enhanced validation
+    if (!formData.clientId) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please select a client for this payment.",
+      });
+      return;
+    }
+    
+    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please enter a valid payment amount greater than $0.",
+      });
+      return;
+    }
+    
+    if (!formData.method) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please select a payment method.",
+      });
+      return;
+    }
+    
+    if (!formData.date) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please select a payment date.",
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -126,13 +164,13 @@ const AddPaymentDialog = () => {
           | "venmo"
           | "paypal",
         status: formData.status as "pending" | "completed" | "failed",
-        description: formData.description,
+        description: formData.description.trim(),
         date: formData.date,
       });
 
       toast({
         title: "Payment Recorded",
-        description: `A payment of $${formData.amount} for ${
+        description: `A payment of $${parseFloat(formData.amount).toFixed(2)} for ${
           clients.find((c) => c.id === formData.clientId)?.name
         } has been recorded.`,
       });
@@ -152,7 +190,7 @@ const AddPaymentDialog = () => {
       toast({
         variant: "destructive",
         title: "Submission Error",
-        description: "Failed to record payment. Please try again.",
+        description: "Failed to record payment. Please check your connection and try again.",
       });
     } finally {
       setLoading(false);
@@ -363,20 +401,23 @@ const Payments = () => {
       });
       toast({
         title: "Payment Updated",
-        description: `Payment of $${payment.amount} marked as completed.`,
+        description: `Payment of $${payment.amount.toFixed(2)} for ${getClientName(payment.clientId)} marked as completed.`,
       });
     } catch (error) {
       console.error("Error updating payment:", error);
       toast({
         variant: "destructive",
         title: "Update Failed",
-        description: "Failed to update payment status. Please try again.",
+        description: "Failed to update payment status. Please check your connection and try again.",
       });
     }
   };
 
   const handleMarkAsFailed = async (payment: Payment) => {
-    const reason = prompt("Reason for payment failure (optional):");
+    // Enhanced confirmation with reason input
+    const reason = window.prompt("Reason for payment failure (optional):");
+    if (reason === null) return; // User cancelled
+    
     try {
       await updatePayment(payment.id, {
         status: "failed",
@@ -386,7 +427,7 @@ const Payments = () => {
       });
       toast({
         title: "Payment Updated",
-        description: `Payment for ${getClientName(
+        description: `Payment of $${payment.amount.toFixed(2)} for ${getClientName(
           payment.clientId,
         )} marked as failed.`,
       });
@@ -395,7 +436,7 @@ const Payments = () => {
       toast({
         variant: "destructive",
         title: "Update Failed",
-        description: "Failed to update payment status. Please try again.",
+        description: "Failed to update payment status. Please check your connection and try again.",
       });
     }
   };
@@ -422,14 +463,14 @@ const Payments = () => {
       await deletePayment(deleteTarget.id);
       toast({
         title: "Payment Deleted",
-        description: "The payment record has been successfully deleted.",
+        description: `Payment record of $${deleteTarget.amount.toFixed(2)} for ${getClientName(deleteTarget.clientId)} has been successfully deleted.`,
       });
     } catch (error) {
       console.error("Error deleting payment:", error);
       toast({
         variant: "destructive",
         title: "Deletion Failed",
-        description: "Failed to delete payment. Please try again.",
+        description: "Failed to delete payment. Please check your connection and try again.",
       });
     } finally {
       setIsDeleting(false);
@@ -626,10 +667,11 @@ const Payments = () => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
+                    aria-label="Search payments"
                   />
                 </div>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-[160px]">
+                  <SelectTrigger className="w-full sm:w-[160px]" aria-label="Filter by payment status">
                     <SelectValue placeholder="All Status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -640,7 +682,7 @@ const Payments = () => {
                   </SelectContent>
                 </Select>
                 <Select value={methodFilter} onValueChange={setMethodFilter}>
-                  <SelectTrigger className="w-full sm:w-[160px]">
+                  <SelectTrigger className="w-full sm:w-[160px]" aria-label="Filter by payment method">
                     <SelectValue placeholder="All Methods" />
                   </SelectTrigger>
                   <SelectContent>
@@ -701,6 +743,15 @@ const Payments = () => {
                 <Card
                   key={payment.id}
                   className="relative flex flex-col overflow-hidden transition-all hover:shadow-lg"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      // Could open payment details dialog here
+                    }
+                  }}
+                  role="button"
+                  aria-label={`Payment from ${clientInfo.name} for $${payment.amount.toFixed(2)} - Status: ${payment.status}${isOverdue ? ' (Overdue)' : ''}`}
                 >
                   <div
                     className={cn(
@@ -734,6 +785,8 @@ const Payments = () => {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 flex-shrink-0"
+                          aria-label={`Payment actions for ${clientInfo.name}`}
+                          title="Payment actions"
                         >
                           <MoreVertical className="h-4 w-4" />
                         </Button>
@@ -742,6 +795,7 @@ const Payments = () => {
                         {payment.status === "pending" && (
                           <DropdownMenuItem
                             onClick={() => handleMarkAsPaid(payment)}
+                            aria-label={`Mark payment from ${clientInfo.name} as paid`}
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />
                             Mark as Paid
@@ -750,6 +804,7 @@ const Payments = () => {
                         {payment.status === "pending" && (
                           <DropdownMenuItem
                             onClick={() => handleSendReminder(payment)}
+                            aria-label={`Send payment reminder to ${clientInfo.name}`}
                           >
                             <Mail className="h-4 w-4 mr-2" />
                             Send Reminder
@@ -758,6 +813,7 @@ const Payments = () => {
                         {payment.status === "pending" && (
                           <DropdownMenuItem
                             onClick={() => handleMarkAsFailed(payment)}
+                            aria-label={`Mark payment from ${clientInfo.name} as failed`}
                           >
                             <XCircle className="h-4 w-4 mr-2" />
                             Mark as Failed
@@ -766,6 +822,7 @@ const Payments = () => {
                         {payment.status === "failed" && (
                           <DropdownMenuItem
                             onClick={() => handleMarkAsPaid(payment)}
+                            aria-label={`Retry payment from ${clientInfo.name}`}
                           >
                             <RefreshCw className="h-4 w-4 mr-2" />
                             Retry Payment
@@ -774,6 +831,7 @@ const Payments = () => {
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => handleDeleteRequest(payment)}
+                          aria-label={`Delete payment record for ${clientInfo.name}`}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete Record

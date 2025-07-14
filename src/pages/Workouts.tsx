@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { WorkoutPlan, Exercise } from "@/lib/types";
 import { useAuth } from "@/contexts/AuthContext";
+import { useData } from "@/contexts/DataContext";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
 import { doc, updateDoc, deleteDoc, addDoc, collection, getDocs } from "firebase/firestore";
@@ -165,7 +166,18 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
   };
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-white to-gray-50/50">
+    <Card 
+      className="group hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-white to-gray-50/50"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onView(plan);
+        }
+      }}
+      role="button"
+      aria-label={`Workout plan: ${plan.name} for ${getClientName(plan.clientId) || 'Unassigned'}. ${plan.exercises.length} exercises. Click to view details.`}
+    >
       <CardHeader className="pb-3 sm:pb-4">
         <div className="flex justify-between items-start">
           <div className="space-y-2 sm:space-y-3 flex-1 min-w-0">
@@ -241,6 +253,8 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
                 size="sm"
                 onClick={() => onView(plan)}
                 className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-primary/10 hover:text-primary"
+                aria-label={`View details for ${plan.name}`}
+                title="View details"
               >
                 <Target className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
@@ -249,6 +263,8 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
                 size="sm"
                 onClick={() => setIsEditing(true)}
                 className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-primary/10 hover:text-primary"
+                aria-label={`Edit ${plan.name}`}
+                title="Edit workout"
               >
                 <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
@@ -257,6 +273,8 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
                 size="sm"
                 onClick={() => onDuplicate(plan)}
                 className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-primary/10 hover:text-primary"
+                aria-label={`Duplicate ${plan.name}`}
+                title="Duplicate workout"
               >
                 <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
@@ -265,6 +283,8 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
                 size="sm"
                 onClick={() => onStart(plan)}
                 className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-green-500/10 hover:text-green-600"
+                aria-label={`Start session with ${plan.name}`}
+                title="Start session"
               >
                 <Play className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
@@ -273,6 +293,8 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
                 size="sm"
                 onClick={() => onDelete(plan)}
                 className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-red-500/10 hover:text-red-600"
+                aria-label={`Delete ${plan.name}`}
+                title="Delete workout"
               >
                 <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
@@ -343,12 +365,41 @@ const CreateWorkoutDialog = ({ isOpen, onClose, onWorkoutCreated, clients }) => 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user?.uid || !workoutData.name || !workoutData.clientId) return;
+    
+    // Enhanced validation
+    if (!user?.uid) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to create a workout plan.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!workoutData.name.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a workout name.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!workoutData.clientId) {
+      toast({
+        title: "Error",
+        description: "Please select a client for this workout plan.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setLoading(true);
     try {
       const newWorkout = {
         ...workoutData,
+        name: workoutData.name.trim(),
+        description: workoutData.description.trim(),
         exercises: [],
         isActive: true,
         createdDate: new Date().toISOString(),
@@ -362,6 +413,13 @@ const CreateWorkoutDialog = ({ isOpen, onClose, onWorkoutCreated, clients }) => 
       onWorkoutCreated();
       onClose();
       
+      // Reset form
+      setWorkoutData({
+        clientId: "",
+        name: "",
+        description: "",
+      });
+      
       toast({
         title: "Workout created",
         description: "New workout plan has been successfully created.",
@@ -370,7 +428,7 @@ const CreateWorkoutDialog = ({ isOpen, onClose, onWorkoutCreated, clients }) => 
       console.error("Error creating workout:", error);
       toast({
         title: "Error",
-        description: "Failed to create workout. Please try again.",
+        description: "Failed to create workout. Please check your connection and try again.",
         variant: "destructive",
       });
     } finally {
@@ -489,16 +547,23 @@ const ViewWorkoutDialog = ({ workout, isOpen, onClose, onSave, getClientName }) 
   }, [workout]);
 
   const handleAddExercise = () => {
-    if (!newExercise.name) return;
+    if (!newExercise.name.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter an exercise name.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const exercise = {
       id: Date.now().toString(),
-      name: newExercise.name,
+      name: newExercise.name.trim(),
       sets: parseInt(newExercise.sets) || 0,
-      reps: newExercise.reps,
-      weight: newExercise.weight,
-      duration: newExercise.duration,
-      notes: newExercise.notes
+      reps: newExercise.reps.trim(),
+      weight: newExercise.weight.trim(),
+      duration: newExercise.duration.trim(),
+      notes: newExercise.notes.trim()
     };
 
     setWorkoutData(prev => ({
@@ -514,6 +579,11 @@ const ViewWorkoutDialog = ({ workout, isOpen, onClose, onSave, getClientName }) 
       duration: "",
       notes: ""
     });
+    
+    toast({
+      title: "Exercise added",
+      description: `${exercise.name} has been added to the workout plan.`,
+    });
   };
 
   const handleRemoveExercise = (index) => {
@@ -526,12 +596,30 @@ const ViewWorkoutDialog = ({ workout, isOpen, onClose, onSave, getClientName }) 
   const handleSave = async () => {
     if (!workout) return;
     
+    // Enhanced validation
+    if (!workoutData.name.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a workout name.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (workoutData.exercises.length === 0) {
+      toast({
+        title: "Warning",
+        description: "This workout plan has no exercises. Consider adding some exercises.",
+        variant: "destructive",
+      });
+    }
+    
     try {
       if (!isDemoAccount) {
         const workoutDoc = doc(db, "users", user.uid, "workoutPlans", workout.id);
         await updateDoc(workoutDoc, {
-          name: workoutData.name,
-          description: workoutData.description,
+          name: workoutData.name.trim(),
+          description: workoutData.description.trim(),
           exercises: workoutData.exercises
         });
       }
@@ -548,7 +636,7 @@ const ViewWorkoutDialog = ({ workout, isOpen, onClose, onSave, getClientName }) 
       console.error("Error updating workout:", error);
       toast({
         title: "Error",
-        description: "Failed to update workout. Please try again.",
+        description: "Failed to update workout. Please check your connection and try again.",
         variant: "destructive",
       });
     }
@@ -779,6 +867,9 @@ const Workouts = () => {
   // Check if this is the demo account
   const isDemoAccount = user?.email === "trainer@demo.com" || user?.uid === "demo-user-123";
 
+  // Use DataContext instead of direct Firestore calls
+  const { clients: contextClients, loading: contextLoading } = useData();
+  
   // Load data once on mount
   useEffect(() => {
     const loadData = async () => {
@@ -801,17 +892,8 @@ const Workouts = () => {
         const plans = workoutSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WorkoutPlan));
         setWorkoutPlans(plans);
 
-        // Load clients
-        const clientsCollection = collection(db, "users", user.uid, "clients");
-        const clientsSnapshot = await getDocs(clientsCollection);
-        const clientData = clientsSnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            ...data,
-            id: doc.id,
-          };
-        });
-        setClients(clientData);
+        // Use DataContext clients
+        setClients(contextClients || []);
     } catch (error) {
         console.error("Error loading data:", error);
       toast({
@@ -825,7 +907,7 @@ const Workouts = () => {
   };
 
     loadData();
-  }, [user?.uid, user?.email, toast, isDemoAccount]);
+  }, [user?.uid, user?.email, contextClients, isDemoAccount]);
 
   const handleDuplicateWorkout = async (workout: WorkoutPlan) => {
     if (!user?.uid) return;
@@ -840,12 +922,14 @@ const Workouts = () => {
       
       if (!isDemoAccount) {
         const workoutPlansCollection = collection(db, "users", user.uid, "workoutPlans");
-        await addDoc(workoutPlansCollection, duplicatedWorkout);
+        const docRef = await addDoc(workoutPlansCollection, duplicatedWorkout);
         
-        // Reload data
-        const snapshot = await getDocs(workoutPlansCollection);
-        const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WorkoutPlan));
-        setWorkoutPlans(plans);
+        // Update local state immediately
+        setWorkoutPlans(prev => [...prev, { ...duplicatedWorkout, id: docRef.id }]);
+      } else {
+        // For demo account, just update local state
+        const newId = `demo-${Date.now()}`;
+        setWorkoutPlans(prev => [...prev, { ...duplicatedWorkout, id: newId }]);
       }
       
       toast({
@@ -865,17 +949,21 @@ const Workouts = () => {
   const handleDeleteWorkout = async (workout: WorkoutPlan) => {
     if (!user?.uid) return;
     
-    if (confirm(`Are you sure you want to delete "${workout.name}"?`)) {
-      try {
+    // Enhanced confirmation dialog
+    if (!confirm(`Are you sure you want to delete "${workout.name}"?\n\nThis action cannot be undone and will remove all associated exercise data.`)) {
+      return;
+    }
+    
+    try {
       if (!isDemoAccount) {
           const workoutDoc = doc(db, "users", user.uid, "workoutPlans", workout.id);
           await deleteDoc(workoutDoc);
           
-          // Reload data
-          const workoutPlansCollection = collection(db, "users", user.uid, "workoutPlans");
-          const snapshot = await getDocs(workoutPlansCollection);
-          const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WorkoutPlan));
-          setWorkoutPlans(plans);
+          // Update local state immediately
+          setWorkoutPlans(prev => prev.filter(plan => plan.id !== workout.id));
+        } else {
+          // For demo account, just update local state
+          setWorkoutPlans(prev => prev.filter(plan => plan.id !== workout.id));
         }
       
       toast({
@@ -890,7 +978,6 @@ const Workouts = () => {
         variant: "destructive",
       });
       }
-    }
   };
 
   const handleStartSession = (workout: WorkoutPlan) => {
@@ -908,8 +995,9 @@ const Workouts = () => {
   };
 
   const handleEditWorkout = (workout: WorkoutPlan) => {
-    // Simple alert for now
-    alert(`Editing workout: ${workout.name}\nThis feature will be implemented soon.`);
+    // Open the view dialog for editing
+    setSelectedWorkout(workout);
+    setShowViewDialog(true);
   };
 
   const handleSaveWorkout = async (workoutId: string, updatedData: { name: string; description: string }) => {
