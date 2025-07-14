@@ -52,7 +52,7 @@ interface LayoutProps {
 const navigation = [
   {
     name: "Dashboard",
-    href: "/admin",
+    href: "/dashboard",
     icon: LayoutDashboard,
   },
   {
@@ -86,20 +86,9 @@ const navigation = [
     icon: TrendingUp,
   },
   {
-    name: "Client Portals",
-    href: "/client-portals",
-    icon: Share2,
-  },
-  {
     name: "AI Coach",
     href: "/ai-recommendations",
     icon: Brain,
-  },
-  {
-    name: "Marketing",
-    href: "/marketing",
-    icon: Megaphone,
-    soon: true,
   },
 ];
 
@@ -136,7 +125,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
         )}
       >
         <div className="flex items-center h-16 px-6 border-b border-sidebar-border">
-          <Link to="/admin" className="flex items-center gap-2 overflow-hidden">
+          <Link to="/dashboard" className="flex items-center gap-2 overflow-hidden">
             <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Zap className="h-5 w-5" />
             </div>
@@ -164,8 +153,8 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
             isCollapsed={isCollapsed}
           />
           <SidebarNavItem
-            item={{ name: "Help & Support", href: "/help-support", icon: HelpCircle }}
-            isActive={location.pathname.startsWith("/help-support")}
+            item={{ name: "Help & Support", href: "/help", icon: HelpCircle }}
+            isActive={location.pathname.startsWith("/help")}
             isCollapsed={isCollapsed}
           />
           <Tooltip>
@@ -280,7 +269,7 @@ const MobileSidebar = () => {
       <SheetContent side="left" className="p-0 w-72 bg-sidebar text-sidebar-foreground">
         <div className="flex flex-col h-full">
           <div className="flex items-center h-16 px-6 border-b border-sidebar-border">
-            <Link to="/admin" className="flex items-center gap-2">
+            <Link to="/dashboard" className="flex items-center gap-2">
               <div className="h-8 w-8 flex items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Zap className="h-5 w-5" />
               </div>
@@ -331,10 +320,10 @@ const MobileSidebar = () => {
             </SheetClose>
             <SheetClose asChild>
               <Link
-                to="/help-support"
+                to="/help"
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-all duration-200",
-                  location.pathname.startsWith("/help-support")
+                  location.pathname.startsWith("/help")
                     ? "bg-sidebar-primary text-sidebar-primary-foreground"
                     : "hover:bg-sidebar-accent"
                 )}

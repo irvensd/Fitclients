@@ -190,16 +190,16 @@ const Landing = () => {
               className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white"
               onClick={() => window.location.href = '/login'}
             >
-              Start Free Trial
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+                Start Free Trial
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             <Button 
               variant="outline" 
               className="flex-1"
               onClick={() => window.open('https://app.storylane.io/share/dvcmg9nwour6', '_blank')}
             >
-              Watch Demo
-            </Button>
+                Watch Demo
+              </Button>
           </div>
         </div>
         {/* Header */}

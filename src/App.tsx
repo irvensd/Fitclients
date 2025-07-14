@@ -10,6 +10,17 @@ import { SubscriptionProvider } from "./contexts/SubscriptionContext";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
+// Import all the pages that the sidebar navigation needs
+import Clients from "./pages/Clients";
+import Sessions from "./pages/Sessions";
+import Workouts from "./pages/Workouts";
+import Payments from "./pages/Payments";
+import Progress from "./pages/Progress";
+import Settings from "./pages/Settings";
+import Help from "./pages/Help";
+import AIRecommendations from "./pages/AIRecommendations";
+import Features from "./pages/Features";
+
 // Landing page redirect component
 const LandingRedirect = () => {
   const { user, loading } = useAuth();
@@ -51,6 +62,15 @@ const App = () => {
               {/* Protected routes with layout */}
               <Route element={<ProtectedLayout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/features" element={<Features />} />
+                <Route path="/clients" element={<Clients />} />
+                <Route path="/sessions" element={<Sessions />} />
+                <Route path="/workouts" element={<Workouts />} />
+                <Route path="/payments" element={<Payments />} />
+                <Route path="/progress" element={<Progress />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/ai-recommendations" element={<AIRecommendations />} />
               </Route>
               
               {/* 404 route */}

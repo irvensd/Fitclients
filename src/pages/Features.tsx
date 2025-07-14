@@ -75,6 +75,18 @@ const Features = () => {
         "Success prediction",
       ],
     },
+    {
+      icon: MessageSquare,
+      title: "AI Session Recaps",
+      description:
+        "Automatically generate detailed session summaries with personalized feedback and next-session recommendations.",
+      highlights: [
+        "Instant summaries",
+        "Personalized feedback",
+        "Progress tracking",
+        "Action items",
+      ],
+    },
   ];
 
   const coreFeatures = [
@@ -265,7 +277,7 @@ const Features = () => {
         </div>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
           The complete AI-Powered personal training management platform to deliver enhanced, innovative 
-          client expereinces to help grow your business. 
+          client experiences to help grow your business. 
         </p>
       </div>
 
@@ -285,7 +297,7 @@ const Features = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {aiFeatures.map((feature, index) => (
             <Card
               key={index}
@@ -319,11 +331,11 @@ const Features = () => {
 
         <div className="text-center">
           <NavigationButton
-            to="/ai-recommendations"
+            to="/dashboard"
             className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
           >
             <Brain className="h-4 w-4 mr-2" />
-            Explore AI Coach Dashboard
+            Explore Dashboard
           </NavigationButton>
         </div>
       </section>
@@ -479,6 +491,90 @@ const Features = () => {
         </Card>
       </section>
 
+      {/* Social Proof */}
+      <section className="space-y-6">
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-bold">Trusted by Fitness Professionals</h2>
+          <p className="text-muted-foreground">
+            Join trainers who have transformed their business with FitClient
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              </div>
+              <p className="text-sm text-muted-foreground mb-3">
+                "The AI recommendations are game-changing. My clients are seeing better results and I'm saving hours on planning."
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">S</span>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">Sarah M.</p>
+                  <p className="text-xs text-muted-foreground">Personal Trainer</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              </div>
+              <p className="text-sm text-muted-foreground mb-3">
+                "The client portals are brilliant. No more password issues - my clients love how easy it is to access their progress."
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">M</span>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">Mike R.</p>
+                  <p className="text-xs text-muted-foreground">Fitness Coach</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              </div>
+              <p className="text-sm text-muted-foreground mb-3">
+                "The gamification keeps my clients motivated. They're competing with themselves and seeing real progress."
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">J</span>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">Jessica L.</p>
+                  <p className="text-xs text-muted-foreground">Strength Coach</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       {/* Call to Action */}
       <section className="text-center space-y-6 py-8">
         <div className="space-y-4">
@@ -494,19 +590,19 @@ const Features = () => {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <NavigationButton
-            to="/ai-recommendations"
+            to="/dashboard"
             className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
           >
             <Brain className="h-4 w-4 mr-2" />
-            Try AI Coach Now
+            Start Free Trial
           </NavigationButton>
           <NavigationButton to="/clients" variant="outline">
             <Users className="h-4 w-4 mr-2" />
             Manage Clients
           </NavigationButton>
-          <NavigationButton to="/client-portals" variant="outline">
+          <NavigationButton to="/demo-portal" variant="outline">
             <Share2 className="h-4 w-4 mr-2" />
-            Share Client Portals
+            View Demo Portal
           </NavigationButton>
         </div>
       </section>

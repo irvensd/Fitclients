@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -128,8 +129,17 @@ const MilestoneCelebrationModal = ({
 };
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const { clients, sessions, payments, progressEntries, loading } = useData();
+  const dataContext = useData();
+  const {
+    clients = [],
+    sessions = [],
+    payments = [],
+    progressEntries = [],
+    loading = false,
+    error = null
+  } = dataContext || {};
   const { getCurrentPlan, subscription } = useSubscription();
 
   // Sample streak data for demo/testing
@@ -200,6 +210,14 @@ const Dashboard = () => {
     }
   }, [sessions.length, clients.length, isDemo, celebratedMilestones]);
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-600 font-bold">Failed to load dashboard data. Please try again later.</div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -217,7 +235,7 @@ const Dashboard = () => {
           title="Welcome to Your Dashboard!"
           description="Get started by adding your first client, scheduling a session, or exploring the features. Your dashboard will come to life as you add data."
           actionText="Add Your First Client"
-          onAction={() => (window.location.href = "/clients")}
+          onAction={() => navigate("/clients")}
         />
       </div>
     );
@@ -225,9 +243,14 @@ const Dashboard = () => {
 
   // Calculate dashboard stats
   const stats = calculateDashboardStats(clients, sessions, payments);
-  const recentClients = getRecentClients(clients);
-  const todaysSessions = getTodaysSessions(sessions);
-  const recentCancellations = getRecentCancellations(sessions);
+  const recentClients = getRecentClients(clients).slice(0, 10);
+  const todaysSessions = getTodaysSessions(sessions).slice(0, 10);
+  const recentCancellations = getRecentCancellations(sessions).slice(0, 10);
+
+  // Dynamic success rate
+  const successRate = sessions.length
+    ? Math.round((sessions.filter(s => s.status === "completed").length / sessions.length) * 100)
+    : 0;
 
   // Prepare motivational stats for creative dashboard
   const motivationalStats = {
@@ -252,16 +275,6 @@ const Dashboard = () => {
 
       <QuickActionsWidget />
 
-      {/* Streak Tracker with Celebration */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Your Streaks</h2>
-        <StreakTracker 
-          streaks={streaks} 
-          variant="card" 
-          showCelebration={true} 
-        />
-      </div>
-
       {/* Creative Dashboard - Motivational Elements */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-6 rounded-lg">
@@ -283,9 +296,19 @@ const Dashboard = () => {
         </div>
         <div className="bg-gradient-to-br from-purple-500 to-pink-600 text-white p-6 rounded-lg">
           <h3 className="text-lg font-semibold mb-2">Success Rate</h3>
-          <p className="text-3xl font-bold">94%</p>
+          <p className="text-3xl font-bold">{successRate}%</p>
           <p className="text-purple-100 text-sm">Excellence achieved!</p>
         </div>
+      </div>
+
+      {/* Streak Tracker with Celebration */}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Your Streaks</h2>
+        <StreakTracker 
+          streaks={streaks} 
+          variant="card" 
+          showCelebration={true} 
+        />
       </div>
 
       {/* Analytics & Charts */}
@@ -435,42 +458,42 @@ const Dashboard = () => {
                 title: "Increase Session Frequency",
                 description: "Clients with 3+ sessions per week show 40% better results",
                 action: "Schedule More",
-                onClick: () => window.location.href = "/sessions"
+                onClick: () => navigate("/sessions")
               },
               {
                 icon: Target,
                 title: "Set Clear Goals",
                 description: "Help clients define specific, measurable fitness objectives",
                 action: "Review Goals",
-                onClick: () => window.location.href = "/clients"
+                onClick: () => navigate("/clients")
               },
               {
                 icon: Activity,
                 title: "Track Progress",
                 description: "Regular progress tracking improves client retention by 60%",
                 action: "Log Progress",
-                onClick: () => window.location.href = "/progress"
+                onClick: () => navigate("/progress")
               },
               {
                 icon: Brain,
                 title: "Get AI Insights",
                 description: "View detailed AI-powered recommendations for each client",
                 action: "View Insights",
-                onClick: () => window.location.href = "/ai-recommendations"
+                onClick: () => navigate("/ai-recommendations")
               },
               {
                 icon: Users,
                 title: "Client Engagement",
                 description: "Engaged clients are 3x more likely to achieve their goals",
                 action: "Engage Clients",
-                onClick: () => window.location.href = "/clients"
+                onClick: () => navigate("/clients")
               },
               {
                 icon: DollarSign,
                 title: "Revenue Optimization",
                 description: "Optimize pricing and payment collection for better revenue",
                 action: "View Payments",
-                onClick: () => window.location.href = "/payments"
+                onClick: () => navigate("/payments")
               }
             ].map((recommendation, index) => (
               <div
