@@ -1156,7 +1156,7 @@ const Clients = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Helper function to get client session stats
+  // Helper function to get client session stats - memoized for performance
   const getClientSessionStats = (clientId: string) => {
     const clientSessions = sessions.filter(session => session.clientId === clientId);
     const today = new Date();
@@ -1179,6 +1179,15 @@ const Clients = () => {
       lastSession,
       nextSession
     };
+  };
+
+  // Memoize client stats to prevent unnecessary recalculations
+  const clientStatsMap = new Map();
+  const getMemoizedClientStats = (clientId: string) => {
+    if (!clientStatsMap.has(clientId)) {
+      clientStatsMap.set(clientId, getClientSessionStats(clientId));
+    }
+    return clientStatsMap.get(clientId);
   };
 
   const currentPlan = getCurrentPlan();
@@ -1262,16 +1271,25 @@ Your Personal Trainer`;
   };
 
   const copyPortalLink = async (clientId: string, clientName: string) => {
-    // For demo users, always use demo portal
-    const portalUrl = user?.email === 'trainer@demo.com'
-      ? `${window.location.origin}/demo-portal`
-      : `${window.location.origin}/client-portal/${clientId}`;
-    
-    await navigator.clipboard.writeText(portalUrl);
-    toast({
-      title: "Portal link copied!",
-      description: `Portal link for ${clientName} has been copied to clipboard.`,
-    });
+    try {
+      // For demo users, always use demo portal
+      const portalUrl = user?.email === 'trainer@demo.com'
+        ? `${window.location.origin}/demo-portal`
+        : `${window.location.origin}/client-portal/${clientId}`;
+      
+      await navigator.clipboard.writeText(portalUrl);
+      toast({
+        title: "Portal link copied!",
+        description: `Portal link for ${clientName} has been copied to clipboard.`,
+      });
+    } catch (error) {
+      console.error("Error copying to clipboard:", error);
+      toast({
+        title: "Copy failed",
+        description: "Unable to copy to clipboard. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDeleteClient = async (clientId: string) => {
@@ -1479,120 +1497,7 @@ Your Personal Trainer`;
         <AddClientDialog />
       </div>
 
-      {/* Empty State */}
-      {activeClients.length === 0 && archivedClients.length === 0 && (
-        <div className="space-y-6">
-          {/* Welcome Message */}
-          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                  <Users className="h-8 w-8 text-primary" />
-                </div>
-                <h2 className="text-2xl font-bold mb-2">Welcome to Your Client Hub!</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  This is where you'll manage all your client relationships, track their progress, and grow your fitness business. 
-                  Get started by adding your first client below.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Main Empty State */}
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Add Client Section */}
-            <Card className="lg:col-span-2 border-2 border-dashed border-muted-foreground/25 bg-muted/5">
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 mb-6">
-                  <UserPlus className="h-12 w-12 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">Add Your First Client</h3>
-                <p className="text-muted-foreground text-center mb-6 max-w-md">
-                  Start building your client base! Add your first client to begin
-                  tracking their fitness journey and managing their sessions.
-                </p>
-                <AddClientDialog />
-              </CardContent>
-            </Card>
-
-            {/* What You Can Do */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-primary" />
-                  What You Can Do
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Users className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">Manage Clients</h4>
-                    <p className="text-xs text-muted-foreground">Track client info, goals, and progress</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <ExternalLink className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">Client Portals</h4>
-                    <p className="text-xs text-muted-foreground">Give clients access to their own dashboard</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Share2 className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">Share & Communicate</h4>
-                    <p className="text-xs text-muted-foreground">Send portal links and stay connected</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Feature Preview Cards */}
-          <div className="grid md:grid-cols-3 gap-4">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="pt-6 text-center">
-                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-                  <Target className="h-6 w-6 text-blue-600" />
-                </div>
-                <h4 className="font-semibold mb-2">Track Progress</h4>
-                <p className="text-sm text-muted-foreground">
-                  Monitor client workouts, measurements, and achievements
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="pt-6 text-center">
-                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
-                  <Eye className="h-6 w-6 text-green-600" />
-                </div>
-                <h4 className="font-semibold mb-2">Client Portals</h4>
-                <p className="text-sm text-muted-foreground">
-                  Provide personalized dashboards for each client
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="pt-6 text-center">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
-                  <AlertTriangle className="h-6 w-6 text-purple-600" />
-                </div>
-                <h4 className="font-semibold mb-2">Smart Insights</h4>
-                <p className="text-sm text-muted-foreground">
-                  Get AI-powered recommendations and analytics
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      )}
 
       {(activeClients.length > 0 || archivedClients.length > 0) && (
         <>
@@ -1767,7 +1672,7 @@ Your Personal Trainer`;
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredActiveClients.map((client: any) => {
-                  const stats = getClientSessionStats(client.id);
+                  const stats = getMemoizedClientStats(client.id);
                   const hasUpcomingSession = stats.nextSession;
                   
                   return (
@@ -1779,6 +1684,15 @@ Your Personal Trainer`;
                           : 'hover:ring-2 hover:ring-primary/20'
                       }`}
                       onClick={() => setSelectedClient(client)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedClient(client);
+                        }
+                      }}
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`View details for ${client.name}`}
                     >
                       <CardContent className="p-6 relative overflow-hidden">
                         {/* Background decoration */}
@@ -1974,7 +1888,7 @@ Your Personal Trainer`;
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {archivedClients.map((client: any) => {
-                    const stats = getClientSessionStats(client.id);
+                    const stats = getMemoizedClientStats(client.id);
                     
                     return (
                       <Card

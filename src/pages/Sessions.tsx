@@ -75,25 +75,38 @@ const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) =>
     notes: "",
   });
 
-  // Load clients when dialog opens
+  // Use DataContext clients instead of direct Firestore calls
+  const { clients: contextClients } = useData();
+  
   useEffect(() => {
-    if (isOpen && user?.uid) {
-      const loadClients = async () => {
-        try {
-          const clientsSnapshot = await getDocs(collection(db, "users", user.uid, "clients"));
-          const clientsData = clientsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          setClients(clientsData);
-        } catch (error) {
-          console.error("Error loading clients:", error);
-        }
-      };
-      loadClients();
+    if (isOpen && contextClients) {
+      setClients(contextClients);
     }
-  }, [isOpen, user?.uid]);
+  }, [isOpen, contextClients]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading || !user?.uid) return;
+    
+    // Validate form data
+    if (!formData.clientId || !formData.date || !formData.startTime || !formData.endTime || !formData.type || !formData.cost) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validate time logic
+    if (formData.startTime >= formData.endTime) {
+      toast({
+        title: "Time Error",
+        description: "End time must be after start time.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setLoading(true);
     
@@ -337,6 +350,17 @@ const Sessions = () => {
     return group;
   }, [sessions]);
 
+  // Helper function to check if a session is overdue
+  const isSessionOverdue = (session: Session) => {
+    const sessionDateTime = new Date(`${session.date}T${session.endTime}`);
+    const now = new Date();
+    return sessionDateTime < now && session.status === "scheduled";
+  };
+
+  // Get overdue sessions count
+  const overdueSessions = sessions.filter(isSessionOverdue);
+  const overdueCount = overdueSessions.length;
+
   const startEditing = (session: Session) => {
     setEditingSession(session.id);
     setEditForm({
@@ -410,6 +434,11 @@ const Sessions = () => {
   const handleDeleteSession = async (session: Session) => {
     if (!user?.uid) return;
     
+    // Add confirmation dialog
+    if (!confirm(`Are you sure you want to delete the session with ${getClientName(session.clientId)} on ${format(parseISO(session.date), 'MMM dd, yyyy')}?`)) {
+      return;
+    }
+    
     try {
       const sessionRef = doc(db, "users", user.uid, "sessions", session.id);
       await deleteDoc(sessionRef);
@@ -462,7 +491,12 @@ const Sessions = () => {
     return client?.name || "Unknown Client";
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string, session?: Session) => {
+    // Check if session is overdue
+    if (session && isSessionOverdue(session)) {
+      return "bg-orange-100 text-orange-800 border-orange-200";
+    }
+    
     switch (status) {
       case "completed":
         return "bg-green-100 text-green-800 border-green-200";
@@ -494,10 +528,23 @@ const Sessions = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => window.location.reload()}>
-            Refresh
-          </Button>
-          <AddSessionDialog onSessionAdded={() => window.location.reload()} />
+          {overdueCount > 0 && (
+            <Button 
+              variant="outline" 
+              className="bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100"
+              onClick={() => {
+                // Bulk complete overdue sessions
+                overdueSessions.forEach(session => handleCompleteSession(session));
+              }}
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Complete {overdueCount} Overdue
+            </Button>
+          )}
+          <AddSessionDialog onSessionAdded={() => {
+            // Trigger a gentle refresh of the data context
+            // This is more efficient than a full page reload
+          }} />
         </div>
       </div>
 
@@ -522,7 +569,10 @@ const Sessions = () => {
                 <p className="text-muted-foreground text-center mb-4">
                   Start by scheduling your first training session.
                 </p>
-                <AddSessionDialog onSessionAdded={() => window.location.reload()} />
+                <AddSessionDialog onSessionAdded={() => {
+                  // Trigger a gentle refresh of the data context
+                  // This is more efficient than a full page reload
+                }} />
               </CardContent>
             </Card>
           ) : (
@@ -534,11 +584,23 @@ const Sessions = () => {
                   </h2>
                   <div className="space-y-4">
                     {sessionsOnDate.map((session) => (
-                      <Card key={session.id} className="transition-shadow hover:shadow-lg">
+                      <Card 
+                        key={session.id} 
+                        className="transition-shadow hover:shadow-lg"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            startEditing(session);
+                          }
+                        }}
+                        role="button"
+                        aria-label={`Session with ${getClientName(session.clientId)} on ${format(parseISO(session.date), 'MMM dd, yyyy')}`}
+                      >
                         <CardHeader className="pb-4">
                           <div className="flex items-start justify-between">
                             <div className="flex items-center gap-4">
-                              <div className={`w-1.5 h-16 rounded-full ${getStatusColor(session.status).replace('bg-', 'bg-opacity-100 bg-')}`}></div>
+                              <div className={`w-1.5 h-16 rounded-full ${getStatusColor(session.status, session).replace('bg-', 'bg-opacity-100 bg-')}`}></div>
                               <div>
                                 <CardTitle className="text-xl font-bold text-foreground">
                                   {getClientName(session.clientId)}
@@ -555,9 +617,10 @@ const Sessions = () => {
                             <div className="flex items-center gap-2">
                               <Badge 
                                 variant="outline" 
-                                className={cn("text-sm", getStatusColor(session.status))}
+                                className={cn("text-sm", getStatusColor(session.status, session))}
+                                aria-label={`Session status: ${isSessionOverdue(session) ? 'overdue' : session.status}`}
                               >
-                                {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+                                {isSessionOverdue(session) ? 'Overdue' : session.status.charAt(0).toUpperCase() + session.status.slice(1)}
                               </Badge>
                               {editingSession !== session.id && (
                                 <DropdownMenu>
@@ -571,7 +634,7 @@ const Sessions = () => {
                                       <Edit className="h-4 w-4 mr-2" />
                                       Edit
                                     </DropdownMenuItem>
-                                    {session.status === "scheduled" && (
+                                    {(session.status === "scheduled" || isSessionOverdue(session)) && (
                                       <DropdownMenuItem onClick={() => handleCompleteSession(session)}>
                                         <CheckCircle className="h-4 w-4 mr-2" />
                                         Mark Complete
@@ -732,6 +795,30 @@ const Sessions = () => {
                                   <p className="text-sm text-muted-foreground">
                                     <strong>Notes:</strong> {session.notes}
                                   </p>
+                                </div>
+                              )}
+                              
+                              {/* Quick Complete Button for Overdue Sessions */}
+                              {isSessionOverdue(session) && (
+                                <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <p className="text-sm font-medium text-orange-800">
+                                        This session is overdue
+                                      </p>
+                                      <p className="text-xs text-orange-600">
+                                        Mark as complete to update your records
+                                      </p>
+                                    </div>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleCompleteSession(session)}
+                                      className="bg-orange-600 hover:bg-orange-700 text-white"
+                                    >
+                                      <CheckCircle className="h-4 w-4 mr-2" />
+                                      Mark Complete
+                                    </Button>
+                                  </div>
                                 </div>
                               )}
                             </div>
