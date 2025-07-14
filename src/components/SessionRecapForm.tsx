@@ -38,6 +38,7 @@ import {
   generateSessionRecap,
   generateClientSummary,
 } from "@/lib/sessionRecapAI";
+import { useToast } from "@/hooks/use-toast";
 
 interface SessionRecapFormProps {
   session: Session;
@@ -50,6 +51,7 @@ export const SessionRecapForm = ({
   client,
   onRecapGenerated,
 }: SessionRecapFormProps) => {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"form" | "generating" | "result">("form");
   const [formData, setFormData] = useState({
@@ -138,14 +140,16 @@ export const SessionRecapForm = ({
         );
       } else if (method === "copy") {
         await navigator.clipboard.writeText(clientSummary);
-        alert("Recap copied to clipboard!");
+        toast({
+          title: "Recap Copied",
+          description: "Recap copied to clipboard!",
+        });
       } else if (method === "sms") {
         // In real app, this would integrate with SMS service
-        alert(
-          "SMS integration would send: " +
-            clientSummary.substring(0, 100) +
-            "...",
-        );
+        toast({
+          title: "SMS Integration",
+          description: "SMS integration would send: " + clientSummary.substring(0, 100) + "...",
+        });
       }
 
       // Mark as shared

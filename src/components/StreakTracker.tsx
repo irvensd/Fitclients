@@ -34,6 +34,7 @@ import {
   getStreakEmoji,
   getNextStreakMilestone,
 } from "@/lib/gamification";
+import { useToast } from "@/hooks/use-toast";
 
 interface StreakTrackerProps {
   streaks: Streak[];
@@ -558,6 +559,7 @@ const MilestoneCelebration = ({
   streak: Streak; 
   onClose: () => void; 
 }) => {
+  const { toast } = useToast();
   const [showConfetti, setShowConfetti] = useState(true);
   const [confetti, setConfetti] = useState<Array<{id: number; x: number; y: number; color: string}>>([]);
 
@@ -604,7 +606,10 @@ const MilestoneCelebration = ({
       // Fallback: copy to clipboard
       const text = `I just achieved a ${streak.currentCount} day streak in ${streak.title}! ${getMilestoneMessage(streak.currentCount)}`;
       navigator.clipboard.writeText(text);
-      alert('Achievement copied to clipboard!');
+              toast({
+          title: "Achievement Copied",
+          description: "Achievement copied to clipboard!",
+        });
     }
     onClose();
   };

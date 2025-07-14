@@ -131,7 +131,7 @@ export const ClientSuccessStories = () => {
 
   const generateReport = (story: SuccessStory) => {
     // This would generate a PDF report or social media post
-    console.log("Generating success story report for:", story.clientName);
+    // Generating success story report
   };
 
   return (

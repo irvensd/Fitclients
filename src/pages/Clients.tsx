@@ -1272,10 +1272,7 @@ Your Personal Trainer`;
 
   const copyPortalLink = async (clientId: string, clientName: string) => {
     try {
-      // For demo users, always use demo portal
-      const portalUrl = user?.email === 'trainer@demo.com'
-        ? `${window.location.origin}/demo-portal`
-        : `${window.location.origin}/client-portal/${clientId}`;
+          const portalUrl = `${window.location.origin}/client-portal/${clientId}`;
       
       await navigator.clipboard.writeText(portalUrl);
       toast({

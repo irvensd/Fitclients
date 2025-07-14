@@ -43,9 +43,9 @@ export const userProfileService = {
         lastLogin: new Date().toISOString(),
       };
       
-      console.log("Creating user profile with data:", userProfile);
+      // Creating user profile
       await setDoc(userRef, userProfile);
-      console.log("User profile created successfully for:", userId);
+              // User profile created successfully
       return userProfile;
     } catch (error) {
       console.error("Error creating user profile:", error);
@@ -56,16 +56,16 @@ export const userProfileService = {
   // Get user profile
   getUserProfile: async (userId: string): Promise<UserProfile | null> => {
     try {
-      console.log("Fetching user profile for:", userId);
+      // Fetching user profile
       const userRef = doc(db, "users", userId);
       const userDoc = await getDoc(userRef);
       
       if (userDoc.exists()) {
         const data = userDoc.data() as UserProfile;
-        console.log("User profile found:", data);
+        // User profile found
         return data;
       }
-      console.log("No user profile found for:", userId);
+              // No user profile found
       return null;
     } catch (error) {
       console.error("Error fetching user profile:", error);
@@ -537,7 +537,7 @@ export const billingHistoryService = {
         await billingHistoryService.addBillingHistoryItem(userId, item);
       }
 
-      console.log("Sample billing history added for user:", userId);
+      // Sample billing history added
     } catch (error) {
       console.error("Error adding sample billing history:", error);
     }

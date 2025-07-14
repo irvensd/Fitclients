@@ -44,15 +44,16 @@ import {
   Loader2,
   Share2,
   Database,
+  Plus,
 } from "lucide-react";
-import { DevModeNotice } from "@/components/DevModeNotice";
+
 import { SubscriptionManager } from "@/components/SubscriptionManager";
 import { BackupManager } from "@/components/BackupManager";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { userProfileService } from "@/lib/firebaseService";
-import { UserProfile, OperatingHours } from "@/lib/types";
+import { UserProfile, OperatingHours, Certification, Pricing, Package } from "@/lib/types";
 
 const Settings = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -76,13 +77,18 @@ const Settings = () => {
     bio: "Certified personal trainer with 5+ years of experience helping clients achieve their fitness goals.",
   });
 
-  const [pricing, setPricing] = useState({
+  const [pricing, setPricing] = useState<Pricing>({
     personalTraining: 75,
     consultation: 50,
     assessment: 60,
     packageDiscount: 10,
     currency: "USD",
     taxRate: 8.5,
+    packages: [
+      { id: "1", name: "4-Session Package", sessions: 4, price: 270, discount: 10 },
+      { id: "2", name: "8-Session Package", sessions: 8, price: 540, discount: 10 },
+      { id: "3", name: "12-Session Package", sessions: 12, price: 810, discount: 15 },
+    ],
   });
 
   const { user, userProfile, updateUserProfile } = useAuth();
@@ -116,6 +122,17 @@ const Settings = () => {
     youtube: "",
   });
 
+  const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [showAddCertification, setShowAddCertification] = useState(false);
+  const [newCertification, setNewCertification] = useState({
+    name: "",
+    issuingOrganization: "",
+    issueDate: "",
+    expirationDate: "",
+    credentialId: "",
+    notes: "",
+  });
+
   // Handle tab changes from URL parameters
   useEffect(() => {
     const tabParam = searchParams.get("tab");
@@ -135,9 +152,7 @@ const Settings = () => {
     
     setRefreshing(true);
     try {
-      console.log("Manually refreshing profile for UID:", user.uid);
       const profile = await userProfileService.getUserProfile(user.uid);
-      console.log("Refreshed profile data:", profile);
       
       if (profile) {
         setProfileForm({
@@ -159,7 +174,6 @@ const Settings = () => {
         ]);
         // Load existing social media if it exists
         if (profile.socialMedia) {
-          console.log("Settings page - Loading existing social media:", profile.socialMedia);
           setSocialMedia({
             instagram: profile.socialMedia.instagram || "",
             facebook: profile.socialMedia.facebook || "",
@@ -167,13 +181,24 @@ const Settings = () => {
             youtube: profile.socialMedia.youtube || "",
           });
         }
-        alert("Profile refreshed successfully!");
+        toast({
+          title: "Profile Refreshed",
+          description: "Your profile has been refreshed successfully.",
+        });
       } else {
-        alert("No profile found. Please try saving your information.");
+        toast({
+          title: "No Profile Found",
+          description: "No profile found. Please try saving your information.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error refreshing profile:", error);
-      alert("Failed to refresh profile. Check console for details.");
+      toast({
+        title: "Refresh Failed",
+        description: "Failed to refresh profile. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setRefreshing(false);
     }
@@ -181,9 +206,6 @@ const Settings = () => {
 
   // Update form when userProfile loads
   useEffect(() => {
-    console.log("Settings page - userProfile:", userProfile);
-    console.log("Settings page - user:", user);
-    
     if (userProfile) {
       setProfileForm({
         firstName: userProfile.firstName || "",
@@ -196,19 +218,27 @@ const Settings = () => {
       
       // Load existing operating hours if they exist
       if (userProfile.operatingHours && userProfile.operatingHours.length > 0) {
-        console.log("Settings page - Loading existing operating hours:", userProfile.operatingHours);
         setOperatingHours(userProfile.operatingHours);
       }
       
       // Load existing social media if it exists
       if (userProfile.socialMedia) {
-        console.log("Settings page - Loading existing social media:", userProfile.socialMedia);
         setSocialMedia({
           instagram: userProfile.socialMedia.instagram || "",
           facebook: userProfile.socialMedia.facebook || "",
           tiktok: userProfile.socialMedia.tiktok || "",
           youtube: userProfile.socialMedia.youtube || "",
         });
+      }
+
+      // Load existing certifications if they exist
+      if (userProfile.certifications) {
+        setCertifications(userProfile.certifications);
+      }
+
+      // Load existing pricing if it exists
+      if (userProfile.pricing) {
+        setPricing(userProfile.pricing);
       }
       
       setProfileLoading(false);
@@ -225,7 +255,31 @@ const Settings = () => {
 
   const handleSaveProfile = async () => {
     if (!user?.uid) {
-      alert("You must be logged in to save changes.");
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to save changes.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate required fields
+    if (!profileForm.firstName.trim() || !profileForm.lastName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "First name and last name are required.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate phone number format (optional but if provided, should be valid)
+    if (profileForm.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(profileForm.phone.replace(/[\s\-\(\)]/g, ''))) {
+      toast({
+        title: "Invalid Phone Number",
+        description: "Please enter a valid phone number.",
+        variant: "destructive",
+      });
       return;
     }
     
@@ -237,20 +291,19 @@ const Settings = () => {
         ...profile,
         // Override with new data
         id: user.uid,
-          email: user.email || profileForm.email,
-          firstName: profileForm.firstName,
-          lastName: profileForm.lastName,
-          displayName: `${profileForm.firstName} ${profileForm.lastName}`.trim(),
-          phone: profileForm.phone,
-          bio: profileForm.bio,
+        email: user.email || profileForm.email,
+        firstName: profileForm.firstName.trim(),
+        lastName: profileForm.lastName.trim(),
+        displayName: `${profileForm.firstName.trim()} ${profileForm.lastName.trim()}`.trim(),
+        phone: profileForm.phone.trim(),
+        bio: profileForm.bio.trim(),
         createdAt: profile?.createdAt || new Date().toISOString(),
         lastLogin: new Date().toISOString(),
         operatingHours: operatingHours,
         socialMedia: socialMedia,
+        certifications: certifications,
+        pricing: pricing,
       };
-
-      console.log("Settings page - Saving profile with operating hours:", updatedProfile);
-      console.log("Settings page - Operating hours to save:", operatingHours);
 
       await userProfileService.updateUserProfile(user.uid, updatedProfile);
       
@@ -258,13 +311,13 @@ const Settings = () => {
       setProfile(updatedProfile);
       
       toast({
-        title: "Profile updated",
+        title: "Profile Updated",
         description: "Your profile and business settings have been saved successfully.",
       });
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
-        title: "Error",
+        title: "Update Failed",
         description: "Failed to update profile. Please try again.",
         variant: "destructive",
       });
@@ -283,10 +336,122 @@ const Settings = () => {
     );
   };
 
+  // Certification management functions
+  const getCertificationStatus = (expirationDate: string): "active" | "expired" | "expiring-soon" => {
+    const today = new Date();
+    const expiration = new Date(expirationDate);
+    const daysUntilExpiration = Math.ceil((expiration.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (daysUntilExpiration < 0) return "expired";
+    if (daysUntilExpiration <= 30) return "expiring-soon";
+    return "active";
+  };
+
+  const addCertification = () => {
+    if (!newCertification.name || !newCertification.issuingOrganization || !newCertification.issueDate || !newCertification.expirationDate) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const certification: Certification = {
+      id: Date.now().toString(),
+      name: newCertification.name,
+      issuingOrganization: newCertification.issuingOrganization,
+      issueDate: newCertification.issueDate,
+      expirationDate: newCertification.expirationDate,
+      credentialId: newCertification.credentialId || undefined,
+      notes: newCertification.notes || undefined,
+      status: getCertificationStatus(newCertification.expirationDate),
+    };
+
+    setCertifications(prev => [...prev, certification]);
+    setNewCertification({
+      name: "",
+      issuingOrganization: "",
+      issueDate: "",
+      expirationDate: "",
+      credentialId: "",
+      notes: "",
+    });
+    setShowAddCertification(false);
+    
+    toast({
+      title: "Certification Added",
+      description: "Your certification has been added successfully.",
+    });
+  };
+
+  const deleteCertification = (id: string) => {
+    if (confirm("Are you sure you want to delete this certification?")) {
+      setCertifications(prev => prev.filter(cert => cert.id !== id));
+      toast({
+        title: "Certification Deleted",
+        description: "The certification has been removed.",
+      });
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  // Pricing management functions
+  const handlePricingChange = (field: keyof Pricing, value: any) => {
+    setPricing(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handlePackageChange = (packageId: string, field: keyof Package, value: any) => {
+    setPricing(prev => ({
+      ...prev,
+      packages: prev.packages.map(pkg => 
+        pkg.id === packageId ? { ...pkg, [field]: value } : pkg
+      )
+    }));
+  };
+
+  const addPackage = () => {
+    const newPackage: Package = {
+      id: Date.now().toString(),
+      name: `New Package`,
+      sessions: 1,
+      price: 0,
+      discount: 0,
+    };
+    setPricing(prev => ({
+      ...prev,
+      packages: [...prev.packages, newPackage]
+    }));
+  };
+
+  const deletePackage = (packageId: string) => {
+    if (confirm("Are you sure you want to delete this package?")) {
+      setPricing(prev => ({
+        ...prev,
+        packages: prev.packages.filter(pkg => pkg.id !== packageId)
+      }));
+      toast({
+        title: "Package Deleted",
+        description: "The package has been removed.",
+      });
+    }
+  };
+
+  const calculatePackagePrice = (sessions: number, basePrice: number, discount: number) => {
+    const totalBeforeDiscount = sessions * basePrice;
+    const discountAmount = (totalBeforeDiscount * discount) / 100;
+    return totalBeforeDiscount - discountAmount;
+  };
+
   return (
     <div className="p-6 space-y-6">
-      <DevModeNotice />
-
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">Settings</h1>
@@ -399,19 +564,25 @@ const Settings = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="first-name">First Name</Label>
+                    <Label htmlFor="first-name">First Name *</Label>
                     <Input 
                       id="first-name" 
                       value={profileForm.firstName}
                       onChange={(e) => setProfileForm(prev => ({ ...prev, firstName: e.target.value }))}
+                      placeholder="Enter your first name"
+                      aria-describedby="first-name-error"
+                      aria-required="true"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="last-name">Last Name</Label>
+                    <Label htmlFor="last-name">Last Name *</Label>
                     <Input 
                       id="last-name" 
                       value={profileForm.lastName}
                       onChange={(e) => setProfileForm(prev => ({ ...prev, lastName: e.target.value }))}
+                      placeholder="Enter your last name"
+                      aria-describedby="last-name-error"
+                      aria-required="true"
                     />
                   </div>
                   <div className="space-y-2">
@@ -422,7 +593,11 @@ const Settings = () => {
                       value={profileForm.email}
                       disabled
                       title="Email cannot be changed"
+                      aria-describedby="email-disabled"
                     />
+                    <p id="email-disabled" className="text-xs text-muted-foreground">
+                      Email address cannot be changed
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
@@ -431,7 +606,12 @@ const Settings = () => {
                       value={profileForm.phone}
                       onChange={(e) => setProfileForm(prev => ({ ...prev, phone: e.target.value }))}
                       placeholder="(555) 123-4567"
+                      type="tel"
+                      aria-describedby="phone-help"
                     />
+                    <p id="phone-help" className="text-xs text-muted-foreground">
+                      Optional - Include area code
+                    </p>
                   </div>
                 </div>
               )}
@@ -444,38 +624,199 @@ const Settings = () => {
                   onChange={(e) => setProfileForm(prev => ({ ...prev, bio: e.target.value }))}
                   rows={4}
                   placeholder="Tell clients about your experience, certifications, and training philosophy..."
+                  aria-describedby="bio-help"
+                  maxLength={500}
                 />
+                <p id="bio-help" className="text-xs text-muted-foreground">
+                  {profileForm.bio.length}/500 characters
+                </p>
               </div>
 
               {/* Certifications */}
               <div className="space-y-4">
-                <h3 className="font-medium">Certifications & Qualifications</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">
-                        NASM Certified Personal Trainer
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        Expires: Dec 2025
-                      </p>
-                    </div>
-                    <Badge>Active</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">CPR/AED Certification</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Expires: Mar 2025
-                      </p>
-                    </div>
-                    <Badge>Active</Badge>
-                  </div>
-                  <Button variant="outline" size="sm">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium">Certifications & Qualifications</h3>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowAddCertification(true)}
+                  >
                     <Upload className="h-4 w-4 mr-2" />
                     Add Certification
                   </Button>
                 </div>
+                
+                <div className="space-y-3">
+                  {certifications.length === 0 ? (
+                    <div className="text-center py-6 border-2 border-dashed border-muted-foreground/25 rounded-lg">
+                      <div className="text-muted-foreground mb-2">
+                        <Upload className="h-8 w-8 mx-auto mb-2" />
+                        <p className="text-sm">No certifications added yet</p>
+                        <p className="text-xs text-muted-foreground">Add your professional certifications and qualifications</p>
+                      </div>
+                    </div>
+                  ) : (
+                    certifications.map((certification) => (
+                      <div key={certification.id} className="flex items-center justify-between p-4 border rounded-lg bg-card">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-medium">{certification.name}</h4>
+                            <Badge 
+                              variant={
+                                certification.status === "active" ? "default" :
+                                certification.status === "expiring-soon" ? "secondary" : "destructive"
+                              }
+                            >
+                              {certification.status === "active" ? "Active" :
+                               certification.status === "expiring-soon" ? "Expiring Soon" : "Expired"}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-1">
+                            {certification.issuingOrganization}
+                          </p>
+                          <div className="text-xs text-muted-foreground space-y-1">
+                            <p>Issued: {formatDate(certification.issueDate)}</p>
+                            <p>Expires: {formatDate(certification.expirationDate)}</p>
+                            {certification.credentialId && (
+                              <p>ID: {certification.credentialId}</p>
+                            )}
+                            {certification.notes && (
+                              <p className="mt-2 italic">"{certification.notes}"</p>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteCertification(certification.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Add Certification Modal */}
+                {showAddCertification && (
+                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-background p-6 rounded-lg shadow-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold">Add Certification</h3>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowAddCertification(false)}
+                        >
+                          ×
+                        </Button>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="cert-name">Certification Name *</Label>
+                          <Input
+                            id="cert-name"
+                            value={newCertification.name}
+                            onChange={(e) => setNewCertification(prev => ({ ...prev, name: e.target.value }))}
+                            placeholder="e.g., NASM Certified Personal Trainer"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="cert-org">Issuing Organization *</Label>
+                          <Input
+                            id="cert-org"
+                            value={newCertification.issuingOrganization}
+                            onChange={(e) => setNewCertification(prev => ({ ...prev, issuingOrganization: e.target.value }))}
+                            placeholder="e.g., National Academy of Sports Medicine"
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="cert-issue">Issue Date *</Label>
+                            <Input
+                              id="cert-issue"
+                              type="date"
+                              value={newCertification.issueDate}
+                              onChange={(e) => setNewCertification(prev => ({ ...prev, issueDate: e.target.value }))}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="cert-expire">Expiration Date *</Label>
+                            <Input
+                              id="cert-expire"
+                              type="date"
+                              value={newCertification.expirationDate}
+                              onChange={(e) => setNewCertification(prev => ({ ...prev, expirationDate: e.target.value }))}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="cert-id">Credential ID (Optional)</Label>
+                          <Input
+                            id="cert-id"
+                            value={newCertification.credentialId}
+                            onChange={(e) => setNewCertification(prev => ({ ...prev, credentialId: e.target.value }))}
+                            placeholder="e.g., NASM-CPT-123456"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="cert-notes">Notes (Optional)</Label>
+                          <Textarea
+                            id="cert-notes"
+                            value={newCertification.notes}
+                            onChange={(e) => setNewCertification(prev => ({ ...prev, notes: e.target.value }))}
+                            placeholder="Additional notes about this certification..."
+                            rows={3}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2 mt-6">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowAddCertification(false)}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={addCertification}
+                          className="flex-1"
+                        >
+                          Add Certification
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Save Button */}
+              <div className="flex justify-end pt-4">
+                <Button 
+                  onClick={handleSaveProfile}
+                  disabled={loading}
+                  className="min-w-[120px]"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Profile
+                    </>
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -534,7 +875,7 @@ const Settings = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {operatingHours.map((hour) => (
-                    <div key={hour.day} className="flex items-center gap-4">
+                    <div key={hour.day} className="flex items-center gap-4 p-3 border rounded-lg">
                       <div className="w-20">
                         <span className="text-sm font-medium">{hour.day}</span>
                       </div>
@@ -543,6 +884,7 @@ const Settings = () => {
                         onCheckedChange={(checked) => 
                           handleOperatingHoursChange(hour.day, 'isOpen', checked)
                         }
+                        aria-label={`Toggle ${hour.day} operating hours`}
                       />
                       <Input 
                         className="w-20" 
@@ -552,8 +894,9 @@ const Settings = () => {
                           handleOperatingHoursChange(hour.day, 'startTime', e.target.value)
                         }
                         disabled={!hour.isOpen}
+                        aria-label={`${hour.day} start time`}
                       />
-                      <span className="text-muted-foreground">to</span>
+                      <span className="text-muted-foreground text-sm">to</span>
                       <Input
                         className="w-20"
                         value={hour.endTime}
@@ -562,6 +905,7 @@ const Settings = () => {
                           handleOperatingHoursChange(hour.day, 'endTime', e.target.value)
                         }
                         disabled={!hour.isOpen}
+                        aria-label={`${hour.day} end time`}
                       />
                     </div>
                   ))}
@@ -580,7 +924,11 @@ const Settings = () => {
                       placeholder="@yourusername"
                       value={socialMedia.instagram}
                       onChange={(e) => setSocialMedia(prev => ({ ...prev, instagram: e.target.value }))}
+                      aria-describedby="instagram-help"
                     />
+                    <p id="instagram-help" className="text-xs text-muted-foreground">
+                      Your Instagram username or profile URL
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="facebook">Facebook</Label>
@@ -589,7 +937,11 @@ const Settings = () => {
                       placeholder="facebook.com/yourpage"
                       value={socialMedia.facebook}
                       onChange={(e) => setSocialMedia(prev => ({ ...prev, facebook: e.target.value }))}
+                      aria-describedby="facebook-help"
                     />
+                    <p id="facebook-help" className="text-xs text-muted-foreground">
+                      Your Facebook page URL
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="tiktok">TikTok</Label>
@@ -598,7 +950,11 @@ const Settings = () => {
                       placeholder="@yourusername"
                       value={socialMedia.tiktok}
                       onChange={(e) => setSocialMedia(prev => ({ ...prev, tiktok: e.target.value }))}
+                      aria-describedby="tiktok-help"
                     />
+                    <p id="tiktok-help" className="text-xs text-muted-foreground">
+                      Your TikTok username
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="youtube">YouTube</Label>
@@ -607,7 +963,11 @@ const Settings = () => {
                       placeholder="youtube.com/yourchannel"
                       value={socialMedia.youtube}
                       onChange={(e) => setSocialMedia(prev => ({ ...prev, youtube: e.target.value }))}
+                      aria-describedby="youtube-help"
                     />
+                    <p id="youtube-help" className="text-xs text-muted-foreground">
+                      Your YouTube channel URL
+                    </p>
                   </div>
                 </div>
               </div>
@@ -639,10 +999,17 @@ const Settings = () => {
                     <Input
                       id="personal-training"
                       type="number"
-                      defaultValue={pricing.personalTraining}
+                      min="0"
+                      step="0.01"
+                      value={pricing.personalTraining}
+                      onChange={(e) => handlePricingChange('personalTraining', parseFloat(e.target.value) || 0)}
                       className="pl-8"
+                      aria-describedby="personal-training-help"
                     />
                   </div>
+                  <p id="personal-training-help" className="text-xs text-muted-foreground">
+                    Set your rate for individual training sessions
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="consultation">Consultation</Label>
@@ -653,10 +1020,17 @@ const Settings = () => {
                     <Input
                       id="consultation"
                       type="number"
-                      defaultValue={pricing.consultation}
+                      min="0"
+                      step="0.01"
+                      value={pricing.consultation}
+                      onChange={(e) => handlePricingChange('consultation', parseFloat(e.target.value) || 0)}
                       className="pl-8"
+                      aria-describedby="consultation-help"
                     />
                   </div>
+                  <p id="consultation-help" className="text-xs text-muted-foreground">
+                    Set your rate for initial consultations
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="assessment">Fitness Assessment</Label>
@@ -667,10 +1041,17 @@ const Settings = () => {
                     <Input
                       id="assessment"
                       type="number"
-                      defaultValue={pricing.assessment}
+                      min="0"
+                      step="0.01"
+                      value={pricing.assessment}
+                      onChange={(e) => handlePricingChange('assessment', parseFloat(e.target.value) || 0)}
                       className="pl-8"
+                      aria-describedby="assessment-help"
                     />
                   </div>
+                  <p id="assessment-help" className="text-xs text-muted-foreground">
+                    Set your rate for fitness assessments
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="package-discount">Package Discount (%)</Label>
@@ -678,13 +1059,20 @@ const Settings = () => {
                     <Input
                       id="package-discount"
                       type="number"
-                      defaultValue={pricing.packageDiscount}
+                      min="0"
+                      max="100"
+                      value={pricing.packageDiscount}
+                      onChange={(e) => handlePricingChange('packageDiscount', parseFloat(e.target.value) || 0)}
                       className="pr-8"
+                      aria-describedby="package-discount-help"
                     />
                     <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                       %
                     </span>
                   </div>
+                  <p id="package-discount-help" className="text-xs text-muted-foreground">
+                    Default discount applied to packages
+                  </p>
                 </div>
               </div>
 
@@ -693,7 +1081,10 @@ const Settings = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="currency">Currency</Label>
-                  <Select defaultValue={pricing.currency}>
+                  <Select 
+                    value={pricing.currency}
+                    onValueChange={(value) => handlePricingChange('currency', value)}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -712,63 +1103,126 @@ const Settings = () => {
                       id="tax-rate"
                       type="number"
                       step="0.1"
-                      defaultValue={pricing.taxRate}
+                      min="0"
+                      max="100"
+                      value={pricing.taxRate}
+                      onChange={(e) => handlePricingChange('taxRate', parseFloat(e.target.value) || 0)}
                       className="pr-8"
+                      aria-describedby="tax-rate-help"
                     />
                     <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                       %
                     </span>
                   </div>
+                  <p id="tax-rate-help" className="text-xs text-muted-foreground">
+                    Tax rate applied to all services
+                  </p>
                 </div>
               </div>
 
               <Separator />
 
               <div className="space-y-4">
-                <h3 className="font-medium">Package Pricing</h3>
-                <div className="space-y-3">
-                  <div className="grid grid-cols-3 gap-4 p-4 border rounded-lg">
-                    <div>
-                      <Label className="text-sm">4-Session Package</Label>
-                      <div className="relative mt-1">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                          $
-                        </span>
-                        <Input
-                          type="number"
-                          defaultValue="270"
-                          className="pl-8"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label className="text-sm">8-Session Package</Label>
-                      <div className="relative mt-1">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                          $
-                        </span>
-                        <Input
-                          type="number"
-                          defaultValue="540"
-                          className="pl-8"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label className="text-sm">12-Session Package</Label>
-                      <div className="relative mt-1">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                          $
-                        </span>
-                        <Input
-                          type="number"
-                          defaultValue="810"
-                          className="pl-8"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium">Package Pricing</h3>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={addPackage}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Package
+                  </Button>
                 </div>
+                <div className="space-y-3">
+                  {pricing.packages.map((pkg) => (
+                    <div key={pkg.id} className="p-4 border rounded-lg bg-card">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={pkg.name}
+                            onChange={(e) => handlePackageChange(pkg.id, 'name', e.target.value)}
+                            className="w-48"
+                            placeholder="Package name"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deletePackage(pkg.id)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-sm">Sessions</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            value={pkg.sessions}
+                            onChange={(e) => handlePackageChange(pkg.id, 'sessions', parseInt(e.target.value) || 1)}
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm">Price ($)</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={pkg.price}
+                            onChange={(e) => handlePackageChange(pkg.id, 'price', parseFloat(e.target.value) || 0)}
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm">Discount (%)</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={pkg.discount}
+                            onChange={(e) => handlePackageChange(pkg.id, 'discount', parseFloat(e.target.value) || 0)}
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm">Total</Label>
+                          <div className="p-2 bg-muted rounded text-sm font-medium">
+                            ${pkg.price.toFixed(2)}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-2 text-xs text-muted-foreground">
+                        {pkg.sessions} sessions × ${pricing.personalTraining} = ${(pkg.sessions * pricing.personalTraining).toFixed(2)} 
+                        {pkg.discount > 0 && ` - ${pkg.discount}% = $${pkg.price.toFixed(2)}`}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="flex justify-end pt-4">
+                <Button 
+                  onClick={handleSaveProfile}
+                  disabled={loading}
+                  className="min-w-[120px]"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Pricing
+                    </>
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -914,7 +1368,16 @@ const Settings = () => {
                   <div className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium">Session Reminder</h4>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          toast({
+                            title: "Template Editor",
+                            description: "Template editing feature coming soon.",
+                          });
+                        }}
+                      >
                         Edit Template
                       </Button>
                     </div>
@@ -926,7 +1389,16 @@ const Settings = () => {
                   <div className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium">Payment Reminder</h4>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          toast({
+                            title: "Template Editor",
+                            description: "Template editing feature coming soon.",
+                          });
+                        }}
+                      >
                         Edit Template
                       </Button>
                     </div>
@@ -970,7 +1442,16 @@ const Settings = () => {
                     </Label>
                     <Input id="confirm-password" type="password" />
                   </div>
-                  <Button>Update Password</Button>
+                  <Button 
+                    onClick={() => {
+                      toast({
+                        title: "Password Update",
+                        description: "Password update feature coming soon.",
+                      });
+                    }}
+                  >
+                    Update Password
+                  </Button>
                 </div>
               </div>
 
@@ -1008,7 +1489,20 @@ const Settings = () => {
                     Once you delete your account, there is no going back. This
                     action cannot be undone.
                   </p>
-                  <Button variant="destructive" size="sm">
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={() => {
+                      if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+                        // Handle account deletion
+                        toast({
+                          title: "Account Deletion",
+                          description: "Account deletion feature coming soon.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                  >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Delete Account
                   </Button>
@@ -1021,7 +1515,10 @@ const Settings = () => {
         <TabsContent value="backup" className="space-y-6">
           <BackupManager onDataChange={() => {
             // Trigger data refresh if needed
-            console.log("Data changed, refreshing...");
+            toast({
+              title: "Data Updated",
+              description: "Your backup data has been updated.",
+            });
           }} />
         </TabsContent>
       </Tabs>

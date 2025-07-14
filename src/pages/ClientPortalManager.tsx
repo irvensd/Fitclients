@@ -233,7 +233,7 @@ const PortalSettingsDialog = ({ client }: { client: any }) => {
   const [portalActive, setPortalActive] = useState(client.portalActive);
 
   const handleSave = () => {
-    console.log("Saving portal settings:", { portalActive, settings });
+          // Saving portal settings
     setOpen(false);
   };
 

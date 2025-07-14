@@ -54,6 +54,7 @@ import { Client, Session, Payment, WorkoutPlan, ProgressEntry, UserProfile } fro
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { userProfileService } from "@/lib/firebaseService";
+import { useToast } from "@/hooks/use-toast";
 
 const CancelSessionDialog = ({
   session,
@@ -68,7 +69,7 @@ const CancelSessionDialog = ({
 
   const handleCancel = async () => {
     if (!reason.trim()) {
-      alert("Please provide a reason for cancellation");
+      // Validation error - will be handled by parent component
       return;
     }
     setIsSubmitting(true);
@@ -163,6 +164,7 @@ const ClientPortal = () => {
     updateSession,
   } = useData();
   const { isDemoUser, user } = useAuth();
+  const { toast } = useToast();
   const [trainerProfile, setTrainerProfile] = useState<UserProfile | null>(null);
 
   // Check if we're on the demo portal route (public access)
@@ -193,11 +195,10 @@ const ClientPortal = () => {
       if (user?.uid) {
         try {
           const profile = await userProfileService.getUserProfile(user.uid);
-          console.log("ClientPortal - Trainer profile loaded:", profile);
-          console.log("ClientPortal - Operating hours:", profile?.operatingHours);
+          
           setTrainerProfile(profile);
         } catch (error) {
-          console.error("Error fetching trainer profile:", error);
+          // Error fetching trainer profile
         }
       }
     };
@@ -214,8 +215,12 @@ const ClientPortal = () => {
           cancelledBy: "client",
       });
     } catch (err) {
-      console.error("Failed to cancel session:", err);
-      alert("There was an error cancelling the session.");
+              // Failed to cancel session
+              toast({
+          title: "Cancellation Failed",
+          description: "There was an error cancelling the session.",
+          variant: "destructive",
+        });
     }
   };
 

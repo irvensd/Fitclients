@@ -37,6 +37,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { supportTicketsService } from "@/lib/firebaseService";
+import { useToast } from "@/hooks/use-toast";
 
 // Types for monitoring
 interface ServiceStatus {
@@ -79,6 +80,7 @@ const Help = () => {
   const [incidents, setIncidents] = useState<Incident[]>([]);
 
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const faqs = [
     {
@@ -592,7 +594,7 @@ const Help = () => {
       }
 
     } catch (error) {
-      console.error('Health check failed:', error);
+      // Health check failed - continue silently
     } finally {
       setIsMonitoring(false);
     }
@@ -637,24 +639,35 @@ const Help = () => {
   );
 
   const handleContact = (type: string, action: string) => {
-    switch (type) {
-      case "email":
-        window.location.href = `mailto:${action}?subject=FitClients Support Request`;
-        break;
-      case "phone":
-        window.location.href = `tel:${action}`;
-        break;
-      case "chat":
-        setShowChatWidget(true);
-        // In a real app, this would open a chat widget
-        setTimeout(() => {
-          alert("Live chat is coming soon! For now, please use email support as our primary contact method.");
-          setShowChatWidget(false);
-        }, 1000);
-        break;
-      case "priority":
-        window.location.href = `mailto:sales@fitclients.com?subject=Priority Support Inquiry`;
-        break;
+    try {
+      switch (type) {
+        case "email":
+          window.location.href = `mailto:${action}?subject=FitClients Support Request`;
+          break;
+        case "phone":
+          window.location.href = `tel:${action}`;
+          break;
+        case "chat":
+          setShowChatWidget(true);
+          // In a real app, this would open a chat widget
+          setTimeout(() => {
+            toast({
+          title: "Live Chat Coming Soon",
+          description: "For now, please use email support as our primary contact method.",
+        });
+            setShowChatWidget(false);
+          }, 1000);
+          break;
+        case "priority":
+          window.location.href = `mailto:sales@fitclients.com?subject=Priority Support Inquiry`;
+          break;
+        default:
+          // Unknown contact type - handle gracefully
+          break;
+      }
+    } catch (error) {
+      // Handle any errors gracefully
+      // Contact action failed
     }
   };
 
@@ -761,10 +774,12 @@ const Help = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                  aria-label="Search FAQ questions"
+                  aria-describedby="search-results"
                 />
               </div>
               {searchQuery && (
-                <p className="text-sm text-muted-foreground mt-2">
+                <p id="search-results" className="text-sm text-muted-foreground mt-2">
                   Found {filteredFaqs.length} result{filteredFaqs.length !== 1 ? 's' : ''}
                 </p>
               )}
@@ -1032,8 +1047,14 @@ const Help = () => {
                     if (!formData.subject.trim()) {
                       throw new Error('Please enter a subject for your ticket');
                     }
+                    if (formData.subject.trim().length < 5) {
+                      throw new Error('Subject must be at least 5 characters long');
+                    }
                     if (!formData.description.trim()) {
                       throw new Error('Please provide a description of your issue');
+                    }
+                    if (formData.description.trim().length < 20) {
+                      throw new Error('Description must be at least 20 characters long');
                     }
 
                     // Attempt to submit the ticket
@@ -1049,6 +1070,10 @@ const Help = () => {
                     
                     // Success - show confirmation
                     setSubmitted(true);
+                    toast({
+                      title: "Ticket Submitted",
+                      description: "Your support request has been received. We'll get back to you soon.",
+                    });
                     setTimeout(() => {
                       setSubmitted(false);
                       setFormData({
@@ -1060,8 +1085,6 @@ const Help = () => {
                     }, 3000);
                     
                   } catch (err) {
-                    console.error('Ticket submission error:', err);
-                    
                     // Handle different types of errors
                     let errorMessage = 'Failed to submit ticket. Please try again.';
                     
@@ -1080,6 +1103,11 @@ const Help = () => {
                     }
                     
                     setError(errorMessage);
+                    toast({
+                      title: "Submission Failed",
+                      description: errorMessage,
+                      variant: "destructive",
+                    });
                   } finally {
                     setIsSubmitting(false);
                   }
@@ -1122,7 +1150,7 @@ const Help = () => {
                     )}
 
                     <div>
-                      <Label htmlFor="subject">Subject</Label>
+                      <Label htmlFor="subject">Subject *</Label>
                       <Input
                         id="subject"
                         value={formData.subject}
@@ -1130,7 +1158,11 @@ const Help = () => {
                         placeholder="Brief description of your issue"
                         required
                         disabled={isSubmitting}
+                        aria-describedby="subject-help"
                       />
+                      <p id="subject-help" className="text-xs text-muted-foreground mt-1">
+                        Provide a clear, concise title for your issue
+                      </p>
                     </div>
                     <div>
                       <Label htmlFor="category">Category</Label>
@@ -1140,6 +1172,7 @@ const Help = () => {
                         onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
                         className="w-full border border-input rounded-md px-3 py-2 text-sm"
                         disabled={isSubmitting}
+                        aria-describedby="category-help"
                       >
                         <option value="Technical">Technical Issue</option>
                         <option value="Billing">Billing & Payments</option>
@@ -1147,6 +1180,9 @@ const Help = () => {
                         <option value="Feature">Feature Request</option>
                         <option value="Other">Other</option>
                       </select>
+                      <p id="category-help" className="text-xs text-muted-foreground mt-1">
+                        Select the category that best describes your issue
+                      </p>
                     </div>
                     <div>
                       <Label htmlFor="priority">Priority</Label>
@@ -1156,15 +1192,19 @@ const Help = () => {
                         onChange={e => setFormData(prev => ({ ...prev, priority: e.target.value }))}
                         className="w-full border border-input rounded-md px-3 py-2 text-sm"
                         disabled={isSubmitting}
+                        aria-describedby="priority-help"
                       >
                         <option value="low">Low - General question</option>
                         <option value="medium">Medium - Minor issue</option>
                         <option value="high">High - Affecting usage</option>
                         <option value="urgent">Urgent - Cannot use system</option>
                       </select>
+                      <p id="priority-help" className="text-xs text-muted-foreground mt-1">
+                        Choose the urgency level of your issue
+                      </p>
                     </div>
                     <div>
-                      <Label htmlFor="description">Description</Label>
+                      <Label htmlFor="description">Description *</Label>
                       <Textarea
                         id="description"
                         value={formData.description}
@@ -1173,7 +1213,12 @@ const Help = () => {
                         className="min-h-[120px]"
                         required
                         disabled={isSubmitting}
+                        aria-describedby="description-help"
+                        maxLength={1000}
                       />
+                      <p id="description-help" className="text-xs text-muted-foreground mt-1">
+                        Provide detailed information about your issue. Include steps to reproduce, error messages, and any relevant context.
+                      </p>
                     </div>
                     <Button type="submit" className="w-full" disabled={isSubmitting}>
                       {isSubmitting ? (

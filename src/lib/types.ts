@@ -17,6 +17,35 @@ export interface OperatingHours {
   endTime: string;
 }
 
+export interface Certification {
+  id: string;
+  name: string;
+  issuingOrganization: string;
+  issueDate: string;
+  expirationDate: string;
+  credentialId?: string;
+  status: "active" | "expired" | "expiring-soon";
+  notes?: string;
+}
+
+export interface Package {
+  id: string;
+  name: string;
+  sessions: number;
+  price: number;
+  discount: number;
+}
+
+export interface Pricing {
+  personalTraining: number;
+  consultation: number;
+  assessment: number;
+  packageDiscount: number;
+  currency: string;
+  taxRate: number;
+  packages: Package[];
+}
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -38,6 +67,8 @@ export interface UserProfile {
     tiktok?: string;
     youtube?: string;
   };
+  certifications?: Certification[];
+  pricing?: Pricing;
   referralCode?: string;
   referredBy?: string;
   referralRewardGranted?: boolean;

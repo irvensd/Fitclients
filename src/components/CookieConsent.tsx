@@ -134,24 +134,24 @@ export const CookieConsent = () => {
     // Initialize services based on preferences
     if (prefs.analytics) {
       // Initialize analytics (Google Analytics, etc.)
-      console.log("Analytics cookies enabled");
+      // Analytics cookies enabled
       // In production: initializeGoogleAnalytics();
     }
     
     if (prefs.marketing) {
       // Initialize marketing pixels (Facebook, etc.)
-      console.log("Marketing cookies enabled");
+      // Marketing cookies enabled
       // In production: initializeMarketingPixels();
     }
 
     if (prefs.functional) {
       // Initialize functional features
-      console.log("Functional cookies enabled");
+      // Functional cookies enabled
       // In production: initializeFunctionalFeatures();
     }
 
-    // Always log essential cookies as they're required
-    console.log("Essential cookies enabled (required)");
+    // Essential cookies are always enabled (required)
+    // Essential cookies enabled (required)
   };
 
   const handleWithdrawConsent = () => {

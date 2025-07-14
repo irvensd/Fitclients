@@ -36,11 +36,9 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import {
   SUBSCRIPTION_PLANS,
   formatPrice,
-  createCheckoutSession,
   cancelSubscription,
 } from "@/lib/stripe";
 import { useToast } from "@/hooks/use-toast";
-import { DemoCheckoutModal } from "@/components/DemoCheckoutModal";
 import { ClientSelectionModal } from "@/components/ClientSelectionModal";
 import { useData } from "@/contexts/DataContext";
 import {
@@ -611,19 +609,6 @@ export const SubscriptionManager = ({
           </div>
         </CardContent>
       </Card>
-
-      {/* Demo Checkout Modal */}
-      {selectedPlanId && (
-        <DemoCheckoutModal
-          isOpen={checkoutModalOpen}
-          onClose={() => {
-            setCheckoutModalOpen(false);
-            setSelectedPlanId(null);
-          }}
-          planId={selectedPlanId}
-          onSuccess={handleCheckoutSuccess}
-        />
-      )}
 
       {/* Client Selection Modal for Downgrades */}
       {pendingDowngrade && (

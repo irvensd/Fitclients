@@ -88,9 +88,16 @@ const AIRecommendations = () => {
         setAppliedRecommendationIds(ids);
       } catch (e) {
         console.warn("Failed to load applied recommendations:", e);
+        // Clear corrupted localStorage data
+        localStorage.removeItem("appliedRecommendations");
+        toast({
+          title: "Data Reset",
+          description: "Applied recommendations have been reset due to data corruption.",
+          variant: "destructive",
+        });
       }
     }
-  }, []);
+  }, [toast]);
 
   // Show loading state
   if (loading) {
@@ -151,9 +158,21 @@ const AIRecommendations = () => {
   }
 
   // Generate analyses for all clients using real data
-  const clientAnalyses = clients.map((client) =>
-    generateRecommendations(client, sessions, payments),
-  );
+  const clientAnalyses = clients.map((client) => {
+    try {
+      return generateRecommendations(client, sessions, payments);
+    } catch (error) {
+      console.error(`Error generating recommendations for ${client.name}:`, error);
+      // Return a basic analysis structure if generation fails
+      return {
+        clientId: client.id,
+        clientName: client.name,
+        recommendations: [],
+        keyInsights: [],
+        attendanceRate: 0,
+      };
+    }
+  });
 
   // Get all recommendations across clients
   const allRecommendations = clientAnalyses.flatMap((analysis) =>
@@ -227,20 +246,31 @@ const AIRecommendations = () => {
           onClick={async () => {
             setIsAnalyzing(true);
 
-            // Simulate AI processing
-            await new Promise((resolve) => setTimeout(resolve, 3000));
+            try {
+              // Simulate AI processing
+              await new Promise((resolve) => setTimeout(resolve, 3000));
 
-            setLastAnalysisTime(new Date());
-            setIsAnalyzing(false);
+              setLastAnalysisTime(new Date());
+              setIsAnalyzing(false);
 
-            // Show success toast
-            toast({
-              title: "🤖 AI Analysis Complete!",
-              description: `Analyzed ${clients.length} clients and generated ${allRecommendations.length} recommendations with ${highPriorityCount} high-priority items.`,
-              duration: 5000,
-            });
+              // Show success toast
+              toast({
+                title: "🤖 AI Analysis Complete!",
+                description: `Analyzed ${clients.length} clients and generated ${allRecommendations.length} recommendations with ${highPriorityCount} high-priority items.`,
+                duration: 5000,
+              });
+            } catch (error) {
+              console.error("AI analysis failed:", error);
+              setIsAnalyzing(false);
+              toast({
+                title: "Analysis Failed",
+                description: "Failed to complete AI analysis. Please try again.",
+                variant: "destructive",
+              });
+            }
           }}
           disabled={isAnalyzing}
+          aria-label="Generate new AI analysis"
         >
           {isAnalyzing ? (
             <>
@@ -318,7 +348,12 @@ const AIRecommendations = () => {
           if (!client) return null;
           
           return (
-            <Card key={analysis.clientId} className="overflow-hidden">
+            <Card 
+              key={analysis.clientId} 
+              className="overflow-hidden"
+              role="article"
+              aria-label={`AI analysis for ${client.name} - ${analysis.recommendations.length} recommendations`}
+            >
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
@@ -365,7 +400,7 @@ const AIRecommendations = () => {
                   </div>
                   <div className="text-center p-3 bg-muted rounded-lg">
                     <div className="text-lg font-bold text-green-600">
-                      {analysis.attendanceRate}%
+                      {analysis.attendanceRate ? analysis.attendanceRate.toFixed(1) : 0}%
                     </div>
                     <div className="text-xs text-muted-foreground">Attendance</div>
                   </div>
@@ -375,12 +410,12 @@ const AIRecommendations = () => {
                     </div>
                     <div className="text-xs text-muted-foreground">Progress Logs</div>
                   </div>
-                  <div className="text-center p-3 bg-muted rounded-lg">
-                    <div className="text-lg font-bold text-orange-600">
-                      ${payments.filter(p => p.clientId === analysis.clientId).reduce((sum, p) => sum + p.amount, 0)}
+                                      <div className="text-center p-3 bg-muted rounded-lg">
+                      <div className="text-lg font-bold text-orange-600">
+                        ${payments.filter(p => p.clientId === analysis.clientId).reduce((sum, p) => sum + (p.amount || 0), 0).toFixed(2)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Revenue</div>
                     </div>
-                    <div className="text-xs text-muted-foreground">Revenue</div>
-                  </div>
                 </div>
 
                 {/* Recommendations */}
@@ -390,10 +425,12 @@ const AIRecommendations = () => {
                     AI Recommendations
                   </h4>
                   <div className="space-y-2">
-                    {analysis.recommendations.map((rec, index) => (
+                    {analysis.recommendations && analysis.recommendations.map((rec, index) => (
                       <div
                         key={index}
                         className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg"
+                        role="article"
+                        aria-label={`AI recommendation: ${rec.title}`}
                       >
                         <div className="p-1.5 bg-primary/10 rounded-full mt-0.5">
                           <Target className="h-3 w-3 text-primary" />
@@ -403,7 +440,13 @@ const AIRecommendations = () => {
                           <p className="text-xs text-muted-foreground mt-1">
                             {rec.description}
                           </p>
-                          <Button size="sm" variant="outline" className="mt-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="mt-2"
+                            aria-label={`Apply recommendation: ${rec.title}`}
+                            title="Apply this recommendation"
+                          >
                             Apply Recommendation
                           </Button>
                         </div>
@@ -413,7 +456,7 @@ const AIRecommendations = () => {
                 </div>
 
                 {/* Key Insights */}
-                {analysis.keyInsights.length > 0 && (
+                {analysis.keyInsights && analysis.keyInsights.length > 0 && (
                   <div className="space-y-3">
                     <h4 className="font-semibold text-sm flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-purple-600" />

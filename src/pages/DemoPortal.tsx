@@ -309,10 +309,7 @@ const upcomingSessions = demoSessions.filter(s => new Date(s.date) >= new Date()
 const pastSessions = demoSessions.filter(s => new Date(s.date) < new Date() || s.status !== 'scheduled').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
 const DemoPortal = () => {
-  console.log("=== DEMO PORTAL LOADED ===");
-  console.log("DemoPortal component is rendering");
-  console.log("Demo client data:", demoClient);
-  console.log("=== END DEMO PORTAL DEBUG ===");
+      // Demo portal loaded successfully
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">

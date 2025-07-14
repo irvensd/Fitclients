@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { SessionRecap, Client } from "@/lib/types";
 import { generateClientSummary } from "@/lib/sessionRecapAI";
+import { useToast } from "@/hooks/use-toast";
 
 interface SessionRecapViewerProps {
   recap: SessionRecap;
@@ -43,6 +44,7 @@ export const SessionRecapViewer = ({
   sessionDate,
   onUpdateRecap,
 }: SessionRecapViewerProps) => {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
@@ -61,13 +63,15 @@ export const SessionRecapViewer = ({
         );
       } else if (method === "copy") {
         await navigator.clipboard.writeText(clientSummary);
-        alert("Recap copied to clipboard!");
+        toast({
+          title: "Recap Copied",
+          description: "Recap copied to clipboard!",
+        });
       } else if (method === "sms") {
-        alert(
-          "SMS integration would send: " +
-            clientSummary.substring(0, 100) +
-            "...",
-        );
+        toast({
+          title: "SMS Integration",
+          description: "SMS integration would send: " + clientSummary.substring(0, 100) + "...",
+        });
       }
 
       // Update shared status

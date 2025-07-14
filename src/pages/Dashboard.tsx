@@ -27,6 +27,7 @@ import {
 import { AdminSummary } from "@/components/AdminSummary";
 import { NavigationButton } from "@/components/NavigationButton";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import {
   RevenueChart,
   ClientGrowthChart,
@@ -64,10 +65,12 @@ const MilestoneCelebrationModal = ({
   type,
   count,
   onClose,
+  onShare,
 }: {
   type: "session" | "client";
   count: number;
   onClose: () => void;
+  onShare: () => void;
 }) => {
   const [showConfetti, setShowConfetti] = useState(true);
   useEffect(() => {
@@ -107,16 +110,7 @@ const MilestoneCelebrationModal = ({
           <Button
             className="bg-gradient-to-r from-orange-500 to-red-500"
             onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: `${count} ${label} Milestone!`,
-                  text: message,
-                  url: window.location.href,
-                });
-              } else {
-                navigator.clipboard.writeText(message);
-                alert("Milestone copied to clipboard!");
-              }
+              onShare();
               onClose();
             }}
           >
@@ -131,6 +125,7 @@ const MilestoneCelebrationModal = ({
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
   const dataContext = useData();
   const {
     clients = [],
@@ -192,6 +187,29 @@ const Dashboard = () => {
 
   const [milestone, setMilestone] = useState<{ type: "session" | "client"; count: number } | null>(null);
   const [celebratedMilestones, setCelebratedMilestones] = useState<number[]>([]);
+
+  const handleShareMilestone = () => {
+    if (milestone) {
+      const label = milestone.type === "session" ? "Session" : "Client";
+      const message = milestone.type === "session"
+        ? `I've completed ${milestone.count} sessions!`
+        : `I've added ${milestone.count} clients!`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: `${milestone.count} ${label} Milestone!`,
+          text: message,
+          url: window.location.href,
+        });
+      } else {
+        navigator.clipboard.writeText(message);
+        toast({
+          title: "Milestone Copied",
+          description: "Milestone copied to clipboard!",
+        });
+      }
+    }
+  };
 
   // Detect session/client milestones
   useEffect(() => {
@@ -535,6 +553,7 @@ const Dashboard = () => {
           type={milestone.type}
           count={milestone.count}
           onClose={() => setMilestone(null)}
+          onShare={handleShareMilestone}
         />
       )}
     </div>

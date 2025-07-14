@@ -39,21 +39,21 @@ const USE_EMULATORS = false; // Temporarily disabled to fix network issues
 //   import.meta.env.DEV; // Only in development mode
 
 if (USE_EMULATORS) {
-  console.log("🔧 Development mode: Attempting to connect to Firebase emulators...");
+      // Development mode: Attempting to connect to Firebase emulators
   try {
     // Connect to Auth emulator if not already connected
     connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
-    console.log("✅ Connected to Auth emulator");
+          // Connected to Auth emulator
     
     // Connect to Firestore emulator if not already connected  
     connectFirestoreEmulator(db, "localhost", 8080);
-    console.log("✅ Connected to Firestore emulator");
+          // Connected to Firestore emulator
   } catch (error) {
     // Emulators might already be connected or not running, use production
     console.warn("⚠️ Emulator connection failed, using production Firebase:", error.message);
   }
 } else {
-  console.log("🚀 Using production Firebase services");
+      // Using production Firebase services
 }
 
 // Utility function to diagnose Firebase connection issues
@@ -100,7 +100,7 @@ export const diagnoseFirebaseConnection = async () => {
     diagnostics.tests.push(`❌ Firebase Auth API: FAILED - ${error.message}`);
   }
 
-  console.log("🔍 Firebase Connection Diagnostics:", diagnostics);
+      // Firebase Connection Diagnostics
   return diagnostics;
 };
 

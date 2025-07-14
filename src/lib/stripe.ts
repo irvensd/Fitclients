@@ -133,7 +133,7 @@ export const createCheckoutSession = async (planId: string, userId: string) => {
       body: JSON.stringify({
         planId,
         userId,
-        priceId: plan.stripePriceId,
+        priceId: "stripePriceId" in plan ? (plan as any).stripePriceId : "demo_price_id",
         successUrl: `${window.location.origin}/billing?success=true`,
         cancelUrl: `${window.location.origin}/billing?canceled=true`,
       }),
@@ -160,7 +160,7 @@ export const createCheckoutSession = async (planId: string, userId: string) => {
     return session;
   } catch (error) {
     // For demo purposes, simulate a successful checkout without external redirect
-    console.log("Demo mode: Would redirect to Stripe checkout for", plan.name);
+    // Demo mode: Would redirect to Stripe checkout
 
     // Simulate a successful checkout session creation
     return {
@@ -173,7 +173,7 @@ export const createCheckoutSession = async (planId: string, userId: string) => {
 
 export const cancelSubscription = async (subscriptionId: string) => {
   // Mock implementation - would call backend API
-  console.log("Cancelling subscription:", subscriptionId);
+  // Cancelling subscription
   return { success: true };
 };
 

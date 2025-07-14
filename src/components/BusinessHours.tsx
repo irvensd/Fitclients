@@ -14,8 +14,7 @@ export const BusinessHours: React.FC<BusinessHoursProps> = ({
   trainerName = "Your Trainer" 
 }) => {
   // Debug logging
-  console.log("BusinessHours component - operatingHours:", operatingHours);
-  console.log("BusinessHours component - trainerName:", trainerName);
+  // BusinessHours component loaded
 
   if (!operatingHours || operatingHours.length === 0) {
     return (
