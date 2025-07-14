@@ -10,6 +10,26 @@ import { SubscriptionProvider } from "./contexts/SubscriptionContext";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
+// Staff-only route component
+const StaffOnlyRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
+  
+  // Only allow FitClient staff emails
+  const isStaff = user?.email && [
+    'support@fitclients.com',
+    'admin@fitclients.com',
+    'dev@fitclients.com',
+    'staff@fitclients.com',
+    'demo@fitclients.com' // Temporary for testing
+  ].includes(user.email);
+  
+  if (!isStaff) {
+    return <Navigate to="/support-login" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 // Import all the pages that the sidebar navigation needs
 import Clients from "./pages/Clients";
 import Sessions from "./pages/Sessions";
@@ -20,6 +40,9 @@ import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import AIRecommendations from "./pages/AIRecommendations";
 import Features from "./pages/Features";
+import SupportPortal from "./pages/SupportPortal";
+import SupportLogin from "./pages/SupportLogin";
+
 
 // Landing page redirect component
 const LandingRedirect = () => {
@@ -58,8 +81,9 @@ const App = () => {
               <Route path="/" element={<LandingRedirect />} />
               <Route path="/landing" element={<LandingRedirect />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/support-login" element={<SupportLogin />} />
               
-              {/* Protected routes with layout */}
+                            {/* Protected routes with layout */}
               <Route element={<ProtectedLayout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/features" element={<Features />} />
@@ -70,8 +94,12 @@ const App = () => {
                 <Route path="/progress" element={<Progress />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/help" element={<Help />} />
+ 
                 <Route path="/ai-recommendations" element={<AIRecommendations />} />
               </Route>
+              
+              {/* Staff-only routes */}
+              <Route path="/support-portal" element={<StaffOnlyRoute><SupportPortal /></StaffOnlyRoute>} />
               
               {/* 404 route */}
               <Route path="*" element={<NotFound />} />

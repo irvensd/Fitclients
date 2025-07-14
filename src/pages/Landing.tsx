@@ -33,10 +33,20 @@ import {
 import AnimatedHero from "@/components/AnimatedHero";
 import MotivationalElements from "@/components/MotivationalElements";
 import ColorPsychology from "@/components/ColorPsychology";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Landing = () => {
   // Scroll progress state
   const [scrollProgress, setScrollProgress] = React.useState(0);
+  const { user, logout } = useAuth();
+
+  // Force logout in dev mode on landing page mount
+  React.useEffect(() => {
+    if (import.meta.env.DEV && user) {
+      logout();
+    }
+    // eslint-disable-next-line
+  }, []);
 
   // Update scroll progress
   React.useEffect(() => {

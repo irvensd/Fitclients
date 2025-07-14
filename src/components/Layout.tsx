@@ -30,6 +30,7 @@ import {
   ChevronRight,
   ExternalLink,
   HelpCircle,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { GlobalSearch } from "@/components/GlobalSearch";
@@ -210,11 +211,6 @@ const SidebarNavItem = ({ item, isActive, isCollapsed }) => (
         {!isCollapsed && (
           <div className="flex items-center gap-2 flex-1">
             <span>{item.name}</span>
-            {item.soon && (
-              <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-                Soon
-              </Badge>
-            )}
           </div>
         )}
       </Link>
@@ -223,11 +219,6 @@ const SidebarNavItem = ({ item, isActive, isCollapsed }) => (
       <TooltipContent side="right">
         <div className="flex items-center gap-2">
           <span>{item.name}</span>
-          {item.soon && (
-            <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-              Soon
-            </Badge>
-          )}
         </div>
       </TooltipContent>
     )}
@@ -292,11 +283,6 @@ const MobileSidebar = () => {
                   <item.icon className="h-5 w-5" />
                   <div className="flex items-center gap-2 flex-1">
                     <span>{item.name}</span>
-                    {item.soon && (
-                      <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-                        Soon
-                      </Badge>
-                    )}
                   </div>
                 </Link>
               </SheetClose>

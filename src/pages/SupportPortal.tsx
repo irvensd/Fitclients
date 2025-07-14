@@ -73,6 +73,7 @@ import {
   where
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Types for support portal
 interface ServiceStatus {
@@ -148,13 +149,17 @@ interface SystemAlert {
 }
 
 const SupportPortal = () => {
-  // Authentication state
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Use Firebase authentication instead of internal auth
+  const { user } = useAuth();
   const [supportAgent, setSupportAgent] = useState<{
     name: string;
     role: string;
     permissions: string[];
-  } | null>(null);
+  } | null>({
+    name: user?.displayName || "Production Support",
+    role: "System Support Engineer",
+    permissions: ["view_system_status", "view_client_environments", "manage_tickets", "view_alerts", "debug_system", "access_logs"]
+  });
   
   // Monitoring state
   const [systemServices, setSystemServices] = useState<ServiceStatus[]>([]);
@@ -184,11 +189,7 @@ const SupportPortal = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEnvironment, setSelectedEnvironment] = useState<string>("all");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loginCredentials, setLoginCredentials] = useState({
-    username: "",
-    password: ""
-  });
+
 
   // Debug tools state
   const [debugTests, setDebugTests] = useState<{
@@ -326,7 +327,7 @@ const SupportPortal = () => {
 
   // Subscribe to support tickets from Firestore
   useEffect(() => {
-    if (isAuthenticated) {
+    if (user) {
       setTicketsLoading(true);
       
       // Subscribe to real-time updates
@@ -345,11 +346,11 @@ const SupportPortal = () => {
 
       return () => unsubscribe();
     }
-  }, [isAuthenticated]);
+  }, [user]);
 
   // Subscribe to system alerts from Firestore
   useEffect(() => {
-    if (isAuthenticated) {
+    if (user) {
       setAlertsLoading(true);
       
       const q = query(collection(db, "systemAlerts"), orderBy("createdAt", "desc"));
@@ -372,11 +373,11 @@ const SupportPortal = () => {
 
       return () => unsubscribe();
     }
-  }, [isAuthenticated]);
+  }, [user]);
 
   // Subscribe to client environments from Firestore
   useEffect(() => {
-    if (isAuthenticated) {
+    if (user) {
       setEnvironmentsLoading(true);
       
       const q = query(collection(db, "clientEnvironments"), orderBy("lastLogin", "desc"));
@@ -399,11 +400,11 @@ const SupportPortal = () => {
 
       return () => unsubscribe();
     }
-  }, [isAuthenticated]);
+  }, [user]);
 
   // Subscribe to error logs from Firestore
   useEffect(() => {
-    if (isAuthenticated && isLoggingEnabled) {
+    if (user && isLoggingEnabled) {
       const q = query(
         collection(db, "errorLogs"), 
         orderBy("timestamp", "desc"),
@@ -425,7 +426,7 @@ const SupportPortal = () => {
 
       return () => unsubscribe();
     }
-  }, [isAuthenticated, isLoggingEnabled]);
+  }, [user, isLoggingEnabled]);
 
   // Service definitions for monitoring
   const serviceDefinitions: Omit<ServiceStatus, 'status' | 'lastChecked'>[] = [
@@ -642,42 +643,25 @@ const SupportPortal = () => {
     }
   }, [checkServiceHealth]);
 
-  // Authentication functions
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Production support credentials - in real app, this would validate against backend
-    if (loginCredentials.username === "support" && loginCredentials.password === "fitclients2025") {
-      setIsAuthenticated(true);
-      setSupportAgent({
-        name: "Production Support",
-        role: "System Support Engineer",
-        permissions: ["view_system_status", "view_client_environments", "manage_tickets", "view_alerts", "debug_system", "access_logs"]
-      });
-      
-      // Initialize data
-      
-      // Start monitoring
-      performHealthChecks();
-    } else {
-      alert("Invalid production support credentials. Please contact your system administrator.");
-    }
-  };
-
+  // Use Firebase authentication - no internal auth needed
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    setSupportAgent(null);
-    setSystemServices([]);
-    setSystemAlerts([]);
+    // Sign out from Firebase and redirect to landing page
+    auth.signOut().then(() => {
+      window.location.href = "/";
+    }).catch((error) => {
+      console.error('Error signing out:', error);
+      // Fallback redirect even if signout fails
+      window.location.href = "/";
+    });
   };
 
   // Initialize monitoring on mount
   useEffect(() => {
-    if (isAuthenticated) {
+    if (user) {
       const interval = setInterval(performHealthChecks, 30000);
       return () => clearInterval(interval);
     }
-  }, [isAuthenticated, performHealthChecks]);
+  }, [user, performHealthChecks]);
 
   // Format time ago
   const formatTimeAgo = (date: Date | any): string => {
@@ -1353,72 +1337,15 @@ const SupportPortal = () => {
 
   // Run threshold checks when services update
   useEffect(() => {
-    if (isAuthenticated && systemServices.length > 0) {
+    if (user && systemServices.length > 0) {
       checkAlertThresholds();
     }
-  }, [systemServices, isAuthenticated, checkAlertThresholds]);
+  }, [systemServices, user, checkAlertThresholds]);
 
-  // Login screen
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
-              <Shield className="h-6 w-6 text-white" />
-            </div>
-            <CardTitle>FitClients Production Support</CardTitle>
-            <CardDescription>
-              System debugging and support portal for production issues
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Support Username</label>
-                <Input
-                  type="text"
-                  placeholder="Enter support username"
-                  value={loginCredentials.username}
-                  onChange={(e) => setLoginCredentials(prev => ({ ...prev, username: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Support Password</label>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter support password"
-                    value={loginCredentials.password}
-                    onChange={(e) => setLoginCredentials(prev => ({ ...prev, password: e.target.value }))}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-              <Button type="submit" className="w-full">
-                <Key className="h-4 w-4 mr-2" />
-                Access Support Portal
-              </Button>
-            </form>
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800 font-medium mb-1">Production Support Access</p>
-              <p className="text-xs text-blue-700">
-                This portal is for FitClients production support team members only. 
-                Contact your system administrator for access credentials.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  // Redirect to support login if not authenticated
+  if (!user) {
+    window.location.href = "/support-login";
+    return null;
   }
 
   // Main support portal
