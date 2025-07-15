@@ -10,6 +10,9 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import { ServiceSuspensionBanner } from "@/components/ServiceSuspensionBanner";
+import { TrialExpirationModal } from "@/components/TrialExpirationModal";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 import {
   LayoutDashboard,
@@ -336,6 +339,9 @@ const MobileSidebar = () => {
 export const Layout = ({ children }: LayoutProps) => {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showTrialModal, setShowTrialModal] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const { isTrialExpired, hasValidPaymentMethod } = useSubscription();
 
   useEffect(() => {
     // Collapse sidebar by default on smaller desktop screens
@@ -350,14 +356,38 @@ export const Layout = ({ children }: LayoutProps) => {
     }
   }, [isDesktop]);
 
+  // Show trial expiration modal when trial expires and no payment method
+  useEffect(() => {
+    if (isTrialExpired && !hasValidPaymentMethod) {
+      setShowTrialModal(true);
+    }
+  }, [isTrialExpired, hasValidPaymentMethod]);
+
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  const handleAddPaymentMethod = () => {
+    // Navigate to billing page to add payment method
+    window.location.href = "/payments";
+  };
+
+  const handleDismissBanner = () => {
+    setBannerDismissed(true);
   };
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar isCollapsed={isCollapsed} onToggleCollapse={toggleCollapse} />
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Service Suspension Banner */}
+        {!bannerDismissed && (
+          <ServiceSuspensionBanner
+            onAddPaymentMethod={handleAddPaymentMethod}
+            onDismiss={handleDismissBanner}
+          />
+        )}
+        
         <header className="flex h-16 items-center justify-between gap-2 sm:gap-4 border-b bg-background px-3 sm:px-4 lg:px-6">
           <div className="flex items-center gap-2">
             <MobileSidebar />
@@ -373,6 +403,13 @@ export const Layout = ({ children }: LayoutProps) => {
         </main>
       </div>
       <QuickActionsWidget />
+      
+      {/* Trial Expiration Modal */}
+      <TrialExpirationModal
+        isOpen={showTrialModal}
+        onClose={() => setShowTrialModal(false)}
+        onAddPaymentMethod={handleAddPaymentMethod}
+      />
     </div>
   );
 };

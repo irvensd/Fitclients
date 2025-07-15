@@ -49,6 +49,7 @@ import {
 
 import { SubscriptionManager } from "@/components/SubscriptionManager";
 import { BackupManager } from "@/components/BackupManager";
+import Billing from "@/pages/Billing";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -451,15 +452,118 @@ const Settings = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account, business settings, and preferences
+    <div className="flex h-full">
+      {/* Sidebar Navigation */}
+      <div className="w-64 border-r bg-muted/30 p-4 space-y-2">
+        <div className="mb-6">
+          <h1 className="text-xl font-bold">Settings</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage your account & preferences
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        
+        <nav className="space-y-1">
+          <button
+            onClick={() => handleTabChange("profile")}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "profile"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted"
+            }`}
+          >
+            <User className="h-4 w-4" />
+            Profile
+          </button>
+          
+          <button
+            onClick={() => handleTabChange("business")}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "business"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted"
+            }`}
+          >
+            <SettingsIcon className="h-4 w-4" />
+            Business
+          </button>
+          
+          <button
+            onClick={() => handleTabChange("pricing")}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "pricing"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted"
+            }`}
+          >
+            <DollarSign className="h-4 w-4" />
+            Pricing
+          </button>
+          
+          <button
+            onClick={() => handleTabChange("billing")}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "billing"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted"
+            }`}
+          >
+            <CreditCard className="h-4 w-4" />
+            Billing
+          </button>
+          
+          <button
+            onClick={() => handleTabChange("notifications")}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "notifications"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted"
+            }`}
+          >
+            <Bell className="h-4 w-4" />
+            Notifications
+          </button>
+          
+          <button
+            onClick={() => handleTabChange("security")}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "security"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted"
+            }`}
+          >
+            <Shield className="h-4 w-4" />
+            Security
+          </button>
+          
+          <button
+            onClick={() => handleTabChange("backup")}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "backup"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted"
+            }`}
+          >
+            <Database className="h-4 w-4" />
+            Backup
+          </button>
+        </nav>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold capitalize">{activeTab}</h2>
+            <p className="text-muted-foreground">
+              {activeTab === "profile" && "Manage your personal information"}
+              {activeTab === "business" && "Configure your business settings"}
+              {activeTab === "pricing" && "Set your service pricing"}
+              {activeTab === "billing" && "Manage your subscription"}
+              {activeTab === "notifications" && "Configure your notifications"}
+              {activeTab === "security" && "Security and privacy settings"}
+              {activeTab === "backup" && "Backup and restore your data"}
+            </p>
+          </div>
           <Button
             variant="outline"
             size="sm"
@@ -470,39 +574,10 @@ const Settings = () => {
             {refreshing ? "Refreshing..." : "Refresh"}
           </Button>
         </div>
-      </div>
 
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <div className="overflow-x-auto">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
-            <TabsTrigger value="profile" className="text-xs sm:text-sm">
-              Profile
-            </TabsTrigger>
-            <TabsTrigger value="business" className="text-xs sm:text-sm">
-              Business
-            </TabsTrigger>
-            <TabsTrigger value="pricing" className="text-xs sm:text-sm">
-              Pricing
-            </TabsTrigger>
-            <TabsTrigger value="billing" className="text-xs sm:text-sm">
-              Billing
-            </TabsTrigger>
-            <TabsTrigger value="referrals" className="text-xs sm:text-sm">
-              Referrals
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="text-xs sm:text-sm">
-              Notifications
-            </TabsTrigger>
-            <TabsTrigger value="security" className="text-xs sm:text-sm">
-              Security
-            </TabsTrigger>
-            <TabsTrigger value="backup" className="text-xs sm:text-sm">
-              Backup
-            </TabsTrigger>
-          </TabsList>
-        </div>
+        <div className="space-y-6">
 
-        <TabsContent value="profile" className="space-y-6">
+        {activeTab === "profile" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -820,9 +895,9 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
-        <TabsContent value="business" className="space-y-6">
+        {activeTab === "business" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -973,9 +1048,9 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
-        <TabsContent value="pricing" className="space-y-6">
+        {activeTab === "pricing" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1226,13 +1301,13 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
-        <TabsContent value="billing" className="space-y-6">
-          <SubscriptionManager />
-        </TabsContent>
+        {activeTab === "billing" && (
+          <Billing />
+        )}
 
-        <TabsContent value="referrals" className="space-y-6">
+        {activeTab === "referrals" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1254,9 +1329,9 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
-        <TabsContent value="notifications" className="space-y-6">
+        {activeTab === "notifications" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1411,9 +1486,9 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
-        <TabsContent value="security" className="space-y-6">
+        {activeTab === "security" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1510,9 +1585,9 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
-        <TabsContent value="backup" className="space-y-6">
+        {activeTab === "backup" && (
           <BackupManager onDataChange={() => {
             // Trigger data refresh if needed
             toast({
@@ -1520,8 +1595,9 @@ const Settings = () => {
               description: "Your backup data has been updated.",
             });
           }} />
-        </TabsContent>
-      </Tabs>
+        )}
+        </div>
+      </div>
     </div>
   );
 };

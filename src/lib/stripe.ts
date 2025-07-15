@@ -7,74 +7,68 @@ export { stripePromise };
 
 // Subscription plans configuration
 export const SUBSCRIPTION_PLANS = {
-  FREE: {
-    id: "free",
+  STARTER: {
+    id: "starter",
     name: "Starter",
-    price: 0,
-    interval: "forever",
+    price: 9,
+    interval: "month",
+    stripeProductId: "prod_starter", // Will be created in Stripe dashboard
+    stripePriceId: "price_starter", // Will be created in Stripe dashboard
     features: [
-      "Up to 5 clients",
+      "Manage up to 200 clients",
       "Session scheduling & calendar",
       "Payment tracking & invoicing",
-      "Progress photos & tracking",
+      "Progress tracking",
       "Client portal links (no login)",
       "Workout plan builder",
       "Session recaps",
+      "Custom business branding",
       "Email support",
     ],
     limits: {
-      clients: 5,
-      sessions: 50,
-      storage: "500MB",
+      clients: 200,
+      sessions: 1000,
+      storage: "2GB",
     },
   },
-  PROFESSIONAL: {
-    id: "professional",
-    name: "Professional",
-    price: 29,
+  PRO: {
+    id: "pro",
+    name: "Pro",
+    price: 19,
     interval: "month",
-    stripeProductId: "prod_professional", // Will be created in Stripe dashboard
-    stripePriceId: "price_professional", // Will be created in Stripe dashboard
+    stripeProductId: "prod_pro", // Will be created in Stripe dashboard
+    stripePriceId: "price_pro", // Will be created in Stripe dashboard
     features: [
-      "Up to 50 clients",
       "Everything in Starter, plus:",
-      "Advanced scheduling & calendar sync",
-      "Automated reminders (SMS/Email)",
-      "Detailed client progress reports",
-      "Advanced workout plan builder",
-      "AI-powered session recaps",
-      "Client streak tracking & badges",
-      "Priority email support",
-    ],
-    limits: {
-      clients: 50,
-      sessions: 500,
-      storage: "5GB",
-    },
-  },
-  GOLD: {
-    id: "gold",
-    name: "Gold",
-    price: 79,
-    interval: "month",
-    stripeProductId: "prod_gold", // Will be created in Stripe dashboard
-    stripePriceId: "price_gold", // Will be created in Stripe dashboard
-    features: [
       "Unlimited clients",
-      "Everything in Professional, plus:",
-      "Multi-trainer management",
-      "Advanced analytics & reporting",
-      "White-label client portals",
-      "API access for integrations",
-      "Advanced AI coaching features",
-      "Custom branding options",
-      "Dedicated phone support",
-      "Priority feature requests",
+      "AI-powered recommendations",
+      "Client progress stats & performance summaries",
+      "Priority support",
     ],
     limits: {
       clients: -1, // Unlimited
       sessions: -1, // Unlimited
-      storage: "50GB",
+      storage: "10GB",
+    },
+  },
+  LIFETIME: {
+    id: "lifetime",
+    name: "Pro Lifetime",
+    price: 149,
+    interval: "one-time",
+    stripeProductId: "prod_lifetime", // Will be created in Stripe dashboard
+    stripePriceId: "price_lifetime", // Will be created in Stripe dashboard
+    features: [
+      "Everything in Pro, forever",
+      "No monthly fees",
+      "All future updates included",
+      "Lifetime support",
+      "Limited to first 100 trainers",
+    ],
+    limits: {
+      clients: -1, // Unlimited
+      sessions: -1, // Unlimited
+      storage: "10GB",
     },
   },
 };
@@ -97,12 +91,12 @@ export const isPlanActive = (userPlan: string): boolean => {
 
 export const getPlanLimits = (planId: string) => {
   const plan = Object.values(SUBSCRIPTION_PLANS).find((p) => p.id === planId);
-  return plan?.limits || SUBSCRIPTION_PLANS.FREE.limits;
+  return plan?.limits || SUBSCRIPTION_PLANS.STARTER.limits;
 };
 
 export const canExceedLimit = (
   planId: string,
-  limitType: keyof typeof SUBSCRIPTION_PLANS.FREE.limits,
+  limitType: keyof typeof SUBSCRIPTION_PLANS.STARTER.limits,
   currentCount: number,
 ): boolean => {
   const limits = getPlanLimits(planId);
@@ -184,7 +178,7 @@ export const getSubscriptionStatus = async (userId: string) => {
 
   return {
     status: "trialing",
-    currentPlan: "professional",
+    currentPlan: "starter",
     trialEnd: mockTrialEnd.toISOString(),
     subscriptionId: "sub_mock123",
     customerId: "cus_mock123",

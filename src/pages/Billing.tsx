@@ -40,7 +40,10 @@ import {
   Plus,
   Trash2,
   Download,
-  ArrowLeft,
+  Settings,
+  FileText,
+  Users,
+  Database,
 } from "lucide-react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import {
@@ -52,13 +55,12 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { useNavigate } from "react-router-dom";
-import { DemoCheckoutModal } from "@/components/DemoCheckoutModal";
 import { billingHistoryService } from "@/lib/firebaseService";
 import { useAuth } from "@/contexts/AuthContext";
 import { BillingHistory as BillingHistoryType } from "@/lib/types";
-import "@/lib/resetSubscription"; // Import for console access
+import "@/lib/resetSubscription";
 
-// Mock payment methods - in real app, these would come from Stripe
+// Mock payment methods
 const mockPaymentMethods = [
   {
     id: "pm_1",
@@ -107,7 +109,7 @@ const PaymentMethodCard = ({
   };
 
   return (
-    <Card className={method.isDefault ? "ring-2 ring-primary" : ""}>
+    <Card className={`${method.isDefault ? "ring-2 ring-primary border-primary" : "hover:shadow-md"} transition-all duration-200`}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -123,7 +125,9 @@ const PaymentMethodCard = ({
           </div>
           <div className="flex items-center gap-2">
             {method.isDefault && (
-              <Badge className="bg-green-100 text-green-800">Default</Badge>
+              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                Default
+              </Badge>
             )}
             <div className="flex gap-1">
               {!method.isDefault && (
@@ -169,7 +173,6 @@ const AddPaymentMethodDialog = ({
   const handleAdd = async () => {
     setLoading(true);
     try {
-      // In real implementation, this would create a payment method with Stripe
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const newMethod = {
@@ -251,12 +254,9 @@ const AddPaymentMethodDialog = ({
                   <SelectValue placeholder="MM" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <SelectItem
-                      key={i + 1}
-                      value={String(i + 1).padStart(2, "0")}
-                    >
-                      {String(i + 1).padStart(2, "0")}
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                    <SelectItem key={month} value={month.toString()}>
+                      {month.toString().padStart(2, "0")}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -274,12 +274,9 @@ const AddPaymentMethodDialog = ({
                   <SelectValue placeholder="YYYY" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Array.from({ length: 10 }, (_, i) => (
-                    <SelectItem
-                      key={i}
-                      value={String(new Date().getFullYear() + i)}
-                    >
-                      {new Date().getFullYear() + i}
+                  {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -297,11 +294,17 @@ const AddPaymentMethodDialog = ({
               />
             </div>
           </div>
-          <div className="flex gap-2 justify-end pt-4">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={handleAdd} disabled={loading}>
+            <Button
+              onClick={handleAdd}
+              disabled={loading}
+            >
               {loading ? "Adding..." : "Add Card"}
             </Button>
           </div>
@@ -317,21 +320,25 @@ const PlanCard = ({
   onUpgrade,
   loading,
 }: {
-  plan: typeof SUBSCRIPTION_PLANS.FREE;
+  plan: typeof SUBSCRIPTION_PLANS.STARTER;
   isCurrentPlan: boolean;
   onUpgrade: (planId: string) => void;
   loading: boolean;
 }) => {
-  const isPro = plan.id === "professional";
-  const isGold = plan.id === "gold";
+  const isPro = plan.id === "pro";
+  const isLifetime = plan.id === "lifetime";
 
   return (
     <Card
       className={`relative transition-all duration-300 ${
-        isPro ? "ring-2 ring-primary shadow-lg scale-105" : "hover:shadow-md"
-      } ${isCurrentPlan ? "bg-green-50 border-green-200" : ""}`}
+        isCurrentPlan 
+          ? "ring-2 ring-green-500 shadow-lg bg-green-50 border-green-200" 
+          : isPro 
+            ? "ring-2 ring-primary shadow-lg" 
+            : "hover:shadow-md"
+      }`}
     >
-      {isPro && (
+      {isPro && !isCurrentPlan && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
           <Badge className="bg-primary text-white">
             <Star className="h-3 w-3 mr-1" />
@@ -341,7 +348,7 @@ const PlanCard = ({
       )}
 
       {isCurrentPlan && (
-        <div className="absolute -top-2 -right-2">
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
           <Badge className="bg-green-600 text-white">
             <Check className="h-3 w-3 mr-1" />
             Current Plan
@@ -349,9 +356,9 @@ const PlanCard = ({
         </div>
       )}
 
-      <CardHeader className="text-center">
+      <CardHeader className="text-center pb-4">
         <div className="flex items-center justify-center mb-2">
-          {isGold && <Crown className="h-6 w-6 text-yellow-600 mr-2" />}
+          {isLifetime && <Crown className="h-6 w-6 text-yellow-600 mr-2" />}
           <CardTitle className="text-xl">{plan.name}</CardTitle>
         </div>
 
@@ -373,7 +380,7 @@ const PlanCard = ({
         </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="pt-0">
         <div className="space-y-3 mb-6">
           {plan.features.map((feature, index) => (
             <div key={index} className="flex items-start gap-2">
@@ -386,16 +393,18 @@ const PlanCard = ({
         <div className="space-y-2 mb-6 p-3 bg-muted rounded-lg">
           <h4 className="font-medium text-sm">Plan Limits</h4>
           <div className="space-y-1 text-xs text-muted-foreground">
-            <div>
-              Clients:{" "}
-              {plan.limits.clients === -1 ? "Unlimited" : plan.limits.clients}
+            <div className="flex items-center gap-1">
+              <Users className="h-3 w-3" />
+              Clients: {plan.limits.clients === -1 ? "Unlimited" : plan.limits.clients}
             </div>
-            <div>
-              Sessions:{" "}
-              {plan.limits.sessions === -1 ? "Unlimited" : plan.limits.sessions}
-              /month
+            <div className="flex items-center gap-1">
+              <FileText className="h-3 w-3" />
+              Sessions: {plan.limits.sessions === -1 ? "Unlimited" : plan.limits.sessions}/month
             </div>
-            <div>Storage: {plan.limits.storage}</div>
+            <div className="flex items-center gap-1">
+              <Database className="h-3 w-3" />
+              Storage: {plan.limits.storage}
+            </div>
           </div>
         </div>
 
@@ -411,7 +420,7 @@ const PlanCard = ({
         )}
 
         {isCurrentPlan && plan.id !== "free" && (
-          <Button variant="outline" className="w-full" disabled>
+          <Button variant="outline" className="w-full bg-green-100 border-green-300 text-green-800" disabled>
             <Check className="h-4 w-4 mr-2" />
             Current Plan
           </Button>
@@ -479,7 +488,7 @@ const TrialStatus = () => {
 };
 
 const BillingHistoryComponent = () => {
-  const { user } = useAuth();
+  const { user, isDemoUser } = useAuth();
   const [billingHistory, setBillingHistory] = useState<BillingHistoryType[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -504,140 +513,104 @@ const BillingHistoryComponent = () => {
 
   const handleAddSampleData = async () => {
     if (!user?.uid) return;
-    
+
     try {
-      await billingHistoryService.addSampleBillingHistory(user.uid, "professional");
+      await billingHistoryService.addSampleBillingHistory(user.uid);
       toast({
         title: "Sample data added",
-        description: "Sample billing history has been added for testing purposes.",
+        description: "Sample billing history has been added to your account.",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to add sample billing history.",
+        description: "Failed to add sample data.",
         variant: "destructive",
       });
     }
   };
 
   const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "paid":
-        return "bg-green-100 text-green-800";
+        return "default";
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "secondary";
       case "failed":
-        return "bg-red-100 text-red-800";
-      case "refunded":
-        return "bg-gray-100 text-gray-800";
+        return "destructive";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "outline";
     }
   };
-
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Billing History
-          </CardTitle>
-          <CardDescription>View your past invoices and payments</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center justify-between p-3 border rounded-lg animate-pulse">
-                <div className="space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-48"></div>
-                  <div className="h-3 bg-gray-200 rounded w-24"></div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-16"></div>
-                  <div className="h-6 bg-gray-200 rounded w-20"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (billingHistory.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Billing History
-          </CardTitle>
-          <CardDescription>View your past invoices and payments</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No billing history found</p>
-            <p className="text-sm text-gray-400 mb-4">Your billing history will appear here once you have active subscriptions</p>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleAddSampleData}
-              className="text-xs"
-            >
-              Add Sample Data (Demo)
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <CreditCard className="h-5 w-5" />
-          Billing History
-        </CardTitle>
-        <CardDescription>View your past invoices and payments</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Billing History
+            </CardTitle>
+            <CardDescription>
+              View your past invoices and payments
+            </CardDescription>
+          </div>
+          {(isDemoUser || user?.email === 'trainer@demo.com') && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleAddSampleData}
+            >
+              Add Sample Data
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          {billingHistory.map((invoice) => (
-            <div
-              key={invoice.id}
-              className="flex items-center justify-between p-3 border rounded-lg"
-            >
-              <div>
-                <p className="font-medium">{invoice.description}</p>
-                <p className="text-sm text-muted-foreground">
-                  {new Date(invoice.date).toLocaleDateString()}
-                </p>
-                {invoice.planName && (
-                  <p className="text-xs text-muted-foreground">
-                    Plan: {invoice.planName}
-                  </p>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <p className="font-medium">{formatPrice(invoice.amount)}</p>
-                  <Badge className={getStatusBadgeVariant(invoice.status)}>
-                    {invoice.status}
-                  </Badge>
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground mt-2">Loading billing history...</p>
+          </div>
+        ) : billingHistory.length === 0 ? (
+          <div className="text-center py-8">
+            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">No billing history found</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Your invoices and payments will appear here
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {billingHistory.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <CreditCard className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{item.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(item.date).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
-                {invoice.invoiceUrl && (
-                <Button size="sm" variant="outline" className="h-8">
-                  <Download className="h-3 w-3 mr-1" />
-                  Download
-                </Button>
-                )}
+                <div className="flex items-center gap-3">
+                  <Badge variant={getStatusBadgeVariant(item.status)}>
+                    {item.status}
+                  </Badge>
+                  <p className="font-medium">{formatPrice(item.amount)}</p>
+                  <Button variant="ghost" size="sm">
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -663,12 +636,11 @@ const Billing = () => {
   const currentPlan = getCurrentPlan();
 
   const handleUpgrade = async (planId: string) => {
-    if (planId === "free") {
-      // Handle switching to free plan directly
+    if (planId === "starter") {
       updateSubscriptionPlan(planId, user?.uid);
       toast({
         title: "Switched to Starter Plan",
-        description: "You've been switched to the free Starter plan. Some features may be limited.",
+        description: "You've been switched to the Starter plan. Some features may be limited.",
       });
       return;
     }
@@ -680,7 +652,6 @@ const Billing = () => {
   const handleCheckoutSuccess = () => {
     if (!selectedPlanId) return;
 
-    // Actually update the subscription plan
     updateSubscriptionPlan(selectedPlanId, user?.uid);
 
     const planKey =
@@ -761,234 +732,209 @@ const Billing = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <DevModeNotice />
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Trial Status */}
+          <TrialStatus />
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/settings")}
-            className="p-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Billing & Payments
-            </h1>
-            <p className="text-muted-foreground">
-              Manage your subscription, payment methods, and billing history.
-            </p>
-          </div>
-        </div>
-        {/* Debug info - current plan */}
-        <div className="text-right">
-          <p className="text-sm font-medium">
-            Current Plan: {currentPlan.name}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Status: {subscription?.status || "unknown"}
-          </p>
-        </div>
-      </div>
-
-      {/* Trial Status */}
-      <TrialStatus />
-
-      {/* Current Subscription */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5" />
-            Current Subscription
-          </CardTitle>
-          <CardDescription>
-            Manage your FitClient subscription and billing
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-            <div>
-              <div className="flex items-center gap-3">
-                <h3 className="font-semibold text-lg">
-                  {currentPlan.name} Plan
-                </h3>
-                <Badge
-                  variant={
-                    currentPlan.id === "gold"
-                      ? "default"
-                      : currentPlan.id === "professional"
-                        ? "secondary"
-                        : "outline"
-                  }
-                  className={
-                    currentPlan.id === "gold"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : ""
-                  }
-                >
-                  {subscription?.status === "active"
-                    ? "Active"
-                    : subscription?.status || "Active"}
-                </Badge>
-              </div>
-              <p className="text-muted-foreground">
-                {currentPlan.price === 0
-                  ? "Free forever"
-                  : `$${currentPlan.price}/${currentPlan.interval}`}
-              </p>
-              {isOnTrial && (
-                <Badge className="bg-blue-100 text-blue-800 mt-2">
-                  <Calendar className="h-3 w-3 mr-1" />
-                  Free Trial Active
-                </Badge>
-              )}
-              {!isOnTrial && subscription?.status === "active" && (
-                <p className="text-sm text-green-600 mt-1">
-                  ✓ Subscription active since {new Date().toLocaleDateString()}
-                </p>
-              )}
-            </div>
-
-            {currentPlan.id !== "free" && (
-              <Dialog
-                open={cancelDialogOpen}
-                onOpenChange={setCancelDialogOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    Cancel Subscription
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Cancel Subscription</DialogTitle>
-                    <DialogDescription>
-                      Are you sure you want to cancel your subscription? You'll
-                      lose access to premium features at the end of your billing
-                      period.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="flex gap-2 justify-end">
-                    <Button
-                      variant="outline"
-                      onClick={() => setCancelDialogOpen(false)}
-                    >
-                      Keep Subscription
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={handleCancelSubscription}
-                      disabled={loading}
-                    >
-                      {loading ? "Cancelling..." : "Cancel Subscription"}
-                    </Button>
+          {/* Current Plan Summary */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5" />
+                Current Plan
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <Crown className="h-6 w-6 text-green-600" />
                   </div>
-                </DialogContent>
-              </Dialog>
-            )}
+                  <div>
+                    <h3 className="font-semibold text-lg">
+                      {currentPlan.name} Plan
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {currentPlan.price === 0
+                        ? "Free forever"
+                        : `$${currentPlan.price}/${currentPlan.interval}`}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <Badge
+                    variant={
+                      currentPlan.id === "lifetime"
+                        ? "default"
+                        : currentPlan.id === "pro"
+                          ? "secondary"
+                          : "outline"
+                    }
+                    className={
+                      currentPlan.id === "lifetime"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : ""
+                    }
+                  >
+                    {subscription?.status === "active"
+                      ? "Active"
+                      : subscription?.status || "Active"}
+                  </Badge>
+                  {isOnTrial && (
+                    <Badge className="bg-blue-100 text-blue-800 mt-2 block">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      Free Trial
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Available Plans */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Available Plans</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {Object.values(SUBSCRIPTION_PLANS).map((plan) => {
+                const isCurrent = currentPlan.id === plan.id;
+                return (
+                  <PlanCard
+                    key={plan.id}
+                    plan={plan}
+                    isCurrentPlan={isCurrent}
+                    onUpgrade={handleUpgrade}
+                    loading={loading}
+                  />
+                );
+              })}
+            </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Payment Methods */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Payment Methods
-          </CardTitle>
-          <CardDescription>
-            Manage your credit cards and payment methods
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {paymentMethods.map((method) => (
-            <PaymentMethodCard
-              key={method.id}
-              method={method}
-              onSetDefault={handleSetDefaultPaymentMethod}
-              onDelete={handleDeletePaymentMethod}
-            />
-          ))}
-          <Separator />
-          <AddPaymentMethodDialog onAdd={handleAddPaymentMethod} />
-        </CardContent>
-      </Card>
+          {/* Billing History */}
+          <BillingHistoryComponent />
+        </div>
 
-      {/* Available Plans */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Available Plans</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {Object.values(SUBSCRIPTION_PLANS).map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              isCurrentPlan={currentPlan.id === plan.id}
-              onUpgrade={handleUpgrade}
-              loading={loading}
-            />
-          ))}
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Payment Methods */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Payment Methods
+              </CardTitle>
+              <CardDescription>
+                Manage your credit cards and payment methods
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {paymentMethods.map((method) => (
+                <PaymentMethodCard
+                  key={method.id}
+                  method={method}
+                  onSetDefault={handleSetDefaultPaymentMethod}
+                  onDelete={handleDeletePaymentMethod}
+                />
+              ))}
+              <Separator />
+              <AddPaymentMethodDialog onAdd={handleAddPaymentMethod} />
+            </CardContent>
+          </Card>
+
+          {/* Subscription Management */}
+          {currentPlan.id !== "free" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Subscription Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Dialog
+                  open={cancelDialogOpen}
+                  onOpenChange={setCancelDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      Cancel Subscription
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Cancel Subscription</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to cancel your subscription? You'll
+                        lose access to premium features at the end of your billing
+                        period.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        variant="outline"
+                        onClick={() => setCancelDialogOpen(false)}
+                      >
+                        Keep Subscription
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleCancelSubscription}
+                        disabled={loading}
+                      >
+                        {loading ? "Cancelling..." : "Cancel Subscription"}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Security & Trust */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-green-600" />
+                Security & Trust
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <Shield className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Secure Payments</h4>
+                    <p className="text-xs text-muted-foreground">Powered by Stripe</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <CreditCard className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Cancel Anytime</h4>
+                    <p className="text-xs text-muted-foreground">No long-term contracts</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Sparkles className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">14-Day Free Trial</h4>
+                    <p className="text-xs text-muted-foreground">Try before you buy</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
-
-      {/* Billing History */}
-      <BillingHistoryComponent />
-
-      {/* Security & Trust */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-green-600" />
-            Security & Trust
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Shield className="h-6 w-6 text-green-600" />
-              </div>
-              <h4 className="font-medium">Secure Payments</h4>
-              <p className="text-sm text-muted-foreground">Powered by Stripe</p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <CreditCard className="h-6 w-6 text-blue-600" />
-              </div>
-              <h4 className="font-medium">Cancel Anytime</h4>
-              <p className="text-sm text-muted-foreground">
-                No long-term contracts
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Sparkles className="h-6 w-6 text-purple-600" />
-              </div>
-              <h4 className="font-medium">14-Day Free Trial</h4>
-              <p className="text-sm text-muted-foreground">
-                Try before you buy
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Demo Checkout Modal */}
-      {selectedPlanId && (
-        <DemoCheckoutModal
-          isOpen={checkoutModalOpen}
-          onClose={() => {
-            setCheckoutModalOpen(false);
-            setSelectedPlanId(null);
-          }}
-          planId={selectedPlanId}
-          onSuccess={handleCheckoutSuccess}
-        />
-      )}
     </div>
   );
 };

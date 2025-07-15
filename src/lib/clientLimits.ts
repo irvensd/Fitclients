@@ -14,7 +14,7 @@ export const getClientLimitInfo = (
   currentClientCount: number,
 ): ClientLimitInfo => {
   const plan = Object.values(SUBSCRIPTION_PLANS).find((p) => p.id === planId);
-  const limit = plan?.limits.clients || SUBSCRIPTION_PLANS.FREE.limits.clients;
+  const limit = plan?.limits.clients || SUBSCRIPTION_PLANS.STARTER.limits.clients;
 
   const isUnlimited = limit === -1;
   const canAddMore = isUnlimited || currentClientCount < limit;
@@ -52,11 +52,11 @@ export const getUpgradeMessage = (
   }
 
   if (planId === "free") {
-    return "You've reached your limit of 5 clients. Upgrade to Professional for up to 50 clients, or Gold for unlimited clients.";
+    return "You've reached your limit of 5 clients. Upgrade to Starter for up to 200 clients, or Pro for unlimited clients.";
   }
 
-  if (planId === "professional") {
-    return "You've reached your limit of 50 clients. Upgrade to Gold for unlimited clients and advanced features.";
+  if (planId === "starter") {
+    return "You've reached your limit of 200 clients. Upgrade to Pro for unlimited clients and advanced features.";
   }
 
   return null;
@@ -64,13 +64,13 @@ export const getUpgradeMessage = (
 
 export const getPlanFeaturesList = (planId: string): string[] => {
   const plan = Object.values(SUBSCRIPTION_PLANS).find((p) => p.id === planId);
-  return plan?.features || SUBSCRIPTION_PLANS.FREE.features;
+  return plan?.features || SUBSCRIPTION_PLANS.STARTER.features;
 };
 
 export const getPlanLimitText = (planId: string): string => {
   const plan = Object.values(SUBSCRIPTION_PLANS).find((p) => p.id === planId);
   const clientLimit =
-    plan?.limits.clients || SUBSCRIPTION_PLANS.FREE.limits.clients;
+    plan?.limits.clients || SUBSCRIPTION_PLANS.STARTER.limits.clients;
 
   if (clientLimit === -1) {
     return "Unlimited clients";

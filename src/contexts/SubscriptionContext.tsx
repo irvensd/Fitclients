@@ -23,7 +23,10 @@ interface SubscriptionContextType {
   subscription: SubscriptionData | null;
   isOnTrial: boolean;
   trialDaysLeft: number;
-  getCurrentPlan: () => typeof SUBSCRIPTION_PLANS.FREE;
+  isTrialExpired: boolean;
+  hasValidPaymentMethod: boolean;
+  isServiceSuspended: boolean;
+  getCurrentPlan: () => typeof SUBSCRIPTION_PLANS.STARTER;
   hasFeatureAccess: (feature: string) => boolean;
   refreshSubscription: () => Promise<void>;
   updateSubscriptionPlan: (
@@ -38,25 +41,37 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(
 );
 
 const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
   const [subscription, setSubscription] = useState<SubscriptionData | null>(
     () => {
       // Check for persisted subscription data
       const saved = localStorage.getItem("subscription_data");
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          console.log("Loaded subscription from localStorage:", parsed);
+          return parsed;
         } catch {
+          console.log("Failed to parse localStorage subscription data");
           // Fall through to default
         }
       }
 
-      // Default to Professional plan (trial period is over)
+      // Default to Pro plan (trial period is over)
+      // For testing trial expiration, uncomment the line below:
+      // return {
+      //   status: "trialing",
+      //   currentPlan: "starter",
+      //   trialEnd: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+      //   subscriptionId: "sub_trial123",
+      //   customerId: "cus_trial123",
+      // };
       return {
         status: "active",
-        currentPlan: "professional",
+        currentPlan: "pro",
         trialEnd: null,
-        subscriptionId: "sub_professional123",
-        customerId: "cus_professional123",
+        subscriptionId: "sub_pro123",
+        customerId: "cus_pro123",
       };
     },
   );
@@ -76,41 +91,63 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
     return Math.max(0, diffDays);
   }, [isOnTrial, subscription]);
 
+  // Check if trial has expired
+  const isTrialExpired = React.useMemo(() => {
+    return isOnTrial && trialDaysLeft <= 0;
+  }, [isOnTrial, trialDaysLeft]);
+
+  // Check if user has valid payment method (mock implementation)
+  const hasValidPaymentMethod = React.useMemo(() => {
+    // In a real app, this would check Stripe for valid payment methods
+    // For now, we'll simulate based on user email
+    return user?.email?.includes("paid") || user?.email === "trainer@demo.com";
+  }, [user]);
+
+  // Check if service should be suspended
+  const isServiceSuspended = React.useMemo(() => {
+    return isTrialExpired && !hasValidPaymentMethod;
+  }, [isTrialExpired, hasValidPaymentMethod]);
+
   const getCurrentPlan = () => {
     const planId = subscription?.currentPlan || "free";
+    console.log("getCurrentPlan - subscription?.currentPlan:", subscription?.currentPlan, "planId:", planId);
     const plan = Object.values(SUBSCRIPTION_PLANS).find((p) => p.id === planId);
-    return plan || SUBSCRIPTION_PLANS.FREE;
+    console.log("getCurrentPlan - found plan:", plan);
+    return plan || SUBSCRIPTION_PLANS.STARTER;
   };
 
   const hasFeatureAccess = (feature: string) => {
     const currentPlan = getCurrentPlan();
 
-    // Free plan restrictions
-    if (currentPlan.id === "free") {
+    // Starter plan restrictions
+    if (currentPlan.id === "starter") {
       const restrictedFeatures = [
+        "ai-recommendations",
         "advanced-analytics",
         "api-access",
         "white-label",
         "multi-trainer",
-        "sms-reminders",
         "priority-support",
       ];
       return !restrictedFeatures.includes(feature);
     }
 
-    // Professional plan restrictions
-    if (currentPlan.id === "professional") {
-      const goldOnlyFeatures = [
-        "api-access",
-        "white-label",
-        "multi-trainer",
-        "advanced-analytics",
-      ];
-      return !goldOnlyFeatures.includes(feature);
+    // Pro and Lifetime plans have access to everything
+    if (currentPlan.id === "pro" || currentPlan.id === "lifetime") {
+      return true;
     }
 
-    // Gold has access to everything
-    return true;
+    // Free plan (fallback) - very limited
+    const restrictedFeatures = [
+      "advanced-analytics",
+      "api-access",
+      "white-label",
+      "multi-trainer",
+      "sms-reminders",
+      "priority-support",
+      "ai-recommendations",
+    ];
+    return !restrictedFeatures.includes(feature);
   };
 
   const refreshSubscription = async () => {
@@ -186,6 +223,9 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
     subscription,
     isOnTrial,
     trialDaysLeft,
+    isTrialExpired,
+    hasValidPaymentMethod,
+    isServiceSuspended,
     getCurrentPlan,
     hasFeatureAccess,
     refreshSubscription,

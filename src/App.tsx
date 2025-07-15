@@ -42,6 +42,7 @@ import AIRecommendations from "./pages/AIRecommendations";
 import Features from "./pages/Features";
 import SupportPortal from "./pages/SupportPortal";
 import SupportLogin from "./pages/SupportLogin";
+import TrialTest from "./pages/TrialTest";
 
 
 // Landing page redirect component
@@ -96,6 +97,7 @@ const App = () => {
                 <Route path="/help" element={<Help />} />
  
                 <Route path="/ai-recommendations" element={<AIRecommendations />} />
+                <Route path="/trial-test" element={<TrialTest />} />
               </Route>
               
               {/* Staff-only routes */}

@@ -71,6 +71,7 @@ import { Progress } from "@/components/ui/progress";
 import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { ServiceRestriction } from "@/components/ServiceRestriction";
 
 const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenChange?: (open: boolean) => void; }) => {
   const [open, setOpen] = useState(false);
@@ -1482,17 +1483,18 @@ Your Personal Trainer`;
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Clients</h1>
-          <p className="text-muted-foreground">
-            Manage your client relationships and track their progress.
-          </p>
+    <ServiceRestriction featureName="client management">
+      <div className="p-6 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Clients</h1>
+            <p className="text-muted-foreground">
+              Manage your client relationships and track their progress.
+            </p>
+          </div>
+          <AddClientDialog />
         </div>
-        <AddClientDialog />
-      </div>
 
 
 
@@ -2064,6 +2066,7 @@ Your Personal Trainer`;
         onDelete={handleDeleteClient}
       />
     </div>
+    </ServiceRestriction>
   );
 };
 

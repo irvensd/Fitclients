@@ -347,7 +347,7 @@ const Contact = () => {
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-2">Can I try FitClients for free?</h3>
                 <p className="text-sm text-muted-foreground">
-                  Yes! We offer a free Starter plan for up to 5 clients, plus a 14-day free trial of our Professional plan 
+                  Yes! We offer a Starter plan ($9/month) for up to 200 clients, plus a 14-day free trial of our Pro plan 
                   with no credit card required.
                 </p>
               </CardContent>

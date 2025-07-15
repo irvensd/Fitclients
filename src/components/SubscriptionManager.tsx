@@ -55,13 +55,13 @@ const PlanCard = ({
   onUpgrade,
   loading,
 }: {
-  plan: typeof SUBSCRIPTION_PLANS.FREE;
+  plan: typeof SUBSCRIPTION_PLANS.STARTER;
   isCurrentPlan: boolean;
   onUpgrade: (planId: string) => void;
   loading: boolean;
 }) => {
-  const isPro = plan.id === "professional";
-  const isGold = plan.id === "gold";
+      const isPro = plan.id === "pro" || plan.id === "lifetime";
+      const isLifetime = plan.id === "lifetime";
 
   return (
     <Card
@@ -89,7 +89,7 @@ const PlanCard = ({
 
       <CardHeader className="text-center">
         <div className="flex items-center justify-center mb-2">
-          {isGold && <Crown className="h-6 w-6 text-yellow-600 mr-2" />}
+                      {isLifetime && <Crown className="h-6 w-6 text-yellow-600 mr-2" />}
           <CardTitle className="text-xl">{plan.name}</CardTitle>
         </div>
 
@@ -470,11 +470,11 @@ export const SubscriptionManager = ({
     }
   };
 
-  const handleDowngradeToFree = () => {
-    updateSubscriptionPlan("free", user?.uid, onDowngradeClients);
+  const handleDowngradeToStarter = () => {
+    updateSubscriptionPlan("starter", user?.uid, onDowngradeClients);
     toast({
-      title: "Downgraded to Free Plan",
-      description: "You've been downgraded to the free plan. Some features may be limited.",
+      title: "Downgraded to Starter Plan",
+      description: "You've been downgraded to the Starter plan. Some features may be limited.",
     });
   };
 

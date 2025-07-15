@@ -122,7 +122,7 @@ const Landing = () => {
         "name": "How much does FitClient cost?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "FitClient offers three plans: Starter (Free forever for up to 5 clients), Professional ($29/month for up to 50 clients with advanced features), and Gold ($79/month for unlimited clients with enterprise features). All paid plans include a 14-day free trial."
+          "text": "FitClient offers three plans: Starter ($9/month for up to 200 clients), Pro ($19/month for unlimited clients with advanced features), and Pro Lifetime ($199 one-time payment for unlimited clients forever). All plans include a 14-day free trial."
         }
       },
       {
@@ -138,7 +138,7 @@ const Landing = () => {
         "name": "Can I try FitClient before purchasing?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes! You can start with our free Starter plan that supports up to 5 clients forever. For Professional and Gold plans, we offer a 14-day free trial with no credit card required."
+          "text": "Yes! You can start with our Starter plan ($9/month) that supports up to 200 clients. For Pro and Pro Lifetime plans, we offer a 14-day free trial with no credit card required."
         }
       },
       {
@@ -153,7 +153,7 @@ const Landing = () => {
   };
 
   return (
-    <>
+    <div>
       <Helmet>
         {/* Primary Meta Tags */}
         <title>FitClient - Simple CRM Software for Personal Trainers | Client Management Made Easy</title>
@@ -1663,12 +1663,12 @@ const Landing = () => {
                   <h4 className="font-semibold mb-3 text-center">Reward Structure</h4>
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-green-600">$29</div>
-                      <div className="text-sm text-muted-foreground">Professional Plan</div>
+                      <div className="text-2xl font-bold text-green-600">$19</div>
+                      <div className="text-sm text-muted-foreground">Pro Plan</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-green-600">$79</div>
-                      <div className="text-sm text-muted-foreground">Gold Plan</div>
+                      <div className="text-2xl font-bold text-green-600">$199</div>
+                      <div className="text-sm text-muted-foreground">Pro Lifetime Plan</div>
                     </div>
                   </div>
                   <p className="text-xs text-center text-muted-foreground mt-3">
@@ -1736,37 +1736,55 @@ const Landing = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {/* Starter Plan */}
               <Card className="border-2 hover:border-primary/20 transition-all duration-300">
                 <CardContent className="p-8">
                   <div className="text-center mb-6">
                     <h3 className="text-xl font-bold mb-2">Starter</h3>
                     <p className="text-muted-foreground text-sm mb-4">
-                      Perfect for new trainers
+                      Perfect for growing trainers
                     </p>
                     <div className="flex items-center justify-center gap-1">
-                      <span className="text-3xl font-bold">Free</span>
+                      <span className="text-sm text-muted-foreground">$</span>
+                      <span className="text-3xl font-bold">9</span>
+                      <span className="text-muted-foreground">/month</span>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">Forever</p>
+                    <p className="text-sm text-muted-foreground mt-1">Billed monthly</p>
                   </div>
 
                   <div className="space-y-3 mb-8">
                     <div className="flex items-center gap-3">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Up to 5 clients</span>
+                      <span className="text-sm">Manage up to 200 clients</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Basic session scheduling</span>
+                      <span className="text-sm">Session scheduling & calendar</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Payment tracking</span>
+                      <span className="text-sm">Payment tracking & invoicing</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Progress photos</span>
+                      <span className="text-sm">Progress tracking</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Client portal links (no login)</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Workout plan builder</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Session recaps</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Custom business branding</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="h-4 w-4 text-green-600" />
@@ -1776,13 +1794,13 @@ const Landing = () => {
 
                   <Link to="/login" className="block">
                     <Button variant="outline" className="w-full">
-                      Start Free
+                      Start 14-Day Free Trial
                     </Button>
                   </Link>
                 </CardContent>
               </Card>
 
-              {/* Professional Plan - Most Popular */}
+              {/* Pro Plan - Most Popular */}
               <Card className="border-2 border-primary shadow-lg transform hover:scale-105 transition-all duration-300 relative">
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <div className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
@@ -1792,13 +1810,13 @@ const Landing = () => {
                 </div>
                 <CardContent className="p-8">
                   <div className="text-center mb-6">
-                    <h3 className="text-xl font-bold mb-2">Professional</h3>
+                    <h3 className="text-xl font-bold mb-2">Pro</h3>
                     <p className="text-muted-foreground text-sm mb-4">
-                      For growing training businesses
+                      For growing coaches who need unlimited clients
                     </p>
                     <div className="flex items-center justify-center gap-1">
                       <span className="text-sm text-muted-foreground">$</span>
-                      <span className="text-3xl font-bold">29</span>
+                      <span className="text-3xl font-bold">19</span>
                       <span className="text-muted-foreground">/month</span>
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -1809,37 +1827,19 @@ const Landing = () => {
                   <div className="space-y-3 mb-8">
                     <div className="flex items-center gap-3">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Up to 50 clients</span>
+                      <span className="text-sm">Everything in Starter, plus:</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">
-                        Advanced scheduling & calendar
-                      </span>
+                      <span className="text-sm">Unlimited clients</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">
-                        Automated reminders (SMS/Email)
-                      </span>
+                      <span className="text-sm">AI-powered recommendations</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Client progress reports</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Workout plan builder</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Client portal links</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Sparkles className="h-4 w-4 text-purple-600" />
-                      <span className="text-sm font-medium">
-                        AI Session Recaps
-                      </span>
+                      <span className="text-sm">Client progress stats & performance summaries</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="h-4 w-4 text-green-600" />
@@ -1848,83 +1848,77 @@ const Landing = () => {
                   </div>
 
                   <Link to="/login" className="block">
-                    <Button className="w-full">Start 14-Day Free Trial</Button>
+                    <Button className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white">Start 14-Day Free Trial</Button>
                   </Link>
                 </CardContent>
               </Card>
 
-              {/* Gold Plan */}
-              <Card className="border-2 hover:border-primary/20 transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Crown className="h-5 w-5 text-yellow-600" />
-                      <h3 className="text-xl font-bold">Gold</h3>
+              {/* Lifetime Plan */}
+              <Card className="border-2 border-yellow-200 bg-gradient-to-br from-yellow-50 to-white hover:border-yellow-300 transition-all duration-300 relative">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-yellow-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                    <Crown className="h-3 w-3" />
+                    Limited Time
+                  </div>
+                </div>
+                <CardContent className="p-8">
+                  <div className="text-center mb-6">
+                    <h3 className="text-xl font-bold mb-2">Pro Lifetime</h3>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Get FitClient forever — one-time payment
+                    </p>
+                    <div className="flex items-center justify-center gap-1">
+                      <span className="text-sm text-muted-foreground">$</span>
+                      <span className="text-3xl font-bold">149</span>
                     </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      One-time payment
+                    </p>
+                    <p className="text-xs text-green-600 font-medium mt-1">
+                      Save over $500 vs. monthly plans
+                    </p>
+                  </div>
 
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <span className="text-sm text-muted-foreground">$</span>
-                        <span className="text-3xl font-bold">79</span>
-                        <span className="text-muted-foreground">/month</span>
-                      </div>
+                  <div className="space-y-3 mb-8">
+                    <div className="flex items-center gap-3">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Everything in Pro, forever</span>
                     </div>
-
-                    <div className="space-y-3 mb-8">
-                      <div className="flex items-center gap-3">
-                        <Check className="h-4 w-4 text-green-600" />
-                        <span className="text-sm">Unlimited clients</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Check className="h-4 w-4 text-green-600" />
-                        <span className="text-sm">
-                          Everything in Professional
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Check className="h-4 w-4 text-green-600" />
-                        <span className="text-sm">Multi-trainer management</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Check className="h-4 w-4 text-green-600" />
-                        <span className="text-sm">
-                          Advanced analytics & reporting
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Check className="h-4 w-4 text-green-600" />
-                        <span className="text-sm">
-                          White-label client portals
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Check className="h-4 w-4 text-green-600" />
-                        <span className="text-sm">
-                          API access for integrations
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Sparkles className="h-4 w-4 text-purple-600" />
-                        <span className="text-sm font-medium">
-                          Advanced AI coaching
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Shield className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium">
-                          Dedicated phone support
-                        </span>
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">No monthly fees</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">All future updates included</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Lifetime support</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Limited to first 100 trainers</span>
                     </div>
                   </div>
 
-                  <Link to="/login" className="block mt-6">
-                    <Button variant="outline" className="w-full">
-                      Start 14-Day Free Trial
+                  <Link to="/login" className="block">
+                    <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white">
+                      Get Lifetime Access
                     </Button>
                   </Link>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Call to Action */}
+            <div className="text-center mt-12">
+              <p className="text-lg text-muted-foreground mb-4">
+                💬 Not sure which plan is right for you?
+              </p>
+              <p className="text-muted-foreground">
+                Start with a 14-day free trial – upgrade or cancel anytime. No credit card required.
+              </p>
             </div>
 
             {/* Pricing FAQ/Features */}
@@ -2097,9 +2091,8 @@ const Landing = () => {
                 <CardContent className="p-6">
                   <h3 className="font-semibold text-lg mb-3">How much does FitClient cost?</h3>
                   <p className="text-muted-foreground">
-                    FitClient offers three plans: <strong>Starter (Free forever for up to 5 clients)</strong>, 
-                    Professional ($29/month for up to 50 clients), and Gold ($79/month for unlimited clients). 
-                    All paid plans include a 14-day free trial with no credit card required.
+                    FitClient offers two simple plans: <strong>Starter ($9/month for up to 200 clients)</strong> 
+                    and Pro ($19/month for unlimited clients). Both plans include a 14-day free trial with no credit card required.
                   </p>
                 </CardContent>
               </Card>
@@ -2121,8 +2114,7 @@ const Landing = () => {
                 <CardContent className="p-6">
                   <h3 className="font-semibold text-lg mb-3">Can I try FitClient before purchasing?</h3>
                   <p className="text-muted-foreground">
-                    <strong>Absolutely!</strong> You can start with our free Starter plan that supports up to 5 clients forever. 
-                    For Professional and Gold plans, we offer a 14-day free trial with no credit card required. 
+                    <strong>Absolutely!</strong> Both Starter and Pro plans include a 14-day free trial with no credit card required. 
                     You can upgrade, downgrade, or cancel anytime.
                   </p>
                 </CardContent>
@@ -2195,7 +2187,7 @@ const Landing = () => {
           <div className="container mx-auto text-center max-w-4xl">
             <div className="inline-flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
               <Zap className="h-4 w-4" />
-              Limited Time: Free Forever Plan Available
+              Limited Time: Early Access Pricing
             </div>
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
               Stop Losing Money to <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Poor Organization</span>
@@ -2208,7 +2200,7 @@ const Landing = () => {
             <div className="flex flex-wrap justify-center items-center gap-6 mb-8 text-sm opacity-90">
               <div className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-green-300" />
-                <span>Free forever for 5 clients</span>
+                <span>Starting at $9/month</span>
               </div>
               <div className="flex items-center gap-2">
                 <Shield className="h-4 w-4 text-blue-300" />
@@ -2304,7 +2296,7 @@ const Landing = () => {
         {/* Bottom spacing for mobile sticky CTA */}
         <div className="md:hidden h-20"></div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -131,9 +131,8 @@ const Terms = () => {
                     FitClients offers both free and paid subscription plans. Paid subscriptions are billed in advance on a monthly or annual basis.
                   </p>
                   <ul className="list-disc pl-6 space-y-1 mt-2">
-                    <li><strong>Free Plan:</strong> Limited features, no credit card required</li>
-                    <li><strong>Professional Plan:</strong> $29/month, includes advanced features</li>
-                    <li><strong>Gold Plan:</strong> $79/month, includes all features and priority support</li>
+                    <li><strong>Starter Plan:</strong> $9/month, up to 200 clients</li>
+                    <li><strong>Pro Plan:</strong> $19/month, unlimited clients</li>
                   </ul>
                 </div>
 
@@ -281,8 +280,8 @@ const Terms = () => {
                   <h4 className="font-semibold mb-2">Support</h4>
                   <ul className="list-disc pl-6 space-y-1">
                     <li><strong>Free Plan:</strong> Email support with 48-hour response time</li>
-                    <li><strong>Professional Plan:</strong> Email support with 24-hour response time</li>
-                    <li><strong>Gold Plan:</strong> Priority email and phone support with 4-hour response time</li>
+                    <li><strong>Pro Plan:</strong> Email support with 24-hour response time</li>
+                    <li><strong>Pro Lifetime Plan:</strong> Priority email and phone support with 4-hour response time</li>
                   </ul>
                 </div>
 

@@ -39,6 +39,8 @@ import {
   generateClientSummary,
 } from "@/lib/sessionRecapAI";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { SUBSCRIPTION_PLANS } from "@/lib/stripe";
 
 interface SessionRecapFormProps {
   session: Session;
@@ -52,8 +54,13 @@ export const SessionRecapForm = ({
   onRecapGenerated,
 }: SessionRecapFormProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"form" | "generating" | "result">("form");
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  // Check if user has Pro or Lifetime plan
+  const hasProAccess = user?.email === "trainer@demo.com" || user?.email?.includes("pro");
   const [formData, setFormData] = useState({
     workoutFocus: "",
     exercisesCompleted: [] as string[],
@@ -93,6 +100,12 @@ export const SessionRecapForm = ({
   };
 
   const handleGenerateRecap = async () => {
+    // Check if user has Pro access
+    if (!hasProAccess) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     setStep("generating");
 
     try {
@@ -504,6 +517,64 @@ export const SessionRecapForm = ({
           </div>
         )}
       </DialogContent>
+      
+      {/* Upgrade Modal */}
+      <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-purple-600" />
+              Upgrade to Pro
+            </DialogTitle>
+            <DialogDescription>
+              AI-powered session recaps are available exclusively for Pro and Lifetime plan subscribers.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg">
+              <h4 className="font-semibold mb-2">What you'll get with Pro:</h4>
+              <ul className="space-y-1 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  AI-powered session recaps
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  Unlimited clients
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  Advanced analytics & insights
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  Priority support
+                </li>
+              </ul>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button 
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+                onClick={() => {
+                  setShowUpgradeModal(false);
+                  // In a real app, this would redirect to billing/upgrade page
+                  window.location.href = "/billing";
+                }}
+              >
+                Upgrade to Pro - $19/month
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowUpgradeModal(false)}
+              >
+                Maybe Later
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 };

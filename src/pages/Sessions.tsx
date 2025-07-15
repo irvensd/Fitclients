@@ -57,6 +57,7 @@ import {
 import { SessionCalendar } from "@/components/SessionCalendar";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import { formatTime, cn } from "@/lib/utils";
+import { ServiceRestriction } from "@/components/ServiceRestriction";
 
 // Add Session Dialog Component
 const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) => {
@@ -518,35 +519,36 @@ const Sessions = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Sessions</h1>
-          <p className="text-muted-foreground">
-            Manage and track all your training sessions.
-          </p>
+    <ServiceRestriction featureName="session management">
+      <div className="p-6 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Sessions</h1>
+            <p className="text-muted-foreground">
+              Manage and track all your training sessions.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {overdueCount > 0 && (
+              <Button 
+                variant="outline" 
+                className="bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100"
+                onClick={() => {
+                  // Bulk complete overdue sessions
+                  overdueSessions.forEach(session => handleCompleteSession(session));
+                }}
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Complete {overdueCount} Overdue
+              </Button>
+            )}
+            <AddSessionDialog onSessionAdded={() => {
+              // Trigger a gentle refresh of the data context
+              // This is more efficient than a full page reload
+            }} />
+          </div>
         </div>
-        <div className="flex gap-2">
-          {overdueCount > 0 && (
-            <Button 
-              variant="outline" 
-              className="bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100"
-              onClick={() => {
-                // Bulk complete overdue sessions
-                overdueSessions.forEach(session => handleCompleteSession(session));
-              }}
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Complete {overdueCount} Overdue
-            </Button>
-          )}
-          <AddSessionDialog onSessionAdded={() => {
-            // Trigger a gentle refresh of the data context
-            // This is more efficient than a full page reload
-          }} />
-        </div>
-      </div>
 
       <Tabs defaultValue="list" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
@@ -838,6 +840,7 @@ const Sessions = () => {
         </TabsContent>
       </Tabs>
     </div>
+    </ServiceRestriction>
   );
 };
 
