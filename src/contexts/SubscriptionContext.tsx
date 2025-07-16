@@ -41,7 +41,7 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(
 );
 
 const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, updateUserProfile } = useAuth();
   const [subscription, setSubscription] = useState<SubscriptionData | null>(
     () => {
       // Check for persisted subscription data
@@ -168,6 +168,40 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
   const refreshSubscription = async () => {
     // In a real app, this would fetch the latest subscription data from the server
     console.log("Refreshing subscription data...");
+    
+    try {
+      // Reload subscription data from localStorage
+      const saved = localStorage.getItem("subscription_data");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          console.log("Refreshed subscription from localStorage:", parsed);
+          setSubscription(parsed);
+        } catch {
+          console.log("Failed to parse localStorage subscription data during refresh");
+        }
+      }
+      
+      // Also check if user profile has updated plan
+      if (user?.uid) {
+        try {
+          const userProfile = await userProfileService.getUserProfile(user.uid);
+          if (userProfile?.selectedPlan && subscription?.currentPlan !== userProfile.selectedPlan) {
+            console.log("Updating subscription from user profile during refresh:", userProfile.selectedPlan);
+            const newSubscription = {
+              ...subscription,
+              currentPlan: userProfile.selectedPlan,
+            };
+            setSubscription(newSubscription);
+            localStorage.setItem("subscription_data", JSON.stringify(newSubscription));
+          }
+        } catch (error) {
+          console.error("Error refreshing subscription from user profile:", error);
+        }
+      }
+    } catch (error) {
+      console.error("Error refreshing subscription:", error);
+    }
   };
 
   const updateSubscriptionPlan = async (
@@ -191,12 +225,16 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("subscription_data", JSON.stringify(newSubscription));
     console.log(`Subscription updated to ${planId} plan`);
 
-    // Save the selected plan to the user's profile in Firestore
+    // Save the selected plan to the user's profile in Firestore and update local state
     if (userId) {
       try {
         await userProfileService.updateUserProfile(userId, {
           selectedPlan: planId,
         });
+        // Update local userProfile state in AuthContext
+        if (updateUserProfile) {
+          await updateUserProfile({ selectedPlan: planId });
+        }
         console.log(`Updated user profile with selected plan: ${planId}`);
       } catch (error) {
         console.error("Error updating user profile with selected plan:", error);
