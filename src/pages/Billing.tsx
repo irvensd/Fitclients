@@ -912,6 +912,92 @@ const Billing = () => {
           </Card>
         </div>
       </div>
+
+      {/* Checkout Modal */}
+      <Dialog open={checkoutModalOpen} onOpenChange={setCheckoutModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-yellow-600" />
+              Upgrade Your Plan
+            </DialogTitle>
+            <DialogDescription>
+              {selectedPlanId && (
+                <>
+                  You're about to upgrade to the{" "}
+                  <span className="font-semibold">
+                    {SUBSCRIPTION_PLANS[selectedPlanId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS]?.name}
+                  </span>{" "}
+                  plan.
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {selectedPlanId && (
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
+                <h4 className="font-semibold mb-2">Plan Details:</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Plan:</span>
+                    <span className="font-medium">
+                      {SUBSCRIPTION_PLANS[selectedPlanId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS]?.name}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Price:</span>
+                    <span className="font-medium">
+                      ${SUBSCRIPTION_PLANS[selectedPlanId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS]?.price}
+                      {SUBSCRIPTION_PLANS[selectedPlanId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS]?.interval === "one-time" 
+                        ? " (one-time)" 
+                        : "/month"}
+                    </span>
+                  </div>
+                  {isOnTrial && (
+                    <div className="flex justify-between">
+                      <span>Trial Status:</span>
+                      <span className="font-medium text-green-600">Free Trial Active</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="font-medium text-yellow-800 mb-1">Important:</p>
+                  <p className="text-yellow-700">
+                    {isOnTrial 
+                      ? "You're currently on a free trial. No charges will be made until your trial ends."
+                      : "This will update your subscription immediately."
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button 
+                className="flex-1"
+                onClick={handleCheckoutSuccess}
+                disabled={loading}
+              >
+                {loading ? "Processing..." : "Confirm Upgrade"}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setCheckoutModalOpen(false)}
+                disabled={loading}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

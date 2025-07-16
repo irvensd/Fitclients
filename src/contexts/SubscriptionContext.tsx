@@ -188,6 +188,18 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("subscription_data", JSON.stringify(newSubscription));
     console.log(`Subscription updated to ${planId} plan`);
 
+    // Save the selected plan to the user's profile in Firestore
+    if (userId) {
+      try {
+        await userProfileService.updateUserProfile(userId, {
+          selectedPlan: planId,
+        });
+        console.log(`Updated user profile with selected plan: ${planId}`);
+      } catch (error) {
+        console.error("Error updating user profile with selected plan:", error);
+      }
+    }
+
     // Initialize billing history for new paid subscribers
     try {
       if (userId && planId !== "free") {
