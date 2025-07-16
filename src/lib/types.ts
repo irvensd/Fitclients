@@ -60,6 +60,7 @@ export interface UserProfile {
   address?: string;
   createdAt: string;
   lastLogin?: string;
+  selectedPlan?: string; // Store the user's selected plan
   operatingHours?: OperatingHours[];
   socialMedia?: {
     instagram?: string;

@@ -41,7 +41,7 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(
 );
 
 const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [subscription, setSubscription] = useState<SubscriptionData | null>(
     () => {
       // Check for persisted subscription data
@@ -76,6 +76,20 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
       };
     },
   );
+
+  // Update subscription when user profile loads with selected plan
+  React.useEffect(() => {
+    if (userProfile?.selectedPlan && subscription?.currentPlan !== userProfile.selectedPlan) {
+      console.log("Updating subscription from user profile:", userProfile.selectedPlan);
+      const newSubscription = {
+        ...subscription,
+        currentPlan: userProfile.selectedPlan,
+      };
+      setSubscription(newSubscription);
+      // Persist to localStorage
+      localStorage.setItem("subscription_data", JSON.stringify(newSubscription));
+    }
+  }, [userProfile?.selectedPlan, subscription]);
 
   const isOnTrial = React.useMemo(() => {
     return subscription?.status === "trialing";

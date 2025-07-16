@@ -177,6 +177,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                 firstName: firstName,
                 lastName: lastName,
                 displayName: `${firstName} ${lastName}`,
+                selectedPlan: planId || "starter", // Save the selected plan to the profile
               };
               console.log("Creating user profile during registration:", profileData);
               
@@ -237,56 +238,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         } catch (error: any) {
           console.error(`Registration attempt ${retryCount + 1} failed:`, error);
           retryCount++;
-
-          // Handle specific Firebase errors
-          if (error.code === "auth/network-request-failed") {
-            if (retryCount < maxRetries) {
-              console.log(`Network error, retrying in ${retryCount * 1000}ms...`);
-              await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
-              continue; // Retry
-            } else {
-              // Run diagnostics on final network failure
-              console.log("Running Firebase connection diagnostics...");
-              await diagnoseFirebaseConnection();
-              setAuthError(
-                "Network connection failed. Please check your internet connection and try again. Check the console for detailed diagnostics."
-              );
-            }
-          } else if (error.code === "auth/email-already-in-use") {
-            setAuthError(
-              "An account with this email already exists. Please sign in instead."
-            );
-            break; // Don't retry for this error
-          } else if (error.code === "auth/weak-password") {
-            setAuthError("Password should be at least 6 characters long.");
-            break; // Don't retry for this error
-          } else if (error.code === "auth/invalid-email") {
-            setAuthError("Invalid email address format.");
-            break; // Don't retry for this error
-          } else if (error.code === "auth/operation-not-allowed") {
-            setAuthError(
-              "Email/password accounts are not enabled. Please contact support."
-            );
-            break; // Don't retry for this error
-          } else {
-            if (retryCount < maxRetries) {
-              console.log(`Unknown error, retrying in ${retryCount * 1000}ms...`);
-              await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
-              continue; // Retry for unknown errors
-            } else {
-              setAuthError(
-                error.message || "Registration failed. Please try again."
-              );
-            }
-          }
           
           if (retryCount >= maxRetries) {
-            throw error; // Re-throw after max retries
+            console.error("All registration attempts failed");
+            setAuthError(
+              error.code === "auth/email-already-in-use"
+                ? "An account with this email already exists. Please try logging in instead."
+                : error.code === "auth/weak-password"
+                ? "Password is too weak. Please choose a stronger password."
+                : error.code === "auth/invalid-email"
+                ? "Please enter a valid email address."
+                : error.code === "auth/network-request-failed"
+                ? "Network error. Please check your connection and try again."
+                : "Registration failed. Please try again."
+            );
+            throw error;
           }
+          
+          // Wait before retrying
+          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
         }
       }
     },
-    [],
+    []
   );
 
   const logout = React.useCallback(async () => {
