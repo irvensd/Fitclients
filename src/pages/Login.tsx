@@ -33,17 +33,19 @@ const Login = () => {
 
   const { login, register, user, isDevMode, authError, clearError } = useAuth();
 
-  // Get referral code from URL parameters
+  // Get referral code and mode from URL parameters
   useEffect(() => {
     const refParam = searchParams.get("ref");
+    const modeParam = searchParams.get("mode");
+    
     if (refParam) {
       setReferralCode(refParam);
-      // If there's a referral code, switch to register mode
-      if (mode === "login") {
-        setMode("register");
-      }
     }
-  }, [searchParams, mode]);
+    
+    if (modeParam === "register") {
+      setMode("register");
+    }
+  }, [searchParams]);
 
   // Redirect if already logged in
   if (user) {

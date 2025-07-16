@@ -44,6 +44,11 @@ import {
   Instagram,
   Facebook,
   Youtube,
+  Settings as SettingsIcon,
+  Smartphone,
+  Mail,
+  Globe,
+  MapPin,
 } from "lucide-react";
 import { GamificationDashboard } from "@/components/GamificationDashboard";
 import { BusinessHours } from "@/components/BusinessHours";
@@ -508,168 +513,204 @@ const ClientPortal = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="business" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-              <BusinessHours 
-                operatingHours={trainerProfile?.operatingHours}
-                trainerName={trainerProfile?.displayName || "Your Trainer"}
-              />
-              
-              <Card className="shadow-sm border-0 bg-white">
-                <CardHeader className="pb-3 lg:pb-4">
-                  <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                    <MessageCircle className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
-                    Contact Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3 lg:space-y-4 px-3 lg:px-6">
-                  {trainerProfile?.businessName && (
-                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                      <Label className="text-xs font-medium text-blue-700">Business Name</Label>
-                      <p className="font-semibold text-blue-900 text-sm lg:text-base break-words">{trainerProfile.businessName}</p>
+          <TabsContent value="business" className="mt-4 sm:mt-6">
+            <div className="space-y-4 sm:space-y-6">
+              {/* Business Information Hero Section */}
+              {trainerProfile?.businessName && (
+                <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg">
+                  <CardHeader className="text-center pb-3 sm:pb-4 px-4 sm:px-6">
+                    <CardTitle className="flex items-center justify-center gap-2 text-blue-800 text-lg sm:text-xl">
+                      <SettingsIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                      {trainerProfile.businessName}
+                    </CardTitle>
+                    {trainerProfile?.bio && (
+                      <CardDescription className="text-blue-700 max-w-2xl mx-auto text-sm sm:text-base">
+                        {trainerProfile.bio}
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                </Card>
+              )}
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                {/* Operating Hours */}
+                <BusinessHours 
+                  operatingHours={trainerProfile?.operatingHours}
+                  trainerName={trainerProfile?.displayName || "Your Trainer"}
+                />
+                
+                {/* Contact Information */}
+                <Card className="border-2 border-green-100 bg-gradient-to-br from-green-50 to-emerald-50 shadow-lg">
+                  <CardHeader className="px-4 sm:px-6 pb-3 sm:pb-4">
+                    <CardTitle className="flex items-center gap-2 text-green-800 text-base sm:text-lg">
+                      <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+                      Contact Information
+                    </CardTitle>
+                    <CardDescription className="text-green-700 text-sm">
+                      Get in touch with your trainer
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-6">
+                    {trainerProfile?.phone && (
+                      <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white/60 rounded-lg border border-green-200 hover:bg-white/80 transition-colors">
+                        <div className="p-1.5 sm:p-2 bg-green-100 rounded-full flex-shrink-0">
+                          <Smartphone className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <Label className="text-xs font-medium text-green-700">Phone</Label>
+                          <a 
+                            href={`tel:${trainerProfile.phone}`}
+                            className="font-semibold text-green-900 text-xs sm:text-sm hover:underline block break-all"
+                          >
+                            {trainerProfile.phone}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {(trainerProfile?.email || user?.email) && (
+                      <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white/60 rounded-lg border border-green-200 hover:bg-white/80 transition-colors">
+                        <div className="p-1.5 sm:p-2 bg-green-100 rounded-full flex-shrink-0">
+                          <Mail className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <Label className="text-xs font-medium text-green-700">Email</Label>
+                          <a 
+                            href={`mailto:${trainerProfile?.email || user?.email}`}
+                            className="font-semibold text-green-900 text-xs sm:text-sm hover:underline break-all block"
+                          >
+                            {trainerProfile?.email || user?.email}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {trainerProfile?.website && (
+                      <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white/60 rounded-lg border border-green-200 hover:bg-white/80 transition-colors">
+                        <div className="p-1.5 sm:p-2 bg-green-100 rounded-full flex-shrink-0">
+                          <Globe className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <Label className="text-xs font-medium text-green-700">Website</Label>
+                          <a 
+                            href={trainerProfile.website} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="font-semibold text-green-900 text-xs sm:text-sm hover:underline break-all"
+                          >
+                            {trainerProfile.website}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {trainerProfile?.address && (
+                      <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white/60 rounded-lg border border-green-200 hover:bg-white/80 transition-colors">
+                        <div className="p-1.5 sm:p-2 bg-green-100 rounded-full flex-shrink-0">
+                          <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <Label className="text-xs font-medium text-green-700">Address</Label>
+                          <p className="font-semibold text-green-900 text-xs sm:text-sm">{trainerProfile.address}</p>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Social Media Section */}
+              {trainerProfile?.socialMedia && (
+                Object.values(trainerProfile.socialMedia).some(value => value && value.trim() !== "")
+              ) && (
+                <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-pink-50 shadow-lg">
+                  <CardHeader className="text-center px-4 sm:px-6 pb-3 sm:pb-4">
+                    <CardTitle className="flex items-center justify-center gap-2 text-purple-800 text-base sm:text-lg">
+                      <Star className="h-4 w-4 sm:h-5 sm:w-5" />
+                      Follow {trainerProfile?.displayName || "Your Trainer"}
+                    </CardTitle>
+                    <CardDescription className="text-purple-700 text-sm">
+                      Stay connected and get fitness tips, motivation, and updates
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-4 sm:px-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                      {trainerProfile.socialMedia.instagram && (
+                        <a
+                          href={`https://instagram.com/${trainerProfile.socialMedia.instagram.replace('@', '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-white/60 rounded-xl border border-purple-200 hover:bg-white/80 hover:shadow-lg transition-all duration-200 hover:scale-105"
+                        >
+                          <div className="p-2 sm:p-3 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex-shrink-0">
+                            <Instagram className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-purple-900 text-sm">Instagram</p>
+                            <p className="text-xs sm:text-sm text-purple-700 truncate">{trainerProfile.socialMedia.instagram}</p>
+                          </div>
+                        </a>
+                      )}
+
+                      {trainerProfile.socialMedia.facebook && (
+                        <a
+                          href={trainerProfile.socialMedia.facebook.startsWith('http') 
+                            ? trainerProfile.socialMedia.facebook 
+                            : `https://facebook.com/${trainerProfile.socialMedia.facebook}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-white/60 rounded-xl border border-purple-200 hover:bg-white/80 hover:shadow-lg transition-all duration-200 hover:scale-105"
+                        >
+                          <div className="p-2 sm:p-3 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex-shrink-0">
+                            <Facebook className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-purple-900 text-sm">Facebook</p>
+                            <p className="text-xs sm:text-sm text-purple-700">Visit Page</p>
+                          </div>
+                        </a>
+                      )}
+
+                      {trainerProfile.socialMedia.youtube && (
+                        <a
+                          href={trainerProfile.socialMedia.youtube.startsWith('http') 
+                            ? trainerProfile.socialMedia.youtube 
+                            : `https://youtube.com/${trainerProfile.socialMedia.youtube}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-white/60 rounded-xl border border-purple-200 hover:bg-white/80 hover:shadow-lg transition-all duration-200 hover:scale-105"
+                        >
+                          <div className="p-2 sm:p-3 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex-shrink-0">
+                            <Youtube className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-purple-900 text-sm">YouTube</p>
+                            <p className="text-xs sm:text-sm text-purple-700">Watch Videos</p>
+                          </div>
+                        </a>
+                      )}
+
+                      {trainerProfile.socialMedia.tiktok && (
+                        <a
+                          href={`https://tiktok.com/@${trainerProfile.socialMedia.tiktok.replace('@', '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-white/60 rounded-xl border border-purple-200 hover:bg-white/80 hover:shadow-lg transition-all duration-200 hover:scale-105"
+                        >
+                          <div className="p-2 sm:p-3 bg-black rounded-full flex-shrink-0">
+                            <span className="text-white text-xs sm:text-sm font-bold">T</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-purple-900 text-sm">TikTok</p>
+                            <p className="text-xs sm:text-sm text-purple-700 truncate">{trainerProfile.socialMedia.tiktok}</p>
+                          </div>
+                        </a>
+                      )}
                     </div>
-                  )}
-                  
-                  {trainerProfile?.phone && (
-                    <div className="p-3 bg-green-50 rounded-lg border border-green-100">
-                      <Label className="text-xs font-medium text-green-700">Phone</Label>
-                      <a 
-                        href={`tel:${trainerProfile.phone}`}
-                        className="font-semibold text-green-900 text-sm lg:text-base hover:underline"
-                      >
-                        {trainerProfile.phone}
-                      </a>
-                    </div>
-                  )}
-                  
-                  {trainerProfile?.email && (
-                    <div className="p-3 bg-purple-50 rounded-lg border border-purple-100">
-                      <Label className="text-xs font-medium text-purple-700">Email</Label>
-                      <a 
-                        href={`mailto:${trainerProfile.email}`}
-                        className="font-semibold text-purple-900 text-sm lg:text-base hover:underline break-all"
-                      >
-                        {trainerProfile.email}
-                      </a>
-                    </div>
-                  )}
-                  
-                  {trainerProfile?.website && (
-                    <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
-                      <Label className="text-xs font-medium text-orange-700">Website</Label>
-                      <a 
-                        href={trainerProfile.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="font-semibold text-orange-900 text-sm lg:text-base hover:underline break-all"
-                      >
-                        {trainerProfile.website}
-                      </a>
-                    </div>
-                  )}
-                  
-                  {trainerProfile?.address && (
-                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                      <Label className="text-xs font-medium text-gray-700">Address</Label>
-                      <p className="font-semibold text-gray-900 text-sm lg:text-base">{trainerProfile.address}</p>
-                    </div>
-                  )}
-                  
-                  {trainerProfile?.bio && (
-                    <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
-                      <Label className="text-xs font-medium text-indigo-700">About</Label>
-                      <p className="text-xs lg:text-sm text-indigo-900">{trainerProfile.bio}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
             </div>
-
-            {/* Social Media Section - Full Width */}
-            {trainerProfile?.socialMedia && (
-              Object.values(trainerProfile.socialMedia).some(value => value && value.trim() !== "")
-            ) && (
-              <Card className="shadow-sm border-0 bg-white mt-4 lg:mt-6">
-                <CardHeader className="pb-3 lg:pb-4">
-                  <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                    <Star className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
-                    Follow {trainerProfile?.displayName || "Your Trainer"}
-                  </CardTitle>
-                  <CardDescription className="text-xs lg:text-sm">
-                    Stay connected and get fitness tips, motivation, and updates
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="px-3 lg:px-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-                    {trainerProfile.socialMedia.instagram && (
-                      <a
-                        href={`https://instagram.com/${trainerProfile.socialMedia.instagram.replace('@', '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 lg:p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100 hover:shadow-md transition-shadow active:scale-95"
-                      >
-                        <Instagram className="h-5 w-5 lg:h-6 lg:w-6 text-pink-600 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <p className="font-semibold text-pink-900 text-sm lg:text-base">Instagram</p>
-                          <p className="text-xs lg:text-sm text-pink-700 truncate">{trainerProfile.socialMedia.instagram}</p>
-                        </div>
-                      </a>
-                    )}
-
-                    {trainerProfile.socialMedia.facebook && (
-                      <a
-                        href={trainerProfile.socialMedia.facebook.startsWith('http') 
-                          ? trainerProfile.socialMedia.facebook 
-                          : `https://facebook.com/${trainerProfile.socialMedia.facebook}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 lg:p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:shadow-md transition-shadow active:scale-95"
-                      >
-                        <Facebook className="h-5 w-5 lg:h-6 lg:w-6 text-blue-600 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <p className="font-semibold text-blue-900 text-sm lg:text-base">Facebook</p>
-                          <p className="text-xs lg:text-sm text-blue-700">Visit Page</p>
-                        </div>
-                      </a>
-                    )}
-
-                    {trainerProfile.socialMedia.youtube && (
-                      <a
-                        href={trainerProfile.socialMedia.youtube.startsWith('http') 
-                          ? trainerProfile.socialMedia.youtube 
-                          : `https://youtube.com/${trainerProfile.socialMedia.youtube}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 lg:p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl border border-red-100 hover:shadow-md transition-shadow active:scale-95"
-                      >
-                        <Youtube className="h-5 w-5 lg:h-6 lg:w-6 text-red-600 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <p className="font-semibold text-red-900 text-sm lg:text-base">YouTube</p>
-                          <p className="text-xs lg:text-sm text-red-700">Watch Videos</p>
-                        </div>
-                      </a>
-                    )}
-
-                    {trainerProfile.socialMedia.tiktok && (
-                      <a
-                        href={`https://tiktok.com/@${trainerProfile.socialMedia.tiktok.replace('@', '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 lg:p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl border border-gray-100 hover:shadow-md transition-shadow active:scale-95"
-                      >
-                        <div className="h-5 w-5 lg:h-6 lg:w-6 bg-black rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-white text-xs font-bold">T</span>
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-semibold text-gray-900 text-sm lg:text-base">TikTok</p>
-                          <p className="text-xs lg:text-sm text-gray-700 truncate">{trainerProfile.socialMedia.tiktok}</p>
-                        </div>
-                      </a>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </TabsContent>
         </Tabs>
       </main>

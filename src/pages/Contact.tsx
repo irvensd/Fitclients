@@ -387,7 +387,7 @@ const Contact = () => {
                 Join thousands of personal trainers who have simplified their business with FitClients.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link to="/login">
+                <Link to="/login?mode=register">
                   <Button size="lg" className="w-full sm:w-auto">
                     Start Free Trial
                   </Button>

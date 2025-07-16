@@ -152,15 +152,14 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
       return true;
     }
 
-    // Free plan (fallback) - very limited
+    // Default to Starter plan restrictions for any other plan
     const restrictedFeatures = [
+      "ai-recommendations",
       "advanced-analytics",
       "api-access",
       "white-label",
       "multi-trainer",
-      "sms-reminders",
       "priority-support",
-      "ai-recommendations",
     ];
     return !restrictedFeatures.includes(feature);
   };
@@ -243,7 +242,7 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Initialize billing history for new paid subscribers
     try {
-      if (userId && planId !== "free") {
+      if (userId) {
         await billingHistoryService.initializeBillingHistory(userId, planId);
         
         // Check if user was referred and complete the referral

@@ -45,6 +45,10 @@ import {
   Share2,
   Database,
   Plus,
+  Instagram,
+  Facebook,
+  Youtube,
+  Package as PackageIcon,
 } from "lucide-react";
 
 import { SubscriptionManager } from "@/components/SubscriptionManager";
@@ -603,30 +607,6 @@ const Settings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Profile Picture */}
-              <div className="flex items-center gap-6">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage src="/placeholder-avatar.jpg" />
-                  <AvatarFallback className="text-lg">AJ</AvatarFallback>
-                </Avatar>
-                <div className="space-y-2">
-                  <h3 className="font-medium">Profile Picture</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Upload a professional photo for your profile
-                  </p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline">
-                      <Camera className="h-4 w-4 mr-2" />
-                      Change Photo
-                    </Button>
-                    <Button size="sm" variant="ghost">
-                      Remove
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
 
               {/* Personal Details */}
               {profileLoading ? (
@@ -912,61 +892,91 @@ const Settings = () => {
         )}
 
         {activeTab === "business" && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <SettingsIcon className="h-5 w-5" />
-                Business Information
-              </CardTitle>
-              <CardDescription>
-                Configure your business details and contact information
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            {/* Business Information Card */}
+            <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-800">
+                  <SettingsIcon className="h-5 w-5" />
+                  Business Information
+                </CardTitle>
+                <CardDescription className="text-blue-700">
+                  Configure your business details and contact information
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="business-name" className="text-blue-800 font-medium">Business Name</Label>
+                    <Input
+                      id="business-name"
+                      defaultValue={businessInfo.businessName}
+                      className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                      placeholder="Your Fitness Studio"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="website" className="text-blue-800 font-medium">Website</Label>
+                    <Input 
+                      id="website" 
+                      defaultValue={businessInfo.website} 
+                      className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                      placeholder="www.yourfitnessstudio.com"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="business-name">Business Name</Label>
-                  <Input
-                    id="business-name"
-                    defaultValue={businessInfo.businessName}
+                  <Label htmlFor="address" className="text-blue-800 font-medium">Business Address</Label>
+                  <Textarea
+                    id="address"
+                    defaultValue={businessInfo.address}
+                    rows={3}
+                    className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                    placeholder="Full business address including city, state, and zip code"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="website">Website</Label>
-                  <Input id="website" defaultValue={businessInfo.website} />
-                </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="space-y-2">
-                <Label htmlFor="address">Business Address</Label>
-                <Textarea
-                  id="address"
-                  defaultValue={businessInfo.address}
-                  rows={3}
-                  placeholder="Full business address including city, state, and zip code"
-                />
-              </div>
-
-              <Separator />
-
-              <div className="space-y-4">
+            {/* Operating Hours Card */}
+            <Card className="border-2 border-green-100 bg-gradient-to-br from-green-50 to-emerald-50">
+              <CardHeader>
                 <div className="flex items-center justify-between">
-                <h3 className="font-medium">Operating Hours</h3>
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-green-800">
+                      <Clock className="h-5 w-5" />
+                      Operating Hours
+                    </CardTitle>
+                    <CardDescription className="text-green-700">
+                      Set your business hours for client scheduling
+                    </CardDescription>
+                  </div>
                   <Button 
                     size="sm" 
                     onClick={handleSaveProfile}
                     disabled={loading}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-green-600 hover:bg-green-700 text-white"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     {loading ? "Saving..." : "Save Hours"}
                   </Button>
                 </div>
+              </CardHeader>
+              <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {operatingHours.map((hour) => (
-                    <div key={hour.day} className="flex items-center gap-4 p-3 border rounded-lg">
+                    <div key={hour.day} className={`flex items-center gap-4 p-4 rounded-lg border-2 transition-all duration-200 ${
+                      hour.isOpen 
+                        ? 'border-green-200 bg-green-50 shadow-sm' 
+                        : 'border-gray-200 bg-gray-50'
+                    }`}>
                       <div className="w-20">
-                        <span className="text-sm font-medium">{hour.day}</span>
+                        <span className={`text-sm font-medium ${
+                          hour.isOpen ? 'text-green-800' : 'text-gray-500'
+                        }`}>
+                          {hour.day}
+                        </span>
                       </div>
                       <Switch 
                         checked={hour.isOpen}
@@ -974,271 +984,325 @@ const Settings = () => {
                           handleOperatingHoursChange(hour.day, 'isOpen', checked)
                         }
                         aria-label={`Toggle ${hour.day} operating hours`}
+                        className="data-[state=checked]:bg-green-600"
                       />
-                      <Input 
-                        className="w-20" 
-                        value={hour.startTime}
-                        type="time"
-                        onChange={(e) => 
-                          handleOperatingHoursChange(hour.day, 'startTime', e.target.value)
-                        }
-                        disabled={!hour.isOpen}
-                        aria-label={`${hour.day} start time`}
-                      />
-                      <span className="text-muted-foreground text-sm">to</span>
-                      <Input
-                        className="w-20"
-                        value={hour.endTime}
-                        type="time"
-                        onChange={(e) => 
-                          handleOperatingHoursChange(hour.day, 'endTime', e.target.value)
-                        }
-                        disabled={!hour.isOpen}
-                        aria-label={`${hour.day} end time`}
-                      />
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          className="w-20 border-green-200 focus:border-green-400 focus:ring-green-400" 
+                          value={hour.startTime}
+                          type="time"
+                          onChange={(e) => 
+                            handleOperatingHoursChange(hour.day, 'startTime', e.target.value)
+                          }
+                          disabled={!hour.isOpen}
+                          aria-label={`${hour.day} start time`}
+                        />
+                        <span className="text-green-600 text-sm font-medium">to</span>
+                        <Input
+                          className="w-20 border-green-200 focus:border-green-400 focus:ring-green-400"
+                          value={hour.endTime}
+                          type="time"
+                          onChange={(e) => 
+                            handleOperatingHoursChange(hour.day, 'endTime', e.target.value)
+                          }
+                          disabled={!hour.isOpen}
+                          aria-label={`${hour.day} end time`}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              <Separator />
-
-              <div className="space-y-4">
-                <h3 className="font-medium">Social Media</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Social Media Card */}
+            <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-pink-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-purple-800">
+                  <Share2 className="h-5 w-5" />
+                  Social Media
+                </CardTitle>
+                <CardDescription className="text-purple-700">
+                  Connect your social media profiles to share with clients
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="instagram">Instagram</Label>
+                    <Label htmlFor="instagram" className="text-purple-800 font-medium flex items-center gap-2">
+                      <Instagram className="h-4 w-4" />
+                      Instagram
+                    </Label>
                     <Input 
                       id="instagram" 
                       placeholder="@yourusername"
                       value={socialMedia.instagram}
                       onChange={(e) => setSocialMedia(prev => ({ ...prev, instagram: e.target.value }))}
+                      className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                       aria-describedby="instagram-help"
                     />
-                    <p id="instagram-help" className="text-xs text-muted-foreground">
+                    <p id="instagram-help" className="text-xs text-purple-600">
                       Your Instagram username or profile URL
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="facebook">Facebook</Label>
+                    <Label htmlFor="facebook" className="text-purple-800 font-medium flex items-center gap-2">
+                      <Facebook className="h-4 w-4" />
+                      Facebook
+                    </Label>
                     <Input 
                       id="facebook" 
                       placeholder="facebook.com/yourpage"
                       value={socialMedia.facebook}
                       onChange={(e) => setSocialMedia(prev => ({ ...prev, facebook: e.target.value }))}
+                      className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                       aria-describedby="facebook-help"
                     />
-                    <p id="facebook-help" className="text-xs text-muted-foreground">
+                    <p id="facebook-help" className="text-xs text-purple-600">
                       Your Facebook page URL
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="tiktok">TikTok</Label>
+                    <Label htmlFor="tiktok" className="text-purple-800 font-medium flex items-center gap-2">
+                      <span className="text-lg">🎵</span>
+                      TikTok
+                    </Label>
                     <Input 
                       id="tiktok" 
                       placeholder="@yourusername"
                       value={socialMedia.tiktok}
                       onChange={(e) => setSocialMedia(prev => ({ ...prev, tiktok: e.target.value }))}
+                      className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                       aria-describedby="tiktok-help"
                     />
-                    <p id="tiktok-help" className="text-xs text-muted-foreground">
+                    <p id="tiktok-help" className="text-xs text-purple-600">
                       Your TikTok username
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="youtube">YouTube</Label>
+                    <Label htmlFor="youtube" className="text-purple-800 font-medium flex items-center gap-2">
+                      <Youtube className="h-4 w-4" />
+                      YouTube
+                    </Label>
                     <Input 
                       id="youtube" 
                       placeholder="youtube.com/yourchannel"
                       value={socialMedia.youtube}
                       onChange={(e) => setSocialMedia(prev => ({ ...prev, youtube: e.target.value }))}
+                      className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                       aria-describedby="youtube-help"
                     />
-                    <p id="youtube-help" className="text-xs text-muted-foreground">
+                    <p id="youtube-help" className="text-xs text-purple-600">
                       Your YouTube channel URL
                     </p>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {activeTab === "pricing" && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
-                Pricing & Rates
-              </CardTitle>
-              <CardDescription>
-                Set your service rates and payment preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="personal-training">
-                    Personal Training (per session)
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                      $
-                    </span>
-                    <Input
-                      id="personal-training"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={pricing.personalTraining}
-                      onChange={(e) => handlePricingChange('personalTraining', parseFloat(e.target.value) || 0)}
-                      className="pl-8"
-                      aria-describedby="personal-training-help"
-                    />
+          <div className="space-y-6">
+            {/* Service Rates Card */}
+            <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-800">
+                  <DollarSign className="h-5 w-5" />
+                  Service Rates
+                </CardTitle>
+                <CardDescription className="text-blue-700">
+                  Set your rates for different types of services
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="personal-training" className="text-blue-800 font-medium">
+                      Personal Training (per session)
+                    </Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-600">
+                        $
+                      </span>
+                      <Input
+                        id="personal-training"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={pricing.personalTraining}
+                        onChange={(e) => handlePricingChange('personalTraining', parseFloat(e.target.value) || 0)}
+                        className="pl-8 border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                        aria-describedby="personal-training-help"
+                      />
+                    </div>
+                    <p id="personal-training-help" className="text-xs text-blue-600">
+                      Set your rate for individual training sessions
+                    </p>
                   </div>
-                  <p id="personal-training-help" className="text-xs text-muted-foreground">
-                    Set your rate for individual training sessions
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="consultation">Consultation</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                      $
-                    </span>
-                    <Input
-                      id="consultation"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={pricing.consultation}
-                      onChange={(e) => handlePricingChange('consultation', parseFloat(e.target.value) || 0)}
-                      className="pl-8"
-                      aria-describedby="consultation-help"
-                    />
+                  <div className="space-y-2">
+                    <Label htmlFor="consultation" className="text-blue-800 font-medium">Consultation</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-600">
+                        $
+                      </span>
+                      <Input
+                        id="consultation"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={pricing.consultation}
+                        onChange={(e) => handlePricingChange('consultation', parseFloat(e.target.value) || 0)}
+                        className="pl-8 border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                        aria-describedby="consultation-help"
+                      />
+                    </div>
+                    <p id="consultation-help" className="text-xs text-blue-600">
+                      Set your rate for initial consultations
+                    </p>
                   </div>
-                  <p id="consultation-help" className="text-xs text-muted-foreground">
-                    Set your rate for initial consultations
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="assessment">Fitness Assessment</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                      $
-                    </span>
-                    <Input
-                      id="assessment"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={pricing.assessment}
-                      onChange={(e) => handlePricingChange('assessment', parseFloat(e.target.value) || 0)}
-                      className="pl-8"
-                      aria-describedby="assessment-help"
-                    />
+                  <div className="space-y-2">
+                    <Label htmlFor="assessment" className="text-blue-800 font-medium">Fitness Assessment</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-600">
+                        $
+                      </span>
+                      <Input
+                        id="assessment"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={pricing.assessment}
+                        onChange={(e) => handlePricingChange('assessment', parseFloat(e.target.value) || 0)}
+                        className="pl-8 border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                        aria-describedby="assessment-help"
+                      />
+                    </div>
+                    <p id="assessment-help" className="text-xs text-blue-600">
+                      Set your rate for fitness assessments
+                    </p>
                   </div>
-                  <p id="assessment-help" className="text-xs text-muted-foreground">
-                    Set your rate for fitness assessments
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="package-discount">Package Discount (%)</Label>
-                  <div className="relative">
-                    <Input
-                      id="package-discount"
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={pricing.packageDiscount}
-                      onChange={(e) => handlePricingChange('packageDiscount', parseFloat(e.target.value) || 0)}
-                      className="pr-8"
-                      aria-describedby="package-discount-help"
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                      %
-                    </span>
+                  <div className="space-y-2">
+                    <Label htmlFor="package-discount" className="text-blue-800 font-medium">Package Discount (%)</Label>
+                    <div className="relative">
+                      <Input
+                        id="package-discount"
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={pricing.packageDiscount}
+                        onChange={(e) => handlePricingChange('packageDiscount', parseFloat(e.target.value) || 0)}
+                        className="pr-8 border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                        aria-describedby="package-discount-help"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-600">
+                        %
+                      </span>
+                    </div>
+                    <p id="package-discount-help" className="text-xs text-blue-600">
+                      Default discount applied to packages
+                    </p>
                   </div>
-                  <p id="package-discount-help" className="text-xs text-muted-foreground">
-                    Default discount applied to packages
-                  </p>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              <Separator />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="currency">Currency</Label>
-                  <Select 
-                    value={pricing.currency}
-                    onValueChange={(value) => handlePricingChange('currency', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="USD">USD ($)</SelectItem>
-                      <SelectItem value="EUR">EUR (€)</SelectItem>
-                      <SelectItem value="GBP">GBP (£)</SelectItem>
-                      <SelectItem value="CAD">CAD ($)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="tax-rate">Tax Rate (%)</Label>
-                  <div className="relative">
-                    <Input
-                      id="tax-rate"
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      max="100"
-                      value={pricing.taxRate}
-                      onChange={(e) => handlePricingChange('taxRate', parseFloat(e.target.value) || 0)}
-                      className="pr-8"
-                      aria-describedby="tax-rate-help"
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                      %
-                    </span>
+            {/* Business Settings Card */}
+            <Card className="border-2 border-green-100 bg-gradient-to-br from-green-50 to-emerald-50 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-green-800">
+                  <SettingsIcon className="h-5 w-5" />
+                  Business Settings
+                </CardTitle>
+                <CardDescription className="text-green-700">
+                  Configure currency and tax settings
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="currency" className="text-green-800 font-medium">Currency</Label>
+                    <Select 
+                      value={pricing.currency}
+                      onValueChange={(value) => handlePricingChange('currency', value)}
+                    >
+                      <SelectTrigger className="border-green-200 focus:border-green-400 focus:ring-green-400">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="USD">USD ($)</SelectItem>
+                        <SelectItem value="EUR">EUR (€)</SelectItem>
+                        <SelectItem value="GBP">GBP (£)</SelectItem>
+                        <SelectItem value="CAD">CAD ($)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <p id="tax-rate-help" className="text-xs text-muted-foreground">
-                    Tax rate applied to all services
-                  </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="tax-rate" className="text-green-800 font-medium">Tax Rate (%)</Label>
+                    <div className="relative">
+                      <Input
+                        id="tax-rate"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="100"
+                        value={pricing.taxRate}
+                        onChange={(e) => handlePricingChange('taxRate', parseFloat(e.target.value) || 0)}
+                        className="pr-8 border-green-200 focus:border-green-400 focus:ring-green-400"
+                        aria-describedby="tax-rate-help"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600">
+                        %
+                      </span>
+                    </div>
+                    <p id="tax-rate-help" className="text-xs text-green-600">
+                      Tax rate applied to all services
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              <Separator />
-
-              <div className="space-y-4">
+            {/* Package Pricing Card */}
+            <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-pink-50 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-purple-800">
+                  <PackageIcon className="h-5 w-5" />
+                  Package Pricing
+                </CardTitle>
+                <CardDescription className="text-purple-700">
+                  Create and manage service packages with discounts
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-medium">Package Pricing</h3>
+                  <h3 className="font-medium text-purple-800">Your Packages</h3>
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={addPackage}
+                    className="border-purple-200 text-purple-700 hover:bg-purple-100"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Package
                   </Button>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {pricing.packages.map((pkg) => (
-                    <div key={pkg.id} className="p-4 border rounded-lg bg-card">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
+                    <div key={pkg.id} className="p-4 bg-white/60 rounded-lg border border-purple-200 hover:bg-white/80 transition-colors">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
                           <Input
                             value={pkg.name}
                             onChange={(e) => handlePackageChange(pkg.id, 'name', e.target.value)}
-                            className="w-48"
+                            className="w-48 border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                             placeholder="Package name"
                           />
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => deletePackage(pkg.id)}
-                            className="text-destructive hover:text-destructive"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -1246,75 +1310,75 @@ const Settings = () => {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-sm">Sessions</Label>
+                          <Label className="text-sm text-purple-800 font-medium">Sessions</Label>
                           <Input
                             type="number"
                             min="1"
                             value={pkg.sessions}
                             onChange={(e) => handlePackageChange(pkg.id, 'sessions', parseInt(e.target.value) || 1)}
-                            className="w-full"
+                            className="w-full border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-sm">Price ($)</Label>
+                          <Label className="text-sm text-purple-800 font-medium">Price ($)</Label>
                           <Input
                             type="number"
                             min="0"
                             step="0.01"
                             value={pkg.price}
                             onChange={(e) => handlePackageChange(pkg.id, 'price', parseFloat(e.target.value) || 0)}
-                            className="w-full"
+                            className="w-full border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-sm">Discount (%)</Label>
+                          <Label className="text-sm text-purple-800 font-medium">Discount (%)</Label>
                           <Input
                             type="number"
                             min="0"
                             max="100"
                             value={pkg.discount}
                             onChange={(e) => handlePackageChange(pkg.id, 'discount', parseFloat(e.target.value) || 0)}
-                            className="w-full"
+                            className="w-full border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-sm">Total</Label>
-                          <div className="p-2 bg-muted rounded text-sm font-medium">
+                          <Label className="text-sm text-purple-800 font-medium">Total</Label>
+                          <div className="p-2 bg-purple-100 rounded text-sm font-medium text-purple-900">
                             ${pkg.price.toFixed(2)}
                           </div>
                         </div>
                       </div>
-                      <div className="mt-2 text-xs text-muted-foreground">
+                      <div className="mt-3 text-xs text-purple-600 bg-purple-50 p-2 rounded">
                         {pkg.sessions} sessions × ${pricing.personalTraining} = ${(pkg.sessions * pricing.personalTraining).toFixed(2)} 
                         {pkg.discount > 0 && ` - ${pkg.discount}% = $${pkg.price.toFixed(2)}`}
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Save Button */}
-              <div className="flex justify-end pt-4">
-                <Button 
-                  onClick={handleSaveProfile}
-                  disabled={loading}
-                  className="min-w-[120px]"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Pricing
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Save Button */}
+            <div className="flex justify-end">
+              <Button 
+                onClick={handleSaveProfile}
+                disabled={loading}
+                className="min-w-[120px] bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Pricing
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         )}
 
         {activeTab === "billing" && (

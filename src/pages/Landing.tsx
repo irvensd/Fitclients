@@ -198,7 +198,7 @@ const Landing = () => {
           <div className="flex gap-3">
             <Button 
               className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white"
-              onClick={() => window.location.href = '/login'}
+              onClick={() => window.location.href = '/login?mode=register'}
             >
                 Start Free Trial
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -232,7 +232,7 @@ const Landing = () => {
               <Link to="/login">
                 <Button variant="ghost">Login</Button>
               </Link>
-              <Link to="/login">
+              <Link to="/login?mode=register">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -279,7 +279,7 @@ const Landing = () => {
             
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Link to="/login">
+              <Link to="/login?mode=register">
                 <Button size="lg" className="text-lg px-8 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                   Start Free Trial - No Credit Card
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -969,7 +969,7 @@ const Landing = () => {
               <p className="text-muted-foreground mb-4">
                 Ready to see the difference?
               </p>
-              <Link to="/login">
+              <Link to="/login?mode=register">
                 <Button size="lg" className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white">
                   Start Free Trial
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -2217,7 +2217,7 @@ const Landing = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Link to="/login">
+              <Link to="/login?mode=register">
                 <Button
                   size="lg"
                   variant="secondary"

@@ -51,10 +51,6 @@ export const getUpgradeMessage = (
     return null;
   }
 
-  if (planId === "free") {
-    return "You've reached your limit of 5 clients. Upgrade to Starter for up to 200 clients, or Pro for unlimited clients.";
-  }
-
   if (planId === "starter") {
     return "You've reached your limit of 200 clients. Upgrade to Pro for unlimited clients and advanced features.";
   }

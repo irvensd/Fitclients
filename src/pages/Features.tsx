@@ -590,7 +590,7 @@ const Features = () => {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <NavigationButton
-            to="/dashboard"
+            to="/login?mode=register"
             className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
           >
             <Brain className="h-4 w-4 mr-2" />

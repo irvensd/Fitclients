@@ -44,6 +44,8 @@ import SupportPortal from "./pages/SupportPortal";
 import SupportLogin from "./pages/SupportLogin";
 import TrialTest from "./pages/TrialTest";
 import Onboarding from "./pages/Onboarding";
+import ClientPortal from "./pages/ClientPortal";
+import ClientPortalManager from "./pages/ClientPortalManager";
 
 
 // Landing page redirect component
@@ -104,6 +106,10 @@ const App = () => {
               
               {/* Staff-only routes */}
               <Route path="/support-portal" element={<StaffOnlyRoute><SupportPortal /></StaffOnlyRoute>} />
+              
+              {/* Client Portal routes (public access) */}
+              <Route path="/client-portal/:clientId" element={<ClientPortal />} />
+              <Route path="/demo-portal" element={<ClientPortal />} />
               
               {/* 404 route */}
               <Route path="*" element={<NotFound />} />
