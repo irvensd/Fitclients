@@ -250,8 +250,8 @@ const Dashboard = () => {
       <div className="p-6 space-y-6">
         <EmptyState
           Icon={Users}
-          title="Welcome to Your Dashboard!"
-          description="Get started by adding your first client, scheduling a session, or exploring the features. Your dashboard will come to life as you add data."
+          title="Welcome to FitClient! 🎉"
+          description="Your complete fitness business management platform. Get started by exploring the features below and adding your first client to begin your journey."
           actionText="Add Your First Client"
           onAction={() => navigate("/clients")}
         />
