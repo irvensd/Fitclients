@@ -206,7 +206,7 @@ const Landing = () => {
             <Button 
               variant="outline" 
               className="flex-1"
-              onClick={() => window.open('https://app.storylane.io/share/dvcmg9nwour6', '_blank')}
+              onClick={() => window.open('https://www.loom.com/share/5c5dbae5eced4f0caf3d5c48ea91ae58?sid=3785c9dd-f0e5-484d-abf4-cc4b2cee980f', '_blank')}
             >
                 Watch Demo
               </Button>
@@ -286,7 +286,7 @@ const Landing = () => {
                 </Button>
               </Link>
               <a
-                href="https://app.storylane.io/share/dvcmg9nwour6"
+                href="https://www.loom.com/share/5c5dbae5eced4f0caf3d5c48ea91ae58?sid=3785c9dd-f0e5-484d-abf4-cc4b2cee980f"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -2173,7 +2173,7 @@ const Landing = () => {
                   </Button>
                 </Link>
                 <a
-                  href="https://app.storylane.io/share/dvcmg9nwour6"
+                  href="https://www.loom.com/share/5c5dbae5eced4f0caf3d5c48ea91ae58?sid=3785c9dd-f0e5-484d-abf4-cc4b2cee980f"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -2228,7 +2228,7 @@ const Landing = () => {
                 </Button>
               </Link>
               <a
-                href="https://app.storylane.io/share/dvcmg9nwour6"
+                href="https://www.loom.com/share/5c5dbae5eced4f0caf3d5c48ea91ae58?sid=3785c9dd-f0e5-484d-abf4-cc4b2cee980f"
                 target="_blank"
                 rel="noopener noreferrer"
               >
