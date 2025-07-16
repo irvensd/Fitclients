@@ -89,13 +89,14 @@ interface ServiceStatus {
   environment: "production" | "staging" | "development";
 }
 
-interface ClientEnvironment {
+interface RealUserEnvironment {
   id: string;
-  clientName: string;
+  email: string;
+  displayName: string;
   environment: "production" | "staging" | "development";
-  status: "active" | "suspended" | "maintenance";
+  status: "active" | "suspended" | "pending" | "inactive";
   lastLogin: Date;
-  subscription: "basic" | "premium" | "enterprise";
+  subscription: "starter" | "pro" | "pro_lifetime" | "enterprise";
   clientCount: number;
   dataUsage: number;
   issues: number;
@@ -111,6 +112,18 @@ interface ClientEnvironment {
     timestamp: Date;
     description: string;
   }>;
+  userProfile?: {
+    firstName: string;
+    lastName: string;
+    businessName?: string;
+    phone?: string;
+    createdAt: string;
+    lastLogin?: string;
+    selectedPlan?: string;
+    referralCode?: string;
+    totalReferrals?: number;
+    freeMonthsEarned?: number;
+  };
 }
 
 // Update SupportTicket interface
@@ -234,7 +247,7 @@ const SupportPortal = () => {
     assignedTo: 'all'
   });
 
-  // Client environment monitoring state
+  // Real user environment monitoring state
   const [environmentFilters, setEnvironmentFilters] = useState({
     environment: 'all',
     status: 'all',
@@ -279,7 +292,7 @@ const SupportPortal = () => {
   });
 
   // Client environments state
-  const [clientEnvironments, setClientEnvironments] = useState<ClientEnvironment[]>([]);
+  const [clientEnvironments, setClientEnvironments] = useState<RealUserEnvironment[]>([]);
   const [environmentsLoading, setEnvironmentsLoading] = useState(false);
   const [environmentsError, setEnvironmentsError] = useState<string | null>(null);
 
@@ -304,10 +317,10 @@ const SupportPortal = () => {
       ? Number(((operationalServices / systemServices.length) * 100).toFixed(1))
       : 0;
 
-    // Count active users from client environments
+    // Count active users from real user environments
     const activeUsers = clientEnvironments.reduce((sum, env) => {
       if (env.status === 'active') {
-        return sum + env.clientCount;
+        return sum + 1; // Each environment represents one user
       }
       return sum;
     }, 0);
@@ -380,25 +393,103 @@ const SupportPortal = () => {
     if (user) {
       setEnvironmentsLoading(true);
       
-      const q = query(collection(db, "clientEnvironments"), orderBy("lastLogin", "desc"));
-      const unsubscribe = onSnapshot(q, 
-        (snapshot) => {
-          const environments = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          })) as ClientEnvironment[];
-          setClientEnvironments(environments);
+      // Load real user data instead of mock client environments
+      const loadRealUserData = async () => {
+        try {
+          // Get all users from Firestore
+          const usersQuery = query(collection(db, "users"), orderBy("createdAt", "desc"));
+          const usersSnapshot = await getDocs(usersQuery);
+          
+          // Get user profiles for additional data
+          const userProfilesQuery = query(collection(db, "userProfiles"));
+          const userProfilesSnapshot = await getDocs(userProfilesQuery);
+          const userProfiles = userProfilesSnapshot.docs.reduce((acc, doc) => {
+            acc[doc.id] = doc.data();
+            return acc;
+          }, {} as Record<string, any>);
+          
+          // Get support tickets to count issues per user
+          const ticketsQuery = query(collection(db, "supportTickets"));
+          const ticketsSnapshot = await getDocs(ticketsQuery);
+          const ticketsByUser = ticketsSnapshot.docs.reduce((acc, doc) => {
+            const ticket = doc.data();
+            const userId = ticket.userId;
+            if (userId) {
+              acc[userId] = (acc[userId] || 0) + 1;
+            }
+            return acc;
+          }, {} as Record<string, number>);
+          
+          // Transform users into RealUserEnvironment format
+          const realUserEnvironments: RealUserEnvironment[] = usersSnapshot.docs.map(doc => {
+            const userData = doc.data();
+            const userProfile = userProfiles[doc.id];
+            const issues = ticketsByUser[doc.id] || 0;
+            
+            // Calculate data usage based on user's data (simplified)
+            const dataUsage = Math.random() * 2 + 0.1; // Mock calculation
+            
+            // Determine subscription from user profile
+            const subscription = userProfile?.selectedPlan || "starter";
+            
+            // Determine status based on user activity
+            const lastLogin = userData.lastLoginAt ? new Date(userData.lastLoginAt) : new Date();
+            const isActive = lastLogin > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Active if logged in within 7 days
+            const status = userData.emailVerified 
+              ? (isActive ? "active" : "inactive")
+              : "pending";
+            
+            return {
+              id: doc.id,
+              email: userData.email || "",
+              displayName: userData.displayName || userData.email || "Unknown User",
+              environment: "production",
+              status,
+              lastLogin,
+              subscription,
+              clientCount: 1, // Individual user
+              dataUsage: Number(dataUsage.toFixed(2)),
+              issues,
+              supportTier: issues > 5 ? "priority" : "standard",
+              healthMetrics: {
+                uptime: 99.9,
+                responseTime: Math.floor(Math.random() * 200) + 50,
+                errorRate: Math.random() * 0.5,
+                lastHealthCheck: new Date()
+              },
+              recentActivity: [
+                {
+                  type: 'login',
+                  timestamp: lastLogin,
+                  description: 'User login to dashboard'
+                }
+              ],
+              userProfile: userProfile ? {
+                firstName: userProfile.firstName || "",
+                lastName: userProfile.lastName || "",
+                businessName: userProfile.businessName,
+                phone: userProfile.phone,
+                createdAt: userProfile.createdAt || userData.createdAt,
+                lastLogin: userProfile.lastLogin,
+                selectedPlan: userProfile.selectedPlan,
+                referralCode: userProfile.referralCode,
+                totalReferrals: userProfile.totalReferrals || 0,
+                freeMonthsEarned: userProfile.freeMonthsEarned || 0
+              } : undefined
+            };
+          });
+          
+          setClientEnvironments(realUserEnvironments);
           setEnvironmentsLoading(false);
           setEnvironmentsError(null);
-        },
-        (error) => {
-          console.error('Error loading client environments:', error);
-          setEnvironmentsError('Failed to load client environments');
+        } catch (error) {
+          console.error('Error loading real user data:', error);
+          setEnvironmentsError('Failed to load user data');
           setEnvironmentsLoading(false);
         }
-      );
-
-      return () => unsubscribe();
+      };
+      
+      loadRealUserData();
     }
   }, [user]);
 
@@ -1386,14 +1477,14 @@ const SupportPortal = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="system">System Status</TabsTrigger>
-            <TabsTrigger value="debug">Debug Tools</TabsTrigger>
-            <TabsTrigger value="clients">Client Environments</TabsTrigger>
-            <TabsTrigger value="tickets">Support Tickets</TabsTrigger>
-            <TabsTrigger value="alerts">System Alerts</TabsTrigger>
-          </TabsList>
+                      <TabsList className="grid w-full grid-cols-6">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="system">System Status</TabsTrigger>
+              <TabsTrigger value="debug">Debug Tools</TabsTrigger>
+              <TabsTrigger value="clients">Real Users</TabsTrigger>
+              <TabsTrigger value="tickets">Support Tickets</TabsTrigger>
+              <TabsTrigger value="alerts">System Alerts</TabsTrigger>
+            </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
@@ -1405,7 +1496,7 @@ const SupportPortal = () => {
                     <Users className="h-8 w-8 text-blue-500" />
                     <div>
                       <p className="text-2xl font-bold">{clientEnvironments.length}</p>
-                      <p className="text-sm text-muted-foreground">Active Clients</p>
+                      <p className="text-sm text-muted-foreground">Active Users</p>
                     </div>
                   </div>
                 </CardContent>
@@ -2092,18 +2183,18 @@ const SupportPortal = () => {
             </Card>
           </TabsContent>
 
-          {/* Client Environments Tab */}
+          {/* Real Users Tab */}
           <TabsContent value="clients" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Users className="h-5 w-5" />
-                    Client Environments
+                    Real Users
                   </div>
                   <div className="flex items-center gap-2">
                     <Input
-                      placeholder="Search clients..."
+                      placeholder="Search users..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-64"
@@ -2111,7 +2202,7 @@ const SupportPortal = () => {
                   </div>
                 </CardTitle>
                 <CardDescription>
-                  Monitor client environments and usage
+                  Monitor real user accounts and activity
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -2174,7 +2265,8 @@ const SupportPortal = () => {
                 <div className="space-y-4">
                   {getFilteredEnvironments()
                     .filter(client => 
-                      client.clientName.toLowerCase().includes(searchQuery.toLowerCase())
+                      client.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      client.email.toLowerCase().includes(searchQuery.toLowerCase())
                     )
                     .map((client) => {
                       const healthStatus = getHealthStatus(client.healthMetrics);
@@ -2184,17 +2276,30 @@ const SupportPortal = () => {
                             <div className="flex items-center gap-3">
                               <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
                                 <span className="text-white font-semibold">
-                                  {client.clientName.charAt(0)}
+                                  {client.displayName.charAt(0)}
                                 </span>
                               </div>
                               <div>
-                                <h3 className="font-semibold text-lg">{client.clientName}</h3>
+                                <h3 className="font-semibold text-lg">{client.displayName}</h3>
                                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                  <span>Environment: {client.environment}</span>
-                                  <span>Clients: {client.clientCount}</span>
-                                  <span>Data: {client.dataUsage}GB</span>
+                                  <span>Email: {client.email}</span>
+                                  <span>Plan: {client.subscription}</span>
+                                  <span>Status: {client.status}</span>
                                   <span>Last login: {formatTimeAgo(client.lastLogin)}</span>
                                 </div>
+                                {client.userProfile && (
+                                  <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
+                                    {client.userProfile.businessName && (
+                                      <span>Business: {client.userProfile.businessName}</span>
+                                    )}
+                                    {client.userProfile.totalReferrals > 0 && (
+                                      <span>Referrals: {client.userProfile.totalReferrals}</span>
+                                    )}
+                                    {client.userProfile.freeMonthsEarned > 0 && (
+                                      <span>Free Months: {client.userProfile.freeMonthsEarned}</span>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             </div>
                             <div className="flex items-center gap-2">

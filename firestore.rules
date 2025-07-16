@@ -104,12 +104,22 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
-    // Client Environments - for support portal client monitoring
-    match /clientEnvironments/{environmentId} {
-      // TEMPORARY: Allow reads for support portal
-      // TODO: Implement proper Firebase auth for support portal
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.token.isSupport == true;
+    // Users - for support portal user monitoring
+    match /users/{userId} {
+      // Support staff can read user data for monitoring
+      allow read: if request.auth != null && 
+        (request.auth.token.email == resource.data.email || 
+         request.auth.token.email in ['support@fitclients.com', 'admin@fitclients.com', 'dev@fitclients.com', 'staff@fitclients.com']);
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // User Profiles - for support portal user monitoring
+    match /userProfiles/{profileId} {
+      // Support staff can read user profiles for monitoring
+      allow read: if request.auth != null && 
+        (request.auth.uid == profileId || 
+         request.auth.token.email in ['support@fitclients.com', 'admin@fitclients.com', 'dev@fitclients.com', 'staff@fitclients.com']);
+      allow write: if request.auth != null && request.auth.uid == profileId;
     }
 
     // Error Logs - for support portal debugging
