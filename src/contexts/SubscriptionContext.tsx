@@ -175,12 +175,15 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
     userId?: string,
     onDowngradeClients?: (newLimit: number, selectedIds: string[]) => void,
   ) => {
+    // Preserve trial status if user is on trial
+    const preserveTrial = subscription?.status === "trialing";
+    
     const newSubscription: SubscriptionData = {
-      status: "active",
+      status: preserveTrial ? "trialing" : "active",
       currentPlan: planId,
-      trialEnd: null,
-      subscriptionId: `sub_${planId}_${Date.now()}`,
-      customerId: `cus_${planId}_${Date.now()}`,
+      trialEnd: preserveTrial ? subscription?.trialEnd : null,
+      subscriptionId: preserveTrial ? subscription?.subscriptionId : `sub_${planId}_${Date.now()}`,
+      customerId: preserveTrial ? subscription?.customerId : `cus_${planId}_${Date.now()}`,
     };
 
     setSubscription(newSubscription);

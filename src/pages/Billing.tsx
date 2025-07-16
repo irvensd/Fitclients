@@ -626,28 +626,43 @@ const Billing = () => {
     setCheckoutModalOpen(true);
   };
 
-  const handleCheckoutSuccess = () => {
+  const handleCheckoutSuccess = async () => {
     if (!selectedPlanId) return;
 
-    updateSubscriptionPlan(selectedPlanId, user?.uid);
+    setLoading(true);
+    try {
+      // Update the subscription plan
+      await updateSubscriptionPlan(selectedPlanId, user?.uid);
 
-    const planKey =
-      selectedPlanId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
-    const selectedPlan = SUBSCRIPTION_PLANS[planKey];
-    const isUpgrade = selectedPlan.price > currentPlan.price;
-    const isDowngrade = selectedPlan.price < currentPlan.price;
+      const planKey =
+        selectedPlanId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS;
+      const selectedPlan = SUBSCRIPTION_PLANS[planKey];
+      const isUpgrade = selectedPlan.price > currentPlan.price;
+      const isDowngrade = selectedPlan.price < currentPlan.price;
 
-    toast({
-      title: "Subscription updated!",
-      description: isUpgrade
-        ? `Successfully upgraded to ${selectedPlan?.name || selectedPlanId} plan.`
-        : isDowngrade
-        ? `Successfully downgraded to ${selectedPlan?.name || selectedPlanId} plan.`
-        : `You are now on the ${selectedPlan?.name || selectedPlanId} plan.`,
-    });
+      toast({
+        title: "Subscription updated!",
+        description: isUpgrade
+          ? `Successfully upgraded to ${selectedPlan?.name || selectedPlanId} plan.`
+          : isDowngrade
+          ? `Successfully downgraded to ${selectedPlan?.name || selectedPlanId} plan.`
+          : `You are now on the ${selectedPlan?.name || selectedPlanId} plan.`,
+      });
 
-    setCheckoutModalOpen(false);
-    setSelectedPlanId(null);
+      // Refresh subscription data to reflect changes
+      await refreshSubscription();
+    } catch (error) {
+      console.error("Error updating subscription:", error);
+      toast({
+        title: "Update failed",
+        description: "There was an error updating your subscription. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+      setCheckoutModalOpen(false);
+      setSelectedPlanId(null);
+    }
   };
 
   const handleCancelSubscription = async () => {
