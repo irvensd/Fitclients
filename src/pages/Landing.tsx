@@ -2177,7 +2177,7 @@ const Landing = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Button size="lg">
+                  <Button size="lg" className="shadow-lg">
                     Watch Demo
                   </Button>
                 </a>
@@ -2234,8 +2234,7 @@ const Landing = () => {
               >
                 <Button
                   size="lg"
-                  variant="outline"
-                  className="text-lg px-8 border-2 border-white/30 text-white hover:bg-white hover:text-primary transition-all duration-300"
+                  className="text-lg px-8 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold border-2 border-yellow-400 shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   Watch 2-Min Demo
                 </Button>
