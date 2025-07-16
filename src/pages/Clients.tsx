@@ -321,7 +321,7 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
   );
 };
 
-// Delete Client Confirmation Dialog
+// Delete Client Confirmation Dialog - Custom Modal to prevent freezing
 const DeleteClientDialog = ({
   client,
   open,
@@ -350,22 +350,26 @@ const DeleteClientDialog = ({
     }
   };
 
-  if (!client) return null;
+  const handleClose = () => {
+    onOpenChange(false);
+    setConfirmText("");
+  };
+
+  if (!open || !client) return null;
 
   const isConfirmed = confirmText.toLowerCase() === "delete";
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Trash2 className="h-5 w-5 text-destructive" />
-            Delete Client
-          </DialogTitle>
-          <DialogDescription>
-            This action cannot be undone. This will permanently delete the client and all associated data.
-          </DialogDescription>
-        </DialogHeader>
+    <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
+      <div className="bg-card border rounded-lg shadow-xl w-full max-w-[500px] p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Trash2 className="h-5 w-5 text-destructive" />
+          <h2 className="text-lg font-semibold">Delete Client</h2>
+        </div>
+        
+        <p className="text-sm text-muted-foreground mb-4">
+          This action cannot be undone. This will permanently delete the client and all associated data.
+        </p>
 
         <div className="space-y-4">
           <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
@@ -415,8 +419,8 @@ const DeleteClientDialog = ({
           </div>
         </div>
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <div className="flex justify-end gap-2 mt-6">
+          <Button variant="outline" onClick={handleClose} disabled={loading}>
             Cancel
           </Button>
           <Button
@@ -427,12 +431,12 @@ const DeleteClientDialog = ({
             {loading ? "Deleting..." : "Delete Client"}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 
-// Delete Progress Entry Confirmation Dialog
+// Delete Progress Entry Confirmation Dialog - Custom Modal to prevent freezing
 const DeleteProgressEntryDialog = ({
   entry,
   open,
@@ -459,20 +463,19 @@ const DeleteProgressEntryDialog = ({
     }
   };
 
-  if (!entry) return null;
+  if (!open || !entry) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[400px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Trash2 className="h-5 w-5 text-destructive" />
-            Delete Progress Entry
-          </DialogTitle>
-          <DialogDescription>
-            This action cannot be undone. This will permanently delete this progress entry.
-          </DialogDescription>
-        </DialogHeader>
+    <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
+      <div className="bg-card border rounded-lg shadow-xl w-full max-w-[400px] p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Trash2 className="h-5 w-5 text-destructive" />
+          <h2 className="text-lg font-semibold">Delete Progress Entry</h2>
+        </div>
+        
+        <p className="text-sm text-muted-foreground mb-4">
+          This action cannot be undone. This will permanently delete this progress entry.
+        </p>
 
         <div className="space-y-4">
           <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
@@ -499,8 +502,8 @@ const DeleteProgressEntryDialog = ({
           </div>
         </div>
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <div className="flex justify-end gap-2 mt-6">
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancel
           </Button>
           <Button
@@ -511,8 +514,8 @@ const DeleteProgressEntryDialog = ({
             {loading ? "Deleting..." : "Delete Entry"}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 
@@ -1752,23 +1755,26 @@ Your Personal Trainer`;
                               </Button>
                             </DropdownMenuTrigger>
                                                       <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem onClick={() => shareClientPortal(client)}>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); shareClientPortal(client); }}>
                               <Mail className="h-4 w-4 mr-2" />
                               Email Client
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => copyPortalLink(client.id, client.name)}>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); copyPortalLink(client.id, client.name); }}>
                               <Copy className="h-4 w-4 mr-2" />
                               Copy Portal Link
                             </DropdownMenuItem>
                             <DropdownMenuItem 
-                              onClick={() => handleArchiveClient(client.id)}
+                              onClick={(e) => { e.stopPropagation(); handleArchiveClient(client.id); }}
                               className="text-orange-600 focus:text-orange-600"
                             >
                               <Archive className="h-4 w-4 mr-2" />
                               Archive Client
                             </DropdownMenuItem>
                             <DropdownMenuItem 
-                              onClick={() => setClientToDelete(client)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setClientToDelete(client);
+                              }}
                               className="text-destructive focus:text-destructive"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -1949,20 +1955,23 @@ Your Personal Trainer`;
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-48">
                                 <DropdownMenuItem 
-                                  onClick={() => handleReactivateClient(client.id)}
+                                  onClick={(e) => { e.stopPropagation(); handleReactivateClient(client.id); }}
                                   className="text-green-600 focus:text-green-600"
                                 >
                                   <RotateCcw className="h-4 w-4 mr-2" />
                                   Reactivate Client
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => copyPortalLink(client.id, client.name)}>
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); copyPortalLink(client.id, client.name); }}>
                                   <Copy className="h-4 w-4 mr-2" />
                                   Copy Portal Link
                                 </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => setClientToDelete(client)}
-                                  className="text-destructive focus:text-destructive"
-                                >
+                                                            <DropdownMenuItem 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setClientToDelete(client);
+                              }}
+                              className="text-destructive focus:text-destructive"
+                            >
                                   <Trash2 className="h-4 w-4 mr-2" />
                                   Delete Client
                                 </DropdownMenuItem>

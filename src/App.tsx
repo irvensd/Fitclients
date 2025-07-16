@@ -43,6 +43,7 @@ import Features from "./pages/Features";
 import SupportPortal from "./pages/SupportPortal";
 import SupportLogin from "./pages/SupportLogin";
 import TrialTest from "./pages/TrialTest";
+import Onboarding from "./pages/Onboarding";
 
 
 // Landing page redirect component
@@ -83,6 +84,7 @@ const App = () => {
               <Route path="/landing" element={<LandingRedirect />} />
               <Route path="/login" element={<Login />} />
               <Route path="/support-login" element={<SupportLogin />} />
+              <Route path="/onboarding" element={<Onboarding />} />
               
                             {/* Protected routes with layout */}
               <Route element={<ProtectedLayout />}>

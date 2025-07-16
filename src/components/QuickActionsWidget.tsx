@@ -72,7 +72,7 @@ export const QuickActionsWidget = () => {
       description: "Invite trainers & earn rewards",
       icon: Share2,
       href: "/settings?tab=referrals",
-      color: "bg-pink-500",
+      color: "bg-gradient-to-r from-pink-500 to-purple-500",
     },
   ];
 

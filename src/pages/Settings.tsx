@@ -49,6 +49,7 @@ import {
 
 import { SubscriptionManager } from "@/components/SubscriptionManager";
 import { BackupManager } from "@/components/BackupManager";
+import { ReferralDashboard } from "@/components/ReferralDashboard";
 import Billing from "@/pages/Billing";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -546,6 +547,18 @@ const Settings = () => {
             <Database className="h-4 w-4" />
             Backup
           </button>
+          
+          <button
+            onClick={() => handleTabChange("referrals")}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "referrals"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted"
+            }`}
+          >
+            <Share2 className="h-4 w-4" />
+            Referrals
+          </button>
         </nav>
       </div>
 
@@ -562,6 +575,7 @@ const Settings = () => {
               {activeTab === "notifications" && "Configure your notifications"}
               {activeTab === "security" && "Security and privacy settings"}
               {activeTab === "backup" && "Backup and restore your data"}
+              {activeTab === "referrals" && "Invite trainers and earn rewards"}
             </p>
           </div>
           <Button
@@ -1308,27 +1322,7 @@ const Settings = () => {
         )}
 
         {activeTab === "referrals" && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Share2 className="h-5 w-5" />
-                Referral Program
-              </CardTitle>
-              <CardDescription>
-                Coming soon - Track referrals and earn rewards
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <Share2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Referral Program</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Track referrals, manage rewards, and grow your business through word-of-mouth marketing.
-                </p>
-                <Badge variant="secondary">Coming Soon</Badge>
-              </div>
-            </CardContent>
-          </Card>
+          <ReferralDashboard />
         )}
 
         {activeTab === "notifications" && (

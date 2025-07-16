@@ -168,7 +168,7 @@ Mike Davis,mike@email.com,555-0125,Improve cardiovascular health`;
         });
       }
 
-      navigate("/admin");
+      navigate("/dashboard");
     } catch (error) {
       toast({
         title: "Setup failed",

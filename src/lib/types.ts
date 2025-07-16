@@ -75,6 +75,8 @@ export interface UserProfile {
   referralRewardGrantedAt?: string;
   totalReferrals?: number;
   referralEarnings?: number;
+  freeMonthsEarned?: number;
+  lastReferralReward?: string;
 }
 
 export interface Session {
@@ -207,6 +209,7 @@ export interface ReferralData {
   rewardGrantedAt?: string;
   rewardAmount?: number;
   planSubscribed?: string;
+  rewardType?: "free_month" | "cash";
 }
 
 export interface ReferralStats {

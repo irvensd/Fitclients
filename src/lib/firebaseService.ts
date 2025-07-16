@@ -18,6 +18,7 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { Client, Session, Payment, UserProfile, BillingHistory, ReferralData, ReferralStats } from "./types";
+import { subscriptionExtensionService } from "./subscriptionExtension";
 
 // Helper to get user's collection path
 const getUserCollection = (userId: string, collectionName: string) => {
@@ -444,11 +445,11 @@ export const billingHistoryService = {
       const sampleHistory: Omit<BillingHistory, "id">[] = [
         {
           date: new Date().toISOString().split("T")[0],
-          amount: planId === "professional" ? 29 : 79,
+          amount: planId === "starter" ? 9 : planId === "pro" ? 19 : 149,
           status: "paid",
-          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Initial Subscription`,
+          description: `${planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime"} Plan - Initial Subscription`,
           planId,
-          planName: planId === "professional" ? "Professional" : "Gold",
+          planName: planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime",
           customerId: `cus_${userId}`,
           paymentMethod: "card",
           currency: "USD",
@@ -457,11 +458,11 @@ export const billingHistoryService = {
         // Add a few more sample entries for better UX
         {
           date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 1 month ago
-          amount: planId === "professional" ? 29 : 79,
+          amount: planId === "starter" ? 9 : planId === "pro" ? 19 : 149,
           status: "paid",
-          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Monthly Subscription`,
+          description: `${planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime"} Plan - Monthly Subscription`,
           planId,
-          planName: planId === "professional" ? "Professional" : "Gold",
+          planName: planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime",
           customerId: `cus_${userId}`,
           paymentMethod: "card",
           currency: "USD",
@@ -611,6 +612,7 @@ export const referralService = {
         .filter(r => r.rewardAmount)
         .reduce((sum, r) => sum + (r.rewardAmount || 0), 0);
 
+      // Generate referral link using current location
       const referralLink = `${window.location.origin}/login?ref=${referralCode}`;
 
       return {
@@ -691,20 +693,36 @@ export const referralService = {
     try {
       const batch = writeBatch(db);
       
-      // Calculate reward amount based on plan
-      const rewardAmount = planSubscribed === "gold" ? 79 : 29; // One month of the subscribed plan
+      // Calculate reward amount based on plan (for display purposes)
+      let rewardAmount = 0;
+      switch (planSubscribed) {
+        case "starter":
+          rewardAmount = 9; // One month of Starter plan
+          break;
+        case "pro":
+          rewardAmount = 19; // One month of Pro plan
+          break;
+        case "lifetime":
+          rewardAmount = 149; // Full lifetime plan value
+          break;
+        default:
+          rewardAmount = 19; // Default to Pro plan value
+      }
       
-      // Update referrer's profile
+      // Update referrer's profile with free month credit
       const referrerRef = doc(db, "users", referrerId);
       batch.update(referrerRef, {
         referralEarnings: increment(rewardAmount),
+        freeMonthsEarned: increment(1), // Track free months earned
+        lastReferralReward: new Date().toISOString(),
       });
 
-      // Update referred user's profile
+      // Update referred user's profile with free month credit
       const referredUserRef = doc(db, "users", referredUserId);
       batch.update(referredUserRef, {
         referralRewardGranted: true,
         referralRewardGrantedAt: new Date().toISOString(),
+        freeMonthsEarned: increment(1), // Track free months earned
       });
 
       // Update referral record
@@ -722,10 +740,21 @@ export const referralService = {
           status: "rewarded",
           rewardGrantedAt: new Date().toISOString(),
           rewardAmount,
+          rewardType: "free_month", // Track that this was a free month reward
         });
       }
 
       await batch.commit();
+      
+      // Apply actual free months to both users' subscriptions
+      try {
+        await subscriptionExtensionService.applyFreeMonth(referrerId);
+        await subscriptionExtensionService.applyFreeMonth(referredUserId);
+        console.log("Free months applied to both users");
+      } catch (extensionError) {
+        console.error("Error applying free months:", extensionError);
+        // Don't fail the referral completion if extension fails
+      }
       
       return true;
     } catch (error) {
