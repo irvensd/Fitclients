@@ -488,24 +488,6 @@ const BillingHistoryComponent = () => {
     return () => unsubscribe();
   }, [user?.uid]);
 
-  const handleAddSampleData = async () => {
-    if (!user?.uid) return;
-
-    try {
-      await billingHistoryService.addSampleBillingHistory(user.uid);
-      toast({
-        title: "Sample data added",
-        description: "Sample billing history has been added to your account.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to add sample data.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const getStatusBadgeVariant = (status: string) => {
     switch (status.toLowerCase()) {
       case "paid":
@@ -532,15 +514,6 @@ const BillingHistoryComponent = () => {
               View your past invoices and payments
             </CardDescription>
           </div>
-          {(isDemoUser || user?.email === 'trainer@demo.com') && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleAddSampleData}
-            >
-              Add Sample Data
-            </Button>
-          )}
         </div>
       </CardHeader>
       <CardContent>
@@ -613,15 +586,6 @@ const Billing = () => {
   const currentPlan = getCurrentPlan();
 
   const handleUpgrade = async (planId: string) => {
-    if (planId === "starter") {
-      updateSubscriptionPlan(planId, user?.uid);
-      toast({
-        title: "Switched to Starter Plan",
-        description: "You've been switched to the Starter plan. Some features may be limited.",
-      });
-      return;
-    }
-
     setSelectedPlanId(planId);
     setCheckoutModalOpen(true);
   };
@@ -934,12 +898,12 @@ const Billing = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Crown className="h-5 w-5 text-yellow-600" />
-              Upgrade Your Plan
+              {selectedPlanId === "starter" ? "Switch to Starter" : "Upgrade Your Plan"}
             </DialogTitle>
             <DialogDescription>
               {selectedPlanId && (
                 <>
-                  You're about to upgrade to the{" "}
+                  You're about to {selectedPlanId === "starter" ? "switch to the " : "upgrade to the "}
                   <span className="font-semibold">
                     {SUBSCRIPTION_PLANS[selectedPlanId.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS]?.name}
                   </span>{" "}
@@ -979,20 +943,37 @@ const Billing = () => {
               </div>
             )}
             
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                <div className="text-sm">
-                  <p className="font-medium text-yellow-800 mb-1">Important:</p>
-                  <p className="text-yellow-700">
-                    {isOnTrial 
-                      ? "You're currently on a free trial. No charges will be made until your trial ends."
-                      : "This will update your subscription immediately."
-                    }
-                  </p>
+            {/* Special warning for Starter downgrade */}
+            {selectedPlanId === "starter" && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm">
+                    <p className="font-medium text-yellow-800 mb-1">Warning:</p>
+                    <p className="text-yellow-700">
+                      Are you sure you want to switch to the Starter plan? Some features may become unavailable.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+            {/* Existing warning for upgrades/trial */}
+            {selectedPlanId !== "starter" && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm">
+                    <p className="font-medium text-yellow-800 mb-1">Important:</p>
+                    <p className="text-yellow-700">
+                      {isOnTrial 
+                        ? "You're currently on a free trial. No charges will be made until your trial ends."
+                        : "This will update your subscription immediately."
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div className="flex gap-2">
               <Button 
@@ -1000,7 +981,7 @@ const Billing = () => {
                 onClick={handleCheckoutSuccess}
                 disabled={loading}
               >
-                {loading ? "Processing..." : "Confirm Upgrade"}
+                {loading ? "Processing..." : selectedPlanId === "starter" ? "Confirm Switch" : "Confirm Upgrade"}
               </Button>
               <Button 
                 variant="outline" 

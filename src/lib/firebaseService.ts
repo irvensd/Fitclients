@@ -431,7 +431,7 @@ export const billingHistoryService = {
   // Initialize billing history for new users (creates sample data if needed)
   initializeBillingHistory: async (userId: string, planId: string = "free") => {
     try {
-      // Only create sample data for non-free plans
+      // Only create billing history for actual subscription events
       if (planId === "free") {
         return;
       }
@@ -441,106 +441,24 @@ export const billingHistoryService = {
         return; // Already has billing history
       }
 
-      // Create sample billing history for new paid subscribers
-      const sampleHistory: Omit<BillingHistory, "id">[] = [
-        {
-          date: new Date().toISOString().split("T")[0],
-          amount: planId === "starter" ? 9 : planId === "pro" ? 19 : 149,
-          status: "paid",
-          description: `${planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime"} Plan - Initial Subscription`,
-          planId,
-          planName: planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime",
-          customerId: `cus_${userId}`,
-          paymentMethod: "card",
-          currency: "USD",
-          createdAt: new Date().toISOString(),
-        },
-        // Add a few more sample entries for better UX
-        {
-          date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 1 month ago
-          amount: planId === "starter" ? 9 : planId === "pro" ? 19 : 149,
-          status: "paid",
-          description: `${planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime"} Plan - Monthly Subscription`,
-          planId,
-          planName: planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime",
-          customerId: `cus_${userId}`,
-          paymentMethod: "card",
-          currency: "USD",
-          createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 2 months ago
-          amount: planId === "professional" ? 29 : 79,
-          status: "paid",
-          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Monthly Subscription`,
-          planId,
-          planName: planId === "professional" ? "Professional" : "Gold",
-          customerId: `cus_${userId}`,
-          paymentMethod: "card",
-          currency: "USD",
-          createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-      ];
+      // Create a real billing history entry for the current subscription
+      const billingEntry: Omit<BillingHistory, "id"> = {
+        date: new Date().toISOString().split("T")[0],
+        amount: planId === "starter" ? 9 : planId === "pro" ? 19 : 149,
+        status: "paid",
+        description: `${planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime"} Plan - Subscription Started`,
+        planId,
+        planName: planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime",
+        customerId: `cus_${userId}`,
+        paymentMethod: "card",
+        currency: "USD",
+        createdAt: new Date().toISOString(),
+      };
 
-      // Add sample billing history items
-      for (const item of sampleHistory) {
-        await billingHistoryService.addBillingHistoryItem(userId, item);
-      }
+      // Add the billing history entry
+      await billingHistoryService.addBillingHistoryItem(userId, billingEntry);
     } catch (error) {
       console.error("Error initializing billing history:", error);
-    }
-  },
-
-  // Manually add sample billing history for existing users (for demo purposes)
-  addSampleBillingHistory: async (userId: string, planId: string = "professional") => {
-    try {
-      const sampleHistory: Omit<BillingHistory, "id">[] = [
-        {
-          date: new Date().toISOString().split("T")[0],
-          amount: planId === "professional" ? 29 : 79,
-          status: "paid",
-          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Current Month`,
-          planId,
-          planName: planId === "professional" ? "Professional" : "Gold",
-          customerId: `cus_${userId}`,
-          paymentMethod: "card",
-          currency: "USD",
-          createdAt: new Date().toISOString(),
-        },
-        {
-          date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 1 month ago
-          amount: planId === "professional" ? 29 : 79,
-          status: "paid",
-          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Previous Month`,
-          planId,
-          planName: planId === "professional" ? "Professional" : "Gold",
-          customerId: `cus_${userId}`,
-          paymentMethod: "card",
-          currency: "USD",
-          createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 2 months ago
-          amount: planId === "professional" ? 29 : 79,
-          status: "paid",
-          description: `${planId === "professional" ? "Professional" : "Gold"} Plan - Monthly Subscription`,
-          planId,
-          planName: planId === "professional" ? "Professional" : "Gold",
-          customerId: `cus_${userId}`,
-          paymentMethod: "card",
-          currency: "USD",
-          createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-      ];
-
-      // Add sample billing history items
-      for (const item of sampleHistory) {
-        await billingHistoryService.addBillingHistoryItem(userId, item);
-      }
-
-      // Sample billing history added
-    } catch (error) {
-      console.error("Error adding sample billing history:", error);
     }
   },
 };
