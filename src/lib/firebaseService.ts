@@ -428,38 +428,11 @@ export const billingHistoryService = {
     );
   },
 
-  // Initialize billing history for new users (creates sample data if needed)
+  // Initialize billing history for new users (do nothing now)
   initializeBillingHistory: async (userId: string, planId: string = "free") => {
-    try {
-      // Only create billing history for actual subscription events
-      if (planId === "free") {
-        return;
-      }
-
-      const existingHistory = await billingHistoryService.getBillingHistory(userId);
-      if (existingHistory.length > 0) {
-        return; // Already has billing history
-      }
-
-      // Create a real billing history entry for the current subscription
-      const billingEntry: Omit<BillingHistory, "id"> = {
-        date: new Date().toISOString().split("T")[0],
-        amount: planId === "starter" ? 9 : planId === "pro" ? 19 : 149,
-        status: "paid",
-        description: `${planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime"} Plan - Subscription Started`,
-        planId,
-        planName: planId === "starter" ? "Starter" : planId === "pro" ? "Pro" : "Pro Lifetime",
-        customerId: `cus_${userId}`,
-        paymentMethod: "card",
-        currency: "USD",
-        createdAt: new Date().toISOString(),
-      };
-
-      // Add the billing history entry
-      await billingHistoryService.addBillingHistoryItem(userId, billingEntry);
-    } catch (error) {
-      console.error("Error initializing billing history:", error);
-    }
+    // No-op: Do not create any billing history entry for new users or plan switches
+    // Only real payment events should create billing history
+    return;
   },
 };
 
