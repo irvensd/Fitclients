@@ -15,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { Zap, ArrowLeft, Check, X, Gift } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isFirebaseConfigured } from "@/lib/firebase";
+import PlanSelectionModal from "@/components/PlanSelectionModal";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -27,6 +28,8 @@ const Login = () => {
   const [mode, setMode] = useState<"login" | "register" | "reset">("login");
   const [searchParams] = useSearchParams();
   const [referralCode, setReferralCode] = useState("");
+  const [showPlanSelection, setShowPlanSelection] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("starter");
 
   const { login, register, user, isDevMode, authError, clearError } = useAuth();
 
@@ -56,8 +59,25 @@ const Login = () => {
       if (mode === "login") {
         await login(email, password);
       } else {
-        await register(email, password, firstName, lastName, referralCode);
+        // For registration, show plan selection first
+        setShowPlanSelection(true);
+        setLoading(false);
+        return;
       }
+    } catch (err: any) {
+      // Error is handled in AuthContext
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePlanSelected = async (planId: string) => {
+    setSelectedPlan(planId);
+    setLoading(true);
+    clearError();
+
+    try {
+      await register(email, password, firstName, lastName, referralCode, planId);
     } catch (err: any) {
       // Error is handled in AuthContext
     } finally {
@@ -438,6 +458,14 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Plan Selection Modal */}
+      <PlanSelectionModal
+        isOpen={showPlanSelection}
+        onClose={() => setShowPlanSelection(false)}
+        onPlanSelected={handlePlanSelected}
+        selectedPlan={selectedPlan}
+      />
     </div>
   );
 };

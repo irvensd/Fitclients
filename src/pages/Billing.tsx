@@ -60,31 +60,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { BillingHistory as BillingHistoryType } from "@/lib/types";
 import "@/lib/resetSubscription";
 
-// Mock payment methods
-const mockPaymentMethods = [
-  {
-    id: "pm_1",
-    type: "card",
-    card: {
-      brand: "visa",
-      last4: "4242",
-      exp_month: 12,
-      exp_year: 2027,
-    },
-    isDefault: true,
-  },
-  {
-    id: "pm_2",
-    type: "card",
-    card: {
-      brand: "mastercard",
-      last4: "5555",
-      exp_month: 8,
-      exp_year: 2026,
-    },
-    isDefault: false,
-  },
-];
+// Real payment methods will be loaded from Stripe
+const mockPaymentMethods: any[] = [];
 
 const PaymentMethodCard = ({
   method,

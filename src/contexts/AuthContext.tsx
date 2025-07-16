@@ -22,7 +22,8 @@ export interface AuthContextType {
     password: string,
     firstName: string,
     lastName: string,
-    referralCode?: string
+    referralCode?: string,
+    planId?: string
   ) => Promise<void>;
   logout: () => Promise<void>;
   isDevMode: boolean;
@@ -144,7 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const register = React.useCallback(
-    async (email: string, password: string, firstName: string, lastName: string, referralCode?: string) => {
+    async (email: string, password: string, firstName: string, lastName: string, referralCode?: string, planId?: string) => {
       setAuthError(null);
       
       // Retry logic for network issues
@@ -213,6 +214,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               
               // Set the profile immediately after creation
               setUserProfile(createdProfile);
+              
+              // Set up subscription with selected plan
+              if (planId) {
+                try {
+                  // Store the selected plan in localStorage for the subscription context to pick up
+                  localStorage.setItem('selected_plan', planId);
+                  console.log(`User registered with plan: ${planId}`);
+                } catch (subscriptionError) {
+                  console.error("Error setting up subscription:", subscriptionError);
+                  // Don't fail registration if subscription setup fails
+                }
+              }
             } catch (profileError) {
               console.error("Failed to create user profile:", profileError);
               // Don't throw here as the user is already created in Firebase Auth

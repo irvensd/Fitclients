@@ -57,21 +57,22 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
         }
       }
 
-      // Default to Pro plan (trial period is over)
-      // For testing trial expiration, uncomment the line below:
-      // return {
-      //   status: "trialing",
-      //   currentPlan: "starter",
-      //   trialEnd: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-      //   subscriptionId: "sub_trial123",
-      //   customerId: "cus_trial123",
-      // };
+      // Check if user selected a plan during registration
+      const selectedPlan = localStorage.getItem('selected_plan');
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + TRIAL_PERIOD_DAYS);
+      
+      // Clear the selected plan from localStorage since we've used it
+      if (selectedPlan) {
+        localStorage.removeItem('selected_plan');
+      }
+      
       return {
-        status: "active",
-        currentPlan: "pro",
-        trialEnd: null,
-        subscriptionId: "sub_pro123",
-        customerId: "cus_pro123",
+        status: "trialing",
+        currentPlan: selectedPlan || "starter", // Use selected plan or default to starter
+        trialEnd: trialEnd.toISOString(),
+        subscriptionId: "sub_trial123",
+        customerId: "cus_trial123",
       };
     },
   );
@@ -109,7 +110,7 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
   }, [isTrialExpired, hasValidPaymentMethod]);
 
   const getCurrentPlan = () => {
-    const planId = subscription?.currentPlan || "free";
+    const planId = subscription?.currentPlan || "starter"; // Default to starter, not free
     console.log("getCurrentPlan - subscription?.currentPlan:", subscription?.currentPlan, "planId:", planId);
     const plan = Object.values(SUBSCRIPTION_PLANS).find((p) => p.id === planId);
     console.log("getCurrentPlan - found plan:", plan);
@@ -198,42 +199,31 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
                 console.log("Referral completed and rewards granted");
               }
             }
-          } catch (referralError) {
-            console.error("Error processing referral completion:", referralError);
-            // Don't fail subscription update if referral processing fails
+          } catch (error) {
+            console.error("Error completing referral:", error);
           }
         }
       }
     } catch (error) {
       console.error("Error initializing billing history:", error);
     }
-
-    // Handle client downgrade if callback provided
-    if (onDowngradeClients) {
-      const newPlan = Object.values(SUBSCRIPTION_PLANS).find(
-        (p) => p.id === planId,
-      );
-      if (newPlan) {
-        onDowngradeClients(newPlan.limits.clients, []);
-      }
-    }
-  };
-
-  const value = {
-    subscription,
-    isOnTrial,
-    trialDaysLeft,
-    isTrialExpired,
-    hasValidPaymentMethod,
-    isServiceSuspended,
-    getCurrentPlan,
-    hasFeatureAccess,
-    refreshSubscription,
-    updateSubscriptionPlan,
   };
 
   return (
-    <SubscriptionContext.Provider value={value}>
+    <SubscriptionContext.Provider
+      value={{
+        subscription,
+        isOnTrial,
+        trialDaysLeft,
+        isTrialExpired,
+        hasValidPaymentMethod,
+        isServiceSuspended,
+        getCurrentPlan,
+        hasFeatureAccess,
+        refreshSubscription,
+        updateSubscriptionPlan,
+      }}
+    >
       {children}
     </SubscriptionContext.Provider>
   );
@@ -242,9 +232,7 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
 export const useSubscription = () => {
   const context = useContext(SubscriptionContext);
   if (context === undefined) {
-    throw new Error(
-      "useSubscription must be used within a SubscriptionProvider",
-    );
+    throw new Error("useSubscription must be used within a SubscriptionProvider");
   }
   return context;
 };
