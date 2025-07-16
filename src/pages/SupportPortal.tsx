@@ -396,35 +396,22 @@ const SupportPortal = () => {
       // Load real user data instead of mock client environments
       const loadRealUserData = async () => {
         try {
-          // Get all users from Firestore
-          const usersQuery = query(collection(db, "users"), orderBy("createdAt", "desc"));
+          console.log('Loading real user data for support portal...');
+          
+          // Get all users from Firestore - users are stored with UID as document ID
+          const usersQuery = query(collection(db, "users"));
           const usersSnapshot = await getDocs(usersQuery);
           
-          // Get user profiles for additional data
-          const userProfilesQuery = query(collection(db, "userProfiles"));
-          const userProfilesSnapshot = await getDocs(userProfilesQuery);
-          const userProfiles = userProfilesSnapshot.docs.reduce((acc, doc) => {
-            acc[doc.id] = doc.data();
-            return acc;
-          }, {} as Record<string, any>);
-          
-          // Get support tickets to count issues per user
-          const ticketsQuery = query(collection(db, "supportTickets"));
-          const ticketsSnapshot = await getDocs(ticketsQuery);
-          const ticketsByUser = ticketsSnapshot.docs.reduce((acc, doc) => {
-            const ticket = doc.data();
-            const userId = ticket.userId;
-            if (userId) {
-              acc[userId] = (acc[userId] || 0) + 1;
-            }
-            return acc;
-          }, {} as Record<string, number>);
+          console.log(`Found ${usersSnapshot.docs.length} users in Firestore`);
           
           // Transform users into RealUserEnvironment format
           const realUserEnvironments: RealUserEnvironment[] = usersSnapshot.docs.map(doc => {
             const userData = doc.data();
-            const userProfile = userProfiles[doc.id];
-            const issues = ticketsByUser[doc.id] || 0;
+            console.log('Processing user:', doc.id, userData);
+            
+            // Get user profile data (stored in the same document)
+            const userProfile = userData;
+            const issues = 0; // TODO: Count support tickets per user
             
             // Calculate data usage based on user's data (simplified)
             const dataUsage = Math.random() * 2 + 0.1; // Mock calculation
@@ -433,16 +420,16 @@ const SupportPortal = () => {
             const subscription = userProfile?.selectedPlan || "starter";
             
             // Determine status based on user activity
-            const lastLogin = userData.lastLoginAt ? new Date(userData.lastLoginAt) : new Date();
+            const lastLogin = userProfile?.lastLogin ? new Date(userProfile.lastLogin) : new Date();
             const isActive = lastLogin > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Active if logged in within 7 days
-            const status = userData.emailVerified 
+            const status = userProfile?.emailVerified 
               ? (isActive ? "active" : "inactive")
               : "pending";
             
             return {
               id: doc.id,
-              email: userData.email || "",
-              displayName: userData.displayName || userData.email || "Unknown User",
+              email: userProfile?.email || userData.email || "",
+              displayName: userProfile?.displayName || userProfile?.firstName + " " + userProfile?.lastName || userData.email || "Unknown User",
               environment: "production",
               status,
               lastLogin,
@@ -479,12 +466,13 @@ const SupportPortal = () => {
             };
           });
           
+          console.log('Processed user environments:', realUserEnvironments);
           setClientEnvironments(realUserEnvironments);
           setEnvironmentsLoading(false);
           setEnvironmentsError(null);
         } catch (error) {
           console.error('Error loading real user data:', error);
-          setEnvironmentsError('Failed to load user data');
+          setEnvironmentsError('Failed to load user data: ' + (error instanceof Error ? error.message : 'Unknown error'));
           setEnvironmentsLoading(false);
         }
       };
@@ -854,6 +842,40 @@ const SupportPortal = () => {
           timestamp: new Date()
         }
       }));
+    }
+  };
+
+  // Debug function to check user data
+  const debugUserData = async () => {
+    try {
+      console.log('=== DEBUG: Checking User Data ===');
+      
+      // Check users collection
+      const usersQuery = query(collection(db, "users"));
+      const usersSnapshot = await getDocs(usersQuery);
+      console.log(`Found ${usersSnapshot.docs.length} users in 'users' collection`);
+      
+      usersSnapshot.docs.forEach((doc, index) => {
+        console.log(`User ${index + 1}:`, {
+          id: doc.id,
+          data: doc.data()
+        });
+      });
+      
+      // Check if we're authenticated
+      console.log('Current user:', user);
+      console.log('User email:', user?.email);
+      
+      // Test support staff access
+      const testUser = usersSnapshot.docs[0];
+      if (testUser) {
+        console.log('Testing access to first user:', testUser.id);
+        const userData = testUser.data();
+        console.log('User data accessible:', userData);
+      }
+      
+    } catch (error) {
+      console.error('Debug error:', error);
     }
   };
 
@@ -2193,6 +2215,15 @@ const SupportPortal = () => {
                     Real Users
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={debugUserData}
+                      className="mr-2"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-1" />
+                      Debug
+                    </Button>
                     <Input
                       placeholder="Search users..."
                       value={searchQuery}
@@ -2262,13 +2293,28 @@ const SupportPortal = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  {getFilteredEnvironments()
-                    .filter(client => 
-                      client.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      client.email.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .map((client) => {
+                {environmentsLoading && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <span className="ml-2">Loading real users...</span>
+                  </div>
+                )}
+                
+                {environmentsError && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 font-medium">Error loading users:</p>
+                    <p className="text-red-600 text-sm">{environmentsError}</p>
+                  </div>
+                )}
+                
+                {!environmentsLoading && !environmentsError && (
+                  <div className="space-y-4">
+                    {getFilteredEnvironments()
+                      .filter(client => 
+                        client.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        client.email.toLowerCase().includes(searchQuery.toLowerCase())
+                      )
+                      .map((client) => {
                       const healthStatus = getHealthStatus(client.healthMetrics);
                       return (
                         <div key={client.id} className="p-6 border rounded-lg hover:shadow-md transition-shadow">
@@ -2384,10 +2430,11 @@ const SupportPortal = () => {
                   {getFilteredEnvironments().length === 0 && (
                     <div className="text-center py-8 text-muted-foreground">
                       <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>No client environments found matching the current filters</p>
+                      <p>No real users found matching the current filters</p>
                     </div>
                   )}
                 </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
