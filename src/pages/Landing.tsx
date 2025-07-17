@@ -181,18 +181,18 @@ const Landing = () => {
 
       <div className="min-h-screen bg-gradient-to-br from-background to-muted">
         {/* Mobile Sticky CTA */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t shadow-lg p-4 safe-bottom">
-          <div className="flex gap-3">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t shadow-lg p-3 sm:p-4 safe-bottom">
+          <div className="flex gap-2 sm:gap-3">
             <Button 
-              className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white"
+              className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white text-sm sm:text-base"
               onClick={() => window.location.href = '/login?mode=register'}
             >
                 Start Free Trial
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             <Button 
               variant="outline" 
-              className="flex-1"
+              className="flex-1 text-sm sm:text-base"
               onClick={() => window.open('https://www.loom.com/share/5c5dbae5eced4f0caf3d5c48ea91ae58?sid=3785c9dd-f0e5-484d-abf4-cc4b2cee980f', '_blank')}
             >
                 Watch Demo
@@ -230,46 +230,46 @@ const Landing = () => {
         <section id="demo" className="py-20 px-4 relative">
           <AnimatedHero />
           <div className="container mx-auto text-center max-w-4xl relative z-10">
-            {/* Social Proof Badge */}
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">
-              <Star className="h-4 w-4" />
-              Trusted by 1,000+ Personal Trainers
+            {/* Demo Badge */}
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">
+              <Zap className="h-4 w-4" />
+              Now in Demo Mode - Try It Free
             </div>
             
             {/* Main Headline */}
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 md:mb-6 px-2">
               Stop Losing Clients to <span className="bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 bg-clip-text text-transparent">Poor Organization</span>
             </h1>
             
             {/* Subheadline with Problem-Solution */}
-            <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-muted-foreground mb-6 max-w-2xl mx-auto px-4">
               Struggling with scattered client info, missed payments, and chaotic scheduling? 
               <span className="font-semibold text-foreground"> FitClient organizes everything in one place</span> - 
               so you can focus on what matters: growing your fitness business.
             </p>
             
             {/* Trust Indicators */}
-            <div className="flex flex-wrap justify-center items-center gap-6 mb-8 text-sm text-muted-foreground">
+            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 mb-6 md:mb-8 text-xs sm:text-sm text-muted-foreground px-4">
               <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-green-600" />
-                <span>Free forever for 5 clients</span>
+                <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                <span>14-day free trial</span>
               </div>
               <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-blue-600" />
-                <span>30-day money-back guarantee</span>
+                <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                <span>30-day guarantee</span>
               </div>
               <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-yellow-600" />
-                <span>Set up in 5 minutes</span>
+                <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600" />
+                <span>5 min setup</span>
               </div>
             </div>
             
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 md:mb-8 px-4">
               <Link to="/login?mode=register">
-                <Button size="lg" className="text-lg px-8 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                <Button size="lg" className="text-base sm:text-lg px-6 sm:px-8 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                   Start Free Trial - No Credit Card
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </Link>
               <a
@@ -280,30 +280,30 @@ const Landing = () => {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8 border-2 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-transparent transition-all duration-300"
+                  className="text-base sm:text-lg px-6 sm:px-8 border-2 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-transparent transition-all duration-300"
                 >
                   Watch 2-Min Demo
                 </Button>
               </a>
             </div>
             
-            {/* Social Proof Numbers */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-3xl mx-auto">
-              <div className="text-center p-3 md:p-0">
-                <div className="text-xl md:text-2xl font-bold text-primary">1,000+</div>
-                <div className="text-xs md:text-sm text-muted-foreground">Active Trainers</div>
+            {/* Demo Features */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-3xl mx-auto px-4">
+              <div className="text-center p-2 sm:p-3 md:p-0">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary">Free</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">14-Day Trial</div>
               </div>
-              <div className="text-center p-3 md:p-0">
-                <div className="text-xl md:text-2xl font-bold text-primary">50,000+</div>
-                <div className="text-xs md:text-sm text-muted-foreground">Clients Managed</div>
+              <div className="text-center p-2 sm:p-3 md:p-0">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary">No Setup</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Fees</div>
               </div>
-              <div className="text-center p-3 md:p-0">
-                <div className="text-xl md:text-2xl font-bold text-primary">10+ hrs</div>
-                <div className="text-xs md:text-sm text-muted-foreground">Saved Per Week</div>
+              <div className="text-center p-2 sm:p-3 md:p-0">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary">5 Min</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Setup Time</div>
               </div>
-              <div className="text-center p-3 md:p-0">
-                <div className="text-xl md:text-2xl font-bold text-primary">4.9★</div>
-                <div className="text-xs md:text-sm text-muted-foreground">Average Rating</div>
+              <div className="text-center p-2 sm:p-3 md:p-0">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary">$9</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Starting Price</div>
               </div>
             </div>
           </div>
@@ -313,31 +313,31 @@ const Landing = () => {
 
 
         {/* Most Common Pain Points Section */}
-        <section className="py-20 px-4 bg-gradient-to-br from-orange-50 to-red-50">
+        <section className="py-12 sm:py-16 md:py-20 px-4 bg-gradient-to-br from-orange-50 to-red-50">
           <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-600 to-red-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <AlertTriangle className="h-4 w-4" />
+            <div className="text-center mb-12 sm:mb-16">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-600 to-red-600 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+                <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4" />
                 Common Pain Points
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">
                 The <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Biggest Challenges</span> Personal Trainers Face
               </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
                 We've identified the most common pain points that hold personal trainers back from growing their business
               </p>
             </div>
 
             {/* Pain Points Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12">
               {/* Pain Point 1 */}
               <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-white hover:shadow-lg transition-all">
-                <CardContent className="p-6">
-                  <div className="bg-gradient-to-r from-orange-500 to-red-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <Clock className="h-6 w-6 text-white" />
+                <CardContent className="p-4 sm:p-6">
+                  <div className="bg-gradient-to-r from-orange-500 to-red-500 w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                    <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
-                  <h3 className="font-semibold mb-3 text-center">Time-Consuming Admin</h3>
-                  <p className="text-sm text-muted-foreground text-center">
+                  <h3 className="font-semibold mb-2 sm:mb-3 text-center text-sm sm:text-base">Time-Consuming Admin</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground text-center">
                     Spending 15+ hours per week on scheduling, payments, and client communication instead of training
                   </p>
                 </CardContent>
@@ -1004,142 +1004,7 @@ const Landing = () => {
 
 
 
-        {/* Testimonials Section */}
-        <section className="py-20 px-4 bg-muted/30">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
-                <Star className="h-4 w-4" />
-                Trusted by Personal Trainers
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Real Results from Real Trainers
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                See how FitClient is helping personal trainers transform their business operations and client relationships.
-              </p>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Testimonial 2 - Focus on Client Portals */}
-              <Card className="border-2 hover:border-primary/20 transition-all">
-                <CardContent className="p-6">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-6 italic">
-                    "The no-login client portal is a game-changer! My older clients love how easy it is to track their progress without remembering passwords. It's professional, simple, and my retention rate has improved by 30%."
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div className="bg-gradient-to-br from-green-500 to-emerald-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold">
-                      JR
-                    </div>
-                    <div>
-                      <p className="font-semibold">James Rodriguez</p>
-                      <p className="text-sm text-muted-foreground">Fitness Coach, Miami</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Testimonial 3 - Focus on Business Growth */}
-              <Card className="border-2 hover:border-primary/20 transition-all">
-                <CardContent className="p-6">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-6 italic">
-                    "Since switching to FitClient, I've doubled my client base. The professional image it gives my business and the AI recommendations help me provide personalized service at scale. Worth every penny!"
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div className="bg-gradient-to-br from-orange-500 to-red-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold">
-                      ET
-                    </div>
-                    <div>
-                      <p className="font-semibold">Emma Thompson</p>
-                      <p className="text-sm text-muted-foreground">Online PT, Los Angeles</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Additional testimonials row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-              {/* Testimonial 4 - Focus on AI Features */}
-              <Card className="border-2 hover:border-primary/20 transition-all">
-                <CardContent className="p-6">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-6 italic">
-                    "The AI-powered session recaps save me 30 minutes after each session. My clients love receiving personalized summaries, and the smart recommendations help me adjust their programs perfectly. It's like having an assistant!"
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div className="bg-gradient-to-br from-purple-500 to-pink-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold">
-                      MK
-                    </div>
-                    <div>
-                      <p className="font-semibold">Marcus King</p>
-                      <p className="text-sm text-muted-foreground">Strength Coach, Chicago</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Testimonial 5 - Focus on Payment Tracking */}
-              <Card className="border-2 hover:border-primary/20 transition-all">
-                <CardContent className="p-6">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-6 italic">
-                    "Managing payments used to be my biggest headache. FitClient makes it crystal clear who's paid and who hasn't. The revenue analytics help me make better business decisions. I've increased my income by 40% this year!"
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div className="bg-gradient-to-br from-indigo-500 to-blue-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold">
-                      AL
-                    </div>
-                    <div>
-                      <p className="font-semibold">Amanda Liu</p>
-                      <p className="text-sm text-muted-foreground">Boutique Trainer, Boston</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Trust indicators */}
-            <div className="mt-16 text-center">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-                <div>
-                  <div className="text-3xl font-bold text-primary">500+</div>
-                  <p className="text-sm text-muted-foreground mt-1">Active Trainers</p>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-primary">15,000+</div>
-                  <p className="text-sm text-muted-foreground mt-1">Clients Managed</p>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-primary">4.8/5</div>
-                  <p className="text-sm text-muted-foreground mt-1">Average Rating</p>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-primary">98%</div>
-                  <p className="text-sm text-muted-foreground mt-1">Would Recommend</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Benefits Section */}
         <section className="py-20 px-4">
