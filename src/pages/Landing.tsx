@@ -34,6 +34,7 @@ import AnimatedHero from "@/components/AnimatedHero";
 import MotivationalElements from "@/components/MotivationalElements";
 import ColorPsychology from "@/components/ColorPsychology";
 import { useAuth } from "@/contexts/AuthContext";
+import SEO from "@/components/SEO";
 
 const Landing = () => {
   // Scroll progress state
@@ -154,32 +155,15 @@ const Landing = () => {
 
   return (
     <div>
+      <SEO
+        title="FitClient - Simple CRM Software for Personal Trainers | Client Management Made Easy"
+        description="Manage your personal training business effortlessly with FitClient CRM. Schedule sessions, track payments, monitor client progress, and grow your fitness business. Start free today!"
+        keywords="personal trainer software, fitness CRM, client management software, personal training business, fitness business software, workout planning software, gym management, fitness client tracking, personal trainer app, fitness scheduling software"
+        url="https://fitclients-4c5f2.web.app"
+        image="https://fitclients-4c5f2.web.app/og-image.png"
+        type="website"
+      />
       <Helmet>
-        {/* Primary Meta Tags */}
-        <title>FitClient - Simple CRM Software for Personal Trainers | Client Management Made Easy</title>
-        <meta name="title" content="FitClient - Simple CRM Software for Personal Trainers | Client Management Made Easy" />
-        <meta name="description" content="Manage your personal training business effortlessly with FitClient CRM. Schedule sessions, track payments, monitor client progress, and grow your fitness business. Start free today!" />
-        <meta name="keywords" content="personal trainer software, fitness CRM, client management software, personal training business, fitness business software, workout planning software, gym management, fitness client tracking, personal trainer app, fitness scheduling software" />
-        <meta name="robots" content="index, follow" />
-        <meta name="language" content="English" />
-        <meta name="author" content="FitClient" />
-        <link rel="canonical" href="https://fitclients-4c5f2.web.app" />
-
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://fitclients-4c5f2.web.app/" />
-        <meta property="og:title" content="FitClient - Simple CRM Software for Personal Trainers" />
-        <meta property="og:description" content="Everything you need to run your personal training business: client management, session scheduling, payment tracking, and progress monitoring." />
-        <meta property="og:image" content="https://fitclients-4c5f2.web.app/og-image.png" />
-        <meta property="og:site_name" content="FitClient" />
-
-        {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content="https://fitclients-4c5f2.web.app/" />
-        <meta property="twitter:title" content="FitClient - Simple CRM Software for Personal Trainers" />
-        <meta property="twitter:description" content="Everything you need to run your personal training business: client management, session scheduling, payment tracking, and progress monitoring." />
-        <meta property="twitter:image" content="https://fitclients-4c5f2.web.app/twitter-image.png" />
-
         {/* Structured Data */}
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}

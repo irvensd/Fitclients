@@ -57,6 +57,7 @@ import CreativeDashboard from "@/components/CreativeDashboard";
 import { BadgeReveal } from "@/components/BadgeReveal";
 import { StreakTracker } from "@/components/StreakTracker";
 import { Streak, calculateGamificationData } from "@/lib/gamification";
+import { DemoTips } from "@/components/DemoTips";
 
 const SESSION_MILESTONES = [10, 25, 50, 100, 250, 500];
 const CLIENT_MILESTONES = [10, 25, 50, 100, 250, 500];
@@ -292,6 +293,9 @@ const Dashboard = () => {
       </div>
 
       <QuickActionsWidget />
+
+      {/* Demo Tips for Demo Users */}
+      <DemoTips />
 
       {/* Creative Dashboard - Motivational Elements */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

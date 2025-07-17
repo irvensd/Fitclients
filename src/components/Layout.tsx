@@ -48,6 +48,7 @@ import {
 import { useMediaQuery } from "@/hooks/use-media-query";
 import NotificationBell from "./NotificationBell";
 import { QuickActionsWidget } from "@/components/QuickActionsWidget";
+import { DemoModeBanner } from "./DemoModeBanner";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -399,6 +400,7 @@ export const Layout = ({ children }: LayoutProps) => {
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
+          <DemoModeBanner className="mb-4" />
           {children}
         </main>
       </div>

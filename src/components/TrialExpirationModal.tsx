@@ -199,7 +199,7 @@ export const TrialExpirationModal: React.FC<TrialExpirationModalProps> = ({
 
           {/* Help Text */}
           <p className="text-center text-sm text-muted-foreground">
-            Need help? Contact our support team at support@fitclients.com
+            Need help? Contact our support team at support@fitclients.io
           </p>
         </div>
       </DialogContent>

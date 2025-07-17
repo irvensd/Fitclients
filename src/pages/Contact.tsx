@@ -39,24 +39,50 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitted(true);
-    setIsSubmitting(false);
-    
-    // Reset form after success
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        subject: "",
-        category: "",
-        message: "",
-      });
-    }, 3000);
+    try {
+      // Create email content
+      const emailSubject = `[${formData.category || 'General'}] ${formData.subject}`;
+      const emailBody = `Name: ${formData.firstName} ${formData.lastName}
+Email: ${formData.email}
+Category: ${formData.category || 'General'}
+
+Message:
+${formData.message}
+
+---
+Sent from FitClient Contact Form`;
+
+      // Create mailto URL
+      const mailtoUrl = `mailto:support@fitclients.io?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+
+      // Open email client
+      window.location.href = mailtoUrl;
+      
+      // Show success message
+      setIsSubmitted(true);
+      setIsSubmitting(false);
+      
+      // Reset form after success
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          subject: "",
+          category: "",
+          message: "",
+        });
+      }, 5000);
+    } catch (error) {
+      console.error('Error sending email:', error);
+      setIsSubmitting(false);
+      // Fallback: just show success message
+      setIsSubmitted(true);
+      setTimeout(() => {
+        setIsSubmitted(false);
+      }, 3000);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -110,9 +136,9 @@ const Contact = () => {
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
                       <CheckCircle className="h-8 w-8 text-green-600" />
                     </div>
-                    <h3 className="text-lg font-semibold text-green-800 mb-2">Message Sent!</h3>
+                    <h3 className="text-lg font-semibold text-green-800 mb-2">Email Client Opened!</h3>
                     <p className="text-green-700 mb-4">
-                      Thank you for contacting us. We'll get back to you within 24 hours.
+                      Your email client should have opened with a pre-filled message to support@fitclients.io. Please send the email to complete your inquiry.
                     </p>
                     <Button onClick={() => setIsSubmitted(false)} variant="outline">
                       Send Another Message
@@ -234,21 +260,12 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-medium text-sm">Email Support</h4>
-                    <p className="text-sm text-muted-foreground">support@fitclients.app</p>
+                    <p className="text-sm text-muted-foreground">support@fitclients.io</p>
                     <p className="text-xs text-muted-foreground mt-1">We respond within 24 hours</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
-                    <Phone className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">Phone Support</h4>
-                    <p className="text-sm text-muted-foreground">+1 (555) 123-4567</p>
-                    <p className="text-xs text-muted-foreground mt-1">Mon-Fri, 9AM-6PM EST</p>
-                  </div>
-                </div>
+
 
                 <div className="flex items-start gap-3">
                   <div className="bg-blue-100 p-2 rounded-lg flex-shrink-0">

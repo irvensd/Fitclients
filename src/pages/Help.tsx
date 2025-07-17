@@ -226,7 +226,7 @@ const Help = () => {
       title: "Email Support",
       description: "Primary support method - get help via email",
       icon: Mail,
-      action: "support@fitclients.com",
+              action: "support@fitclients.io",
       type: "email",
       responseTime: "24 hours",
       availability: "24/7",
@@ -659,7 +659,7 @@ const Help = () => {
           }, 1000);
           break;
         case "priority":
-          window.location.href = `mailto:sales@fitclients.com?subject=Priority Support Inquiry`;
+          window.location.href = `mailto:support@fitclients.io?subject=Priority Support Inquiry`;
           break;
         default:
           // Unknown contact type - handle gracefully
@@ -966,7 +966,7 @@ const Help = () => {
                   </div>
                 </div>
                 <div className="mt-8">
-                  <Button variant="outline" onClick={() => window.location.href = 'mailto:support@fitclients.com?subject=Resource Request'}>
+                  <Button variant="outline" onClick={() => window.location.href = 'mailto:support@fitclients.io?subject=Resource Request'}>
                     <Mail className="h-4 w-4 mr-2" />
                     Request Specific Resources
                   </Button>
@@ -1004,7 +1004,7 @@ const Help = () => {
                   <p className="text-sm text-muted-foreground mb-3">
                     Get personalized help from our support team
                   </p>
-                  <Button variant="outline" size="sm" onClick={() => window.location.href = 'mailto:support@fitclients.com'}>
+                  <Button variant="outline" size="sm" onClick={() => window.location.href = 'mailto:support@fitclients.io'}>
                     Contact Support
                       </Button>
                 </div>
@@ -1238,10 +1238,10 @@ const Help = () => {
                     <div className="text-center text-sm text-muted-foreground">
                       <p>Having trouble? Contact us directly at{' '}
                         <a 
-                          href="mailto:support@fitclients.com" 
+                          href="mailto:support@fitclients.io" 
                           className="text-blue-600 hover:underline"
                         >
-                          support@fitclients.com
+                          support@fitclients.io
                         </a>
                       </p>
                   </div>

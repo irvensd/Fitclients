@@ -16,11 +16,11 @@ const StaffOnlyRoute = ({ children }: { children: React.ReactNode }) => {
   
   // Only allow FitClient staff emails
   const isStaff = user?.email && [
-    'support@fitclients.com',
-    'admin@fitclients.com',
-    'dev@fitclients.com',
-    'staff@fitclients.com',
-    'demo@fitclients.com' // Temporary for testing
+    'support@fitclients.io',
+    'admin@fitclients.io',
+    'dev@fitclients.io',
+    'staff@fitclients.io',
+    'demo@fitclients.io' // Temporary for testing
   ].includes(user.email);
   
   if (!isStaff) {
@@ -46,6 +46,10 @@ import TrialTest from "./pages/TrialTest";
 import Onboarding from "./pages/Onboarding";
 import ClientPortal from "./pages/ClientPortal";
 import ClientPortalManager from "./pages/ClientPortalManager";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Contact from "./pages/Contact";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 
 // Landing page redirect component
@@ -76,17 +80,21 @@ const App = () => {
   console.log('App component rendering...');
   
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <DataProvider>
-          <SubscriptionProvider>
-            <Routes>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <DataProvider>
+            <SubscriptionProvider>
+              <Routes>
               {/* Public routes */}
               <Route path="/" element={<LandingRedirect />} />
               <Route path="/landing" element={<LandingRedirect />} />
               <Route path="/login" element={<Login />} />
               <Route path="/support-login" element={<SupportLogin />} />
               <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/contact" element={<Contact />} />
               
                             {/* Protected routes with layout */}
               <Route element={<ProtectedLayout />}>
@@ -118,6 +126,7 @@ const App = () => {
         </DataProvider>
       </AuthProvider>
     </BrowserRouter>
+    </ErrorBoundary>
   );
 };
 

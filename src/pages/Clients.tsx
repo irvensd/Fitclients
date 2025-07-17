@@ -375,7 +375,7 @@ const DeleteClientDialog = ({
           <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={client.avatar} />
+                <AvatarImage src={client.avatar} alt={client.name} />
                 <AvatarFallback className="text-sm font-semibold">
                   {client.name
                     .split(" ")

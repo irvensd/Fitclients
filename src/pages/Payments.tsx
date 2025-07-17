@@ -57,6 +57,7 @@ import { Payment } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { DemoPaymentBanner } from "@/components/DemoPaymentBanner";
 
 const getStatusBorderColor = (status: string) => {
   switch (status) {
@@ -572,6 +573,9 @@ const Payments = () => {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Demo Payment Banner */}
+      <DemoPaymentBanner variant="compact" />
+      
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

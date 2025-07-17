@@ -59,6 +59,7 @@ import { billingHistoryService } from "@/lib/firebaseService";
 import { useAuth } from "@/contexts/AuthContext";
 import { BillingHistory as BillingHistoryType } from "@/lib/types";
 import "@/lib/resetSubscription";
+import { DemoPaymentBanner } from "@/components/DemoPaymentBanner";
 
 // Real payment methods will be loaded from Stripe
 const mockPaymentMethods: any[] = [];
@@ -689,6 +690,9 @@ const Billing = () => {
 
   return (
     <div className="space-y-6">
+      {/* Demo Payment Banner */}
+      <DemoPaymentBanner />
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">

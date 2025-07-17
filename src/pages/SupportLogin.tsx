@@ -24,11 +24,11 @@ const SupportLogin = () => {
     try {
       // Check if email is authorized for support portal
       const authorizedEmails = [
-        'support@fitclients.com',
-        'admin@fitclients.com',
-        'dev@fitclients.com',
-        'staff@fitclients.com',
-        'demo@fitclients.com' // Temporary for testing
+        'support@fitclients.io',
+        'admin@fitclients.io',
+        'dev@fitclients.io',
+        'staff@fitclients.io',
+        'demo@fitclients.io' // Temporary for testing
       ];
 
       if (!authorizedEmails.includes(email.toLowerCase())) {
@@ -73,7 +73,7 @@ const SupportLogin = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="support@fitclients.com"
+                  placeholder="support@fitclients.io"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required

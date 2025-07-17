@@ -51,8 +51,8 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Redirect to onboarding if needed (except if already on onboarding page)
-  if (needsOnboarding && location.pathname !== "/onboarding") {
+  // Redirect to onboarding if needed (except if already on onboarding page or demo user)
+  if (needsOnboarding && location.pathname !== "/onboarding" && !isDemoUser) {
     return <Navigate to="/onboarding" replace />;
   }
 

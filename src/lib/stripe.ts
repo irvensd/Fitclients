@@ -1,6 +1,7 @@
 import { loadStripe } from "@stripe/stripe-js";
 
 // Initialize Stripe
+// Note: This is using demo/test keys. Replace with production keys when ready.
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 export { stripePromise };
@@ -152,17 +153,18 @@ export const createCheckoutSession = async (planId: string, userId: string) => {
     }
 
     return session;
-  } catch (error) {
-    // For demo purposes, simulate a successful checkout without external redirect
-    // Demo mode: Would redirect to Stripe checkout
+      } catch (error) {
+      // DEMO MODE: Simulate a successful checkout without external redirect
+      // In production, this would redirect to Stripe checkout
+      console.log('Demo mode: Simulating Stripe checkout session');
 
-    // Simulate a successful checkout session creation
-    return {
-      url: `/billing?demo=true&plan=${planId}`,
-      sessionId: `demo_session_${Date.now()}`,
-      isDemoMode: true,
-    };
-  }
+      // Simulate a successful checkout session creation
+      return {
+        url: `/billing?demo=true&plan=${planId}`,
+        sessionId: `demo_session_${Date.now()}`,
+        isDemoMode: true,
+      };
+    }
 };
 
 export const cancelSubscription = async (subscriptionId: string) => {
