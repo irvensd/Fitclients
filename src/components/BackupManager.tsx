@@ -65,7 +65,6 @@ export const BackupManager = ({ onDataChange }: BackupManagerProps) => {
       const userBackups = await backupService.listBackups(user.uid);
       setBackups(userBackups);
     } catch (error) {
-      console.error('Error loading backups:', error);
       toast({
         title: "Error",
         description: "Failed to load backups",
@@ -89,7 +88,6 @@ export const BackupManager = ({ onDataChange }: BackupManagerProps) => {
         description: `Exported ${backupData.metadata.totalClients} clients, ${backupData.metadata.totalSessions} sessions, and ${backupData.metadata.totalPayments} payments`,
       });
     } catch (error) {
-      console.error('Export error:', error);
       toast({
         title: "Export Failed",
         description: error instanceof Error ? error.message : "Unknown error occurred",
@@ -115,7 +113,6 @@ export const BackupManager = ({ onDataChange }: BackupManagerProps) => {
       // Refresh backups list
       await loadBackups();
     } catch (error) {
-      console.error('Backup creation error:', error);
       toast({
         title: "Backup Failed",
         description: error instanceof Error ? error.message : "Unknown error occurred",
@@ -182,7 +179,6 @@ export const BackupManager = ({ onDataChange }: BackupManagerProps) => {
       setImportPreview(null);
       
     } catch (error) {
-      console.error('Import error:', error);
       toast({
         title: "Import Failed",
         description: error instanceof Error ? error.message : "Unknown error occurred",
@@ -223,7 +219,6 @@ export const BackupManager = ({ onDataChange }: BackupManagerProps) => {
         });
       }
     } catch (error) {
-      console.error('Restore error:', error);
       toast({
         title: "Restore Failed",
         description: error instanceof Error ? error.message : "Unknown error occurred",
@@ -249,7 +244,6 @@ export const BackupManager = ({ onDataChange }: BackupManagerProps) => {
       // Refresh backups list
       await loadBackups();
     } catch (error) {
-      console.error('Delete backup error:', error);
       toast({
         title: "Delete Failed",
         description: error instanceof Error ? error.message : "Unknown error occurred",

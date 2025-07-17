@@ -57,7 +57,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   React.useEffect(() => {
     // Set a timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
-      console.log("Auth timeout - setting loading to false");
       setLoading(false);
     }, 1000); // Reduced timeout to 1 second
 
@@ -329,18 +328,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           await new Promise(resolve => setTimeout(resolve, 500));
           
           try {
-            console.log("Loading user profile for UID:", user.uid);
-            console.log("User email:", user.email);
-            console.log("User displayName:", user.displayName);
-            
             const profile = await userProfileService.getUserProfile(user.uid);
-            console.log("Loaded user profile:", profile);
-            
             if (profile) {
               setUserProfile(profile);
             } else {
               // If profile doesn't exist, create it with basic info
-              console.log("No profile found, creating default profile");
               if (user.email) {
                 const nameParts = user.displayName?.split(' ') || ['', ''];
                 const newProfileData = {
@@ -349,13 +341,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                   lastName: nameParts.slice(1).join(' ') || '',
                   displayName: user.displayName || '',
                 };
-                console.log("Creating profile with data:", newProfileData);
-                
                 await userProfileService.createUserProfile(user.uid, newProfileData);
-                
                 // Try loading again
                 const newProfile = await userProfileService.getUserProfile(user.uid);
-                console.log("Newly created profile:", newProfile);
                 setUserProfile(newProfile);
               }
             }

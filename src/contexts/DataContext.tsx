@@ -124,41 +124,35 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
               status: doc.data().status || { isActive: true },
             })) as ClientWithStatus[];
             setClients(fetchedClients);
-            console.log('Clients loaded:', fetchedClients.length, 'clients');
             checkAllLoaded();
           }, (err) => { console.error("Clients snapshot error:", err); setError("Failed to load clients."); }),
 
           onSnapshot(collections.sessions, (snapshot) => {
             const fetchedSessions = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<Session, 'id'>), id: doc.id })) as Session[];
             setSessions(fetchedSessions);
-            console.log('Sessions loaded:', fetchedSessions.length, 'sessions');
             checkAllLoaded();
           }, (err) => { console.error("Sessions snapshot error:", err); setError("Failed to load sessions."); }),
 
           onSnapshot(collections.payments, (snapshot) => {
             const fetchedPayments = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<Payment, 'id'>), id: doc.id })) as Payment[];
             setPayments(fetchedPayments);
-            console.log('Payments loaded:', fetchedPayments.length, 'payments');
             checkAllLoaded();
           }, (err) => { console.error("Payments snapshot error:", err); setError("Failed to load payments."); }),
           
           onSnapshot(collections.workoutPlans, (snapshot) => {
             const fetchedPlans = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<WorkoutPlan, 'id'>), id: doc.id })) as WorkoutPlan[];
             setWorkoutPlans(fetchedPlans);
-            console.log('WorkoutPlans loaded:', fetchedPlans.length, 'plans');
             checkAllLoaded();
           }, (err) => { console.error("WorkoutPlans snapshot error:", err); setError("Failed to load workout plans."); }),
           
           onSnapshot(collections.progressEntries, (snapshot) => {
             const fetchedEntries = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<ProgressEntry, 'id'>), id: doc.id })) as ProgressEntry[];
             setProgressEntries(fetchedEntries);
-            console.log('ProgressEntries loaded:', fetchedEntries.length, 'entries');
             checkAllLoaded();
           }, (err) => { console.error("ProgressEntries snapshot error:", err); setError("Failed to load progress entries."); }),
         ];
 
         return () => {
-          console.log(`Cleaning up Firestore listeners for user: ${user.uid}`);
           unsubscribes.forEach(unsub => unsub());
         };
       }
@@ -306,19 +300,9 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   };
   
   const addProgressEntry = async (entry: Omit<ProgressEntry, "id">): Promise<ProgressEntry> => {
-    console.log("addProgressEntry called with:", entry);
-    console.log("isDemo:", isDemo);
-    console.log("user:", user);
-    
     if (isDemo) {
-      console.log("Adding progress entry to demo state");
       const newEntry = { ...entry, id: `mock-${Date.now()}` };
-      setProgressEntries(prev => {
-        console.log("Previous progress entries:", prev);
-        const updated = [...prev, newEntry];
-        console.log("Updated progress entries:", updated);
-        return updated;
-      });
+      setProgressEntries(prev => [...prev, newEntry]);
       return newEntry;
     }
     
@@ -328,9 +312,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
     }
     
     try {
-      console.log("Adding progress entry to Firestore");
       const docRef = await addDoc(collection(db, "users", user.uid, "progressEntries"), entry);
-      console.log("Progress entry added to Firestore with ID:", docRef.id);
       return { ...entry, id: docRef.id };
     } catch (error) {
       console.error("Firestore error in addProgressEntry:", error);

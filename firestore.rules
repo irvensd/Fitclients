@@ -1,66 +1,51 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow authenticated users to access their own data
-    // Using user UID as the document ID
+    // Users collection - authenticated users can access their own data
     match /users/{userId} {
-      allow read, write, create: if request.auth != null &&
-        request.auth.uid == userId;
+      allow read, write, create: if request.auth != null && request.auth.uid == userId;
 
-      // Allow access to subcollections (clients, sessions, payments, workoutPlans)
+      // Allow access to subcollections (clients, sessions, payments, workoutPlans, progressEntries)
       // Only the owner user can access their subcollections
       match /{collection}/{document} {
-        allow read, write, create, delete: if request.auth != null &&
-          request.auth.uid == userId;
+        allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
       }
     }
 
-    // Trainers collection - authenticated trainers can access their own data
-    match /trainers/{trainerId} {
-      allow read, write, create: if request.auth != null &&
-        (request.auth.uid == trainerId || request.auth.token.email == trainerId);
+    // Support tickets - authenticated users can create tickets
+    // Support staff can read and update all tickets
+    match /supportTickets/{ticketId} {
+      allow create: if request.auth != null;
+      allow read, update: if request.auth != null && 
+        (request.auth.uid == resource.data.userId ||
+         request.auth.token.email in [
+           'support@fitclients.com',
+           'admin@fitclients.com',
+           'dev@fitclients.com',
+           'staff@fitclients.com'
+         ]);
+    }
 
-      // Marketing subcollections for trainers
-      match /campaigns/{campaignId} {
-        allow read, write, create, delete: if request.auth != null &&
-          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
-      }
+    // System Alerts - for support portal monitoring (support staff only)
+    match /systemAlerts/{alertId} {
+      allow read, write: if request.auth != null &&
+        request.auth.token.email in [
+          'support@fitclients.com',
+          'admin@fitclients.com',
+          'dev@fitclients.com',
+          'staff@fitclients.com'
+        ];
+    }
 
-      match /leads/{leadId} {
-        allow read, write, create, delete: if request.auth != null &&
-          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
-      }
-
-      match /referralLinks/{referralId} {
-        allow read, write, create, delete: if request.auth != null &&
-          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
-      }
-
-      match /socialPosts/{postId} {
-        allow read, write, create, delete: if request.auth != null &&
-          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
-      }
-
-      match /emailCampaigns/{campaignId} {
-        allow read, write, create, delete: if request.auth != null &&
-          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
-      }
-
-      match /marketingAssets/{assetId} {
-        allow read, write, create, delete: if request.auth != null &&
-          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
-      }
-
-      match /testimonials/{testimonialId} {
-        allow read, write, create, delete: if request.auth != null &&
-          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
-      }
-
-      // Other existing subcollections
-      match /{collection}/{document} {
-        allow read, write, create, delete: if request.auth != null &&
-          (request.auth.uid == trainerId || request.auth.token.email == trainerId);
-      }
+    // Error Logs - for support portal debugging (support staff only)
+    match /errorLogs/{logId} {
+      allow read, write: if request.auth != null &&
+        request.auth.token.email in [
+          'support@fitclients.com',
+          'admin@fitclients.com',
+          'dev@fitclients.com',
+          'staff@fitclients.com'
+        ];
     }
 
     // Referrals collection - authenticated users can read/write
@@ -68,70 +53,9 @@ service cloud.firestore {
       allow read, write, create: if request.auth != null;
     }
 
-    // sessionRecaps - only authenticated users can access
-    match /sessionRecaps/{recapId} {
-      allow read, write: if request.auth != null;
-    }
-
-    // Workout plans - only authenticated users can access
-    match /workoutPlans/{planId} {
-      allow read, write: if request.auth != null;
-    }
-
-    // Progress entries - only authenticated users can access
-    match /progressEntries/{entryId} {
-      allow read, write: if request.auth != null;
-    }
-
-    // Payments - only authenticated users can access
-    match /payments/{paymentId} {
-      allow read, write: if request.auth != null;
-    }
-
-    // Support tickets - authenticated users can create tickets
-    // Support staff (with custom claims) can read and update all tickets
-    match /supportTickets/{ticketId} {
-      allow create: if request.auth != null;
-      allow read, update: if request.auth != null && 
-        (request.auth.uid == resource.data.userId || 
-         request.auth.token.supportStaff == true);
-    }
-
-    // System Alerts - for support portal monitoring
-    match /systemAlerts/{alertId} {
-      // TEMPORARY: Allow all operations for support portal
-      // TODO: Implement proper Firebase auth for support portal
-      allow read, write: if true;
-    }
-
-    // Users - for support portal user monitoring
-    match /users/{userId} {
-      // Support staff can read user data for monitoring
-      allow read: if request.auth != null && 
-        (request.auth.token.email == resource.data.email || 
-         request.auth.token.email in ['support@fitclients.com', 'admin@fitclients.com', 'dev@fitclients.com', 'staff@fitclients.com']);
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // User Profiles - for support portal user monitoring
-    match /userProfiles/{profileId} {
-      // Support staff can read user profiles for monitoring
-      allow read: if request.auth != null && 
-        (request.auth.uid == profileId || 
-         request.auth.token.email in ['support@fitclients.com', 'admin@fitclients.com', 'dev@fitclients.com', 'staff@fitclients.com']);
-      allow write: if request.auth != null && request.auth.uid == profileId;
-    }
-
-    // Error Logs - for support portal debugging
-    match /errorLogs/{logId} {
-      // TEMPORARY: Allow all operations for support portal
-      // TODO: Implement proper Firebase auth for support portal
-      allow read, write: if true;
-    }
-
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;
     }
   }
-}
+} 

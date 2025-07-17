@@ -51,8 +51,6 @@ class BackupService {
    */
   async exportUserData(userId: string, userEmail: string): Promise<BackupData> {
     try {
-      console.log('Starting data export for user:', userId);
-
       // Fetch all data from Firestore
       const [clients, sessions, payments, workoutPlans, progressEntries] = await Promise.all([
         this.fetchCollection(`users/${userId}/clients`),
@@ -90,7 +88,6 @@ class BackupService {
       const jsonString = JSON.stringify(backupData, null, 2);
       backupData.metadata.backupSize = new Blob([jsonString]).size;
 
-      console.log('Data export completed:', backupData.metadata);
       return backupData;
 
     } catch (error) {
@@ -116,7 +113,6 @@ class BackupService {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      console.log('Backup downloaded successfully');
     } catch (error) {
       console.error('Error downloading backup:', error);
       throw new Error(`Failed to download backup: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -154,15 +150,12 @@ class BackupService {
     };
 
     try {
-      console.log('Starting data import for user:', userId);
-
       // Validate backup data
       if (!this.validateBackupData(backupData)) {
         throw new Error('Invalid backup data format');
       }
 
       if (options.validateOnly) {
-        console.log('Validation only - no data imported');
         return results;
       }
 
@@ -272,7 +265,6 @@ class BackupService {
         downloadUrl: backupRef.id
       });
 
-      console.log('Automated backup created:', backupId);
       return backupId;
 
     } catch (error) {
@@ -373,7 +365,6 @@ class BackupService {
   async deleteBackup(backupId: string): Promise<void> {
     try {
       await deleteDoc(doc(db, "backups", backupId));
-      console.log('Backup deleted:', backupId);
     } catch (error) {
       console.error('Error deleting backup:', error);
       throw new Error(`Failed to delete backup: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -429,7 +420,6 @@ class BackupService {
         });
         
         await batch.commit();
-        console.log(`Cleared ${collectionName} collection`);
       } catch (error) {
         console.error(`Error clearing ${collectionName}:`, error);
       }

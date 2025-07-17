@@ -12,6 +12,8 @@ import {
   doc,
   updateDoc,
   limit,
+  getDocs,
+  writeBatch,
 } from "firebase/firestore";
 import { auth } from "./firebase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -248,10 +250,39 @@ class AINotificationManager {
 
   // Mark all as read
   async markAllAsRead(): Promise<void> {
-    // This is more complex with Firestore, requires a batch write or cloud function.
-    // For now, we will mark a few recent ones as read on the client-side triggered query.
-    // A proper implementation would be fetching all unread and batch updating them.
-    console.warn("markAllAsRead is not fully implemented for Firestore yet.");
+    if (!this.userId) {
+      console.warn("User not set, cannot mark notifications as read.");
+      return;
+    }
+
+    try {
+      // Get all unread notifications
+      const unreadQuery = query(
+        this.notificationsCollection,
+        where("read", "==", false),
+        orderBy("timestamp", "desc")
+      );
+      
+      const unreadSnapshot = await getDocs(unreadQuery);
+      
+      if (unreadSnapshot.empty) {
+        return; // No unread notifications to mark
+      }
+
+      // Use batch write to update all unread notifications
+      const batch = writeBatch(this.db);
+      
+      unreadSnapshot.docs.forEach(doc => {
+        batch.update(doc.ref, { read: true });
+      });
+      
+      await batch.commit();
+      
+      console.log(`Marked ${unreadSnapshot.size} notifications as read`);
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      throw new Error("Failed to mark notifications as read");
+    }
   }
 
   // Update settings

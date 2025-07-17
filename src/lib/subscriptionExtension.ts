@@ -39,7 +39,6 @@ export const subscriptionExtensionService = {
         subscriptionExtensions: updatedExtensions,
       });
 
-      console.log(`Applied free month to user ${userId}`);
       return true;
     } catch (error) {
       console.error("Error applying free month:", error);
@@ -102,7 +101,6 @@ export const subscriptionExtensionService = {
         subscriptionExtensions: updatedExtensions,
       });
 
-      console.log(`Used free month for user ${userId}`);
       return true;
     } catch (error) {
       console.error("Error using free month:", error);

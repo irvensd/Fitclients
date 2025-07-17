@@ -641,7 +641,6 @@ export const referralService = {
       try {
         await subscriptionExtensionService.applyFreeMonth(referrerId);
         await subscriptionExtensionService.applyFreeMonth(referredUserId);
-        console.log("Free months applied to both users");
       } catch (extensionError) {
         console.error("Error applying free months:", extensionError);
         // Don't fail the referral completion if extension fails

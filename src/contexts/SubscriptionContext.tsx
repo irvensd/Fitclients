@@ -49,10 +49,8 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          console.log("Loaded subscription from localStorage:", parsed);
           return parsed;
         } catch {
-          console.log("Failed to parse localStorage subscription data");
           // Fall through to default
         }
       }
@@ -80,7 +78,6 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
   // Update subscription when user profile loads with selected plan
   React.useEffect(() => {
     if (userProfile?.selectedPlan && subscription?.currentPlan !== userProfile.selectedPlan) {
-      console.log("Updating subscription from user profile:", userProfile.selectedPlan);
       const newSubscription = {
         ...subscription,
         currentPlan: userProfile.selectedPlan,
@@ -125,9 +122,7 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
 
   const getCurrentPlan = () => {
     const planId = subscription?.currentPlan || "starter"; // Default to starter, not free
-    console.log("getCurrentPlan - subscription?.currentPlan:", subscription?.currentPlan, "planId:", planId);
     const plan = Object.values(SUBSCRIPTION_PLANS).find((p) => p.id === planId);
-    console.log("getCurrentPlan - found plan:", plan);
     return plan || SUBSCRIPTION_PLANS.STARTER;
   };
 
@@ -166,7 +161,6 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
 
   const refreshSubscription = async () => {
     // In a real app, this would fetch the latest subscription data from the server
-    console.log("Refreshing subscription data...");
     
     try {
       // Reload subscription data from localStorage
@@ -174,10 +168,9 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          console.log("Refreshed subscription from localStorage:", parsed);
           setSubscription(parsed);
         } catch {
-          console.log("Failed to parse localStorage subscription data during refresh");
+          //
         }
       }
       
@@ -186,7 +179,6 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const userProfile = await userProfileService.getUserProfile(user.uid);
           if (userProfile?.selectedPlan && subscription?.currentPlan !== userProfile.selectedPlan) {
-            console.log("Updating subscription from user profile during refresh:", userProfile.selectedPlan);
             const newSubscription = {
               ...subscription,
               currentPlan: userProfile.selectedPlan,
@@ -195,11 +187,11 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
             localStorage.setItem("subscription_data", JSON.stringify(newSubscription));
           }
         } catch (error) {
-          console.error("Error refreshing subscription from user profile:", error);
+          //
         }
       }
     } catch (error) {
-      console.error("Error refreshing subscription:", error);
+      //
     }
   };
 
@@ -222,7 +214,6 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
     setSubscription(newSubscription);
     // Persist to localStorage
     localStorage.setItem("subscription_data", JSON.stringify(newSubscription));
-    console.log(`Subscription updated to ${planId} plan`);
 
     // Save the selected plan to the user's profile in Firestore and update local state
     if (userId) {
@@ -234,9 +225,8 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
         if (updateUserProfile) {
           await updateUserProfile({ selectedPlan: planId });
         }
-        console.log(`Updated user profile with selected plan: ${planId}`);
       } catch (error) {
-        console.error("Error updating user profile with selected plan:", error);
+        //
       }
     }
 
@@ -262,16 +252,15 @@ const SubscriptionProvider = ({ children }: { children: React.ReactNode }) => {
               if (!querySnapshot.empty) {
                 const referralDoc = querySnapshot.docs[0];
                 await referralService.completeReferral(referralDoc.id, planId);
-                console.log("Referral completed and rewards granted");
               }
             }
           } catch (error) {
-            console.error("Error completing referral:", error);
+            //
           }
         }
       }
     } catch (error) {
-      console.error("Error initializing billing history:", error);
+      //
     }
   };
 

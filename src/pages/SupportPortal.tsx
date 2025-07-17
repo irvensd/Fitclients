@@ -396,80 +396,67 @@ const SupportPortal = () => {
       // Load real user data instead of mock client environments
       const loadRealUserData = async () => {
         try {
-          console.log('Loading real user data for support portal...');
-          
           // Get all users from Firestore - users are stored with UID as document ID
           const usersQuery = query(collection(db, "users"));
           const usersSnapshot = await getDocs(usersQuery);
           
-          console.log(`Found ${usersSnapshot.docs.length} users in Firestore`);
-          
           // Transform users into RealUserEnvironment format
           const realUserEnvironments: RealUserEnvironment[] = usersSnapshot.docs.map(doc => {
             const userData = doc.data();
-            console.log('Processing user:', doc.id, userData);
-            
-            // Get user profile data (stored in the same document)
             const userProfile = userData;
             const issues = 0; // TODO: Count support tickets per user
-            
-            // Calculate data usage based on user's data (simplified)
             const dataUsage = Math.random() * 2 + 0.1; // Mock calculation
-            
-            // Determine subscription from user profile
             const subscription = userProfile?.selectedPlan || "starter";
-            
-            // Determine status based on user activity
             const lastLogin = userProfile?.lastLogin ? new Date(userProfile.lastLogin) : new Date();
-            const isActive = lastLogin > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Active if logged in within 7 days
+            const isActive = lastLogin > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
             const status = userProfile?.emailVerified 
               ? (isActive ? "active" : "inactive")
               : "pending";
             
             return {
               id: doc.id,
-              email: userProfile?.email || userData.email || "",
-              displayName: userProfile?.displayName || userProfile?.firstName + " " + userProfile?.lastName || userData.email || "Unknown User",
-              environment: "production",
+              email: userProfile?.email || doc.id,
+              displayName: userProfile?.firstName && userProfile?.lastName 
+                ? `${userProfile.firstName} ${userProfile.lastName}` 
+                : userProfile?.businessName || userProfile?.email || 'Unknown User',
+              environment: "production" as const,
               status,
               lastLogin,
               subscription,
-              clientCount: 1, // Individual user
-              dataUsage: Number(dataUsage.toFixed(2)),
+              clientCount: userProfile?.clientCount || 0,
+              dataUsage,
               issues,
-              supportTier: issues > 5 ? "priority" : "standard",
+              supportTier: "standard" as const,
               healthMetrics: {
                 uptime: 99.9,
-                responseTime: Math.floor(Math.random() * 200) + 50,
-                errorRate: Math.random() * 0.5,
+                responseTime: 150,
+                errorRate: 0.1,
                 lastHealthCheck: new Date()
               },
               recentActivity: [
                 {
                   type: 'login',
                   timestamp: lastLogin,
-                  description: 'User login to dashboard'
+                  description: 'User logged in'
                 }
               ],
-              userProfile: userProfile ? {
-                firstName: userProfile.firstName || "",
-                lastName: userProfile.lastName || "",
-                businessName: userProfile.businessName,
-                phone: userProfile.phone,
-                createdAt: userProfile.createdAt || userData.createdAt,
-                lastLogin: userProfile.lastLogin,
-                selectedPlan: userProfile.selectedPlan,
-                referralCode: userProfile.referralCode,
-                totalReferrals: userProfile.totalReferrals || 0,
-                freeMonthsEarned: userProfile.freeMonthsEarned || 0
-              } : undefined
+              userProfile: {
+                firstName: userProfile?.firstName || '',
+                lastName: userProfile?.lastName || '',
+                businessName: userProfile?.businessName || '',
+                phone: userProfile?.phone || '',
+                createdAt: userProfile?.createdAt || new Date().toISOString(),
+                lastLogin: userProfile?.lastLogin || new Date().toISOString(),
+                selectedPlan: userProfile?.selectedPlan || 'starter',
+                referralCode: userProfile?.referralCode || '',
+                totalReferrals: userProfile?.totalReferrals || 0,
+                freeMonthsEarned: userProfile?.freeMonthsEarned || 0
+              }
             };
           });
           
-          console.log('Processed user environments:', realUserEnvironments);
           setClientEnvironments(realUserEnvironments);
           setEnvironmentsLoading(false);
-          setEnvironmentsError(null);
         } catch (error) {
           console.error('Error loading real user data:', error);
           setEnvironmentsError('Failed to load user data: ' + (error instanceof Error ? error.message : 'Unknown error'));
@@ -848,32 +835,15 @@ const SupportPortal = () => {
   // Debug function to check user data
   const debugUserData = async () => {
     try {
-      console.log('=== DEBUG: Checking User Data ===');
-      
       // Check users collection
       const usersQuery = query(collection(db, "users"));
       const usersSnapshot = await getDocs(usersQuery);
-      console.log(`Found ${usersSnapshot.docs.length} users in 'users' collection`);
-      
-      usersSnapshot.docs.forEach((doc, index) => {
-        console.log(`User ${index + 1}:`, {
-          id: doc.id,
-          data: doc.data()
-        });
-      });
-      
       // Check if we're authenticated
-      console.log('Current user:', user);
-      console.log('User email:', user?.email);
-      
       // Test support staff access
       const testUser = usersSnapshot.docs[0];
       if (testUser) {
-        console.log('Testing access to first user:', testUser.id);
         const userData = testUser.data();
-        console.log('User data accessible:', userData);
       }
-      
     } catch (error) {
       console.error('Debug error:', error);
     }
@@ -1158,14 +1128,11 @@ const SupportPortal = () => {
       // Get all error logs
       const q = query(collection(db, "errorLogs"));
       const snapshot = await getDocs(q);
-      
       // Delete each log
       const deletePromises = snapshot.docs.map(doc => 
         deleteDoc(doc.ref)
       );
-      
       await Promise.all(deletePromises);
-      console.log('All error logs cleared');
     } catch (error) {
       console.error('Error clearing logs:', error);
     }
