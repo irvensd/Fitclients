@@ -96,8 +96,22 @@ export const mockApi = {
         // Count active users (logged in within last 24 hours)
         const activeCount = usersSnapshot.docs.filter(doc => {
           const lastLogin = doc.data().lastLogin;
-          if (lastLogin && lastLogin.toDate) {
-            return lastLogin.toDate() > oneDayAgo;
+          if (lastLogin) {
+            let loginDate: Date;
+            
+            // Handle both Firestore timestamps and string dates
+            if (lastLogin.toDate && typeof lastLogin.toDate === 'function') {
+              // Firestore timestamp
+              loginDate = lastLogin.toDate();
+            } else if (typeof lastLogin === 'string') {
+              // String date
+              loginDate = new Date(lastLogin);
+            } else {
+              return false;
+            }
+            
+            // Check if login was within last 24 hours
+            return loginDate > oneDayAgo;
           }
           return false;
         }).length;

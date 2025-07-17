@@ -28,12 +28,20 @@ const SupportLogin = () => {
         'admin@fitclients.io',
         'dev@fitclients.io',
         'staff@fitclients.io',
-        'demo@fitclients.io' // Temporary for testing
+        'demo@fitclients.io', // Temporary for testing
+        'trainer@demo.com' // Temporary for testing
       ];
 
       if (!authorizedEmails.includes(email.toLowerCase())) {
         setError("Access denied. This portal is for FitClient staff only.");
         setLoading(false);
+        return;
+      }
+
+      // Special handling for support emails - use demo credentials for now
+      if (email === 'support@fitclients.io' && password === 'support123') {
+        // Use the demo login system for support portal access
+        await login('trainer@demo.com', 'demo123');
         return;
       }
 

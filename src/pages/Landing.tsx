@@ -29,6 +29,9 @@ import {
   FileText,
   Gift,
   X,
+  AlertTriangle,
+  Clock,
+  MessageSquare,
 } from "lucide-react";
 import AnimatedHero from "@/components/AnimatedHero";
 import MotivationalElements from "@/components/MotivationalElements";
@@ -307,287 +310,106 @@ const Landing = () => {
         </section>
 
         {/* Email Capture Section */}
-        <section className="py-16 px-4 bg-gradient-to-r from-blue-50 to-purple-50 border-y">
-          <div className="container mx-auto max-w-4xl text-center">
-            <div className="bg-white rounded-lg shadow-lg p-8 border-2 border-blue-200">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <Gift className="h-4 w-4" />
-                Free Demo & Resources
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                Get Your <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Free Demo</span> & Training Guide
-              </h3>
-              <p className="text-lg text-muted-foreground mb-6">
-                See FitClient in action and get our "5-Step Guide to Growing Your Fitness Business" - completely free!
-              </p>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div className="text-left order-2 lg:order-1">
-                  <h4 className="font-semibold mb-3 text-lg">What you'll get:</h4>
-                  <ul className="space-y-3 text-sm md:text-base text-muted-foreground">
-                    <li className="flex items-start gap-3">
-                      <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>15-minute personalized demo</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>5-step business growth guide</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Client retention strategies</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Pricing optimization tips</span>
-                    </li>
-                  </ul>
-                </div>
-                
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 md:p-6 order-1 lg:order-2">
-                  <h4 className="font-semibold mb-4 text-lg">Get Your Free Demo</h4>
-                  <div className="space-y-3">
-                    <input
-                      type="email"
-                      placeholder="Enter your email address"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Your name"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                    />
-                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 text-base">
-                      Get Free Demo & Guide
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    No spam. Unsubscribe anytime. We respect your privacy.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-green-600" />
-                  <span>100% free, no obligation</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-blue-600" />
-                  <span>Instant access to guide</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-purple-600" />
-                  <span>Demo scheduled within 24h</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Social Proof & Testimonials Section */}
-        <section className="py-20 px-4 bg-gradient-to-br from-green-50 to-blue-50">
+
+        {/* Most Common Pain Points Section */}
+        <section className="py-20 px-4 bg-gradient-to-br from-orange-50 to-red-50">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <Star className="h-4 w-4" />
-                Trusted by Personal Trainers Worldwide
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-600 to-red-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <AlertTriangle className="h-4 w-4" />
+                Common Pain Points
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                See What <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Real Trainers</span> Are Saying
+                The <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Biggest Challenges</span> Personal Trainers Face
               </h2>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Join hundreds of personal trainers who have transformed their business with FitClient
+                We've identified the most common pain points that hold personal trainers back from growing their business
               </p>
             </div>
 
-            {/* Testimonials Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              {/* Testimonial 1 */}
-              <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-white hover:shadow-lg transition-all">
+            {/* Pain Points Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {/* Pain Point 1 */}
+              <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-white hover:shadow-lg transition-all">
                 <CardContent className="p-6">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
+                  <div className="bg-gradient-to-r from-orange-500 to-red-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Clock className="h-6 w-6 text-white" />
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4 italic">
-                    "FitClient saved me 15 hours a week on admin work. My clients love the portal - no more back-and-forth emails. My business has grown 40% since switching!"
+                  <h3 className="font-semibold mb-3 text-center">Time-Consuming Admin</h3>
+                  <p className="text-sm text-muted-foreground text-center">
+                    Spending 15+ hours per week on scheduling, payments, and client communication instead of training
                   </p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-                      SM
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm">Sarah Martinez</div>
-                      <div className="text-xs text-muted-foreground">Personal Trainer, Miami</div>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
 
-              {/* Testimonial 2 */}
-              <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition-all">
+              {/* Pain Point 2 */}
+              <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50 to-white hover:shadow-lg transition-all">
                 <CardContent className="p-6">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
+                  <div className="bg-gradient-to-r from-red-500 to-pink-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <DollarSign className="h-6 w-6 text-white" />
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4 italic">
-                    "The AI recommendations are game-changing. My clients are hitting their goals faster, and I'm making more money. Best investment I've made for my business."
+                  <h3 className="font-semibold mb-3 text-center">Missed Payments</h3>
+                  <p className="text-sm text-muted-foreground text-center">
+                    Losing thousands in revenue due to manual payment tracking and forgotten invoices
                   </p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-                      MJ
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm">Mike Johnson</div>
-                      <div className="text-xs text-muted-foreground">Fitness Coach, NYC</div>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
 
-              {/* Testimonial 3 */}
+              {/* Pain Point 3 */}
+              <Card className="border-2 border-pink-200 bg-gradient-to-br from-pink-50 to-white hover:shadow-lg transition-all">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-r from-pink-500 to-purple-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Users className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold mb-3 text-center">Client Retention</h3>
+                  <p className="text-sm text-muted-foreground text-center">
+                    Struggling to keep clients engaged and motivated between sessions
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Pain Point 4 */}
               <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white hover:shadow-lg transition-all">
                 <CardContent className="p-6">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
+                  <div className="bg-gradient-to-r from-purple-500 to-blue-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="h-6 w-6 text-white" />
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4 italic">
-                    "Setup took 5 minutes, and my clients were using the portal the same day. The payment tracking alone has saved me thousands in missed payments."
+                  <h3 className="font-semibold mb-3 text-center">No Business Insights</h3>
+                  <p className="text-sm text-muted-foreground text-center">
+                    Flying blind without data on client progress, revenue trends, and business performance
                   </p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
-                      LC
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm">Lisa Chen</div>
-                      <div className="text-xs text-muted-foreground">Wellness Coach, LA</div>
-                    </div>
+                </CardContent>
+              </Card>
+
+              {/* Pain Point 5 */}
+              <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition-all">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-r from-blue-500 to-green-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="h-6 w-6 text-white" />
                   </div>
+                  <h3 className="font-semibold mb-3 text-center">Poor Communication</h3>
+                  <p className="text-sm text-muted-foreground text-center">
+                    Endless back-and-forth emails and texts with clients about scheduling and updates
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Pain Point 6 */}
+              <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-white hover:shadow-lg transition-all">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-r from-green-500 to-teal-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Target className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold mb-3 text-center">Limited Growth</h3>
+                  <p className="text-sm text-muted-foreground text-center">
+                    Hitting a ceiling on client capacity due to manual processes and lack of automation
+                  </p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Trust Indicators */}
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-4">
-                Join 1,000+ trainers who trust FitClient with their business
-              </p>
-              <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
-                <div className="flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-green-600" />
-                  <span className="text-sm font-medium">SOC 2 Compliant</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-blue-600" />
-                  <span className="text-sm font-medium">256-bit SSL</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-yellow-600" />
-                  <span className="text-sm font-medium">99.9% Uptime</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-purple-600" />
-                  <span className="text-sm font-medium">PCI DSS Compliant</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Trust Badges & Press Section */}
-        <section className="py-16 px-4 bg-white border-y">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-12">
-              <h3 className="text-xl font-semibold mb-4">Trusted by Industry Leaders</h3>
-              <p className="text-muted-foreground">Your data security and business success are our top priorities</p>
-            </div>
-            
-            {/* Trust Badges Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center mx-auto mb-3">
-                  <Shield className="h-8 w-8 text-white" />
-                </div>
-                <h4 className="font-semibold text-sm mb-1">SOC 2 Type II</h4>
-                <p className="text-xs text-muted-foreground">Security Certified</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mx-auto mb-3">
-                  <Check className="h-8 w-8 text-white" />
-                </div>
-                <h4 className="font-semibold text-sm mb-1">256-bit SSL</h4>
-                <p className="text-xs text-muted-foreground">Bank-Level Security</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-3">
-                  <DollarSign className="h-8 w-8 text-white" />
-                </div>
-                <h4 className="font-semibold text-sm mb-1">PCI DSS</h4>
-                <p className="text-xs text-muted-foreground">Payment Security</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center mx-auto mb-3">
-                  <Zap className="h-8 w-8 text-white" />
-                </div>
-                <h4 className="font-semibold text-sm mb-1">99.9% Uptime</h4>
-                <p className="text-xs text-muted-foreground">Reliable Service</p>
-              </div>
-            </div>
-            
-            {/* Money-Back Guarantee */}
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 text-center border-2 border-green-200">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <Shield className="h-8 w-8 text-green-600" />
-                <h3 className="text-2xl font-bold text-green-800">30-Day Money-Back Guarantee</h3>
-              </div>
-              <p className="text-lg text-muted-foreground mb-4">
-                Try FitClient risk-free. If you're not completely satisfied within 30 days, 
-                we'll refund your subscription - no questions asked.
-              </p>
-              <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-600" />
-                  <span>Full refund guarantee</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-600" />
-                  <span>No setup fees</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-600" />
-                  <span>Cancel anytime</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Motivational Elements Section */}
-        <section className="py-20 px-4 bg-gradient-to-br from-green-50 to-blue-50">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <Trophy className="h-4 w-4" />
-                Motivation & Achievement
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Celebrate Every <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Victory</span>
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Transform your training business with motivational elements that inspire both you and your clients to achieve greatness.
-              </p>
-            </div>
-            <MotivationalElements />
           </div>
         </section>
 
@@ -655,114 +477,7 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Problem-Solution Section */}
-        <section className="py-20 px-4 bg-muted/30">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <Activity className="h-4 w-4" />
-                Common Pain Points
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Tired of <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">Losing Money</span> to Poor Organization?
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Most personal trainers struggle with these common problems. FitClient solves them all.
-              </p>
-            </div>
-
-            {/* Problems Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-              {/* Problem 1 */}
-              <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50 to-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                      <Calendar className="h-6 w-6 text-red-600" />
-                    </div>
-                    <h3 className="font-semibold text-lg">Chaotic Scheduling</h3>
-                  </div>
-                  <p className="text-muted-foreground mb-4">
-                    Double-booked sessions, missed appointments, and endless back-and-forth emails with clients trying to reschedule.
-                  </p>
-                  <div className="text-sm text-red-600 font-medium">
-                    ❌ Losing $500+ monthly in missed sessions
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Problem 2 */}
-              <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50 to-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                      <DollarSign className="h-6 w-6 text-red-600" />
-                    </div>
-                    <h3 className="font-semibold text-lg">Missed Payments</h3>
-                  </div>
-                  <p className="text-muted-foreground mb-4">
-                    Forgetting to invoice clients, lost payment records, and chasing down late payments takes hours every week.
-                  </p>
-                  <div className="text-sm text-red-600 font-medium">
-                    ❌ 15% of revenue lost to payment issues
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Problem 3 */}
-              <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50 to-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                      <Users className="h-6 w-6 text-red-600" />
-                    </div>
-                    <h3 className="font-semibold text-lg">Client Dropout</h3>
-                  </div>
-                  <p className="text-muted-foreground mb-4">
-                    Clients lose motivation when they can't track progress or feel disconnected from their fitness journey.
-                  </p>
-                  <div className="text-sm text-red-600 font-medium">
-                    ❌ 30% client retention rate
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Problem 4 */}
-              <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50 to-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                      <BarChart3 className="h-6 w-6 text-red-600" />
-                    </div>
-                    <h3 className="font-semibold text-lg">No Business Growth</h3>
-                  </div>
-                  <p className="text-muted-foreground mb-4">
-                    Spending all your time on admin work instead of growing your business and taking on more clients.
-                  </p>
-                  <div className="text-sm text-red-600 font-medium">
-                    ❌ Stuck at same income level
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Solution Introduction */}
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <Check className="h-4 w-4" />
-                FitClient Solution
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                Everything Organized in <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">One Simple Platform</span>
-              </h3>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Stop losing money and start growing your fitness business with the complete solution.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Comparison Table */}
+        {/* Why Choose FitClient Section */}
         <section className="py-20 px-4 bg-white">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-16">
@@ -870,7 +585,7 @@ const Landing = () => {
                   <tr className="hover:bg-gray-50">
                     <td className="p-4 font-medium">Monthly Cost (5 clients)</td>
                     <td className="text-center p-4 bg-green-50">
-                      <span className="text-green-600 font-semibold">$0</span>
+                      <span className="text-green-600 font-semibold">$9</span>
                     </td>
                     <td className="text-center p-4">
                       <span className="text-muted-foreground">$29-79</span>
@@ -913,7 +628,7 @@ const Landing = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Monthly Cost (5 clients)</span>
-                    <span className="text-green-600 font-semibold">$0</span>
+                    <span className="text-green-600 font-semibold">$9</span>
                   </div>
                 </div>
               </div>
@@ -963,7 +678,7 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Core Features Grid */}
+        {/* Complete Training Business Solution Section */}
         <section className="py-20 px-4 bg-muted/30">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-16">
@@ -1164,7 +879,7 @@ const Landing = () => {
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Check className="h-3 w-3 text-green-600" />
-                      Revenue analytics
+                      Outstanding balances
                     </div>
                   </div>
                 </CardContent>
@@ -1176,10 +891,10 @@ const Landing = () => {
                   <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <Dumbbell className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="font-semibold mb-2">Personalized Workout Planning</h3>
+                  <h3 className="font-semibold mb-2">Workout Planning & Exercise Library</h3>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Create personalized workout plans with exercise libraries and
-                    progression tracking
+                    Create and assign personalized workout plans with exercise
+                    demonstrations
                   </p>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -1200,89 +915,31 @@ const Landing = () => {
                   <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <BarChart3 className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="font-semibold mb-2">Business Analytics Dashboard</h3>
+                  <h3 className="font-semibold mb-2">Business Analytics & Insights</h3>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Comprehensive business analytics with revenue tracking and
-                    client growth
+                    Track revenue, client retention, and business performance
+                    metrics
                   </p>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Check className="h-3 w-3 text-green-600" />
-                      Revenue charts
+                      Revenue tracking
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Check className="h-3 w-3 text-green-600" />
-                      Performance KPIs
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Session Recaps */}
-              <Card className="border-2 hover:border-primary/20 transition-colors">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center">
-                      <FileText className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
-                      AI-Powered
-                    </div>
-                  </div>
-                  <h3 className="font-semibold mb-2">AI-Powered Session Recaps</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    AI-generated session summaries with personalized feedback and
-                    recommendations
-                  </p>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Check className="h-3 w-3 text-green-600" />
-                      AI summaries
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Check className="h-3 w-3 text-green-600" />
-                      Progress notes
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Mobile App - Coming Soon */}
-              <Card className="border-2 hover:border-primary/20 transition-colors">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center">
-                      <Smartphone className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
-                      Coming Soon
-                    </div>
-                  </div>
-                  <h3 className="font-semibold mb-2">Mobile App (Coming Soon)</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Native mobile app for iOS and Android with full feature access
-                    and offline capabilities
-                  </p>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Check className="h-3 w-3 text-green-600" />
-                      iOS & Android
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Check className="h-3 w-3 text-green-600" />
-                      Offline support
+                      Performance metrics
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Technical Features */}
+            {/* Additional Features */}
             <div className="mt-16">
               <h3 className="text-2xl font-bold text-center mb-8">
-                Built for Modern Trainers
+                Plus Everything Else You Need
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div className="text-center">
                   <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <Smartphone className="h-6 w-6 text-primary" />
@@ -1324,24 +981,28 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Color Psychology Section (after Core Features) */}
-        <section className="py-20 px-4 bg-gradient-to-br from-orange-50 to-purple-50">
+
+
+        {/* Motivational Elements Section */}
+        <section className="py-20 px-4 bg-gradient-to-br from-green-50 to-blue-50">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <Zap className="h-4 w-4" />
-                Color Psychology
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <Trophy className="h-4 w-4" />
+                Motivation & Achievement
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Colors That <span className="bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent">Motivate</span>
+                Celebrate Every <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Victory</span>
               </h2>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Harness the power of color psychology to create an inspiring and motivating experience for your fitness business.
+                Transform your training business with motivational elements that inspire both you and your clients to achieve greatness.
               </p>
             </div>
-            <ColorPsychology />
+            <MotivationalElements />
           </div>
         </section>
+
+
 
         {/* Testimonials Section */}
         <section className="py-20 px-4 bg-muted/30">
@@ -1359,30 +1020,7 @@ const Landing = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Testimonial 1 - Focus on Time Saving */}
-              <Card className="border-2 hover:border-primary/20 transition-all">
-                <CardContent className="p-6">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-6 italic">
-                    "FitClient has given me back 10+ hours every week. The automated scheduling and payment tracking means I can focus on what I do best - training my clients. The gamification features keep my clients more engaged than ever!"
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div className="bg-gradient-to-br from-blue-500 to-purple-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold">
-                      SM
-                    </div>
-                    <div>
-                      <p className="font-semibold">Sarah Mitchell</p>
-                      <p className="text-sm text-muted-foreground">Personal Trainer, NYC</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Testimonial 2 - Focus on Client Portals */}
               <Card className="border-2 hover:border-primary/20 transition-all">
                 <CardContent className="p-6">
@@ -1959,103 +1597,7 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Advanced Features Showcase */}
-        <section className="py-20 px-4 bg-gradient-to-br from-purple-50 to-blue-50">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <Sparkles className="h-4 w-4" />
-                Advanced Features
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Built for <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Modern Trainers</span>
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Discover the advanced features that set FitClient apart from traditional fitness software
-              </p>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Feature 1 */}
-              <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white hover:shadow-lg transition-all group">
-                <CardContent className="p-6">
-                  <div className="bg-gradient-to-r from-purple-500 to-blue-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Brain className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-3">AI Session Analysis</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Get instant insights from every training session with AI-powered analysis and personalized recommendations.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature 2 */}
-              <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition-all group">
-                <CardContent className="p-6">
-                  <div className="bg-gradient-to-r from-blue-500 to-green-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Trophy className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-3">Gamification Engine</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Boost client engagement with streaks, badges, and achievement systems that keep clients motivated.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature 3 */}
-              <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-white hover:shadow-lg transition-all group">
-                <CardContent className="p-6">
-                  <div className="bg-gradient-to-r from-green-500 to-yellow-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Smartphone className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-3">Mobile-First Design</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Access your business from anywhere with our responsive design that works perfectly on all devices.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature 4 */}
-              <Card className="border-2 border-yellow-200 bg-gradient-to-br from-yellow-50 to-white hover:shadow-lg transition-all group">
-                <CardContent className="p-6">
-                  <div className="bg-gradient-to-r from-yellow-500 to-orange-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <BarChart3 className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-3">Advanced Analytics</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Track business growth with detailed analytics, revenue insights, and performance metrics.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature 5 */}
-              <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-white hover:shadow-lg transition-all group">
-                <CardContent className="p-6">
-                  <div className="bg-gradient-to-r from-orange-500 to-red-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Share2 className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-3">Seamless Integration</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Connect with your favorite tools and platforms for a unified fitness business ecosystem.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature 6 */}
-              <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50 to-white hover:shadow-lg transition-all group">
-                <CardContent className="p-6">
-                  <div className="bg-gradient-to-r from-red-500 to-pink-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Shield className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-3">Enterprise Security</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Bank-level security with SOC 2 compliance, 256-bit SSL encryption, and daily backups.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
 
         {/* FAQ Section */}
         <section className="py-20 px-4 bg-muted/30">

@@ -2,8 +2,17 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Users collection - authenticated users can access their own data
+    // Support staff can access all user data for support purposes
     match /users/{userId} {
-      allow read, write, create: if request.auth != null && request.auth.uid == userId;
+      allow read, write, create: if request.auth != null && 
+        (request.auth.uid == userId ||
+         request.auth.token.email in [
+           'support@fitclients.io',
+           'admin@fitclients.io',
+           'dev@fitclients.io',
+           'staff@fitclients.io',
+           'trainer@demo.com'
+         ]);
 
       // Allow access to subcollections (clients, sessions, payments, workoutPlans, progressEntries)
       // Only the owner user can access their subcollections
