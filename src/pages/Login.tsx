@@ -146,34 +146,34 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       {/* Hero Section with Value Proposition */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 text-white py-8 px-4">
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 text-white py-6 sm:py-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 sm:mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm">
-                <Zap className="h-7 w-7" />
+              <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm">
+                <Zap className="h-6 w-6 sm:h-7 sm:w-7" />
               </div>
-              <span className="text-3xl font-bold">FitClient</span>
+              <span className="text-2xl sm:text-3xl font-bold">FitClient</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
               Stop Losing Clients to <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Poor Organization</span>
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-6 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl md:text-2xl text-blue-100 mb-4 sm:mb-6 max-w-3xl mx-auto px-2">
               Built for personal trainers. Track sessions, clients, and payments in one place.
             </p>
             
             {/* Trust Indicators */}
-            <div className="flex flex-wrap justify-center items-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-green-300" />
+            <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-6 text-xs sm:text-sm">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-300" />
                 <span>14-day free trial</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-blue-300" />
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-blue-300" />
                 <span>30-day guarantee</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-yellow-300" />
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-300" />
                 <span>5 min setup</span>
               </div>
             </div>
@@ -182,24 +182,24 @@ const Login = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8 items-start">
+      <div className="max-w-6xl mx-auto px-4 py-6 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
           
           {/* Left Column - Login Form */}
-          <div className="w-full max-w-md mx-auto">
+          <div className="w-full max-w-md mx-auto order-2 lg:order-1">
             {/* Header */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-6 sm:mb-8">
               <Link
                 to="/"
-                className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
+                className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 sm:mb-6"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to home
               </Link>
-              <h2 className="text-2xl font-bold">
+              <h2 className="text-xl sm:text-2xl font-bold">
                 {mode === "login" ? "Trainer Login" : mode === "register" ? "Create Trainer Account" : "Reset Password"}
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 {mode === "login"
                   ? "Access your personal training dashboard"
                   : mode === "register"
@@ -486,88 +486,35 @@ const Login = () => {
           </div>
 
           {/* Right Column - Features Preview */}
-          <div className="lg:col-span-1">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-bold mb-4">Why FitClient?</h3>
-              <ul className="space-y-3 text-muted-foreground">
+          <div className="lg:col-span-1 order-1 lg:order-2">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg">
+              <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Why FitClient?</h3>
+              <ul className="space-y-2 sm:space-y-3 text-sm sm:text-base text-muted-foreground">
                 <li className="flex items-start">
-                  <Sparkles className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2 sm:mr-3 flex-shrink-0 mt-0.5" />
                   <span>Seamless client management</span>
                 </li>
                 <li className="flex items-start">
-                  <Target className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <Target className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2 sm:mr-3 flex-shrink-0 mt-0.5" />
                   <span>Clear, actionable goals</span>
                 </li>
                 <li className="flex items-start">
-                  <Calendar className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2 sm:mr-3 flex-shrink-0 mt-0.5" />
                   <span>Track sessions and progress</span>
                 </li>
                 <li className="flex items-start">
-                  <DollarSign className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2 sm:mr-3 flex-shrink-0 mt-0.5" />
                   <span>Effortless payment processing</span>
                 </li>
                 <li className="flex items-start">
-                  <Users className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2 sm:mr-3 flex-shrink-0 mt-0.5" />
                   <span>Built-in client communication</span>
                 </li>
                 <li className="flex items-start">
-                  <TrendingUp className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2 sm:mr-3 flex-shrink-0 mt-0.5" />
                   <span>Scalable and customizable</span>
                 </li>
               </ul>
-            </div>
-
-            {/* Testimonials */}
-            <div className="mt-6 bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-lg border border-green-200">
-              <h4 className="font-semibold text-green-800 mb-4">What Trainers Say</h4>
-              <div className="space-y-4">
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <div className="flex items-center gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-700 mb-2">
-                    "FitClient transformed how I manage my training business. Everything is organized and my clients love the portal!"
-                  </p>
-                  <p className="text-xs text-gray-500">- Sarah M., Personal Trainer</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <div className="flex items-center gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-700 mb-2">
-                    "Finally, a CRM that actually understands what personal trainers need. The AI recommendations are game-changing."
-                  </p>
-                  <p className="text-xs text-gray-500">- Mike R., Fitness Coach</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Trust Stats */}
-            <div className="mt-6 grid grid-cols-2 gap-4 text-center">
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <div className="text-2xl font-bold text-primary">500+</div>
-                <p className="text-sm text-muted-foreground">Active Trainers</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <div className="text-2xl font-bold text-primary">4.8★</div>
-                <p className="text-sm text-muted-foreground">Average Rating</p>
-              </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="mt-6 grid grid-cols-2 gap-4 text-center">
-              <div className="p-4">
-                <div className="text-2xl font-bold text-primary">24/7</div>
-                <p className="text-sm text-muted-foreground">Access Anywhere</p>
-              </div>
-              <div className="p-4">
-                <div className="text-2xl font-bold text-primary">5min</div>
-                <p className="text-sm text-muted-foreground">Quick Setup</p>
-              </div>
             </div>
           </div>
         </div>
