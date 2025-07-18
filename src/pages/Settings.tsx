@@ -54,6 +54,7 @@ import {
 import { SubscriptionManager } from "@/components/SubscriptionManager";
 import { BackupManager } from "@/components/BackupManager";
 import { ReferralDashboard } from "@/components/ReferralDashboard";
+import { DatabasePerformanceMonitor } from "@/components/DatabasePerformanceMonitor";
 import Billing from "@/pages/Billing";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -64,6 +65,7 @@ import { UserProfile, OperatingHours, Certification, Pricing, Package } from "@/
 const Settings = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("profile");
+  const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false);
 
   const [notifications, setNotifications] = useState({
     emailReminders: true,
@@ -550,6 +552,16 @@ const Settings = () => {
           >
             <Database className="h-4 w-4" />
             Backup
+          </button>
+          
+          <Separator className="my-2" />
+          
+          <button
+            onClick={() => setShowPerformanceMonitor(true)}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-muted"
+          >
+            <SettingsIcon className="h-4 w-4" />
+            Database Performance
           </button>
           
           <button
@@ -1656,6 +1668,12 @@ const Settings = () => {
         )}
         </div>
       </div>
+      
+      {/* Database Performance Monitor */}
+      <DatabasePerformanceMonitor
+        isOpen={showPerformanceMonitor}
+        onClose={() => setShowPerformanceMonitor(false)}
+      />
     </div>
   );
 };
