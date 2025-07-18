@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Zap, ArrowLeft, Check, X, Gift } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Zap, ArrowLeft, Check, X, Gift, Users, Calendar, DollarSign, Star, Shield, Sparkles, Target, TrendingUp } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import PlanSelectionModal from "@/components/PlanSelectionModal";
@@ -143,320 +144,431 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to home
-          </Link>
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Zap className="h-6 w-6" />
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted">
+      {/* Hero Section with Value Proposition */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 text-white py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm">
+                <Zap className="h-7 w-7" />
+              </div>
+              <span className="text-3xl font-bold">FitClient</span>
             </div>
-            <span className="text-2xl font-bold">FitClient</span>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Stop Losing Clients to <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Poor Organization</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-blue-100 mb-6 max-w-3xl mx-auto">
+              Built for personal trainers. Track sessions, clients, and payments in one place.
+            </p>
+            
+            {/* Trust Indicators */}
+            <div className="flex flex-wrap justify-center items-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-green-300" />
+                <span>14-day free trial</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-blue-300" />
+                <span>30-day guarantee</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-yellow-300" />
+                <span>5 min setup</span>
+              </div>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold">
-            {mode === "login" ? "Trainer Login" : mode === "register" ? "Create Trainer Account" : "Reset Password"}
-          </h1>
-          <p className="text-muted-foreground">
-            {mode === "login"
-              ? "Access your personal training dashboard"
-              : mode === "register"
-              ? "Set up your FitClient trainer account"
-              : "Enter your email to receive a password reset link"}
-          </p>
         </div>
+      </div>
 
-        {/* Login Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {mode === "login" ? "Welcome Back" : mode === "register" ? "Create Your Account" : "Reset Your Password"}
-            </CardTitle>
-            <CardDescription>
-              {mode === "login"
-                ? "Sign in to manage your clients and sessions"
-                : mode === "register"
-                ? "Join FitClient and start managing your training business"
-                : "We'll send you a link to reset your password"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {mode === "reset" ? (
-              <form onSubmit={handlePasswordReset} className="space-y-4">
-                {resetEmailSent ? (
-                  <div className="text-center space-y-4">
-                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <h3 className="font-semibold text-green-800 mb-2">Email Sent!</h3>
-                      <p className="text-sm text-green-700">
-                        We've sent a password reset link to <strong>{email}</strong>. 
-                        Check your email and click the link to reset your password.
-                      </p>
-                    </div>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setMode("login")}
-                      className="w-full"
-                    >
-                      Back to Login
-                    </Button>
-                  </div>
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-2 gap-8 items-start">
+          
+          {/* Left Column - Login Form */}
+          <div className="w-full max-w-md mx-auto">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <Link
+                to="/"
+                className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to home
+              </Link>
+              <h2 className="text-2xl font-bold">
+                {mode === "login" ? "Trainer Login" : mode === "register" ? "Create Trainer Account" : "Reset Password"}
+              </h2>
+              <p className="text-muted-foreground">
+                {mode === "login"
+                  ? "Access your personal training dashboard"
+                  : mode === "register"
+                  ? "Set up your FitClient trainer account"
+                  : "Enter your email to receive a password reset link"}
+              </p>
+            </div>
+
+            {/* Login Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  {mode === "login" ? "Welcome Back" : mode === "register" ? "Create Your Account" : "Reset Your Password"}
+                </CardTitle>
+                <CardDescription>
+                  {mode === "login"
+                    ? "Sign in to manage your clients and sessions"
+                    : mode === "register"
+                    ? "Join FitClient and start managing your training business"
+                    : "We'll send you a link to reset your password"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {mode === "reset" ? (
+                  <form onSubmit={handlePasswordReset} className="space-y-4">
+                    {resetEmailSent ? (
+                      <div className="text-center space-y-4">
+                        <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                          <h3 className="font-semibold text-green-800 mb-2">Email Sent!</h3>
+                          <p className="text-sm text-green-700">
+                            We've sent a password reset link to <strong>{email}</strong>. 
+                            Check your email and click the link to reset your password.
+                          </p>
+                        </div>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => setMode("login")}
+                          className="w-full"
+                        >
+                          Back to Login
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="reset-email">Email Address</Label>
+                          <Input
+                            id="reset-email"
+                            type="email"
+                            placeholder="trainer@email.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+
+                        <Button
+                          type="submit"
+                          className="w-full"
+                          disabled={resetLoading || !email}
+                        >
+                          {resetLoading ? "Sending Reset Link..." : "Send Reset Link"}
+                        </Button>
+
+                        <div className="text-center">
+                          <button
+                            type="button"
+                            onClick={() => setMode("login")}
+                            className="text-sm text-primary hover:underline"
+                          >
+                            Back to Login
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </form>
                 ) : (
-                  <>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {authError && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{authError}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  {!isFirebaseConfigured && mode === "register" && (
+                    <Alert>
+                      <AlertDescription>
+                        🔧 Account creation requires Firebase configuration. Contact
+                        support for assistance.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {mode === "register" && (
                     <div className="space-y-2">
-                      <Label htmlFor="reset-email">Email Address</Label>
+                      <Label htmlFor="firstName">First Name</Label>
                       <Input
-                        id="reset-email"
-                        type="email"
-                        placeholder="trainer@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        id="firstName"
+                        type="text"
+                        placeholder="Your first name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
                         required
                       />
                     </div>
+                  )}
 
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={resetLoading || !email}
-                    >
-                      {resetLoading ? "Sending Reset Link..." : "Send Reset Link"}
-                    </Button>
+                  {mode === "register" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input
+                        id="lastName"
+                        type="text"
+                        placeholder="Your last name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
 
+                  {mode === "register" && referralCode && (
+                    <div className="space-y-2">
+                      <Label htmlFor="referralCode">Referral Code</Label>
+                      <div className="relative">
+                        <Input
+                          id="referralCode"
+                          type="text"
+                          placeholder="Referral code"
+                          value={referralCode}
+                          onChange={(e) => setReferralCode(e.target.value)}
+                          className="pr-10"
+                        />
+                        <Gift className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-600" />
+                      </div>
+                      <p className="text-xs text-green-600">
+                        🎉 You'll both get a free month when you subscribe!
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="trainer@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder={mode === "register" ? "Min. 8 characters" : ""}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                    
+                    {mode === "register" && password && passwordStrength && (
+                      <div className="space-y-2 mt-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">Password strength:</span>
+                          <span className={`text-xs font-medium ${
+                            passwordStrength.level === 'weak' ? 'text-red-600' :
+                            passwordStrength.level === 'medium' ? 'text-yellow-600' : 'text-green-600'
+                          }`}>
+                            {passwordStrength.level.charAt(0).toUpperCase() + passwordStrength.level.slice(1)}
+                          </span>
+                        </div>
+                        <Progress 
+                          value={passwordStrength.score} 
+                          className={`h-2 ${
+                            passwordStrength.level === 'weak' ? '[&>div]:bg-red-500' :
+                            passwordStrength.level === 'medium' ? '[&>div]:bg-yellow-500' : '[&>div]:bg-green-500'
+                          }`}
+                        />
+                        <div className="grid grid-cols-2 gap-1 text-xs">
+                          <div className={`flex items-center gap-1 ${passwordStrength.checks.length ? 'text-green-600' : 'text-gray-400'}`}>
+                            {passwordStrength.checks.length ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                            8+ characters
+                          </div>
+                          <div className={`flex items-center gap-1 ${passwordStrength.checks.lowercase ? 'text-green-600' : 'text-gray-400'}`}>
+                            {passwordStrength.checks.lowercase ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                            Lowercase
+                          </div>
+                          <div className={`flex items-center gap-1 ${passwordStrength.checks.uppercase ? 'text-green-600' : 'text-gray-400'}`}>
+                            {passwordStrength.checks.uppercase ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                            Uppercase
+                          </div>
+                          <div className={`flex items-center gap-1 ${passwordStrength.checks.number ? 'text-green-600' : 'text-gray-400'}`}>
+                            {passwordStrength.checks.number ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                            Number
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={
+                      loading || (!isFirebaseConfigured && mode === "register")
+                    }
+                  >
+                    {loading
+                      ? mode === "login"
+                        ? "Signing in..."
+                        : "Creating account..."
+                      : mode === "login"
+                        ? "Sign In"
+                        : "Create Account"}
+                  </Button>
+
+                  {mode === "login" && (
                     <div className="text-center">
                       <button
                         type="button"
-                        onClick={() => setMode("login")}
+                        onClick={() => setMode("reset")}
                         className="text-sm text-primary hover:underline"
                       >
-                        Back to Login
+                        Forgot your password?
                       </button>
                     </div>
-                  </>
+                  )}
+                </form>
                 )}
-              </form>
-            ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {authError && (
-                <Alert variant="destructive">
-                  <AlertDescription>{authError}</AlertDescription>
-                </Alert>
-              )}
 
-              {!isFirebaseConfigured && mode === "register" && (
-                <Alert>
-                  <AlertDescription>
-                    🔧 Account creation requires Firebase configuration. Contact
-                    support for assistance.
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {mode === "register" && (
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    type="text"
-                    placeholder="Your first name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    required
-                  />
-                </div>
-              )}
-
-              {mode === "register" && (
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    type="text"
-                    placeholder="Your last name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    required
-                  />
-                </div>
-              )}
-
-              {mode === "register" && referralCode && (
-                <div className="space-y-2">
-                  <Label htmlFor="referralCode">Referral Code</Label>
-                  <div className="relative">
-                    <Input
-                      id="referralCode"
-                      type="text"
-                      placeholder="Referral code"
-                      value={referralCode}
-                      onChange={(e) => setReferralCode(e.target.value)}
-                      className="pr-10"
-                    />
-                    <Gift className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-600" />
+                {/* Demo Credentials - Always Available */}
+                <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <p className="text-sm font-medium text-blue-800">
+                      Demo Account Always Available
+                    </p>
                   </div>
-                  <p className="text-xs text-green-600">
-                    🎉 You'll both get a free month when you subscribe!
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Try FitClient instantly with our demo account:
+                  </p>
+                  <div className="bg-white p-3 rounded border text-sm font-mono">
+                    <div>Email: trainer@demo.com</div>
+                    <div>Password: demo123</div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 w-full border-blue-300 text-blue-700 hover:bg-blue-50"
+                    onClick={() => {
+                      setEmail("trainer@demo.com");
+                      setPassword("demo123");
+                    }}
+                  >
+                    🚀 Use Demo Account
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    Works regardless of Firebase configuration
                   </p>
                 </div>
-              )}
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="trainer@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder={mode === "register" ? "Min. 8 characters" : ""}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                
-                {mode === "register" && password && passwordStrength && (
-                  <div className="space-y-2 mt-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">Password strength:</span>
-                      <span className={`text-xs font-medium ${
-                        passwordStrength.level === 'weak' ? 'text-red-600' :
-                        passwordStrength.level === 'medium' ? 'text-yellow-600' : 'text-green-600'
-                      }`}>
-                        {passwordStrength.level.charAt(0).toUpperCase() + passwordStrength.level.slice(1)}
-                      </span>
-                    </div>
-                    <Progress 
-                      value={passwordStrength.score} 
-                      className={`h-2 ${
-                        passwordStrength.level === 'weak' ? '[&>div]:bg-red-500' :
-                        passwordStrength.level === 'medium' ? '[&>div]:bg-yellow-500' : '[&>div]:bg-green-500'
-                      }`}
-                    />
-                    <div className="grid grid-cols-2 gap-1 text-xs">
-                      <div className={`flex items-center gap-1 ${passwordStrength.checks.length ? 'text-green-600' : 'text-gray-400'}`}>
-                        {passwordStrength.checks.length ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                        8+ characters
-                      </div>
-                      <div className={`flex items-center gap-1 ${passwordStrength.checks.lowercase ? 'text-green-600' : 'text-gray-400'}`}>
-                        {passwordStrength.checks.lowercase ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                        Lowercase
-                      </div>
-                      <div className={`flex items-center gap-1 ${passwordStrength.checks.uppercase ? 'text-green-600' : 'text-gray-400'}`}>
-                        {passwordStrength.checks.uppercase ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                        Uppercase
-                      </div>
-                      <div className={`flex items-center gap-1 ${passwordStrength.checks.number ? 'text-green-600' : 'text-gray-400'}`}>
-                        {passwordStrength.checks.number ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                        Number
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={
-                  loading || (!isFirebaseConfigured && mode === "register")
-                }
-              >
-                {loading
-                  ? mode === "login"
-                    ? "Signing in..."
-                    : "Creating account..."
-                  : mode === "login"
-                    ? "Sign In"
-                    : "Create Account"}
-              </Button>
-
-              {mode === "login" && (
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={() => setMode("reset")}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Forgot your password?
-                  </button>
+                {/* Mode Switching */}
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    {mode === "login"
+                      ? "Don't have an account? "
+                      : "Already have an account? "}
+                    <button
+                      type="button"
+                      onClick={switchMode}
+                      className="text-primary hover:underline font-medium"
+                    >
+                      {mode === "login" ? "Create one here" : "Sign in instead"}
+                    </button>
+                  </p>
                 </div>
-              )}
-            </form>
-            )}
-
-            {/* Demo Credentials - Always Available */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <p className="text-sm font-medium text-blue-800">
-                  Demo Account Always Available
-                </p>
-              </div>
-              <p className="text-sm text-muted-foreground mb-3">
-                Try FitClient instantly with our demo account:
-              </p>
-              <div className="bg-white p-3 rounded border text-sm font-mono">
-                <div>Email: trainer@demo.com</div>
-                <div>Password: demo123</div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-3 w-full border-blue-300 text-blue-700 hover:bg-blue-50"
-                onClick={() => {
-                  setEmail("trainer@demo.com");
-                  setPassword("demo123");
-                }}
-              >
-                🚀 Use Demo Account
-              </Button>
-              <p className="text-xs text-muted-foreground mt-2 text-center">
-                Works regardless of Firebase configuration
-              </p>
-            </div>
-
-            {/* Mode Switching */}
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                {mode === "login"
-                  ? "Don't have an account? "
-                  : "Already have an account? "}
-                <button
-                  type="button"
-                  onClick={switchMode}
-                  className="text-primary hover:underline font-medium"
-                >
-                  {mode === "login" ? "Create one here" : "Sign in instead"}
-                </button>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Features Preview */}
-        <div className="mt-8 grid grid-cols-2 gap-4 text-center">
-          <div className="p-4">
-            <div className="text-2xl font-bold text-primary">24/7</div>
-            <p className="text-sm text-muted-foreground">Access Anywhere</p>
+              </CardContent>
+            </Card>
           </div>
-          <div className="p-4">
-            <div className="text-2xl font-bold text-primary">5min</div>
-            <p className="text-sm text-muted-foreground">Quick Setup</p>
+
+          {/* Right Column - Features Preview */}
+          <div className="lg:col-span-1">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-bold mb-4">Why FitClient?</h3>
+              <ul className="space-y-3 text-muted-foreground">
+                <li className="flex items-start">
+                  <Sparkles className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <span>Seamless client management</span>
+                </li>
+                <li className="flex items-start">
+                  <Target className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <span>Clear, actionable goals</span>
+                </li>
+                <li className="flex items-start">
+                  <Calendar className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <span>Track sessions and progress</span>
+                </li>
+                <li className="flex items-start">
+                  <DollarSign className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <span>Effortless payment processing</span>
+                </li>
+                <li className="flex items-start">
+                  <Users className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <span>Built-in client communication</span>
+                </li>
+                <li className="flex items-start">
+                  <TrendingUp className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <span>Scalable and customizable</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Testimonials */}
+            <div className="mt-6 bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-lg border border-green-200">
+              <h4 className="font-semibold text-green-800 mb-4">What Trainers Say</h4>
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <div className="flex items-center gap-1 mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-700 mb-2">
+                    "FitClient transformed how I manage my training business. Everything is organized and my clients love the portal!"
+                  </p>
+                  <p className="text-xs text-gray-500">- Sarah M., Personal Trainer</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <div className="flex items-center gap-1 mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-700 mb-2">
+                    "Finally, a CRM that actually understands what personal trainers need. The AI recommendations are game-changing."
+                  </p>
+                  <p className="text-xs text-gray-500">- Mike R., Fitness Coach</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Trust Stats */}
+            <div className="mt-6 grid grid-cols-2 gap-4 text-center">
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <div className="text-2xl font-bold text-primary">500+</div>
+                <p className="text-sm text-muted-foreground">Active Trainers</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <div className="text-2xl font-bold text-primary">4.8★</div>
+                <p className="text-sm text-muted-foreground">Average Rating</p>
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="mt-6 grid grid-cols-2 gap-4 text-center">
+              <div className="p-4">
+                <div className="text-2xl font-bold text-primary">24/7</div>
+                <p className="text-sm text-muted-foreground">Access Anywhere</p>
+              </div>
+              <div className="p-4">
+                <div className="text-2xl font-bold text-primary">5min</div>
+                <p className="text-sm text-muted-foreground">Quick Setup</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
