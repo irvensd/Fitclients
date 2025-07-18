@@ -51,6 +51,7 @@ import {
 } from "@/lib/recommendations";
 import { useData } from "@/contexts/DataContext";
 import { useToast } from "@/hooks/use-toast";
+import { LoadingPage } from "@/components/ui/loading";
 
 const AIRecommendations = () => {
   const { clients, sessions, payments, progressEntries, loading, addAiNotesToWorkoutPlan } = useData();
@@ -101,16 +102,7 @@ const AIRecommendations = () => {
 
   // Show loading state
   if (loading) {
-    return (
-      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-        <div className="flex items-center justify-center h-48 sm:h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-sm sm:text-base text-muted-foreground">Loading AI analysis...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingPage text="Loading AI analysis..." size="lg" />;
   }
 
   // Show empty state for new accounts

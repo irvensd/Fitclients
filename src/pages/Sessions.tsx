@@ -58,6 +58,7 @@ import { SessionCalendar } from "@/components/SessionCalendar";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import { formatTime, cn } from "@/lib/utils";
 import { ServiceRestriction } from "@/components/ServiceRestriction";
+import { LoadingPage } from "@/components/ui/loading";
 
 // Add Session Dialog Component
 const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) => {
@@ -511,11 +512,7 @@ const Sessions = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LoadingPage text="Loading sessions..." />;
   }
 
   return (

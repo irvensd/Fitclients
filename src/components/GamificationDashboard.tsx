@@ -29,6 +29,7 @@ import {
   type GamificationData,
 } from "@/lib/gamification";
 import { Client } from "@/lib/types";
+import { LoadingSpinner } from "@/components/ui/loading";
 
 interface GamificationDashboardProps {
   data: GamificationData;
@@ -47,10 +48,11 @@ export const GamificationDashboard = ({
     return (
       <Card className="w-full">
         <CardContent className="pt-6">
-          <div className="flex items-center gap-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            <p className="text-sm">Loading gamification data...</p>
-          </div>
+          <LoadingSpinner 
+            size="sm" 
+            text="Loading gamification data..." 
+            className="text-center"
+          />
         </CardContent>
       </Card>
     );

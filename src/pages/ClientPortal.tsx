@@ -60,6 +60,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { userProfileService } from "@/lib/firebaseService";
 import { useToast } from "@/hooks/use-toast";
+import { LoadingScreen } from "@/components/ui/loading";
 
 const CancelSessionDialog = ({
   session,
@@ -230,11 +231,7 @@ const ClientPortal = () => {
   };
 
   if (dataLoading || !dataInitialized) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LoadingScreen text="Loading client portal..." size="lg" />;
   }
 
   if (error) {

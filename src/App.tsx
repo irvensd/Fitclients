@@ -50,6 +50,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { LoadingScreen } from "./components/ui/loading";
 
 
 // Landing page redirect component
@@ -57,9 +58,7 @@ const LandingRedirect = () => {
   const { user, loading } = useAuth();
   
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-    </div>;
+    return <LoadingScreen text="Loading..." size="lg" />;
   }
   
   return user ? <Navigate to="/dashboard" replace /> : <Landing />;

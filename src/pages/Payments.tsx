@@ -58,6 +58,7 @@ import { useData } from "@/contexts/DataContext";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { DemoPaymentBanner } from "@/components/DemoPaymentBanner";
+import { LoadingPage } from "@/components/ui/loading";
 
 const getStatusBorderColor = (status: string) => {
   switch (status) {
@@ -564,11 +565,7 @@ const Payments = () => {
     .reduce((total, p) => total + p.amount, 0);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LoadingPage text="Loading payments..." />;
   }
 
   return (

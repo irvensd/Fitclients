@@ -38,6 +38,7 @@ import {
   type Recommendation,
 } from "@/lib/recommendations";
 import { Client } from "@/lib/types";
+import { LoadingSpinner } from "@/components/ui/loading";
 
 interface SmartRecommendationsProps {
   client: Client;
@@ -83,15 +84,11 @@ export const SmartRecommendations = ({
     return (
       <Card className="w-full">
         <CardContent className="pt-6">
-          <div className="flex items-center gap-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            <div>
-              <p className="text-sm font-medium">AI analyzing client data...</p>
-              <p className="text-xs text-muted-foreground">
-                Processing progress patterns and generating insights
-              </p>
-            </div>
-          </div>
+          <LoadingSpinner 
+            size="sm" 
+            text="AI analyzing client data..." 
+            className="text-center"
+          />
         </CardContent>
       </Card>
     );

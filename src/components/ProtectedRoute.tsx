@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { LoadingScreen } from "@/components/ui/loading";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -40,11 +41,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }, [user, isDemoUser]);
 
   if (loading || checkingOnboarding) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LoadingScreen text="Loading..." />;
   }
 
   if (!user) {

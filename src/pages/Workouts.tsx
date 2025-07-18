@@ -41,6 +41,7 @@ import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
 import { doc, updateDoc, deleteDoc, addDoc, collection, getDocs } from "firebase/firestore";
 import { mockExercises, mockWorkoutPlans, mockClients } from "@/lib/mockData";
+import { LoadingPage } from "@/components/ui/loading";
 
 // Workout templates data
 const workoutTemplates = [
@@ -1149,11 +1150,7 @@ const Workouts = () => {
   };
 
   if (loading) {
-  return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-    );
+    return <LoadingPage text="Loading workouts..." />;
   }
 
   const categories = [

@@ -60,6 +60,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { BillingHistory as BillingHistoryType } from "@/lib/types";
 import "@/lib/resetSubscription";
 import { DemoPaymentBanner } from "@/components/DemoPaymentBanner";
+import { LoadingPage, LoadingSpinner } from "@/components/ui/loading";
 
 // Real payment methods will be loaded from Stripe
 const mockPaymentMethods: any[] = [];
@@ -520,8 +521,7 @@ const BillingHistoryComponent = () => {
       <CardContent>
         {loading ? (
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="text-muted-foreground mt-2">Loading billing history...</p>
+            <LoadingSpinner size="md" text="Loading billing history..." />
           </div>
         ) : billingHistory.length === 0 ? (
           <div className="text-center py-8">

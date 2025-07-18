@@ -72,6 +72,7 @@ import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { ServiceRestriction } from "@/components/ServiceRestriction";
+import { LoadingPage } from "@/components/ui/loading";
 
 const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenChange?: (open: boolean) => void; }) => {
   const [open, setOpen] = useState(false);
@@ -1345,11 +1346,7 @@ Your Personal Trainer`;
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LoadingPage text="Loading clients..." />;
   }
 
   // Show empty state only if not demo user and no clients

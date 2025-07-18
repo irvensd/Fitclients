@@ -58,6 +58,7 @@ import { BadgeReveal } from "@/components/BadgeReveal";
 import { StreakTracker } from "@/components/StreakTracker";
 import { Streak, calculateGamificationData } from "@/lib/gamification";
 import { DemoTips } from "@/components/DemoTips";
+import { LoadingScreen, LoadingPage } from "@/components/ui/loading";
 
 const SESSION_MILESTONES = [10, 25, 50, 100, 250, 500];
 const CLIENT_MILESTONES = [10, 25, 50, 100, 250, 500];
@@ -238,11 +239,7 @@ const Dashboard = () => {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LoadingScreen text="Loading dashboard..." size="lg" />;
   }
 
   // Show empty state for new users
