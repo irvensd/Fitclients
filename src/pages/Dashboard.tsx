@@ -53,6 +53,8 @@ import { StreakTracker } from "@/components/StreakTracker";
 import { Streak, calculateGamificationData } from "@/lib/gamification";
 import { DemoTips } from "@/components/DemoTips";
 import { LoadingScreen, LoadingPage, LoadingSpinner } from "@/components/ui/loading";
+import { useAnnouncement } from "@/hooks/use-keyboard-navigation";
+import { PageHeader } from "@/components/PageHeader";
 
 // Lazy load heavy chart components
 const RevenueChart = React.lazy(() => import("@/components/DashboardCharts").then(module => ({ default: module.RevenueChart })));
@@ -128,6 +130,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { announceNavigation, announceSuccess } = useAnnouncement();
   const dataContext = useData();
   const {
     clients = [],
@@ -230,6 +233,13 @@ const Dashboard = () => {
     }
   }, [sessions.length, clients.length, isDemo, celebratedMilestones]);
 
+  // Announce when dashboard loads
+  React.useEffect(() => {
+    if (!loading && !error) {
+      announceNavigation("Dashboard");
+    }
+  }, [loading, error, announceNavigation]);
+
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -246,6 +256,11 @@ const Dashboard = () => {
   if (clients.length === 0 && sessions.length === 0 && payments.length === 0) {
     return (
       <div className="p-6 space-y-6">
+        <PageHeader 
+          title="Welcome to FitClient! 🎉"
+          description="Your complete fitness business management platform. Get started by exploring the features below and adding your first client to begin your journey."
+          level={1}
+        />
         <EmptyState
           Icon={Users}
           title="Welcome to FitClient! 🎉"
@@ -279,59 +294,87 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Your fitness business overview and key metrics.
-          </p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Dashboard"
+        description="Overview of your fitness business performance and recent activity"
+        level={1}
+      />
 
       <QuickActionsWidget />
 
       {/* Demo Tips for Demo Users */}
       <DemoTips />
 
-      {/* Creative Dashboard - Motivational Elements */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-6 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2">Active Clients</h3>
-          <p className="text-3xl font-bold">{clients.length}</p>
-          <p className="text-blue-100 text-sm">Growing strong!</p>
-        </div>
-        <div className="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2">Total Sessions</h3>
-          <p className="text-3xl font-bold">{sessions.length}</p>
-          <p className="text-green-100 text-sm">Transforming lives!</p>
-        </div>
-        <div className="bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2">Revenue</h3>
-          <p className="text-3xl font-bold">
-            ${payments.reduce((sum, p) => sum + p.amount, 0).toLocaleString()}
-          </p>
-          <p className="text-orange-100 text-sm">Building success!</p>
-        </div>
-        <div className="bg-gradient-to-br from-purple-500 to-pink-600 text-white p-6 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2">Success Rate</h3>
-          <p className="text-3xl font-bold">{successRate}%</p>
-          <p className="text-purple-100 text-sm">Excellence achieved!</p>
-        </div>
-      </div>
+      {/* Stats Overview */}
+      <section aria-labelledby="stats-heading">
+        <h2 id="stats-heading" className="sr-only">Business Statistics</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" aria-label={`${stats.totalClients} total clients`}>
+                {stats.totalClients}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {stats.totalClients > 0 ? `${stats.totalClients} active clients` : 'No clients yet'}
+              </p>
+            </CardContent>
+          </Card>
 
-      {/* Streak Tracker with Celebration */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Your Streaks</h2>
-        <StreakTracker 
-          streaks={streaks} 
-          variant="card" 
-          showCelebration={true} 
-        />
-      </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">This Week</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" aria-label={`${stats.sessionsThisWeek} sessions this week`}>
+                {stats.sessionsThisWeek}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                sessions scheduled
+              </p>
+            </CardContent>
+          </Card>
 
-      {/* Analytics & Charts */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" aria-label={`$${stats.monthlyRevenue.toFixed(2)} revenue this month`}>
+                ${stats.monthlyRevenue.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                this month
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" aria-label={`${stats.pendingPayments} pending payments`}>
+                {stats.pendingPayments}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                payments due
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Charts Section */}
+      <section aria-labelledby="charts-heading">
+        <h2 id="charts-heading" className="sr-only">Analytics Charts</h2>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
           <RevenueAnalytics />
           <Suspense fallback={<LoadingSpinner />}>
             <RevenueChart />
@@ -348,6 +391,7 @@ const Dashboard = () => {
             <WeeklyActivityChart />
           </Suspense>
         </div>
+      </section>
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">

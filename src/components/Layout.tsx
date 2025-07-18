@@ -49,6 +49,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import NotificationBell from "./NotificationBell";
 import { QuickActionsWidget } from "@/components/QuickActionsWidget";
 import { DemoModeBanner } from "./DemoModeBanner";
+import { SkipNavigation } from "./SkipNavigation";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -379,6 +380,7 @@ export const Layout = ({ children }: LayoutProps) => {
 
   return (
     <div className="flex h-screen bg-background">
+      <SkipNavigation />
       <Sidebar isCollapsed={isCollapsed} onToggleCollapse={toggleCollapse} />
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Service Suspension Banner */}
@@ -389,7 +391,11 @@ export const Layout = ({ children }: LayoutProps) => {
           />
         )}
         
-        <header className="flex h-16 items-center justify-between gap-2 sm:gap-4 border-b bg-background px-3 sm:px-4 lg:px-6">
+        <header 
+          className="flex h-16 items-center justify-between gap-2 sm:gap-4 border-b bg-background px-3 sm:px-4 lg:px-6"
+          role="banner"
+          aria-label="Site header"
+        >
           <div className="flex items-center gap-2">
             <MobileSidebar />
             <BreadcrumbNav />
@@ -399,12 +405,26 @@ export const Layout = ({ children }: LayoutProps) => {
             <NotificationBell />
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
+        <main 
+          id="main-content" 
+          className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6"
+          tabIndex={-1}
+          role="main"
+          aria-label="Main content"
+        >
           <DemoModeBanner className="mb-4" />
           {children}
         </main>
       </div>
       <QuickActionsWidget />
+      
+      {/* Live region for screen reader announcements */}
+      <div
+        id="live-region"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      />
       
       {/* Trial Expiration Modal */}
       <TrialExpirationModal
