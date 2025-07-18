@@ -54,3 +54,29 @@ export const formatCancellationTime = (cancelledAt: string) => {
   if (diffDays === 1) return "Yesterday";
   return `${diffDays} days ago`;
 };
+
+/**
+ * Production-friendly logging utility
+ * Only logs in development mode to keep production console clean
+ */
+export const logger = {
+  log: (...args: any[]) => {
+    if (import.meta.env.DEV) {
+      console.log(...args);
+    }
+  },
+  warn: (...args: any[]) => {
+    if (import.meta.env.DEV) {
+      console.warn(...args);
+    }
+  },
+  error: (...args: any[]) => {
+    // Always log errors, even in production
+    console.error(...args);
+  },
+  debug: (...args: any[]) => {
+    if (import.meta.env.DEV) {
+      console.log('[DEBUG]', ...args);
+    }
+  }
+};

@@ -7,8 +7,6 @@ import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
  */
 export const fixFutureLastLoginDates = async () => {
   try {
-    console.log('Starting to fix future lastLogin dates...');
-    
     const usersSnapshot = await getDocs(collection(db, 'users'));
     const now = new Date();
     let fixedCount = 0;
@@ -31,8 +29,6 @@ export const fixFutureLastLoginDates = async () => {
         
         // Check if the date is in the future
         if (loginDate > now) {
-          console.log(`Fixing future lastLogin for user ${userDoc.id}: ${loginDate} -> ${now}`);
-          
           await updateDoc(doc(db, 'users', userDoc.id), {
             lastLogin: now.toISOString()
           });
@@ -42,7 +38,6 @@ export const fixFutureLastLoginDates = async () => {
       }
     }
     
-    console.log(`Fixed ${fixedCount} users with future lastLogin dates`);
     return fixedCount;
   } catch (error) {
     console.error('Error fixing future lastLogin dates:', error);
@@ -84,7 +79,6 @@ export const checkFutureLastLoginDates = async () => {
       }
     }
     
-    console.log(`Found ${futureDates.length} users with future lastLogin dates:`, futureDates);
     return futureDates;
   } catch (error) {
     console.error('Error checking future lastLogin dates:', error);

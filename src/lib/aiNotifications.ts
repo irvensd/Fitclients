@@ -278,7 +278,7 @@ class AINotificationManager {
       
       await batch.commit();
       
-      console.log(`Marked ${unreadSnapshot.size} notifications as read`);
+      // Marked notifications as read
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
       throw new Error("Failed to mark notifications as read");

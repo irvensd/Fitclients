@@ -596,12 +596,7 @@ const SupportPortal = () => {
       return sum;
     }, 0);
 
-    console.log('Performance metrics calculation:', {
-      totalUsers: clientEnvironments.length,
-      activeUsers,
-      systemServices: systemServices.length,
-      operationalServices
-    });
+    // Performance metrics calculated
 
     setPerformanceMetrics({
       avgResponseTime,
@@ -676,13 +671,9 @@ const SupportPortal = () => {
       // Load real user data from Firestore
       const loadRealUserData = async () => {
         try {
-          console.log('Loading real user data from Firestore...');
-          
           // Get all users from Firestore - users are stored with UID as document ID
           const usersQuery = query(collection(db, "users"));
           const usersSnapshot = await getDocs(usersQuery);
-          
-          console.log('Found', usersSnapshot.size, 'users in Firestore');
           
           // Transform users into RealUserEnvironment format
           const realUserEnvironments: RealUserEnvironment[] = usersSnapshot.docs.map(doc => {
@@ -744,13 +735,7 @@ const SupportPortal = () => {
             };
           });
           
-          console.log('Processed', realUserEnvironments.length, 'user environments');
-          console.log('Active users:', realUserEnvironments.filter(env => env.status === "active").length);
-          
-          // Debug: Show details about each user's active status
-          realUserEnvironments.forEach(env => {
-            console.log(`User ${env.email}: lastLogin=${env.lastLogin}, status=${env.status}, isActive=${env.status === "active"}`);
-          });
+          // Processed user environments
           
           setClientEnvironments(realUserEnvironments);
           setEnvironmentsLoading(false);
@@ -1373,11 +1358,9 @@ const SupportPortal = () => {
 
   const handleFixFutureDates = async () => {
     try {
-      console.log('Checking for future lastLogin dates...');
       const futureDates = await checkFutureLastLoginDates();
       
       if (futureDates.length > 0) {
-        console.log(`Found ${futureDates.length} users with future dates. Fixing...`);
         const fixedCount = await fixFutureLastLoginDates();
         alert(`Fixed ${fixedCount} users with future lastLogin dates. Refresh the page to see updated active user count.`);
       } else {
@@ -1660,7 +1643,6 @@ const SupportPortal = () => {
       // Auto-escalate critical alerts
       if (alertData.severity === 'critical') {
         // This will be handled by a cloud function or backend service
-        console.log('Critical alert created - escalation would be handled by backend');
       }
     } catch (error) {
       console.error('Error generating alert:', error);
@@ -2081,7 +2063,7 @@ const SupportPortal = () => {
                         onClick={async () => {
                           const { getHealth } = await import('@/lib/mockApi');
                           const result = await getHealth();
-                          console.log('Health Check Result:', result);
+                          // Health check completed
                           setApiResultModal({
                             show: true,
                             title: 'Health Check Results',
@@ -2098,7 +2080,7 @@ const SupportPortal = () => {
                         onClick={async () => {
                           const { getStatus } = await import('@/lib/mockApi');
                           const result = await getStatus();
-                          console.log('System Status Result:', result);
+                          // System status check completed
                           setApiResultModal({
                             show: true,
                             title: 'System Status',

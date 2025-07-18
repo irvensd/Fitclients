@@ -25,9 +25,6 @@ class AnalyticsService {
 
   track(event: AnalyticsEvent, params?: AnalyticsParams) {
     if (!this.isEnabled) {
-      if (import.meta.env.DEV) {
-        console.log(`[Analytics] ${event}`, params);
-      }
       return;
     }
     try {

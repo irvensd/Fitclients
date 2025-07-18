@@ -214,7 +214,7 @@ class BackupService {
         results.success = false;
         console.warn('Import completed with errors:', results.errors);
       } else {
-        console.log('Data import completed successfully:', results.imported);
+        // Data import completed successfully
       }
 
       return results;

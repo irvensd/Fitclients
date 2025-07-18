@@ -156,7 +156,7 @@ export const createCheckoutSession = async (planId: string, userId: string) => {
       } catch (error) {
       // DEMO MODE: Simulate a successful checkout without external redirect
       // In production, this would redirect to Stripe checkout
-      console.log('Demo mode: Simulating Stripe checkout session');
+      // Demo mode: Simulating Stripe checkout session
 
       // Simulate a successful checkout session creation
       return {

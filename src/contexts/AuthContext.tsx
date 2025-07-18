@@ -157,8 +157,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             throw new Error("Firebase is not properly configured. Please check your setup.");
           }
 
-          console.log(`Registration attempt ${retryCount + 1} for email: ${email}`);
-          
           const userCredential = await createUserWithEmailAndPassword(
             auth,
             email,
@@ -167,7 +165,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           
           if (userCredential.user) {
             await updateProfile(userCredential.user, { displayName: `${firstName} ${lastName}` });
-            console.log("Registration successful for:", email);
             
             // Create user profile in Firestore
             try {
@@ -178,11 +175,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                 displayName: `${firstName} ${lastName}`,
                 selectedPlan: planId || "starter", // Save the selected plan to the profile
               };
-              console.log("Creating user profile during registration:", profileData);
-              
               const createdProfile = await userProfileService.createUserProfile(userCredential.user.uid, profileData);
-              
-              console.log("User profile created successfully:", createdProfile);
               
               // Handle referral code if provided
               if (referralCode) {
@@ -202,7 +195,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                       referredBy: validation.referrerId,
                     });
                     
-                    console.log("Referral created successfully for:", referralCode);
+                    // Referral created successfully
                   } else {
                     console.warn("Invalid referral code:", referralCode);
                   }
@@ -220,7 +213,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                 try {
                   // Store the selected plan in localStorage for the subscription context to pick up
                   localStorage.setItem('selected_plan', planId);
-                  console.log(`User registered with plan: ${planId}`);
+                  // User registered with selected plan
                 } catch (subscriptionError) {
                   console.error("Error setting up subscription:", subscriptionError);
                   // Don't fail registration if subscription setup fails

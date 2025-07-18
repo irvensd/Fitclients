@@ -12,8 +12,6 @@ export const resetSubscriptionToDefault = () => {
     "subscription_data",
     JSON.stringify(defaultSubscription),
   );
-  console.log("Subscription reset to Professional plan");
-
   // Reload the page to reflect changes
   window.location.reload();
 };

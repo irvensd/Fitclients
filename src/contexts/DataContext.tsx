@@ -92,8 +92,6 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
         setLoading(true);
         setDataInitialized(false);
         
-        console.log(`Setting up Firestore listeners for user: ${user.uid}`);
-
         const collections = {
           clients: collection(db, "users", user.uid, "clients"),
           sessions: collection(db, "users", user.uid, "sessions"),
@@ -107,9 +105,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
 
         const checkAllLoaded = () => {
           collectionsLoaded++;
-          console.log(`Collection loaded. Count: ${collectionsLoaded}/${totalCollections}`);
           if (collectionsLoaded >= totalCollections) {
-            console.log('All collections loaded, setting loading to false');
             setDataInitialized(true);
             // Add a small delay to ensure all state updates are processed
             setTimeout(() => setLoading(false), 100);
@@ -335,9 +331,15 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   
   // These functions are not fully implemented for brevity in this refactor,
   // but they are added to satisfy the type interface.
-  const archiveClients = async (clientIds: string[], reason?: string) => console.log('archiveClients', clientIds, reason);
-  const reactivateClients = async (clientIds: string[]) => console.log('reactivateClients', clientIds);
-  const handlePlanDowngrade = async (newLimit: number, selectedActiveIds: string[]) => console.log('handlePlanDowngrade', newLimit, selectedActiveIds);
+  const archiveClients = async (clientIds: string[], reason?: string) => {
+    // TODO: Implement client archiving
+  };
+  const reactivateClients = async (clientIds: string[]) => {
+    // TODO: Implement client reactivation
+  };
+  const handlePlanDowngrade = async (newLimit: number, selectedActiveIds: string[]) => {
+    // TODO: Implement plan downgrade logic
+  };
   const getActiveClients = () => clients.filter(c => c.status.isActive);
   const getArchivedClients = () => clients.filter(c => !c.status.isActive);
 
@@ -349,9 +351,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
     // Check if workout plan exists, if not, create a default one
     const workoutPlan = workoutPlans.find(plan => plan.clientId === clientId && plan.isActive);
     if (!workoutPlan) {
-      console.warn(
-        `No active workout plan for client ${clientId}. Notes will be added to a new default plan.`,
-      );
+      // Create a new default plan when none exists
       const newPlan: WorkoutPlan = {
         id: `wp-${Date.now()}`,
         clientId,

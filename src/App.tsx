@@ -77,8 +77,6 @@ const ProtectedLayout = () => {
 };
 
 const App = () => {
-  console.log('App component rendering...');
-  
   return (
     <ErrorBoundary>
       <BrowserRouter>
