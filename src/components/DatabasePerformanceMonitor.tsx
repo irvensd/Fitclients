@@ -23,6 +23,7 @@ import {
 import { unifiedDataService } from '@/lib/unifiedDataService';
 import { optimizedFirebaseService } from '@/lib/optimizedFirebaseService';
 import { offlineStorage } from '@/lib/offlineStorage';
+import { cn } from '@/lib/utils';
 
 interface PerformanceMetrics {
   connectionState: {
@@ -180,7 +181,7 @@ export const DatabasePerformanceMonitor: React.FC<DatabasePerformanceMonitorProp
   };
 
   const getConnectionStatus = () => {
-    if (!metrics) return { status: 'unknown', color: 'gray' };
+    if (!metrics) return { status: 'unknown', color: 'gray', icon: AlertTriangle };
     
     const { isOnline, isFirebaseConnected } = metrics.connectionState;
     
@@ -273,7 +274,13 @@ export const DatabasePerformanceMonitor: React.FC<DatabasePerformanceMonitorProp
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-sm">Connection</CardTitle>
-                        <StatusIcon className={`h-4 w-4 text-${connectionStatus.color}-500`} />
+                        <StatusIcon className={cn(
+                          "h-4 w-4",
+                          connectionStatus.color === 'green' ? 'text-green-500' :
+                          connectionStatus.color === 'yellow' ? 'text-yellow-500' :
+                          connectionStatus.color === 'red' ? 'text-red-500' :
+                          'text-gray-500'
+                        )} />
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -520,4 +527,6 @@ export const DatabasePerformanceMonitor: React.FC<DatabasePerformanceMonitorProp
       </Card>
     </div>
   );
-}; 
+};
+
+export default DatabasePerformanceMonitor; 
