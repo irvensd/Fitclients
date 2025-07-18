@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, startTransition } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { DataProvider } from "./contexts/DataContext";
@@ -52,7 +52,7 @@ const StaffOnlyRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Landing page redirect component
+// Landing page redirect component with proper Suspense handling
 const LandingRedirect = () => {
   const { user, loading } = useAuth();
   
@@ -60,7 +60,16 @@ const LandingRedirect = () => {
     return <LoadingScreen text="Loading..." size="lg" />;
   }
   
-  return user ? <Navigate to="/dashboard" replace /> : <Landing />;
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  // Use startTransition to prevent Suspense errors during navigation
+  return (
+    <Suspense fallback={<LoadingScreen text="Loading..." size="lg" />}>
+      <Landing />
+    </Suspense>
+  );
 };
 
 // Protected layout wrapper with loading state
@@ -87,12 +96,36 @@ const App = () => {
                 {/* Public routes */}
                 <Route path="/" element={<LandingRedirect />} />
                 <Route path="/landing" element={<LandingRedirect />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/support-login" element={<SupportLogin />} />
-                <Route path="/onboarding" element={<Onboarding />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/contact" element={<Contact />} />
+                <Route path="/login" element={
+                  <Suspense fallback={<LoadingScreen text="Loading..." size="lg" />}>
+                    <Login />
+                  </Suspense>
+                } />
+                <Route path="/support-login" element={
+                  <Suspense fallback={<LoadingScreen text="Loading..." size="lg" />}>
+                    <SupportLogin />
+                  </Suspense>
+                } />
+                <Route path="/onboarding" element={
+                  <Suspense fallback={<LoadingScreen text="Loading..." size="lg" />}>
+                    <Onboarding />
+                  </Suspense>
+                } />
+                <Route path="/privacy" element={
+                  <Suspense fallback={<LoadingScreen text="Loading..." size="lg" />}>
+                    <Privacy />
+                  </Suspense>
+                } />
+                <Route path="/terms" element={
+                  <Suspense fallback={<LoadingScreen text="Loading..." size="lg" />}>
+                    <Terms />
+                  </Suspense>
+                } />
+                <Route path="/contact" element={
+                  <Suspense fallback={<LoadingScreen text="Loading..." size="lg" />}>
+                    <Contact />
+                  </Suspense>
+                } />
                 
                 {/* Protected routes with layout */}
                 <Route element={<ProtectedLayout />}>
@@ -142,7 +175,11 @@ const App = () => {
                 } />
                 
                 {/* Catch-all route */}
-                <Route path="*" element={<NotFound />} />
+                <Route path="*" element={
+                  <Suspense fallback={<LoadingScreen text="Loading..." size="lg" />}>
+                    <NotFound />
+                  </Suspense>
+                } />
               </Routes>
             </SubscriptionProvider>
           </DataProvider>
