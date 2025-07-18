@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "fitclients-4c5f2"
+  },
+  "targets": {
+    "fitclients-4c5f2": {
+      "hosting": {
+        "default": [
+          "fitclients-4c5f2"
+        ],
+        "custom-domain": [
+          "fitclients-io"
+        ]
+      }
+    }
   }
 }
