@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -29,12 +29,6 @@ import { NavigationButton } from "@/components/NavigationButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import {
-  RevenueChart,
-  ClientGrowthChart,
-  SessionTypeChart,
-  WeeklyActivityChart,
-} from "@/components/DashboardCharts";
-import {
   calculateDashboardStats,
   getRecentCancellations,
   getTodaysSessions,
@@ -58,7 +52,13 @@ import { BadgeReveal } from "@/components/BadgeReveal";
 import { StreakTracker } from "@/components/StreakTracker";
 import { Streak, calculateGamificationData } from "@/lib/gamification";
 import { DemoTips } from "@/components/DemoTips";
-import { LoadingScreen, LoadingPage } from "@/components/ui/loading";
+import { LoadingScreen, LoadingPage, LoadingSpinner } from "@/components/ui/loading";
+
+// Lazy load heavy chart components
+const RevenueChart = React.lazy(() => import("@/components/DashboardCharts").then(module => ({ default: module.RevenueChart })));
+const ClientGrowthChart = React.lazy(() => import("@/components/DashboardCharts").then(module => ({ default: module.ClientGrowthChart })));
+const SessionTypeChart = React.lazy(() => import("@/components/DashboardCharts").then(module => ({ default: module.SessionTypeChart })));
+const WeeklyActivityChart = React.lazy(() => import("@/components/DashboardCharts").then(module => ({ default: module.WeeklyActivityChart })));
 
 const SESSION_MILESTONES = [10, 25, 50, 100, 250, 500];
 const CLIENT_MILESTONES = [10, 25, 50, 100, 250, 500];
@@ -331,15 +331,23 @@ const Dashboard = () => {
       </div>
 
       {/* Analytics & Charts */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
-        <RevenueAnalytics />
-        <RevenueChart />
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-        <ClientGrowthChart />
-        <SessionTypeChart />
-        <WeeklyActivityChart />
-      </div>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+          <RevenueAnalytics />
+          <Suspense fallback={<LoadingSpinner />}>
+            <RevenueChart />
+          </Suspense>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+          <Suspense fallback={<LoadingSpinner />}>
+            <ClientGrowthChart />
+          </Suspense>
+          <Suspense fallback={<LoadingSpinner />}>
+            <SessionTypeChart />
+          </Suspense>
+          <Suspense fallback={<LoadingSpinner />}>
+            <WeeklyActivityChart />
+          </Suspense>
+        </div>
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">

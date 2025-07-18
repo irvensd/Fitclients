@@ -80,3 +80,86 @@ export const logger = {
     }
   }
 };
+
+/**
+ * Performance optimization utilities
+ */
+
+// Debounce function to limit how often a function can be called
+export const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: ReturnType<typeof setTimeout>;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
+// Throttle function to limit function execution rate
+export const throttle = <T extends (...args: any[]) => any>(
+  func: T,
+  limit: number
+): ((...args: Parameters<T>) => void) => {
+  let inThrottle: boolean;
+  return (...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
+};
+
+// Memoization helper for expensive calculations
+export const memoize = <T extends (...args: any[]) => any>(
+  func: T,
+  resolver?: (...args: Parameters<T>) => string
+): T => {
+  const cache = new Map<string, ReturnType<T>>();
+  
+  return ((...args: Parameters<T>) => {
+    const key = resolver ? resolver(...args) : JSON.stringify(args);
+    
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    
+    const result = func(...args);
+    cache.set(key, result);
+    return result;
+  }) as T;
+};
+
+// Intersection Observer helper for lazy loading
+export const createIntersectionObserver = (
+  callback: IntersectionObserverCallback,
+  options: IntersectionObserverInit = {}
+) => {
+  if (typeof window === 'undefined') return null;
+  
+  return new IntersectionObserver(callback, {
+    rootMargin: '50px',
+    threshold: 0.1,
+    ...options,
+  });
+};
+
+// Performance measurement helper
+export const measurePerformance = <T extends (...args: any[]) => any>(
+  name: string,
+  func: T
+): T => {
+  return ((...args: Parameters<T>) => {
+    const start = performance.now();
+    const result = func(...args);
+    const end = performance.now();
+    
+    if (import.meta.env.DEV) {
+      console.log(`⏱️ ${name}: ${(end - start).toFixed(2)}ms`);
+    }
+    
+    return result;
+  }) as T;
+};

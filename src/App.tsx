@@ -1,14 +1,36 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { DataProvider } from "./contexts/DataContext";
 import { SubscriptionProvider } from "./contexts/SubscriptionContext";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { LoadingScreen } from "./components/ui/loading";
+
+// Lazy load pages for code splitting
+const Landing = React.lazy(() => import("./pages/Landing"));
+const Login = React.lazy(() => import("./pages/Login"));
+const Dashboard = React.lazy(() => import("./pages/Dashboard"));
+const NotFound = React.lazy(() => import("./pages/NotFound"));
+const Clients = React.lazy(() => import("./pages/Clients"));
+const Sessions = React.lazy(() => import("./pages/Sessions"));
+const Workouts = React.lazy(() => import("./pages/Workouts"));
+const Payments = React.lazy(() => import("./pages/Payments"));
+const Progress = React.lazy(() => import("./pages/Progress"));
+const Settings = React.lazy(() => import("./pages/Settings"));
+const Help = React.lazy(() => import("./pages/Help"));
+const AIRecommendations = React.lazy(() => import("./pages/AIRecommendations"));
+const Features = React.lazy(() => import("./pages/Features"));
+const SupportPortal = React.lazy(() => import("./pages/SupportPortal"));
+const SupportLogin = React.lazy(() => import("./pages/SupportLogin"));
+const TrialTest = React.lazy(() => import("./pages/TrialTest"));
+const Onboarding = React.lazy(() => import("./pages/Onboarding"));
+const ClientPortal = React.lazy(() => import("./pages/ClientPortal"));
+const ClientPortalManager = React.lazy(() => import("./pages/ClientPortalManager"));
+const Privacy = React.lazy(() => import("./pages/Privacy"));
+const Terms = React.lazy(() => import("./pages/Terms"));
+const Contact = React.lazy(() => import("./pages/Contact"));
 
 // Staff-only route component
 const StaffOnlyRoute = ({ children }: { children: React.ReactNode }) => {
@@ -30,29 +52,6 @@ const StaffOnlyRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Import all the pages that the sidebar navigation needs
-import Clients from "./pages/Clients";
-import Sessions from "./pages/Sessions";
-import Workouts from "./pages/Workouts";
-import Payments from "./pages/Payments";
-import Progress from "./pages/Progress";
-import Settings from "./pages/Settings";
-import Help from "./pages/Help";
-import AIRecommendations from "./pages/AIRecommendations";
-import Features from "./pages/Features";
-import SupportPortal from "./pages/SupportPortal";
-import SupportLogin from "./pages/SupportLogin";
-import TrialTest from "./pages/TrialTest";
-import Onboarding from "./pages/Onboarding";
-import ClientPortal from "./pages/ClientPortal";
-import ClientPortalManager from "./pages/ClientPortalManager";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import Contact from "./pages/Contact";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { LoadingScreen } from "./components/ui/loading";
-
-
 // Landing page redirect component
 const LandingRedirect = () => {
   const { user, loading } = useAuth();
@@ -64,12 +63,14 @@ const LandingRedirect = () => {
   return user ? <Navigate to="/dashboard" replace /> : <Landing />;
 };
 
-// Layout wrapper component for protected routes
+// Protected layout wrapper with loading state
 const ProtectedLayout = () => {
   return (
     <ProtectedRoute>
       <Layout>
-        <Outlet />
+        <Suspense fallback={<LoadingScreen text="Loading page..." />}>
+          <Outlet />
+        </Suspense>
       </Layout>
     </ProtectedRoute>
   );
@@ -83,46 +84,70 @@ const App = () => {
           <DataProvider>
             <SubscriptionProvider>
               <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<LandingRedirect />} />
-              <Route path="/landing" element={<LandingRedirect />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/support-login" element={<SupportLogin />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/contact" element={<Contact />} />
-              
-                            {/* Protected routes with layout */}
-              <Route element={<ProtectedLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/features" element={<Features />} />
-                <Route path="/clients" element={<Clients />} />
-                <Route path="/sessions" element={<Sessions />} />
-                <Route path="/workouts" element={<Workouts />} />
-                <Route path="/payments" element={<Payments />} />
-                <Route path="/progress" element={<Progress />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/help" element={<Help />} />
- 
-                <Route path="/ai-recommendations" element={<AIRecommendations />} />
-                <Route path="/trial-test" element={<TrialTest />} />
-              </Route>
-              
-              {/* Staff-only routes */}
-              <Route path="/support-portal" element={<StaffOnlyRoute><SupportPortal /></StaffOnlyRoute>} />
-              
-              {/* Client Portal routes (public access) */}
-              <Route path="/client-portal/:clientId" element={<ClientPortal />} />
-              <Route path="/demo-portal" element={<ClientPortal />} />
-              
-              {/* 404 route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </SubscriptionProvider>
-        </DataProvider>
-      </AuthProvider>
-    </BrowserRouter>
+                {/* Public routes */}
+                <Route path="/" element={<LandingRedirect />} />
+                <Route path="/landing" element={<LandingRedirect />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/support-login" element={<SupportLogin />} />
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/contact" element={<Contact />} />
+                
+                {/* Protected routes with layout */}
+                <Route element={<ProtectedLayout />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/features" element={<Features />} />
+                  <Route path="/clients" element={<Clients />} />
+                  <Route path="/sessions" element={<Sessions />} />
+                  <Route path="/workouts" element={<Workouts />} />
+                  <Route path="/payments" element={<Payments />} />
+                  <Route path="/progress" element={<Progress />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/help" element={<Help />} />
+                  <Route path="/ai-recommendations" element={<AIRecommendations />} />
+                  <Route path="/trial-test" element={<TrialTest />} />
+                </Route>
+                
+                {/* Staff-only routes */}
+                <Route path="/support-portal" element={
+                  <StaffOnlyRoute>
+                    <Suspense fallback={<LoadingScreen text="Loading support portal..." />}>
+                      <SupportPortal />
+                    </Suspense>
+                  </StaffOnlyRoute>
+                } />
+                
+                {/* Client Portal routes (public access) */}
+                <Route path="/client-portal/:clientId" element={
+                  <Suspense fallback={<LoadingScreen text="Loading client portal..." />}>
+                    <ClientPortal />
+                  </Suspense>
+                } />
+                <Route path="/demo-portal" element={
+                  <Suspense fallback={<LoadingScreen text="Loading demo portal..." />}>
+                    <ClientPortal />
+                  </Suspense>
+                } />
+                
+                {/* Client Portal Manager */}
+                <Route path="/client-portals" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Suspense fallback={<LoadingScreen text="Loading portal manager..." />}>
+                        <ClientPortalManager />
+                      </Suspense>
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+                
+                {/* Catch-all route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </SubscriptionProvider>
+          </DataProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 };
