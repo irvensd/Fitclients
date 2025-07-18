@@ -54,15 +54,69 @@ export const DatabasePerformanceMonitor: React.FC<DatabasePerformanceMonitorProp
 }) => {
   const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState<ReturnType<typeof setInterval> | null>(null);
 
   const loadMetrics = async () => {
     try {
-      const performanceMetrics = await unifiedDataService.getPerformanceMetrics();
+      setLoading(true);
+      setError(null);
+      
+      // Check if services are available before trying to access them
+      let performanceMetrics;
+      
+      try {
+        performanceMetrics = await unifiedDataService.getPerformanceMetrics();
+      } catch (error) {
+        console.warn('Unified data service not available, using fallback metrics:', error);
+        setError('Some services are not available. Showing limited metrics.');
+        
+        // Fallback metrics when services aren't available
+        performanceMetrics = {
+          connectionState: {
+            isOnline: navigator.onLine,
+            isFirebaseConnected: false,
+            lastSyncTime: 0,
+          },
+          firebaseMetrics: {
+            cacheHitRate: 0,
+            cacheSize: 0,
+            activeSubscriptions: 0,
+            isOffline: true,
+          },
+          offlineStats: {
+            totalSize: 0,
+            storeStats: {},
+          },
+          syncQueueSize: 0,
+        };
+      }
+      
       setMetrics(performanceMetrics);
     } catch (error) {
       console.error('Failed to load performance metrics:', error);
+      setError('Failed to load performance metrics. Please try again.');
+      
+      // Set fallback metrics on error
+      setMetrics({
+        connectionState: {
+          isOnline: navigator.onLine,
+          isFirebaseConnected: false,
+          lastSyncTime: 0,
+        },
+        firebaseMetrics: {
+          cacheHitRate: 0,
+          cacheSize: 0,
+          activeSubscriptions: 0,
+          isOffline: true,
+        },
+        offlineStats: {
+          totalSize: 0,
+          storeStats: {},
+        },
+        syncQueueSize: 0,
+      });
     } finally {
       setLoading(false);
     }
@@ -96,8 +150,30 @@ export const DatabasePerformanceMonitor: React.FC<DatabasePerformanceMonitorProp
 
   const handleClearCache = async () => {
     try {
-      optimizedFirebaseService.clearCache();
+      // Try to clear cache from optimized Firebase service
+      try {
+        optimizedFirebaseService.clearCache();
+      } catch (error) {
+        console.warn('Optimized Firebase service not available:', error);
+      }
+      
+      // Try to clear localStorage cache
+      try {
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+          if (key.includes('_clients') || key.includes('_sessions') || key.includes('_payments')) {
+            localStorage.removeItem(key);
+          }
+        });
+      } catch (error) {
+        console.warn('Failed to clear localStorage cache:', error);
+      }
+      
+      // Reload metrics
       await loadMetrics();
+      
+      // Show success message
+      console.log('Cache cleared successfully');
     } catch (error) {
       console.error('Failed to clear cache:', error);
     }
@@ -168,6 +244,15 @@ export const DatabasePerformanceMonitor: React.FC<DatabasePerformanceMonitorProp
         </CardHeader>
 
         <CardContent>
+          {error && (
+            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                <span className="text-sm text-yellow-800">{error}</span>
+              </div>
+            </div>
+          )}
+          
           {loading && !metrics ? (
             <div className="flex items-center justify-center py-8">
               <RefreshCw className="h-6 w-6 animate-spin mr-2" />
@@ -426,6 +511,9 @@ export const DatabasePerformanceMonitor: React.FC<DatabasePerformanceMonitorProp
             <div className="text-center py-8">
               <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
               <p className="text-muted-foreground">Failed to load performance metrics</p>
+              <Button onClick={handleRefresh} className="mt-4">
+                Try Again
+              </Button>
             </div>
           )}
         </CardContent>
