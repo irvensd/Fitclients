@@ -59,6 +59,8 @@ import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import { formatTime, cn } from "@/lib/utils";
 import { ServiceRestriction } from "@/components/ServiceRestriction";
 import { LoadingPage } from "@/components/ui/loading";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { logger, logApiError } from "@/lib/logger";
 
 // Add Session Dialog Component
 const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) => {
@@ -307,6 +309,8 @@ const Sessions = () => {
     cost: "",
     notes: "",
   });
+  const [sessionToDelete, setSessionToDelete] = useState<Session | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Check if this is the demo account
   const isDemoAccount = user?.email === "trainer@demo.com" || user?.uid === "demo-user-123";
@@ -433,32 +437,39 @@ const Sessions = () => {
     }
   };
 
-  const handleDeleteSession = async (session: Session) => {
-    if (!user?.uid) return;
-    
-    // Add confirmation dialog
-    if (!confirm(`Are you sure you want to delete the session with ${getClientName(session.clientId)} on ${format(parseISO(session.date), 'MMM dd, yyyy')}?`)) {
-      return;
-    }
+  const handleDeleteSession = (session: Session) => {
+    setSessionToDelete(session);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteSession = async () => {
+    if (!user?.uid || !sessionToDelete) return;
     
     try {
-      const sessionRef = doc(db, "users", user.uid, "sessions", session.id);
+      const sessionRef = doc(db, "users", user.uid, "sessions", sessionToDelete.id);
       await deleteDoc(sessionRef);
       
       // Update local state immediately
-      setSessions(prev => prev.filter(s => s.id !== session.id));
+      setSessions(prev => prev.filter(s => s.id !== sessionToDelete.id));
       
       toast({
         title: "Session deleted",
         description: "Session has been successfully deleted.",
       });
     } catch (error) {
-      console.error("Error deleting session:", error);
+      logApiError("deleting session", error, { 
+        sessionId: sessionToDelete.id, 
+        clientId: sessionToDelete.clientId,
+        sessionDate: sessionToDelete.date 
+      });
       toast({
         title: "Error",
         description: "Failed to delete session. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setSessionToDelete(null);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -836,6 +847,17 @@ const Sessions = () => {
           <SessionCalendar />
         </TabsContent>
       </Tabs>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="Delete Session"
+        description={`Are you sure you want to delete the session with ${sessionToDelete ? getClientName(sessionToDelete.clientId) : ''} on ${sessionToDelete ? format(parseISO(sessionToDelete.date), 'MMM dd, yyyy') : ''}?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+        onConfirm={confirmDeleteSession}
+      />
     </div>
     </ServiceRestriction>
   );

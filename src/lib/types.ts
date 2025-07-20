@@ -54,7 +54,7 @@ export interface Session {
   startTime?: string; // Add missing startTime property
   endTime?: string; // Add missing endTime property
   duration?: number;
-  type: 'training' | 'consultation' | 'assessment' | 'follow-up';
+  type: 'training' | 'personal-training' | 'consultation' | 'assessment' | 'follow-up';
   status: 'scheduled' | 'completed' | 'cancelled' | 'no-show';
   notes?: string;
   exercises?: SessionExercise[];
