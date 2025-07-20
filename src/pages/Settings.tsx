@@ -61,6 +61,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { userProfileService } from "@/lib/firebaseService";
 import { UserProfile, OperatingHours, Certification, Pricing, Package } from "@/lib/types";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { logger, logApiError } from "@/lib/logger";
 
 const Settings = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -140,6 +142,13 @@ const Settings = () => {
     credentialId: "",
     notes: "",
   });
+  
+  // Confirm dialog states
+  const [certificationToDelete, setCertificationToDelete] = useState<string | null>(null);
+  const [showDeleteCertificationConfirm, setShowDeleteCertificationConfirm] = useState(false);
+  const [packageToDelete, setPackageToDelete] = useState<string | null>(null);
+  const [showDeletePackageConfirm, setShowDeletePackageConfirm] = useState(false);
+  const [showDeleteAccountConfirm, setShowDeleteAccountConfirm] = useState(false);
 
   // Handle tab changes from URL parameters
   useEffect(() => {
@@ -394,13 +403,20 @@ const Settings = () => {
   };
 
   const deleteCertification = (id: string) => {
-    if (confirm("Are you sure you want to delete this certification?")) {
-      setCertifications(prev => prev.filter(cert => cert.id !== id));
-      toast({
-        title: "Certification Deleted",
-        description: "The certification has been removed.",
-      });
-    }
+    setCertificationToDelete(id);
+    setShowDeleteCertificationConfirm(true);
+  };
+
+  const confirmDeleteCertification = () => {
+    if (!certificationToDelete) return;
+    
+    setCertifications(prev => prev.filter(cert => cert.id !== certificationToDelete));
+    toast({
+      title: "Certification Deleted",
+      description: "The certification has been removed.",
+    });
+    setCertificationToDelete(null);
+    setShowDeleteCertificationConfirm(false);
   };
 
   const formatDate = (dateString: string) => {
@@ -440,22 +456,39 @@ const Settings = () => {
   };
 
   const deletePackage = (packageId: string) => {
-    if (confirm("Are you sure you want to delete this package?")) {
-      setPricing(prev => ({
-        ...prev,
-        packages: prev.packages.filter(pkg => pkg.id !== packageId)
-      }));
-      toast({
-        title: "Package Deleted",
-        description: "The package has been removed.",
-      });
-    }
+    setPackageToDelete(packageId);
+    setShowDeletePackageConfirm(true);
+  };
+
+  const confirmDeletePackage = () => {
+    if (!packageToDelete) return;
+    
+    setPricing(prev => ({
+      ...prev,
+      packages: prev.packages.filter(pkg => pkg.id !== packageToDelete)
+    }));
+    toast({
+      title: "Package Deleted",
+      description: "The package has been removed.",
+    });
+    setPackageToDelete(null);
+    setShowDeletePackageConfirm(false);
   };
 
   const calculatePackagePrice = (sessions: number, basePrice: number, discount: number) => {
     const totalBeforeDiscount = sessions * basePrice;
     const discountAmount = (totalBeforeDiscount * discount) / 100;
     return totalBeforeDiscount - discountAmount;
+  };
+
+  const confirmDeleteAccount = () => {
+    // Handle account deletion
+    toast({
+      title: "Account Deletion",
+      description: "Account deletion feature coming soon.",
+      variant: "destructive",
+    });
+    setShowDeleteAccountConfirm(false);
   };
 
   return (
@@ -1637,16 +1670,7 @@ const Settings = () => {
                   <Button 
                     variant="destructive" 
                     size="sm"
-                    onClick={() => {
-                      if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-                        // Handle account deletion
-                        toast({
-                          title: "Account Deletion",
-                          description: "Account deletion feature coming soon.",
-                          variant: "destructive",
-                        });
-                      }
-                    }}
+                    onClick={() => setShowDeleteAccountConfirm(true)}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Delete Account
@@ -1673,6 +1697,40 @@ const Settings = () => {
       <DatabasePerformanceMonitor
         isOpen={showPerformanceMonitor}
         onClose={() => setShowPerformanceMonitor(false)}
+      />
+
+      {/* Confirm Dialogs */}
+      <ConfirmDialog
+        open={showDeleteCertificationConfirm}
+        onOpenChange={setShowDeleteCertificationConfirm}
+        title="Delete Certification"
+        description="Are you sure you want to delete this certification?"
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+        onConfirm={confirmDeleteCertification}
+      />
+
+      <ConfirmDialog
+        open={showDeletePackageConfirm}
+        onOpenChange={setShowDeletePackageConfirm}
+        title="Delete Package"
+        description="Are you sure you want to delete this package?"
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+        onConfirm={confirmDeletePackage}
+      />
+
+      <ConfirmDialog
+        open={showDeleteAccountConfirm}
+        onOpenChange={setShowDeleteAccountConfirm}
+        title="Delete Account"
+        description="Are you sure you want to delete your account? This action cannot be undone."
+        confirmText="Delete Account"
+        cancelText="Cancel"
+        variant="destructive"
+        onConfirm={confirmDeleteAccount}
       />
     </div>
   );

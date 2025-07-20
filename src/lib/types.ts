@@ -114,12 +114,25 @@ export interface UserProfile {
   lastName?: string;
   businessName?: string;
   phone?: string;
+  avatar?: string;
+  bio?: string;
+  website?: string;
+  address?: string;
   createdAt: string;
   lastLogin?: string;
   selectedPlan?: string;
   referralCode?: string;
   totalReferrals?: number;
   freeMonthsEarned?: number;
+  operatingHours?: OperatingHours[];
+  socialMedia?: {
+    instagram?: string;
+    facebook?: string;
+    tiktok?: string;
+    youtube?: string;
+  };
+  certifications?: Certification[];
+  pricing?: Pricing;
 }
 
 // Subscription types
@@ -265,4 +278,41 @@ export interface FilterParams {
     start: string;
     end: string;
   };
+}
+
+// Settings-related types
+export interface OperatingHours {
+  day: string;
+  isOpen: boolean;
+  startTime: string;
+  endTime: string;
+}
+
+export interface Certification {
+  id: string;
+  name: string;
+  issuingOrganization: string;
+  issueDate: string;
+  expirationDate: string;
+  credentialId?: string;
+  status: "active" | "expired" | "expiring-soon";
+  notes?: string;
+}
+
+export interface Package {
+  id: string;
+  name: string;
+  sessions: number;
+  price: number;
+  discount: number;
+}
+
+export interface Pricing {
+  personalTraining: number;
+  consultation: number;
+  assessment: number;
+  packageDiscount: number;
+  currency: string;
+  taxRate: number;
+  packages: Package[];
 }
