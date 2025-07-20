@@ -899,6 +899,8 @@ const Workouts = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState<WorkoutPlan | null>(null);
   const [showViewDialog, setShowViewDialog] = useState(false);
+  const [workoutToDelete, setWorkoutToDelete] = useState<WorkoutPlan | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Check if this is the demo account
   const isDemoAccount = user?.email === "trainer@demo.com" || user?.uid === "demo-user-123";
@@ -982,38 +984,41 @@ const Workouts = () => {
     }
   };
 
-  const handleDeleteWorkout = async (workout: WorkoutPlan) => {
-    if (!user?.uid) return;
-    
-    // Enhanced confirmation dialog
-    if (!confirm(`Are you sure you want to delete "${workout.name}"?\n\nThis action cannot be undone and will remove all associated exercise data.`)) {
-      return;
-    }
+  const handleDeleteWorkout = (workout: WorkoutPlan) => {
+    setWorkoutToDelete(workout);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteWorkout = async () => {
+    if (!user?.uid || !workoutToDelete) return;
     
     try {
       if (!isDemoAccount) {
-          const workoutDoc = doc(db, "users", user.uid, "workoutPlans", workout.id);
-          await deleteDoc(workoutDoc);
-          
-          // Update local state immediately
-          setWorkoutPlans(prev => prev.filter(plan => plan.id !== workout.id));
-        } else {
-          // For demo account, just update local state
-          setWorkoutPlans(prev => prev.filter(plan => plan.id !== workout.id));
-        }
+        const workoutDoc = doc(db, "users", user.uid, "workoutPlans", workoutToDelete.id);
+        await deleteDoc(workoutDoc);
+        
+        // Update local state immediately
+        setWorkoutPlans(prev => prev.filter(plan => plan.id !== workoutToDelete.id));
+      } else {
+        // For demo account, just update local state
+        setWorkoutPlans(prev => prev.filter(plan => plan.id !== workoutToDelete.id));
+      }
       
       toast({
-          title: "Workout deleted",
-          description: "Workout plan has been successfully deleted.",
+        title: "Workout deleted",
+        description: "Workout plan has been successfully deleted.",
       });
     } catch (error) {
-        console.error("Error deleting workout:", error);
+      logApiError("deleting workout", error, { workoutId: workoutToDelete.id, workoutName: workoutToDelete.name });
       toast({
         title: "Error",
-          description: "Failed to delete workout. Please try again.",
+        description: "Failed to delete workout. Please try again.",
         variant: "destructive",
       });
-      }
+    } finally {
+      setWorkoutToDelete(null);
+      setShowDeleteConfirm(false);
+    }
   };
 
   const handleStartSession = (workout: WorkoutPlan) => {
@@ -1252,7 +1257,7 @@ const Workouts = () => {
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center gap-2 sm:gap-4">
                 <div className="p-2 sm:p-3 bg-green-500/10 rounded-lg">
-                  <UsersIcon className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
+                  <Users className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Active Clients</p>
@@ -1274,11 +1279,11 @@ const Workouts = () => {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg col-span-2 sm:col-span-1">
+                    <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg col-span-2 sm:col-span-1">
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center gap-2 sm:gap-4">
                 <div className="p-2 sm:p-3 bg-orange-500/10 rounded-lg">
-                  <TrendingUpIcon className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" />
+                  <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Avg. Duration</p>
@@ -1286,8 +1291,8 @@ const Workouts = () => {
                     {workoutPlans.length > 0 
                       ? Math.round(workoutPlans.reduce((total, plan) => total + plan.exercises.length, 0) / workoutPlans.length * 5)
                       : 0} min
-              </p>
-            </div>
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -1720,6 +1725,17 @@ const Workouts = () => {
           }}
           onSave={handleSaveWorkoutDetails}
           getClientName={getClientName}
+        />
+
+        <ConfirmDialog
+          open={showDeleteConfirm}
+          onOpenChange={setShowDeleteConfirm}
+          title="Delete Workout Plan"
+          description={`Are you sure you want to delete "${workoutToDelete?.name}"? This action cannot be undone and will remove all associated exercise data.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="destructive"
+          onConfirm={confirmDeleteWorkout}
         />
       </div>
     </div>
