@@ -74,6 +74,8 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 import { mockApi } from '../lib/mockApi';
 import { fixFutureLastLoginDates, checkFutureLastLoginDates } from '../lib/fixUserDates';
 
@@ -166,6 +168,7 @@ interface SystemAlert {
 const SupportPortal = () => {
   // Use Firebase authentication instead of internal auth
   const { user, loading } = useAuth();
+  const { toast } = useToast();
   const [supportAgent, setSupportAgent] = useState<{
     name: string;
     role: string;
@@ -1364,13 +1367,23 @@ const SupportPortal = () => {
       
       if (futureDates.length > 0) {
         const fixedCount = await fixFutureLastLoginDates();
-        alert(`Fixed ${fixedCount} users with future lastLogin dates. Refresh the page to see updated active user count.`);
+        toast({
+          title: "Future Dates Fixed",
+          description: `Fixed ${fixedCount} users with future lastLogin dates. Refresh the page to see updated active user count.`,
+        });
       } else {
-        alert('No users with future lastLogin dates found.');
+        toast({
+          title: "No Issues Found",
+          description: "No users with future lastLogin dates found.",
+        });
       }
     } catch (error) {
-      console.error('Error fixing future dates:', error);
-      alert('Error fixing future dates: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      logger.error("Error fixing future dates", error);
+      toast({
+        title: "Error",
+        description: `Error fixing future dates: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        variant: "destructive",
+      });
     }
   };
 
