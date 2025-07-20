@@ -461,7 +461,7 @@ const CreateWorkoutDialog = ({ isOpen, onClose, onWorkoutCreated, clients }) => 
         description: "New workout plan has been successfully created.",
       });
     } catch (error) {
-      console.error("Error creating workout:", error);
+      logApiError("creating workout", error, { workoutName: workoutData.name, clientId: workoutData.clientId });
       toast({
         title: "Error",
         description: "Failed to create workout. Please check your connection and try again.",

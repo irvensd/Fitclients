@@ -92,6 +92,7 @@ export interface WorkoutPlan {
   createdDate: string;
   updatedDate?: string;
   isActive: boolean;
+  aiNotes?: string[];
 }
 
 export interface WorkoutExercise {

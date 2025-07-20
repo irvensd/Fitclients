@@ -11,6 +11,8 @@ import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, deleteField,
 import { useAuth } from "@/contexts/AuthContext";
 import { db } from "@/lib/firebase";
 import { logger } from "@/lib/utils";
+import { logApiError } from "@/lib/logger";
+import { retryOperation, handleError } from "@/lib/errorHandling";
 
 interface DataContextType {
   clients: ClientWithStatus[];

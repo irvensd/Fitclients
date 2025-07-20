@@ -3,7 +3,7 @@ import { Client } from "@/lib/types";
 export interface ClientStatus {
   isActive: boolean;
   archivedAt?: string;
-  archiveReason?: "plan_downgrade" | "manual";
+  archiveReason?: "plan_downgrade" | "manual" | string;
 }
 
 export interface ClientWithStatus extends Client {
