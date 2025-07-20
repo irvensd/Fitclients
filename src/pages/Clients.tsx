@@ -60,7 +60,7 @@ import {
 } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { ProgressEntry } from "@/lib/types";
+import { ProgressEntry, Client, ClientWithStatus, ClientFormData, ProgressFormData } from "@/lib/types";
 import {
   getClientLimitInfo,
   canAddClient,
@@ -74,6 +74,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { ServiceRestriction } from "@/components/ServiceRestriction";
 import { LoadingPage } from "@/components/ui/loading";
+import { logger, logApiError } from "@/lib/logger";
 
 
 const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenChange?: (open: boolean) => void; }) => {
@@ -146,7 +147,7 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
             description: `${formData.name} has been added with initial weight of ${formData.initialWeight} lbs.`,
           });
         } catch (progressError) {
-          console.error("Error adding initial progress:", progressError);
+          logApiError("adding initial progress", progressError, { clientName: formData.name, weight: formData.initialWeight });
           // Still show success for client creation, but warn about progress
           toast({
             title: "Client added",
@@ -171,7 +172,7 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
       });
       setOpen(false);
     } catch (error) {
-      console.error("Error adding client:", error);
+      logApiError("adding client", error, { clientName: formData.name });
       toast({
         title: "Error",
         description: "Failed to add client. Please try again.",
@@ -331,7 +332,7 @@ const DeleteClientDialog = ({
   onOpenChange,
   onDelete,
 }: {
-  client: any | null;
+  client: Client | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onDelete: (clientId: string) => void;
@@ -347,7 +348,7 @@ const DeleteClientDialog = ({
       onOpenChange(false);
       setConfirmText("");
     } catch (error) {
-      console.error("Error deleting client:", error);
+      logApiError("deleting client", error, { clientId: client.id, clientName: client.name });
     } finally {
       setLoading(false);
     }
@@ -446,7 +447,7 @@ const DeleteProgressEntryDialog = ({
   onOpenChange,
   onDelete,
 }: {
-  entry: any | null;
+  entry: ProgressEntry | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onDelete: (entryId: string) => void;
@@ -460,7 +461,7 @@ const DeleteProgressEntryDialog = ({
       await onDelete(entry.id);
       onOpenChange(false);
     } catch (error) {
-      console.error("Error deleting progress entry:", error);
+      logApiError("deleting progress entry", error, { entryId: entry.id });
     } finally {
       setLoading(false);
     }
@@ -529,7 +530,7 @@ const ClientDetailsModal = ({
   onOpenChange,
   onClientUpdated,
 }: {
-  client: any | null;
+  client: Client | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onClientUpdated: () => void;
@@ -538,7 +539,7 @@ const ClientDetailsModal = ({
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [progressEntryToDelete, setProgressEntryToDelete] = useState<any | null>(null);
+  const [progressEntryToDelete, setProgressEntryToDelete] = useState<ProgressEntry | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -585,7 +586,7 @@ const ClientDetailsModal = ({
         description: "Client information has been saved successfully.",
       });
     } catch (error) {
-      console.error("Error updating client:", error);
+      logApiError("updating client", error, { clientId: client.id, clientName: client.name });
       toast({
         title: "Error",
         description: "Failed to update client. Please try again.",
@@ -675,7 +676,7 @@ const ClientDetailsModal = ({
         progressNotes: "",
       });
     } catch (error) {
-      console.error("Error saving progress:", error);
+      logApiError("saving progress", error, { clientId: client.id, clientName: client.name });
       toast({
         title: "Error",
         description: "Failed to save progress. Please try again.",
@@ -694,7 +695,7 @@ const ClientDetailsModal = ({
         description: "The progress entry has been removed successfully.",
       });
     } catch (error) {
-      console.error("Error deleting progress entry:", error);
+      logApiError("deleting progress entry", error, { entryId });
       toast({
         title: "Error",
         description: "Failed to delete progress entry. Please try again.",
@@ -1164,8 +1165,8 @@ const Clients = () => {
   const { getCurrentPlan } = useSubscription();
   const { user } = useAuth();
   const [isAddClientDialogOpen, setAddClientDialogOpen] = useState(false);
-  const [clientToDelete, setClientToDelete] = useState<any | null>(null);
-  const [selectedClient, setSelectedClient] = useState<any | null>(null);
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -1206,13 +1207,13 @@ const Clients = () => {
   const currentPlan = getCurrentPlan();
   const activeClients = getActiveClients
     ? getActiveClients()
-    : clients.filter((c: any) => !c.status || c.status.isActive !== false);
+    : clients.filter((c: Client) => !c.status || c.status.isActive !== false);
   const archivedClients = getArchivedClients ? getArchivedClients() : [];
   const currentClientCount = activeClients.length;
   const limitInfo = getClientLimitInfo(currentPlan.id, currentClientCount);
 
   const filteredActiveClients = activeClients
-    .filter((client: any) => {
+    .filter((client: Client) => {
       const matchesSearch =
         client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         client.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -1221,7 +1222,7 @@ const Clients = () => {
         client.fitnessLevel === fitnessLevelFilter;
       return matchesSearch && matchesFitnessLevel;
     })
-    .sort((a: any, b: any) => {
+    .sort((a: Client, b: Client) => {
       switch (sortBy) {
         case "name":
           return a.name.localeCompare(b.name);
@@ -1260,7 +1261,7 @@ const Clients = () => {
         description: `Portal link for ${clientName} has been copied to clipboard.`,
       });
     } catch (error) {
-      console.error("Error copying to clipboard:", error);
+      logger.error("Error copying to clipboard", error, { clientId, clientName });
       toast({
         title: "Copy failed",
         description: "Unable to copy to clipboard. Please try again.",
@@ -1277,7 +1278,7 @@ const Clients = () => {
         description: "Client has been permanently removed from your account.",
       });
     } catch (error) {
-      console.error("Error deleting client:", error);
+      logApiError("deleting client", error, { clientId });
       toast({
         title: "Error",
         description: "Failed to delete client. Please try again.",
@@ -1294,7 +1295,7 @@ const Clients = () => {
         description: "Client has been moved to archived status.",
       });
     } catch (error) {
-      console.error("Error archiving client:", error);
+      logApiError("archiving client", error, { clientId });
       toast({
         title: "Error",
         description: "Failed to archive client. Please try again.",
@@ -1311,7 +1312,7 @@ const Clients = () => {
         description: "Client has been moved back to active status.",
       });
     } catch (error) {
-      console.error("Error reactivating client:", error);
+      logApiError("reactivating client", error, { clientId });
       toast({
         title: "Error",
         description: "Failed to reactivate client. Please try again.",
@@ -1546,7 +1547,7 @@ const Clients = () => {
                 <div className="text-2xl font-bold">
                   {
                     activeClients.filter(
-                      (c: any) => c.fitnessLevel === "beginner",
+                      (c: Client) => c.fitnessLevel === "beginner",
                     ).length
                   }
                 </div>
@@ -1564,7 +1565,7 @@ const Clients = () => {
                 <div className="text-2xl font-bold">
                   {
                     activeClients.filter(
-                      (c: any) => c.fitnessLevel === "intermediate",
+                      (c: Client) => c.fitnessLevel === "intermediate",
                     ).length
                   }
                 </div>
@@ -1582,7 +1583,7 @@ const Clients = () => {
                 <div className="text-2xl font-bold">
                   {
                     activeClients.filter(
-                      (c: any) => c.fitnessLevel === "advanced",
+                      (c: Client) => c.fitnessLevel === "advanced",
                     ).length
                   }
                 </div>
@@ -1645,7 +1646,7 @@ const Clients = () => {
                 Active Clients ({filteredActiveClients.length})
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredActiveClients.map((client: any) => {
+                {filteredActiveClients.map((client: Client) => {
                   const stats = getMemoizedClientStats(client.id);
                   const hasUpcomingSession = stats.nextSession;
                   
@@ -1860,7 +1861,7 @@ const Clients = () => {
                   Archived Clients ({archivedClients.length})
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {archivedClients.map((client: any) => {
+                  {archivedClients.map((client: Client) => {
                     const stats = getMemoizedClientStats(client.id);
                     
                     return (

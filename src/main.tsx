@@ -4,17 +4,20 @@ import App from './App.tsx'
 import './index.css'
 
 // Initialize error capture for production debugging
-// import '@/lib/errorCapture'; // Temporarily disabled to debug blank screen
+import '@/lib/errorCapture';
 
 // Register service worker for caching and offline support
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.log('SW registered: ', registration);
+        // Service worker registered successfully
       })
       .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError);
+        // Service worker registration failed - this is expected in development
+        if (import.meta.env.DEV) {
+          console.warn('Service worker registration failed (expected in development):', registrationError);
+        }
       });
   });
 }
