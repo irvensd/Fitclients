@@ -87,6 +87,7 @@ export interface WorkoutPlan {
   id: string;
   name: string;
   description?: string;
+  clientId?: string;
   exercises: WorkoutExercise[];
   createdDate: string;
   updatedDate?: string;

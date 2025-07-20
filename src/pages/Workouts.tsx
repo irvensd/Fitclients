@@ -17,6 +17,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Plus,
@@ -33,8 +34,39 @@ import {
   Filter,
   TrendingUp,
   Sparkles,
+  Eye,
+  X,
+  Calendar,
+  Activity,
+  Timer,
+  Repeat,
+  BarChart3,
+  PieChart,
+  LineChart,
+  ArrowRight,
+  CheckCircle,
+  AlertCircle,
+  Info,
+  Zap,
+  Star,
+  Award,
+  Trophy,
+  Medal,
+  Crown,
+  Flame,
+  Heart,
+  Shield,
+  Target as TargetIcon,
+  Dumbbell as DumbbellIcon,
+  User,
+  UserCheck,
+  UserPlus,
+  UserX,
+  UserMinus,
+  UserCog,
+  UserSearch,
 } from "lucide-react";
-import { WorkoutPlan, Exercise } from "@/lib/types";
+import { WorkoutPlan, WorkoutExercise } from "@/lib/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { useData } from "@/contexts/DataContext";
 import { useToast } from "@/hooks/use-toast";
@@ -42,6 +74,9 @@ import { db } from "@/lib/firebase";
 import { doc, updateDoc, deleteDoc, addDoc, collection, getDocs } from "firebase/firestore";
 import { mockExercises, mockWorkoutPlans, mockClients } from "@/lib/mockData";
 import { LoadingPage } from "@/components/ui/loading";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { logger, logApiError } from "@/lib/logger";
+import { Client } from "@/lib/types";
 
 // Workout templates data
 const workoutTemplates = [
@@ -53,7 +88,7 @@ const workoutTemplates = [
     duration: "45 min",
     goals: ["Weight Loss", "Cardio"],
     color: "bg-red-500/10",
-    icon: <Target className="h-4 w-4 text-red-600" />,
+    icon: <TargetIcon className="h-4 w-4 text-red-600" />,
     exercises: [
       { name: "Burpees", sets: 3, reps: "10", notes: "Rest 30s between sets" },
       { name: "Mountain Climbers", sets: 3, reps: "20", notes: "Keep core tight" },
@@ -70,7 +105,7 @@ const workoutTemplates = [
     duration: "60 min",
     goals: ["Muscle Gain", "Strength"],
     color: "bg-blue-500/10",
-    icon: <Dumbbell className="h-4 w-4 text-blue-600" />,
+    icon: <DumbbellIcon className="h-4 w-4 text-blue-600" />,
     exercises: [
       { name: "Bench Press", sets: 4, reps: "8-10", notes: "Rest 2-3 min between sets" },
       { name: "Pull-ups", sets: 4, reps: "6-8", notes: "Use assistance if needed" },
@@ -121,7 +156,7 @@ const workoutTemplates = [
     duration: "25 min",
     goals: ["General Fitness", "Beginner"],
     color: "bg-orange-500/10",
-    icon: <Target className="h-4 w-4 text-orange-600" />,
+    icon: <TargetIcon className="h-4 w-4 text-orange-600" />,
     exercises: [
       { name: "Bodyweight Squats", sets: 2, reps: "10-12", notes: "Focus on form" },
       { name: "Wall Push-ups", sets: 2, reps: "8-10", notes: "Build up to regular push-ups" },
@@ -138,7 +173,7 @@ const workoutTemplates = [
     duration: "75 min",
     goals: ["Strength", "Power"],
     color: "bg-indigo-500/10",
-    icon: <Dumbbell className="h-4 w-4 text-indigo-600" />,
+    icon: <DumbbellIcon className="h-4 w-4 text-indigo-600" />,
     exercises: [
       { name: "Deadlifts", sets: 5, reps: "5", notes: "Heavy weight, perfect form" },
       { name: "Squats", sets: 4, reps: "6-8", notes: "Full depth, controlled descent" },
@@ -210,7 +245,7 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
               <>
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
-                    <Dumbbell className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                    <DumbbellIcon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
                   <CardTitle className="text-lg sm:text-xl font-bold text-gray-900 truncate">
                     {plan.name}
@@ -257,7 +292,7 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
                 aria-label={`View details for ${plan.name}`}
                 title="View details"
               >
-                <Target className="h-3 w-3 sm:h-4 sm:w-4" />
+                <TargetIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               <Button
                 variant="ghost"
@@ -308,7 +343,7 @@ const WorkoutCard = ({ plan, onView, onEdit, onDuplicate, onStart, onDelete, get
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
               <div className="flex items-center gap-1">
-                <Target className="h-3 w-3 sm:h-4 sm:w-4" />
+                <TargetIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span>{plan.exercises.length} exercises</span>
                 </div>
               <div className="flex items-center gap-1">
@@ -339,7 +374,7 @@ const ExerciseCard = ({ exercise }) => (
           </Badge>
         </div>
         <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-          <Dumbbell className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+          <DumbbellIcon className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
         </div>
       </div>
     </CardHeader>
@@ -650,7 +685,7 @@ const ViewWorkoutDialog = ({ workout, isOpen, onClose, onSave, getClientName }) 
       <DialogContent className="w-[95vw] max-w-[700px] max-h-[85vh] overflow-y-auto bg-white border-0 shadow-2xl mx-4">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
-            <Dumbbell className="h-4 w-4 sm:h-5 sm:w-5" />
+            <DumbbellIcon className="h-4 w-4 sm:h-5 sm:w-5" />
             {isEditing ? (
               <input
                 value={workoutData.name}
@@ -686,7 +721,7 @@ const ViewWorkoutDialog = ({ workout, isOpen, onClose, onSave, getClientName }) 
           <div className="space-y-3 sm:space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
               <h4 className="font-medium flex items-center gap-2 text-sm sm:text-base">
-                <Target className="h-4 w-4" />
+                <TargetIcon className="h-4 w-4" />
                 Exercises ({workoutData.exercises.length})
               </h4>
               {isEditing && (
@@ -1176,7 +1211,7 @@ const Workouts = () => {
             <div className="space-y-2">
                       <div className="flex items-center gap-3">
                 <div className="p-2 sm:p-3 bg-primary/10 rounded-lg sm:rounded-xl">
-                  <Dumbbell className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                  <DumbbellIcon className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                       </div>
                 <div>
                   <h1 className="text-2xl sm:text-4xl font-bold text-gray-900">
@@ -1204,7 +1239,7 @@ const Workouts = () => {
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center gap-2 sm:gap-4">
                 <div className="p-2 sm:p-3 bg-blue-500/10 rounded-lg">
-                  <Target className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" />
+                  <TargetIcon className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Total Plans</p>
@@ -1217,7 +1252,7 @@ const Workouts = () => {
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center gap-2 sm:gap-4">
                 <div className="p-2 sm:p-3 bg-green-500/10 rounded-lg">
-                  <Users className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
+                  <UsersIcon className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Active Clients</p>
@@ -1230,7 +1265,7 @@ const Workouts = () => {
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center gap-2 sm:gap-4">
                 <div className="p-2 sm:p-3 bg-purple-500/10 rounded-lg">
-                  <Dumbbell className="h-4 w-4 sm:h-6 sm:w-6 text-purple-600" />
+                  <DumbbellIcon className="h-4 w-4 sm:h-6 sm:w-6 text-purple-600" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Total Exercises</p>
@@ -1243,7 +1278,7 @@ const Workouts = () => {
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center gap-2 sm:gap-4">
                 <div className="p-2 sm:p-3 bg-orange-500/10 rounded-lg">
-                  <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" />
+                  <TrendingUpIcon className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Avg. Duration</p>
@@ -1268,7 +1303,7 @@ const Workouts = () => {
                     value="plans" 
                     className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md sm:rounded-lg font-medium transition-all duration-200 text-xs sm:text-sm px-2 sm:px-4 py-2"
                   >
-                    <Target className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <TargetIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     <span className="hidden sm:inline">My Plans</span>
                     <span className="sm:hidden">Plans</span>
                   </TabsTrigger>
@@ -1284,7 +1319,7 @@ const Workouts = () => {
                     value="library" 
                     className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md sm:rounded-lg font-medium transition-all duration-200 text-xs sm:text-sm px-2 sm:px-4 py-2"
                   >
-                    <Dumbbell className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <DumbbellIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     <span className="hidden sm:inline">Exercise Library</span>
                     <span className="sm:hidden">Library</span>
                   </TabsTrigger>
@@ -1292,7 +1327,7 @@ const Workouts = () => {
                     value="analytics" 
                     className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md sm:rounded-lg font-medium transition-all duration-200 text-xs sm:text-sm px-2 sm:px-4 py-2"
                   >
-                    <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <TrendingUpIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     <span className="hidden sm:inline">Analytics</span>
                     <span className="sm:hidden">Stats</span>
                   </TabsTrigger>
@@ -1321,7 +1356,7 @@ const Workouts = () => {
                 <Card className="border-2 border-dashed border-gray-300 bg-gray-50/50">
                   <CardContent className="flex flex-col items-center justify-center py-12 sm:py-16">
                     <div className="p-3 sm:p-4 bg-primary/10 rounded-full mb-3 sm:mb-4">
-                      <Dumbbell className="h-8 w-8 sm:h-12 sm:w-12 text-primary" />
+                      <DumbbellIcon className="h-8 w-8 sm:h-12 sm:w-12 text-primary" />
                     </div>
                     <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 text-center">
                       No workout plans yet
@@ -1346,7 +1381,7 @@ const Workouts = () => {
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-blue-100">
                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <div className="p-2 bg-blue-500/10 rounded-lg">
-                    <Target className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                    <TargetIcon className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-semibold text-gray-900">AI-Powered Recommendations</h3>
@@ -1378,7 +1413,7 @@ const Workouts = () => {
                             setShowViewDialog(true);
                           }}
                         >
-                          <Target className="h-3 w-3 mr-1" />
+                          <TargetIcon className="h-3 w-3 mr-1" />
                           Get Recommendation
                         </Button>
                       </CardContent>
@@ -1429,11 +1464,11 @@ const Workouts = () => {
                             <p className="text-xs sm:text-sm text-gray-600">{template.description}</p>
                             <div className="flex items-center gap-2 sm:gap-4 text-xs text-gray-500">
               <span className="flex items-center gap-1">
-                                <Target className="h-3 w-3" />
+                                <TargetIcon className="h-3 w-3" />
                                 {template.exercises.length} exercises
               </span>
               <span className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
+                                <ClockIcon className="h-3 w-3" />
                                 {template.duration}
               </span>
                               <Badge variant="outline" className="text-xs">
@@ -1515,7 +1550,7 @@ const Workouts = () => {
                   <CardContent className="p-3 sm:p-6">
                     <div className="flex items-center gap-2 sm:gap-4">
                       <div className="p-2 sm:p-3 bg-blue-500/10 rounded-lg">
-                        <Target className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" />
+                        <TargetIcon className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" />
                       </div>
                       <div>
                         <p className="text-xs sm:text-sm font-medium text-gray-600">Active Plans</p>
@@ -1531,7 +1566,7 @@ const Workouts = () => {
                   <CardContent className="p-3 sm:p-6">
                     <div className="flex items-center gap-2 sm:gap-4">
                       <div className="p-2 sm:p-3 bg-green-500/10 rounded-lg">
-                        <Users className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
+                        <UsersIcon className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
           </div>
                       <div>
                         <p className="text-xs sm:text-sm font-medium text-gray-600">Clients with Plans</p>
@@ -1547,7 +1582,7 @@ const Workouts = () => {
                   <CardContent className="p-3 sm:p-6">
                     <div className="flex items-center gap-2 sm:gap-4">
                       <div className="p-2 sm:p-3 bg-purple-500/10 rounded-lg">
-                        <Dumbbell className="h-4 w-4 sm:h-6 sm:w-6 text-purple-600" />
+                        <DumbbellIcon className="h-4 w-4 sm:h-6 sm:w-6 text-purple-600" />
         </div>
                       <div>
                         <p className="text-xs sm:text-sm font-medium text-gray-600">Total Exercises</p>
@@ -1563,7 +1598,7 @@ const Workouts = () => {
                   <CardContent className="p-3 sm:p-6">
                     <div className="flex items-center gap-2 sm:gap-4">
                       <div className="p-2 sm:p-3 bg-orange-500/10 rounded-lg">
-                        <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" />
+                        <TrendingUpIcon className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" />
                       </div>
                       <div>
                         <p className="text-xs sm:text-sm font-medium text-gray-600">Avg. Duration</p>
@@ -1582,7 +1617,7 @@ const Workouts = () => {
               <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
                 <CardHeader className="pb-3 sm:pb-4">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <TrendingUpIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                     Client Workout Progress
                   </CardTitle>
                   <CardDescription className="text-sm">
@@ -1626,7 +1661,7 @@ const Workouts = () => {
               <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
                 <CardHeader className="pb-3 sm:pb-4">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                    <Dumbbell className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <DumbbellIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                     Most Popular Exercises
                   </CardTitle>
                   <CardDescription className="text-sm">
