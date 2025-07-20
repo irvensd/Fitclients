@@ -10,6 +10,8 @@ import {
 import { auth, isFirebaseConfigured, diagnoseFirebaseConnection } from "@/lib/firebase";
 import { userProfileService, referralService } from "@/lib/firebaseService";
 import { UserProfile } from "@/lib/types";
+import { logger, logApiError } from "@/lib/logger";
+import { handleError, retryOperation } from "@/lib/errorHandling";
 
 export interface AuthContextType {
   user: User | null;
@@ -83,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           } as User);
         }
       } catch (error) {
-        console.error("Error parsing stored user:", error);
+        logApiError("parsing stored user", error);
         localStorage.removeItem("devUser");
       }
       clearTimeout(timeoutId);
@@ -120,25 +122,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         );
       }
     } catch (error: any) {
-      console.error("Login error:", error);
-
-      // Provide user-friendly error messages
-      if (
-        error.code === "auth/invalid-login-credentials" ||
-        error.code === "auth/user-not-found"
-      ) {
-        setAuthError(
-          "No account found with these credentials. Please check your email and password, create a new account, or use the demo account (trainer@demo.com / demo123).",
-        );
-      } else if (error.code === "auth/wrong-password") {
-        setAuthError("Incorrect password. Please try again.");
-      } else if (error.code === "auth/invalid-email") {
-        setAuthError("Invalid email address format.");
-      } else if (error.code === "auth/too-many-requests") {
-        setAuthError("Too many failed attempts. Please try again later.");
-      } else {
-        setAuthError(error.message || "Login failed. Please try again.");
-      }
+      const { userMessage } = handleError(error, "user login", { email });
+      setAuthError(userMessage);
       throw error;
     }
   }, []);
@@ -200,7 +185,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                     console.warn("Invalid referral code:", referralCode);
                   }
                 } catch (referralError) {
-                  console.error("Error processing referral code:", referralError);
+                  logApiError("processing referral code", referralError, { referralCode, userId: userCredential.user.uid });
                   // Don't fail registration if referral processing fails
                 }
               }
@@ -215,12 +200,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                   localStorage.setItem('selected_plan', planId);
                   // User registered with selected plan
                 } catch (subscriptionError) {
-                  console.error("Error setting up subscription:", subscriptionError);
+                  logApiError("setting up subscription", subscriptionError, { planId, userId: userCredential.user.uid });
                   // Don't fail registration if subscription setup fails
                 }
               }
             } catch (profileError) {
-              console.error("Failed to create user profile:", profileError);
+              logApiError("creating user profile", profileError, { userId: userCredential.user.uid, email });
               // Don't throw here as the user is already created in Firebase Auth
             }
           }
@@ -228,22 +213,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           return; // Success, exit the retry loop
           
         } catch (error: any) {
-          console.error(`Registration attempt ${retryCount + 1} failed:`, error);
+          logApiError(`registration attempt ${retryCount + 1} failed`, error, { 
+            attempt: retryCount + 1, 
+            maxRetries, 
+            email 
+          });
           retryCount++;
           
           if (retryCount >= maxRetries) {
-            console.error("All registration attempts failed");
-            setAuthError(
-              error.code === "auth/email-already-in-use"
-                ? "An account with this email already exists. Please try logging in instead."
-                : error.code === "auth/weak-password"
-                ? "Password is too weak. Please choose a stronger password."
-                : error.code === "auth/invalid-email"
-                ? "Please enter a valid email address."
-                : error.code === "auth/network-request-failed"
-                ? "Network error. Please check your connection and try again."
-                : "Registration failed. Please try again."
-            );
+            logApiError("all registration attempts failed", error, { email, totalAttempts: retryCount });
+            const { userMessage } = handleError(error, "user registration", { email });
+            setAuthError(userMessage);
             throw error;
           }
           
@@ -269,7 +249,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Force redirect to login page
       window.location.href = "/login";
     } catch (error) {
-      console.error("Logout error:", error);
+      logApiError("logout error", error);
       // Even if Firebase logout fails, clear local state
       setDevUser(null);
       setUser(null);
@@ -292,7 +272,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Update local state
       setUserProfile(prev => prev ? { ...prev, ...updates } : null);
     } catch (error) {
-      console.error("Failed to update user profile:", error);
+      logApiError("updating user profile", error, { userId: user.uid, updates });
       throw error;
     }
   }, [user]);
@@ -341,7 +321,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               }
             }
           } catch (error) {
-            console.error("Failed to load user profile:", error);
+            logApiError("loading user profile", error, { userId: user.uid });
           }
         }
       } else {

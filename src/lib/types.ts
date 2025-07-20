@@ -124,6 +124,7 @@ export interface UserProfile {
   referralCode?: string;
   totalReferrals?: number;
   freeMonthsEarned?: number;
+  referredBy?: string;
   operatingHours?: OperatingHours[];
   socialMedia?: {
     instagram?: string;
