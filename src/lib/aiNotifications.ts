@@ -14,6 +14,7 @@ import {
   limit,
   getDocs,
   writeBatch,
+  CollectionReference,
 } from "firebase/firestore";
 import { auth } from "./firebase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -56,7 +57,7 @@ class AINotificationManager {
   private listeners: ((notifications: AINotification[]) => void)[] = [];
   private userId: string | null = null;
   private db = getFirestore();
-  private notificationsCollection: any = null; // Will be set up in constructor
+  private notificationsCollection: CollectionReference | null = null; // Will be set up in constructor
   private unsubscribe: (() => void) | null = null;
 
   constructor() {

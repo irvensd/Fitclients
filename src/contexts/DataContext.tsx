@@ -7,9 +7,10 @@ import {
   reactivateAllClients,
   getActiveClients,
 } from "@/lib/clientDowngrade";
-import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, deleteField } from "firebase/firestore";
+import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, deleteField, writeBatch } from "firebase/firestore";
 import { useAuth } from "@/contexts/AuthContext";
 import { db } from "@/lib/firebase";
+import { logger } from "@/lib/utils";
 
 interface DataContextType {
   clients: ClientWithStatus[];
@@ -121,31 +122,31 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
             })) as ClientWithStatus[];
             setClients(fetchedClients);
             checkAllLoaded();
-          }, (err) => { console.error("Clients snapshot error:", err); setError("Failed to load clients."); }),
+          }, (err) => { logger.error("Clients snapshot error:", err); setError("Failed to load clients."); }),
 
           onSnapshot(collections.sessions, (snapshot) => {
             const fetchedSessions = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<Session, 'id'>), id: doc.id })) as Session[];
             setSessions(fetchedSessions);
             checkAllLoaded();
-          }, (err) => { console.error("Sessions snapshot error:", err); setError("Failed to load sessions."); }),
+          }, (err) => { logger.error("Sessions snapshot error:", err); setError("Failed to load sessions."); }),
 
           onSnapshot(collections.payments, (snapshot) => {
             const fetchedPayments = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<Payment, 'id'>), id: doc.id })) as Payment[];
             setPayments(fetchedPayments);
             checkAllLoaded();
-          }, (err) => { console.error("Payments snapshot error:", err); setError("Failed to load payments."); }),
+          }, (err) => { logger.error("Payments snapshot error:", err); setError("Failed to load payments."); }),
           
           onSnapshot(collections.workoutPlans, (snapshot) => {
             const fetchedPlans = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<WorkoutPlan, 'id'>), id: doc.id })) as WorkoutPlan[];
             setWorkoutPlans(fetchedPlans);
             checkAllLoaded();
-          }, (err) => { console.error("WorkoutPlans snapshot error:", err); setError("Failed to load workout plans."); }),
+          }, (err) => { logger.error("WorkoutPlans snapshot error:", err); setError("Failed to load workout plans."); }),
           
           onSnapshot(collections.progressEntries, (snapshot) => {
             const fetchedEntries = snapshot.docs.map(doc => ({ ...(doc.data() as Omit<ProgressEntry, 'id'>), id: doc.id })) as ProgressEntry[];
             setProgressEntries(fetchedEntries);
             checkAllLoaded();
-          }, (err) => { console.error("ProgressEntries snapshot error:", err); setError("Failed to load progress entries."); }),
+          }, (err) => { logger.error("ProgressEntries snapshot error:", err); setError("Failed to load progress entries."); }),
         ];
 
         return () => {
@@ -303,7 +304,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
     }
     
     if (!user) {
-      console.error("User not authenticated for addProgressEntry");
+      logger.error("User not authenticated for addProgressEntry");
       throw new Error("User not authenticated for addProgressEntry");
     }
     
@@ -311,7 +312,7 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
       const docRef = await addDoc(collection(db, "users", user.uid, "progressEntries"), entry);
       return { ...entry, id: docRef.id };
     } catch (error) {
-      console.error("Firestore error in addProgressEntry:", error);
+      logger.error("Firestore error in addProgressEntry:", error);
       throw error;
     }
   };
@@ -332,13 +333,81 @@ const DataProvider = ({ children }: { children: React.ReactNode }) => {
   // These functions are not fully implemented for brevity in this refactor,
   // but they are added to satisfy the type interface.
   const archiveClients = async (clientIds: string[], reason?: string) => {
-    // TODO: Implement client archiving
+    if (isDemo) {
+      setClients(prev => prev.map(client => 
+        clientIds.includes(client.id) 
+          ? { ...client, status: { isActive: false } }
+          : client
+      ));
+      return;
+    }
+    
+    if (!user) throw new Error("User not authenticated for archiveClients");
+    
+    const batch = writeBatch(db);
+    clientIds.forEach(clientId => {
+      const clientRef = doc(db, "users", user.uid, "clients", clientId);
+      batch.update(clientRef, { 
+        status: { isActive: false },
+        archivedAt: new Date().toISOString(),
+        archiveReason: reason || "Archived by user"
+      });
+    });
+    
+    await batch.commit();
   };
+  
   const reactivateClients = async (clientIds: string[]) => {
-    // TODO: Implement client reactivation
+    if (isDemo) {
+      setClients(prev => prev.map(client => 
+        clientIds.includes(client.id) 
+          ? { ...client, status: { isActive: true } }
+          : client
+      ));
+      return;
+    }
+    
+    if (!user) throw new Error("User not authenticated for reactivateClients");
+    
+    const batch = writeBatch(db);
+    clientIds.forEach(clientId => {
+      const clientRef = doc(db, "users", user.uid, "clients", clientId);
+      batch.update(clientRef, { 
+        status: { isActive: true },
+        reactivatedAt: new Date().toISOString()
+      });
+    });
+    
+    await batch.commit();
   };
+  
   const handlePlanDowngrade = async (newLimit: number, selectedActiveIds: string[]) => {
-    // TODO: Implement plan downgrade logic
+    if (isDemo) {
+      // In demo mode, just update the client list to match the new limit
+      const activeClients = clients.filter(c => c.status.isActive);
+      if (activeClients.length > newLimit) {
+        const clientsToArchive = activeClients.slice(newLimit);
+        await archiveClients(clientsToArchive.map(c => c.id), "Plan downgrade - client limit exceeded");
+      }
+      return;
+    }
+    
+    if (!user) throw new Error("User not authenticated for handlePlanDowngrade");
+    
+    const activeClients = clients.filter(c => c.status.isActive);
+    if (activeClients.length > newLimit) {
+      // Archive clients beyond the new limit
+      const clientsToArchive = activeClients.slice(newLimit);
+      await archiveClients(clientsToArchive.map(c => c.id), "Plan downgrade - client limit exceeded");
+    }
+    
+    // Update user's plan information
+    const userRef = doc(db, "users", user.uid);
+    await updateDoc(userRef, {
+      selectedPlan: newLimit === 5 ? "starter" : newLimit === 25 ? "pro" : "enterprise",
+      clientLimit: newLimit,
+      planDowngradedAt: new Date().toISOString()
+    });
   };
   const getActiveClients = () => clients.filter(c => c.status.isActive);
   const getArchivedClients = () => clients.filter(c => !c.status.isActive);

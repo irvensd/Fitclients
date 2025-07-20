@@ -680,7 +680,7 @@ const SupportPortal = () => {
             const userData = doc.data();
             
             const userProfile = userData;
-            const issues = 0; // TODO: Count support tickets per user
+            const issues = userData.supportTickets?.length || 0; // Count support tickets per user
             const dataUsage = Math.random() * 2 + 0.1; // Mock calculation
             const subscription = userProfile?.selectedPlan || "starter";
             const lastLogin = userProfile?.lastLogin ? new Date(userProfile.lastLogin) : new Date();
@@ -1019,7 +1019,9 @@ const SupportPortal = () => {
   useEffect(() => {
     if (user) {
       const interval = setInterval(performHealthChecks, 30000);
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+      };
     }
   }, [user, performHealthChecks]);
 

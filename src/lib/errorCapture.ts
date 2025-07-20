@@ -1,5 +1,11 @@
 // Lazy import Firebase to prevent blocking app initialization
-let firestoreImports: any = null;
+interface FirestoreImports {
+  collection: any;
+  addDoc: any;
+  serverTimestamp: any;
+}
+
+let firestoreImports: FirestoreImports | null = null;
 let db: any = null;
 
 const getFirestore = async () => {

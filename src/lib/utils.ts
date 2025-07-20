@@ -73,10 +73,21 @@ export const logger = {
   error: (...args: any[]) => {
     // Always log errors, even in production
     console.error(...args);
+    
+    // In production, you might want to send errors to a logging service
+    if (import.meta.env.PROD) {
+      // TODO: Send to error tracking service like Sentry
+      // captureException(args[0]);
+    }
   },
   debug: (...args: any[]) => {
     if (import.meta.env.DEV) {
       console.log('[DEBUG]', ...args);
+    }
+  },
+  info: (...args: any[]) => {
+    if (import.meta.env.DEV) {
+      console.info('[INFO]', ...args);
     }
   }
 };

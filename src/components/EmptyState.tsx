@@ -1,8 +1,9 @@
 import React from "react";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { 
+  Plus, 
   Users, 
   Calendar, 
   DollarSign, 
@@ -16,20 +17,76 @@ import {
 } from "lucide-react";
 
 interface EmptyStateProps {
-  Icon: React.ElementType;
-  title: string;
-  description: string;
+  type: "clients" | "sessions" | "payments" | "workouts" | "progress" | "general";
+  title?: string;
+  description?: string;
   actionText?: string;
   onAction?: () => void;
+  showAction?: boolean;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({
-  Icon,
+const EmptyState: React.FC<EmptyStateProps> = React.memo(({
+  type,
   title,
   description,
   actionText,
   onAction,
+  showAction = true,
 }) => {
+  // Get icon and default content based on type
+  const getTypeConfig = () => {
+    switch (type) {
+      case "clients":
+        return {
+          icon: Users,
+          defaultTitle: "No Clients Yet",
+          defaultDescription: "Start building your client base by adding your first client.",
+          defaultActionText: "Add Client"
+        };
+      case "sessions":
+        return {
+          icon: Calendar,
+          defaultTitle: "No Sessions Scheduled",
+          defaultDescription: "Schedule your first training session to start tracking progress.",
+          defaultActionText: "Schedule Session"
+        };
+      case "payments":
+        return {
+          icon: DollarSign,
+          defaultTitle: "No Payments Recorded",
+          defaultDescription: "Start tracking payments to monitor your business revenue.",
+          defaultActionText: "Add Payment"
+        };
+      case "workouts":
+        return {
+          icon: Target,
+          defaultTitle: "No Workout Plans",
+          defaultDescription: "Create workout plans to help your clients achieve their goals.",
+          defaultActionText: "Create Plan"
+        };
+      case "progress":
+        return {
+          icon: TrendingUp,
+          defaultTitle: "No Progress Data",
+          defaultDescription: "Start tracking client progress to monitor their fitness journey.",
+          defaultActionText: "Record Progress"
+        };
+      default:
+        return {
+          icon: Plus,
+          defaultTitle: "Get Started",
+          defaultDescription: "Begin your fitness business journey with FitClients.",
+          defaultActionText: "Get Started"
+        };
+    }
+  };
+
+  const config = getTypeConfig();
+  const Icon = config.icon;
+  const displayTitle = title || config.defaultTitle;
+  const displayDescription = description || config.defaultDescription;
+  const displayActionText = actionText || config.defaultActionText;
+
   return (
     <div className="space-y-8">
       {/* Hero Section */}
@@ -38,13 +95,13 @@ const EmptyState: React.FC<EmptyStateProps> = ({
           <Icon className="h-8 w-8 text-white" aria-hidden="true" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">{title}</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{description}</p>
+          <h1 className="text-3xl font-bold text-foreground">{displayTitle}</h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{displayDescription}</p>
         </div>
-        {actionText && onAction && (
+        {showAction && displayActionText && onAction && (
           <div className="flex justify-center">
             <Button onClick={onAction} size="lg" className="text-lg px-8 py-3">
-              {actionText}
+              {displayActionText}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -273,6 +330,6 @@ const EmptyState: React.FC<EmptyStateProps> = ({
       </div>
     </div>
   );
-};
+});
 
 export default EmptyState; 

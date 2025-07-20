@@ -616,7 +616,9 @@ const Help = () => {
     // Set up periodic health checks every 30 seconds
     const interval = setInterval(performHealthChecks, 30000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [performHealthChecks]);
 
   // Format time ago

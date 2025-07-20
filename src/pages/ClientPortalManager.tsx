@@ -36,12 +36,14 @@ import {
   Users,
   ExternalLink,
   Check,
-  Mail,
+
   MessageSquare,
 } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useNavigate } from "react-router-dom";
 import { LoadingPage } from "@/components/ui/loading";
+import { useToast } from "@/components/ui/use-toast";
+
 
 // Mock clients data with working portal settings
 const mockClients = [
@@ -105,6 +107,7 @@ const SharePortalDialog = ({ client }: { client: any }) => {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const portalUrl = `${window.location.origin}/client-portal/${client.id}`;
+  const { toast } = useToast();
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(portalUrl);
@@ -112,28 +115,7 @@ const SharePortalDialog = ({ client }: { client: any }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleEmailShare = () => {
-    const subject = "Your Personal Fitness Portal";
-    const body = `Hi ${client.name},
 
-I've created a personal fitness portal just for you! You can access it anytime to view:
-
-• Your progress and measurements
-• Upcoming training sessions
-• Your personalized workout plan
-• Payment information
-
-Access your portal here: ${portalUrl}
-
-This link is secure and personalized just for you. Bookmark it for easy access!
-
-Best regards,
-Your Personal Trainer`;
-
-    window.open(
-      `mailto:${client.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
-    );
-  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -171,14 +153,6 @@ Your Personal Trainer`;
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              onClick={handleEmailShare}
-              className="justify-center sm:justify-start w-full"
-            >
-              <Mail className="h-4 w-4 mr-2" />
-              Email Client
-            </Button>
             <Button
               variant="outline"
               onClick={() => window.open(portalUrl, "_blank")}
@@ -330,7 +304,7 @@ const ClientPortalManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { clients, loading } = useData();
   const navigate = useNavigate();
-
+  const { toast } = useToast();
 
 
   // Add portal-specific properties for mock purposes

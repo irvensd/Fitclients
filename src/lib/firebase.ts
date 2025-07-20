@@ -5,13 +5,13 @@ import { getAnalytics } from "firebase/analytics";
 
 // Production Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB6YfS9EqFjpgbjzfBLGR90uTwt5-lJ8j4",
-  authDomain: "fitclients-4c5f2.firebaseapp.com",
-  projectId: "fitclients-4c5f2",
-  storageBucket: "fitclients-4c5f2.firebasestorage.app",
-  messagingSenderId: "407177727116",
-  appId: "1:407177727116:web:1f537948f3fd4b1e18ffa9",
-  measurementId: "G-BEWLBZ55RR",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB6YfS9EqFjpgbjzfBLGR90uTwt5-lJ8j4",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "fitclients-4c5f2.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "fitclients-4c5f2",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "fitclients-4c5f2.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "407177727116",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:407177727116:web:1f537948f3fd4b1e18ffa9",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-BEWLBZ55RR",
 };
 
 // Initialize Firebase

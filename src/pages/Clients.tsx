@@ -44,7 +44,7 @@ import {
   ExternalLink,
   Share2,
   Eye,
-  Mail,
+
   Copy,
   ChevronDown,
   Trash2,
@@ -60,6 +60,7 @@ import {
 } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { ProgressEntry } from "@/lib/types";
 import {
   getClientLimitInfo,
   canAddClient,
@@ -73,6 +74,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { ServiceRestriction } from "@/components/ServiceRestriction";
 import { LoadingPage } from "@/components/ui/loading";
+
 
 const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenChange?: (open: boolean) => void; }) => {
   const [open, setOpen] = useState(false);
@@ -617,9 +619,15 @@ const ClientDetailsModal = ({
     setLoading(true);
     try {
       // Create progress entry - only include fields that have values
-      const progressEntry: any = {
+      const progressEntry: ProgressEntry = {
+        id: `progress-${Date.now()}`,
         clientId: client.id,
         date: new Date().toISOString(),
+        weight: 0,
+        bodyFat: 0,
+        notes: "",
+        measurements: {},
+        photos: []
       };
 
       // Only add fields that have values
@@ -631,7 +639,7 @@ const ClientDetailsModal = ({
       }
 
       // Handle measurements - only include if any measurement is provided
-      const measurements: any = {};
+      const measurements: Record<string, number> = {};
       if (progressData.chest) measurements.chest = parseFloat(progressData.chest);
       if (progressData.waist) measurements.waist = parseFloat(progressData.waist);
       if (progressData.hips) measurements.hips = parseFloat(progressData.hips);
@@ -1236,48 +1244,15 @@ const Clients = () => {
 
   // Portal functions
   const openClientPortal = (clientId: string) => {
-    // For demo users, always redirect to demo portal
-    if (user?.email === 'trainer@demo.com') {
-      const portalUrl = `/demo-portal`;
-      window.open(portalUrl, "_blank");
-      return;
-    }
-    
-    const portalUrl = `/client-portal/${clientId}`;
-    window.open(portalUrl, "_blank");
-  };
-
-  const shareClientPortal = (client: any) => {
-    // For demo users, always use demo portal
     const portalUrl = user?.email === 'trainer@demo.com' 
       ? `${window.location.origin}/demo-portal`
-      : `${window.location.origin}/client-portal/${client.id}`;
-    
-    const subject = "Your Personal Fitness Portal";
-    const body = `Hi ${client.name},
-
-I've created a personal fitness portal just for you! You can access it anytime to view:
-
-• Your progress and measurements
-• Upcoming training sessions  
-• Your personalized workout plan
-• Payment information
-
-Access your portal here: ${portalUrl}
-
-This link is secure and personalized just for you. Bookmark it for easy access!
-
-Best regards,
-Your Personal Trainer`;
-
-    window.open(
-      `mailto:${client.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
-    );
+      : `${window.location.origin}/client-portal/${clientId}`;
+    window.open(portalUrl, '_blank');
   };
 
   const copyPortalLink = async (clientId: string, clientName: string) => {
     try {
-          const portalUrl = `${window.location.origin}/client-portal/${clientId}`;
+      const portalUrl = `${window.location.origin}/client-portal/${clientId}`;
       
       await navigator.clipboard.writeText(portalUrl);
       toast({
@@ -1752,10 +1727,6 @@ Your Personal Trainer`;
                               </Button>
                             </DropdownMenuTrigger>
                                                       <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); shareClientPortal(client); }}>
-                              <Mail className="h-4 w-4 mr-2" />
-                              Email Client
-                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); copyPortalLink(client.id, client.name); }}>
                               <Copy className="h-4 w-4 mr-2" />
                               Copy Portal Link

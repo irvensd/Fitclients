@@ -133,6 +133,7 @@ export const DatabasePerformanceMonitor: React.FC<DatabasePerformanceMonitorProp
         
         return () => {
           clearInterval(interval);
+          setRefreshInterval(null);
         };
       }
     }
@@ -140,6 +141,7 @@ export const DatabasePerformanceMonitor: React.FC<DatabasePerformanceMonitorProp
     return () => {
       if (refreshInterval) {
         clearInterval(refreshInterval);
+        setRefreshInterval(null);
       }
     };
   }, [isOpen, autoRefresh]);
