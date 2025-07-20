@@ -76,7 +76,7 @@ export interface Payment {
   clientId: string;
   amount: number;
   date: string;
-  method: 'cash' | 'card' | 'bank_transfer' | 'check' | 'other';
+  method: 'cash' | 'card' | 'bank_transfer' | 'bank-transfer' | 'venmo' | 'paypal' | 'check' | 'other';
   status: 'pending' | 'completed' | 'failed' | 'refunded';
   description?: string;
   notes?: string;

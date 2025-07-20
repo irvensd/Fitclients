@@ -59,6 +59,8 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { DemoPaymentBanner } from "@/components/DemoPaymentBanner";
 import { LoadingPage } from "@/components/ui/loading";
+import { InputDialog } from "@/components/ui/input-dialog";
+import { logger, logApiError } from "@/lib/logger";
 
 const getStatusBorderColor = (status: string) => {
   switch (status) {
@@ -385,6 +387,8 @@ const Payments = () => {
   const { toast } = useToast();
   const [deleteTarget, setDeleteTarget] = useState<Payment | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [paymentToFail, setPaymentToFail] = useState<Payment | null>(null);
+  const [showFailureReasonDialog, setShowFailureReasonDialog] = useState(false);
   const {
     payments,
     clients,
@@ -415,31 +419,41 @@ const Payments = () => {
     }
   };
 
-  const handleMarkAsFailed = async (payment: Payment) => {
-    // Enhanced confirmation with reason input
-    const reason = window.prompt("Reason for payment failure (optional):");
-    if (reason === null) return; // User cancelled
+  const handleMarkAsFailed = (payment: Payment) => {
+    setPaymentToFail(payment);
+    setShowFailureReasonDialog(true);
+  };
+
+  const confirmMarkAsFailed = async (reason: string) => {
+    if (!paymentToFail) return;
     
     try {
-      await updatePayment(payment.id, {
+      await updatePayment(paymentToFail.id, {
         status: "failed",
         description:
-          payment.description +
+          paymentToFail.description +
           (reason ? ` - Failed: ${reason}` : " - Payment failed"),
       });
       toast({
         title: "Payment Updated",
-        description: `Payment of $${payment.amount.toFixed(2)} for ${getClientName(
-          payment.clientId,
+        description: `Payment of $${paymentToFail.amount.toFixed(2)} for ${getClientName(
+          paymentToFail.clientId,
         )} marked as failed.`,
       });
     } catch (error) {
-      console.error("Error updating payment:", error);
+      logApiError("marking payment as failed", error, { 
+        paymentId: paymentToFail.id, 
+        clientId: paymentToFail.clientId,
+        reason 
+      });
       toast({
         variant: "destructive",
         title: "Update Failed",
         description: "Failed to update payment status. Please check your connection and try again.",
       });
+    } finally {
+      setPaymentToFail(null);
+      setShowFailureReasonDialog(false);
     }
   };
 
@@ -899,6 +913,17 @@ const Payments = () => {
             payment={deleteTarget}
             getClientName={getClientName}
             isDeleting={isDeleting}
+          />
+
+          <InputDialog
+            open={showFailureReasonDialog}
+            onOpenChange={setShowFailureReasonDialog}
+            title="Payment Failure Reason"
+            description="Please provide a reason for the payment failure (optional):"
+            placeholder="e.g., Insufficient funds, Card declined, etc."
+            confirmText="Mark as Failed"
+            cancelText="Cancel"
+            onConfirm={confirmMarkAsFailed}
           />
         </>
       )}
