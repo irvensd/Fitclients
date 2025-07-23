@@ -57,10 +57,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const isDemoUser = user?.email === 'trainer@demo.com';
 
   React.useEffect(() => {
-    // Set a timeout to prevent infinite loading
+    // Set a longer timeout to allow Firebase auth to properly initialize
+    // especially important when computer wakes up from sleep
     const timeoutId = setTimeout(() => {
       setLoading(false);
-    }, 1000); // Reduced timeout to 1 second
+    }, 5000); // Increased timeout to 5 seconds for better reliability
 
     if (isFirebaseConfigured && auth) {
       const unsubscribe = onAuthStateChanged(auth, (user) => {

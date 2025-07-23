@@ -56,14 +56,17 @@ const StaffOnlyRoute = ({ children }: { children: React.ReactNode }) => {
 const LandingRedirect = () => {
   const { user, loading } = useAuth();
   
+  // Show loading screen for a reasonable time while auth state settles
   if (loading) {
     return <LoadingScreen text="Loading..." size="lg" />;
   }
   
+  // If user is authenticated, redirect to dashboard
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
   
+  // If not authenticated, show landing page
   // Use startTransition to prevent Suspense errors during navigation
   return (
     <Suspense fallback={<LoadingScreen text="Loading..." size="lg" />}>

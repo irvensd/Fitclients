@@ -40,10 +40,14 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     checkOnboardingStatus();
   }, [user, isDemoUser]);
 
+  // Show loading while authentication state is being determined
+  // or while checking onboarding status
   if (loading || checkingOnboarding) {
     return <LoadingScreen text="Loading..." />;
   }
 
+  // If no user and we're not loading, redirect to login
+  // This should only happen after auth state has been properly determined
   if (!user) {
     return <Navigate to="/login" replace />;
   }
