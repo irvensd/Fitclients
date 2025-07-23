@@ -49,6 +49,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip unsupported URL schemes (chrome-extension, moz-extension, etc.)
+  if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
+  // Skip browser extension URLs and other non-cacheable schemes
+  if (url.protocol === 'chrome-extension:' || 
+      url.protocol === 'moz-extension:' || 
+      url.protocol === 'safari-extension:' ||
+      url.protocol === 'edge-extension:') {
+    return;
+  }
+
   // Handle different types of requests
   if (url.pathname.startsWith('/assets/')) {
     // Cache assets (JS, CSS, images)
@@ -70,6 +83,12 @@ async function cacheFirst(request, cacheName) {
   }
 
   try {
+    // Additional safety check - don't cache unsupported URL schemes
+    const url = new URL(request.url);
+    if (!url.protocol.startsWith('http')) {
+      return fetch(request);
+    }
+
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
       const cache = await caches.open(cacheName);
@@ -88,6 +107,12 @@ async function cacheFirst(request, cacheName) {
 // Network first strategy
 async function networkFirst(request, cacheName) {
   try {
+    // Additional safety check - don't cache unsupported URL schemes
+    const url = new URL(request.url);
+    if (!url.protocol.startsWith('http')) {
+      return fetch(request);
+    }
+
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
       const cache = await caches.open(cacheName);
