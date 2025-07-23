@@ -1332,7 +1332,7 @@ const Workouts = () => {
                     value="analytics" 
                     className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md sm:rounded-lg font-medium transition-all duration-200 text-xs sm:text-sm px-2 sm:px-4 py-2"
                   >
-                    <TrendingUpIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     <span className="hidden sm:inline">Analytics</span>
                     <span className="sm:hidden">Stats</span>
                   </TabsTrigger>
@@ -1473,7 +1473,7 @@ const Workouts = () => {
                                 {template.exercises.length} exercises
               </span>
               <span className="flex items-center gap-1">
-                                <ClockIcon className="h-3 w-3" />
+                                <Clock className="h-3 w-3" />
                                 {template.duration}
               </span>
                               <Badge variant="outline" className="text-xs">
@@ -1571,7 +1571,7 @@ const Workouts = () => {
                   <CardContent className="p-3 sm:p-6">
                     <div className="flex items-center gap-2 sm:gap-4">
                       <div className="p-2 sm:p-3 bg-green-500/10 rounded-lg">
-                        <UsersIcon className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
+                        <Users className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
           </div>
                       <div>
                         <p className="text-xs sm:text-sm font-medium text-gray-600">Clients with Plans</p>
@@ -1603,7 +1603,7 @@ const Workouts = () => {
                   <CardContent className="p-3 sm:p-6">
                     <div className="flex items-center gap-2 sm:gap-4">
                       <div className="p-2 sm:p-3 bg-orange-500/10 rounded-lg">
-                        <TrendingUpIcon className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" />
+                                                        <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" />
                       </div>
                       <div>
                         <p className="text-xs sm:text-sm font-medium text-gray-600">Avg. Duration</p>
@@ -1622,7 +1622,7 @@ const Workouts = () => {
               <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
                 <CardHeader className="pb-3 sm:pb-4">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                    <TrendingUpIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
                     Client Workout Progress
                   </CardTitle>
                   <CardDescription className="text-sm">
