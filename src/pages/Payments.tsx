@@ -190,7 +190,7 @@ const AddPaymentDialog = () => {
       });
       setOpen(false);
     } catch (error) {
-      console.error("Error adding payment:", error);
+      logger.error("Error adding payment:", error);
       toast({
         variant: "destructive",
         title: "Submission Error",
@@ -410,7 +410,7 @@ const Payments = () => {
         description: `Payment of $${payment.amount.toFixed(2)} for ${getClientName(payment.clientId)} marked as completed.`,
       });
     } catch (error) {
-      console.error("Error updating payment:", error);
+      logger.error("Error updating payment:", error);
       toast({
         variant: "destructive",
         title: "Update Failed",
@@ -482,7 +482,7 @@ const Payments = () => {
         description: `Payment record of $${deleteTarget.amount.toFixed(2)} for ${getClientName(deleteTarget.clientId)} has been successfully deleted.`,
       });
     } catch (error) {
-      console.error("Error deleting payment:", error);
+      logger.error("Error deleting payment:", error);
       toast({
         variant: "destructive",
         title: "Deletion Failed",

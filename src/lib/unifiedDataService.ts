@@ -1,5 +1,6 @@
 import { optimizedFirebaseService, QueryOptions } from './optimizedFirebaseService';
 import { offlineStorage } from './offlineStorage';
+import { logger } from './utils';
 import { Client, Session, Payment, WorkoutPlan, ProgressEntry } from './types';
 
 // Connection state management
@@ -82,11 +83,11 @@ class UnifiedDataService {
         await optimizedFirebaseService.getPerformanceMetrics();
         this.connectionState.isFirebaseConnected = true;
       } catch (error) {
-        console.warn('Firebase connection failed, using offline mode:', error);
+        logger.warn('Firebase connection failed, using offline mode:', error);
         this.connectionState.isFirebaseConnected = false;
       }
     } catch (error) {
-      console.error('Failed to initialize unified data service:', error);
+      logger.error('Failed to initialize unified data service:', error);
       throw error;
     }
   }
@@ -116,7 +117,7 @@ class UnifiedDataService {
           isFresh: true,
         };
       } catch (error) {
-        console.warn(`Firebase fetch failed for ${collection}, falling back to cache:`, error);
+        logger.warn(`Firebase fetch failed for ${collection}, falling back to cache:`, error);
         this.connectionState.isFirebaseConnected = false;
       }
     }
@@ -172,7 +173,7 @@ class UnifiedDataService {
           return parsed;
         }
       } catch (error) {
-        console.warn('Failed to parse cached data:', error);
+        logger.warn('Failed to parse cached data:', error);
       }
     }
     
@@ -209,7 +210,7 @@ class UnifiedDataService {
       const storeName = collection;
       await offlineStorage.bulkUpdate(storeName, data as any[]);
     } catch (error) {
-      console.warn('Failed to cache data offline:', error);
+      logger.warn('Failed to cache data offline:', error);
     }
   }
 
@@ -231,14 +232,14 @@ class UnifiedDataService {
     if (this.connectionState.isOnline && this.connectionState.isFirebaseConnected) {
       try {
         // In a real implementation, this would use Firebase's add methods
-        console.log('Syncing new data to Firebase:', newData);
+        logger.log('Syncing new data to Firebase:', newData);
         
         // Clear cache to force refresh
         this.clearCache(userId, collection);
         
         return newData;
       } catch (error) {
-        console.warn('Failed to sync to Firebase, queued for later:', error);
+        logger.warn('Failed to sync to Firebase, queued for later:', error);
         
         // Queue for later sync
         await offlineStorage.addToSyncQueue({
@@ -283,12 +284,12 @@ class UnifiedDataService {
     // Try to sync with Firebase if online
     if (this.connectionState.isOnline && this.connectionState.isFirebaseConnected) {
       try {
-        console.log('Syncing updated data to Firebase:', updatedData);
+        logger.log('Syncing updated data to Firebase:', updatedData);
         
         // Clear cache to force refresh
         this.clearCache(userId, collection);
       } catch (error) {
-        console.warn('Failed to sync update to Firebase, queued for later:', error);
+        logger.warn('Failed to sync update to Firebase, queued for later:', error);
         
         // Queue for later sync
         await offlineStorage.addToSyncQueue({
@@ -324,12 +325,12 @@ class UnifiedDataService {
     // Try to sync with Firebase if online
     if (this.connectionState.isOnline && this.connectionState.isFirebaseConnected) {
       try {
-        console.log('Syncing deletion to Firebase:', id);
+        logger.log('Syncing deletion to Firebase:', id);
         
         // Clear cache to force refresh
         this.clearCache(userId, collection);
       } catch (error) {
-        console.warn('Failed to sync deletion to Firebase, queued for later:', error);
+        logger.warn('Failed to sync deletion to Firebase, queued for later:', error);
         
         // Queue for later sync
         await offlineStorage.addToSyncQueue({
@@ -364,7 +365,7 @@ class UnifiedDataService {
         try {
           unsubscribe = this.subscribeToFirebase<T>(userId, collection, callback, options);
         } catch (error) {
-          console.warn('Firebase subscription failed, using offline data:', error);
+          logger.warn('Firebase subscription failed, using offline data:', error);
           this.loadOfflineData<T>(userId, collection, callback);
         }
       } else {
@@ -430,7 +431,7 @@ class UnifiedDataService {
       const data = await this.getFromOffline<T>(userId, collection);
       callback(data, 'offline');
     } catch (error) {
-      console.error('Failed to load offline data:', error);
+      logger.error('Failed to load offline data:', error);
       callback([], 'offline');
     }
   }
@@ -445,12 +446,12 @@ class UnifiedDataService {
     
     try {
       // This would implement the actual sync logic
-      console.log('Syncing offline data to Firebase...');
+      logger.log('Syncing offline data to Firebase...');
       
       // Update last sync time
       this.connectionState.lastSyncTime = Date.now();
     } catch (error) {
-      console.error('Sync failed:', error);
+      logger.error('Sync failed:', error);
     } finally {
       this.syncInProgress = false;
     }

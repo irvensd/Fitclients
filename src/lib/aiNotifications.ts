@@ -17,6 +17,7 @@ import {
   CollectionReference,
 } from "firebase/firestore";
 import { auth } from "./firebase";
+import { logger } from "./utils";
 import { useAuth } from "@/contexts/AuthContext";
 
 export interface AINotification {
@@ -203,7 +204,7 @@ class AINotificationManager {
   // Add notifications to the system
   async addNotifications(newNotifications: Omit<AINotification, 'id' | 'read' | 'timestamp'>[]): Promise<void> {
     if (!this.userId) {
-      console.warn("User not set, cannot add notifications.");
+      logger.warn("User not set, cannot add notifications.");
       return;
     }
 
@@ -223,7 +224,7 @@ class AINotificationManager {
           read: false,
         });
       } catch (error) {
-        console.error("Error adding notification to Firestore:", error);
+        logger.error("Error adding notification to Firestore:", error);
       }
     }
   }
@@ -245,14 +246,14 @@ class AINotificationManager {
     try {
       await updateDoc(notifDoc, { read: true });
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      logger.error("Error marking notification as read:", error);
     }
   }
 
   // Mark all as read
   async markAllAsRead(): Promise<void> {
     if (!this.userId) {
-      console.warn("User not set, cannot mark notifications as read.");
+      logger.warn("User not set, cannot mark notifications as read.");
       return;
     }
 
@@ -281,7 +282,7 @@ class AINotificationManager {
       
       // Marked notifications as read
     } catch (error) {
-      console.error("Error marking all notifications as read:", error);
+      logger.error("Error marking all notifications as read:", error);
       throw new Error("Failed to mark notifications as read");
     }
   }
@@ -308,7 +309,7 @@ class AINotificationManager {
           ...JSON.parse(saved),
         };
       } catch (e) {
-        console.warn("Failed to load notification settings:", e);
+        logger.warn("Failed to load notification settings:", e);
       }
     }
     return this.settings;
@@ -340,7 +341,7 @@ class AINotificationManager {
       })) as AINotification[];
       this.notifyListeners(notifications);
     }, (error) => {
-      console.error("Error fetching notifications:", error);
+      logger.error("Error fetching notifications:", error);
     });
   }
 

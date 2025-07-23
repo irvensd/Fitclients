@@ -669,7 +669,7 @@ const ViewWorkoutDialog = ({ workout, isOpen, onClose, onSave, getClientName }) 
         description: "Workout plan has been successfully updated.",
       });
     } catch (error) {
-      console.error("Error updating workout:", error);
+      logger.error("Error updating workout:", error);
       toast({
         title: "Error",
         description: "Failed to update workout. Please check your connection and try again.",
@@ -933,7 +933,7 @@ const Workouts = () => {
         // Use DataContext clients
         setClients(contextClients || []);
     } catch (error) {
-        console.error("Error loading data:", error);
+        logger.error("Error loading data:", error);
       toast({
         title: "Error",
           description: "Failed to load data.",
@@ -975,7 +975,7 @@ const Workouts = () => {
         description: "Workout plan has been successfully duplicated.",
       });
     } catch (error) {
-      console.error("Error duplicating workout:", error);
+      logger.error("Error duplicating workout:", error);
       toast({
         title: "Error",
         description: "Failed to duplicate workout. Please try again.",
@@ -1076,7 +1076,7 @@ const Workouts = () => {
         description: "Workout plan has been successfully updated.",
       });
       } catch (error) {
-      console.error("Error updating workout:", error);
+      logger.error("Error updating workout:", error);
         toast({
           title: "Error",
         description: "Failed to update workout. Please try again.",
@@ -1112,7 +1112,7 @@ const Workouts = () => {
         description: "Workout plan has been successfully updated.",
         });
       } catch (error) {
-      console.error("Error updating workout:", error);
+      logger.error("Error updating workout:", error);
         toast({
           title: "Error",
         description: "Failed to update workout. Please try again.",
@@ -1141,7 +1141,7 @@ const Workouts = () => {
       const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WorkoutPlan));
       setWorkoutPlans(plans);
     } catch (error) {
-      console.error("Error reloading workout plans:", error);
+      logger.error("Error reloading workout plans:", error);
     }
   };
 

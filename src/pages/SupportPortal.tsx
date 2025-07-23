@@ -629,7 +629,7 @@ const SupportPortal = () => {
           setTicketsError(null);
         },
         (error) => {
-          console.error('Error loading support tickets:', error);
+          logger.error('Error loading support tickets:', error);
           setTicketsError('Failed to load support tickets');
           setTicketsLoading(false);
         }
@@ -656,7 +656,7 @@ const SupportPortal = () => {
           setAlertsError(null);
         },
         (error) => {
-          console.error('Error loading system alerts:', error);
+          logger.error('Error loading system alerts:', error);
           setAlertsError('Failed to load system alerts');
           setAlertsLoading(false);
         }
@@ -743,7 +743,7 @@ const SupportPortal = () => {
           setClientEnvironments(realUserEnvironments);
           setEnvironmentsLoading(false);
         } catch (error) {
-          console.error('Error loading real user data:', error);
+          logger.error('Error loading real user data:', error);
           setEnvironmentsError('Failed to load user data: ' + (error instanceof Error ? error.message : 'Unknown error'));
           setEnvironmentsLoading(false);
         }
@@ -771,7 +771,7 @@ const SupportPortal = () => {
           setErrorLogs(logs);
         },
         (error) => {
-          console.error('Error loading error logs:', error);
+          logger.error('Error loading error logs:', error);
         }
       );
 
@@ -940,7 +940,7 @@ const SupportPortal = () => {
       }
       
     } catch (error) {
-      console.error(`Health check failed for ${service.name}:`, error);
+      logger.error(`Health check failed for ${service.name}:`, error);
       status = "outage";
       responseTime = Date.now() - startTime;
     }
@@ -1000,7 +1000,7 @@ const SupportPortal = () => {
       }
 
     } catch (error) {
-      console.error('Health check failed:', error);
+      logger.error('Health check failed:', error);
     } finally {
       setIsMonitoring(false);
     }
@@ -1012,7 +1012,7 @@ const SupportPortal = () => {
     auth.signOut().then(() => {
       window.location.href = "/";
     }).catch((error) => {
-      console.error('Error signing out:', error);
+      logger.error('Error signing out:', error);
       // Fallback redirect even if signout fails
       window.location.href = "/";
     });
@@ -1144,7 +1144,7 @@ const SupportPortal = () => {
         const userData = testUser.data();
       }
     } catch (error) {
-      console.error('Debug error:', error);
+      logger.error('Debug error:', error);
     }
   };
 
@@ -1405,7 +1405,7 @@ const SupportPortal = () => {
       
       await addDoc(collection(db, "errorLogs"), log);
     } catch (error) {
-      console.error('Error logging to Firestore:', error);
+      logger.error('Error logging to Firestore:', error);
     }
   };
 
@@ -1459,7 +1459,7 @@ const SupportPortal = () => {
       );
       await Promise.all(deletePromises);
     } catch (error) {
-      console.error('Error clearing logs:', error);
+      logger.error('Error clearing logs:', error);
     }
   };
 
@@ -1619,7 +1619,7 @@ const SupportPortal = () => {
         updatedAt: serverTimestamp()
       });
     } catch (error) {
-      console.error('Error resolving alert:', error);
+      logger.error('Error resolving alert:', error);
     }
   };
 
@@ -1634,7 +1634,7 @@ const SupportPortal = () => {
         });
       }
     } catch (error) {
-      console.error('Error escalating alert:', error);
+      logger.error('Error escalating alert:', error);
     }
   };
 
@@ -1660,7 +1660,7 @@ const SupportPortal = () => {
         // This will be handled by a cloud function or backend service
       }
     } catch (error) {
-      console.error('Error generating alert:', error);
+      logger.error('Error generating alert:', error);
     }
   };
 

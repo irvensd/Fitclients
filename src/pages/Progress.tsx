@@ -52,6 +52,7 @@ import { Client, ProgressEntry } from "@/lib/types";
 import { useData } from "@/contexts/DataContext";
 import { SmartRecommendations } from "@/components/SmartRecommendations";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -167,7 +168,7 @@ const AddProgressDialog = () => {
       });
       setOpen(false);
     } catch (error) {
-      console.error("Error recording progress:", error);
+      logger.error("Error recording progress:", error);
       toast({
         variant: "destructive",
         title: "Submission Error",
@@ -375,7 +376,7 @@ const ClientProgressCard = ({ client }: { client: Client }) => {
       });
       setShowDeleteDialog(false);
     } catch (error) {
-      console.error("Error deleting progress:", error);
+      logger.error("Error deleting progress:", error);
       toast({
         variant: "destructive",
         title: "Deletion Error",

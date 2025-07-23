@@ -17,6 +17,7 @@ import {
   arrayUnion,
 } from "firebase/firestore";
 import { db } from "./firebase";
+import { logger } from "./utils";
 import { Client, Session, Payment, UserProfile, BillingHistory, ReferralData, ReferralStats } from "./types";
 import { subscriptionExtensionService } from "./subscriptionExtension";
 
@@ -49,7 +50,7 @@ export const userProfileService = {
               // User profile created successfully
       return userProfile;
     } catch (error) {
-      console.error("Error creating user profile:", error);
+      logger.error("Error creating user profile:", error);
       throw error;
     }
   },
@@ -69,7 +70,7 @@ export const userProfileService = {
               // No user profile found
       return null;
     } catch (error) {
-      console.error("Error fetching user profile:", error);
+      logger.error("Error fetching user profile:", error);
       throw error;
     }
   },
@@ -144,7 +145,7 @@ export const clientsService = {
         callback(clients);
       },
       (error) => {
-        console.error("Firestore clients subscription error:", error);
+        logger.error("Firestore clients subscription error:", error);
         if (errorCallback) errorCallback(error);
       },
     );
@@ -202,7 +203,7 @@ export const sessionsService = {
         callback(sessions);
       },
       (error) => {
-        console.error("Firestore sessions subscription error:", error);
+        logger.error("Firestore sessions subscription error:", error);
         if (errorCallback) errorCallback(error);
       },
     );
@@ -260,7 +261,7 @@ export const paymentsService = {
         callback(payments);
       },
       (error) => {
-        console.error("Firestore payments subscription error:", error);
+        logger.error("Firestore payments subscription error:", error);
         if (errorCallback) errorCallback(error);
       },
     );
@@ -347,7 +348,7 @@ export const supportTicketsService = {
       const tickets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       callback(tickets);
     }, (error) => {
-      console.error("Firestore supportTickets subscription error:", error);
+      logger.error("Firestore supportTickets subscription error:", error);
       if (errorCallback) errorCallback(error);
     });
   },
@@ -368,7 +369,7 @@ export const billingHistoryService = {
         ...doc.data(),
       })) as BillingHistory[];
     } catch (error) {
-      console.error("Error fetching billing history:", error);
+      logger.error("Error fetching billing history:", error);
       return [];
     }
   },
@@ -382,7 +383,7 @@ export const billingHistoryService = {
       });
       return docRef.id;
     } catch (error) {
-      console.error("Error adding billing history item:", error);
+      logger.error("Error adding billing history item:", error);
       throw error;
     }
   },
@@ -397,7 +398,7 @@ export const billingHistoryService = {
       const billingRef = doc(getUserCollection(userId, "billingHistory"), billingId);
       return updateDoc(billingRef, updates);
     } catch (error) {
-      console.error("Error updating billing history item:", error);
+      logger.error("Error updating billing history item:", error);
       throw error;
     }
   },
@@ -422,7 +423,7 @@ export const billingHistoryService = {
         callback(billingHistory);
       },
       (error) => {
-        console.error("Firestore billing history subscription error:", error);
+        logger.error("Firestore billing history subscription error:", error);
         if (errorCallback) errorCallback(error);
       },
     );
@@ -472,7 +473,7 @@ export const referralService = {
 
       return referralCode;
     } catch (error) {
-      console.error("Error getting/creating referral code:", error);
+      logger.error("Error getting/creating referral code:", error);
       throw error;
     }
   },
@@ -515,7 +516,7 @@ export const referralService = {
         referralLink,
       } as ReferralStats;
     } catch (error) {
-      console.error("Error getting referral stats:", error);
+      logger.error("Error getting referral stats:", error);
       throw error;
     }
   },
@@ -545,7 +546,7 @@ export const referralService = {
         ...referralData,
       } as ReferralData;
     } catch (error) {
-      console.error("Error creating referral:", error);
+      logger.error("Error creating referral:", error);
       throw error;
     }
   },
@@ -574,7 +575,7 @@ export const referralService = {
 
       return true;
     } catch (error) {
-      console.error("Error completing referral:", error);
+      logger.error("Error completing referral:", error);
       throw error;
     }
   },
@@ -642,13 +643,13 @@ export const referralService = {
         await subscriptionExtensionService.applyFreeMonth(referrerId);
         await subscriptionExtensionService.applyFreeMonth(referredUserId);
       } catch (extensionError) {
-        console.error("Error applying free months:", extensionError);
+        logger.error("Error applying free months:", extensionError);
         // Don't fail the referral completion if extension fails
       }
       
       return true;
     } catch (error) {
-      console.error("Error granting referral rewards:", error);
+      logger.error("Error granting referral rewards:", error);
       throw error;
     }
   },
@@ -687,7 +688,7 @@ export const referralService = {
         callback(referrals);
       },
       (error) => {
-        console.error("Firestore referrals subscription error:", error);
+        logger.error("Firestore referrals subscription error:", error);
         if (errorCallback) errorCallback(error);
       },
     );
@@ -713,7 +714,7 @@ export const referralService = {
         referrerEmail: userData.email,
       };
     } catch (error) {
-      console.error("Error validating referral code:", error);
+      logger.error("Error validating referral code:", error);
       return { valid: false };
     }
   },

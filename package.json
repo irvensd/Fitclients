@@ -44,6 +44,8 @@
     "@radix-ui/react-visually-hidden": "^1.2.3",
     "@react-three/drei": "^10.1.2",
     "@react-three/fiber": "^8.18.0",
+    "@sentry/react": "^8.55.0",
+    "@sentry/vite-plugin": "^2.23.0",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.3.1",
     "@swc/core": "^1.11.24",

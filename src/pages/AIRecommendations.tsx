@@ -51,6 +51,7 @@ import {
 } from "@/lib/recommendations";
 import { useData } from "@/contexts/DataContext";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/utils";
 import { LoadingPage } from "@/components/ui/loading";
 
 const AIRecommendations = () => {
@@ -88,7 +89,7 @@ const AIRecommendations = () => {
         const ids = new Set<string>(appliedRecs.map((rec: any) => rec.id as string));
         setAppliedRecommendationIds(ids);
       } catch (e) {
-        console.warn("Failed to load applied recommendations:", e);
+        logger.warn("Failed to load applied recommendations:", e);
         // Clear corrupted localStorage data
         localStorage.removeItem("appliedRecommendations");
         toast({
@@ -154,7 +155,7 @@ const AIRecommendations = () => {
     try {
       return generateRecommendations(client, sessions, payments);
     } catch (error) {
-      console.error(`Error generating recommendations for ${client.name}:`, error);
+      logger.error(`Error generating recommendations for ${client.name}:`, error);
       // Return a basic analysis structure if generation fails
       return {
         clientId: client.id,
@@ -252,7 +253,7 @@ const AIRecommendations = () => {
                 duration: 5000,
               });
             } catch (error) {
-              console.error("AI analysis failed:", error);
+              logger.error("AI analysis failed:", error);
               setIsAnalyzing(false);
               toast({
                 title: "Analysis Failed",

@@ -3,6 +3,10 @@ import { HelmetProvider } from 'react-helmet-async'
 import App from './App.tsx'
 import './index.css'
 
+// Initialize Sentry for error tracking (must be first)
+import { initializeSentry } from '@/lib/sentry';
+initializeSentry();
+
 // Initialize error capture for production debugging
 import '@/lib/errorCapture';
 

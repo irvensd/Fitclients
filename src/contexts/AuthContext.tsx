@@ -12,6 +12,7 @@ import { userProfileService, referralService } from "@/lib/firebaseService";
 import { UserProfile } from "@/lib/types";
 import { logger, logApiError } from "@/lib/logger";
 import { handleError, retryOperation } from "@/lib/errorHandling";
+import { setSentryUser, clearSentryUser, addSentryBreadcrumb } from "@/lib/sentry";
 
 export interface AuthContextType {
   user: User | null;
@@ -67,6 +68,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         clearTimeout(timeoutId);
         setUser(user);
+        
+        // Set Sentry user context
+        if (user) {
+          setSentryUser({
+            id: user.uid,
+            email: user.email || undefined,
+            name: user.displayName || undefined,
+            role: 'trainer'
+          });
+          addSentryBreadcrumb('User authenticated', 'auth', 'info', {
+            userId: user.uid,
+            email: user.email
+          });
+        } else {
+          clearSentryUser();
+          addSentryBreadcrumb('User signed out', 'auth', 'info');
+        }
+        
         setLoading(false);
       });
       return () => {
@@ -80,10 +99,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           setDevUser(parsedUser);
-          setUser({ 
+          const mockUser = { 
             email: parsedUser.email,
             uid: parsedUser.uid || "demo-user-123"
-          } as User);
+          } as User;
+          setUser(mockUser);
+          
+          // Set Sentry user context for demo user
+          setSentryUser({
+            id: mockUser.uid,
+            email: mockUser.email || undefined,
+            name: parsedUser.displayName || undefined,
+            role: 'demo-trainer'
+          });
+          addSentryBreadcrumb('Demo user authenticated', 'auth', 'info', {
+            userId: mockUser.uid,
+            email: mockUser.email
+          });
         }
       } catch (error) {
         logApiError("parsing stored user", error);
@@ -239,6 +271,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const logout = React.useCallback(async () => {
     setAuthError(null);
     try {
+      // Clear Sentry user context before logout
+      clearSentryUser();
+      addSentryBreadcrumb('User logout initiated', 'auth', 'info');
+      
       if (isFirebaseConfigured && auth) {
         await signOut(auth);
       }
@@ -247,10 +283,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(null);
       localStorage.removeItem("devUser");
 
+      addSentryBreadcrumb('User logout completed', 'auth', 'info');
+      
       // Force redirect to login page
       window.location.href = "/login";
     } catch (error) {
       logApiError("logout error", error);
+      addSentryBreadcrumb('User logout failed', 'auth', 'error', { 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+      
       // Even if Firebase logout fails, clear local state
       setDevUser(null);
       setUser(null);

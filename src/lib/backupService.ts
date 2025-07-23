@@ -1,5 +1,6 @@
 import { collection, getDocs, addDoc, deleteDoc, doc, writeBatch } from "firebase/firestore";
 import { db } from "./firebase";
+import { logger } from "./utils";
 import { Client, Session, Payment, WorkoutPlan, ProgressEntry } from "./types";
 
 export interface BackupData {
@@ -91,7 +92,7 @@ class BackupService {
       return backupData;
 
     } catch (error) {
-      console.error('Error exporting user data:', error);
+      logger.error('Error exporting user data:', error);
       throw new Error(`Failed to export data: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -114,7 +115,7 @@ class BackupService {
       URL.revokeObjectURL(url);
 
     } catch (error) {
-      console.error('Error downloading backup:', error);
+      logger.error('Error downloading backup:', error);
       throw new Error(`Failed to download backup: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -212,7 +213,7 @@ class BackupService {
       // Check if any errors occurred
       if (results.errors.length > 0) {
         results.success = false;
-        console.warn('Import completed with errors:', results.errors);
+        logger.warn('Import completed with errors:', results.errors);
       } else {
         // Data import completed successfully
       }
@@ -220,7 +221,7 @@ class BackupService {
       return results;
 
     } catch (error) {
-      console.error('Error importing backup:', error);
+      logger.error('Error importing backup:', error);
       results.success = false;
       results.errors.push(error instanceof Error ? error.message : 'Unknown error');
       return results;
@@ -268,7 +269,7 @@ class BackupService {
       return backupId;
 
     } catch (error) {
-      console.error('Error creating automated backup:', error);
+      logger.error('Error creating automated backup:', error);
       
       // Update status with error
       this.backupStatus.set(backupId, {
@@ -315,7 +316,7 @@ class BackupService {
 
       return backups;
     } catch (error) {
-      console.error('Error listing backups:', error);
+      logger.error('Error listing backups:', error);
       throw new Error(`Failed to list backups: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -354,7 +355,7 @@ class BackupService {
       };
 
     } catch (error) {
-      console.error('Error restoring from backup:', error);
+      logger.error('Error restoring from backup:', error);
       throw new Error(`Failed to restore backup: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -366,7 +367,7 @@ class BackupService {
     try {
       await deleteDoc(doc(db, "backups", backupId));
     } catch (error) {
-      console.error('Error deleting backup:', error);
+      logger.error('Error deleting backup:', error);
       throw new Error(`Failed to delete backup: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -381,7 +382,7 @@ class BackupService {
         ...doc.data()
       }));
     } catch (error) {
-      console.error(`Error fetching collection ${collectionPath}:`, error);
+      logger.error(`Error fetching collection ${collectionPath}:`, error);
       return [];
     }
   }
@@ -399,7 +400,7 @@ class BackupService {
         batch.set(docRef, itemData);
         importedCount++;
       } catch (error) {
-        console.error(`Error importing item in ${collectionPath}:`, error);
+        logger.error(`Error importing item in ${collectionPath}:`, error);
       }
     }
 
@@ -421,7 +422,7 @@ class BackupService {
         
         await batch.commit();
       } catch (error) {
-        console.error(`Error clearing ${collectionName}:`, error);
+        logger.error(`Error clearing ${collectionName}:`, error);
       }
     }
   }

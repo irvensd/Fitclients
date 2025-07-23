@@ -53,6 +53,7 @@ import {
   cancelSubscription,
 } from "@/lib/stripe";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/utils";
 import { DevModeNotice } from "@/components/DevModeNotice";
 import { useNavigate } from "react-router-dom";
 import { billingHistoryService } from "@/lib/firebaseService";
@@ -176,7 +177,7 @@ const AddPaymentMethodDialog = ({
         name: "",
       });
     } catch (error) {
-      console.error("Error adding payment method:", error);
+      logger.error("Error adding payment method:", error);
     } finally {
       setLoading(false);
     }
@@ -482,7 +483,7 @@ const BillingHistoryComponent = () => {
         setLoading(false);
       },
       (error) => {
-        console.error("Error loading billing history:", error);
+        logger.error("Error loading billing history:", error);
         setLoading(false);
       }
     );
@@ -617,7 +618,7 @@ const Billing = () => {
       // Refresh subscription data to reflect changes
       await refreshSubscription();
     } catch (error) {
-      console.error("Error updating subscription:", error);
+      logger.error("Error updating subscription:", error);
       toast({
         title: "Update failed",
         description: "There was an error updating your subscription. Please try again.",

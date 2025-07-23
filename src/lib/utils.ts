@@ -56,8 +56,9 @@ export const formatCancellationTime = (cancelledAt: string) => {
 };
 
 /**
- * Production-friendly logging utility
+ * Production-friendly logging utility with Sentry integration
  * Only logs in development mode to keep production console clean
+ * Sends errors to Sentry in production
  */
 export const logger = {
   log: (...args: any[]) => {
@@ -69,25 +70,80 @@ export const logger = {
     if (import.meta.env.DEV) {
       console.warn(...args);
     }
+    
+    // Send warnings to Sentry in production for monitoring
+    if (import.meta.env.PROD) {
+      try {
+        const { captureSentryMessage } = require('./sentry');
+        const message = args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
+        captureSentryMessage(message, 'warning');
+      } catch (error) {
+        // Fallback if Sentry is not available
+        console.warn('Failed to send warning to Sentry:', error);
+      }
+    }
   },
   error: (...args: any[]) => {
     // Always log errors, even in production
     console.error(...args);
     
-    // In production, you might want to send errors to a logging service
+    // Send errors to Sentry in production
     if (import.meta.env.PROD) {
-      // TODO: Send to error tracking service like Sentry
-      // captureException(args[0]);
+      try {
+        const { captureSentryException, captureSentryMessage } = require('./sentry');
+        const firstArg = args[0];
+        
+        if (firstArg instanceof Error) {
+          // Send actual Error objects to Sentry
+          captureSentryException(firstArg, {
+            extra: {
+              additionalArgs: args.slice(1),
+              timestamp: new Date().toISOString(),
+            }
+          });
+        } else {
+          // Send error messages to Sentry
+          const message = args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
+          captureSentryMessage(message, 'error', {
+            timestamp: new Date().toISOString(),
+          });
+        }
+      } catch (error) {
+        // Fallback if Sentry is not available
+        console.error('Failed to send error to Sentry:', error);
+      }
     }
   },
   debug: (...args: any[]) => {
     if (import.meta.env.DEV) {
       console.log('[DEBUG]', ...args);
     }
+    
+    // Optionally send debug info to Sentry for troubleshooting
+    if (import.meta.env.VITE_SENTRY_DEBUG === 'true') {
+      try {
+        const { captureSentryMessage } = require('./sentry');
+        const message = '[DEBUG] ' + args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
+        captureSentryMessage(message, 'debug');
+      } catch (error) {
+        // Silent fallback for debug messages
+      }
+    }
   },
   info: (...args: any[]) => {
     if (import.meta.env.DEV) {
       console.info('[INFO]', ...args);
+    }
+    
+    // Send important info to Sentry for monitoring
+    if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_INFO === 'true') {
+      try {
+        const { captureSentryMessage } = require('./sentry');
+        const message = '[INFO] ' + args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
+        captureSentryMessage(message, 'info');
+      } catch (error) {
+        // Silent fallback for info messages
+      }
     }
   }
 };

@@ -145,7 +145,7 @@ const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) =>
       setIsOpen(false);
       onSessionAdded();
     } catch (error) {
-      console.error("Error creating session:", error);
+      logger.error("Error creating session:", error);
       toast({
         title: "Error",
         description: "Failed to create session. Please try again.",
@@ -428,7 +428,7 @@ const Sessions = () => {
         description: "Session has been successfully updated.",
       });
     } catch (error) {
-      console.error("Error updating session:", error);
+      logger.error("Error updating session:", error);
       toast({
         title: "Error",
         description: "Failed to update session. Please try again.",
@@ -490,7 +490,7 @@ const Sessions = () => {
         description: "Session has been marked as completed.",
       });
     } catch (error) {
-      console.error("Error completing session:", error);
+      logger.error("Error completing session:", error);
       toast({
         title: "Error",
         description: "Failed to complete session. Please try again.",
