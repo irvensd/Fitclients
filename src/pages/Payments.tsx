@@ -393,6 +393,7 @@ const Payments = () => {
     payments,
     clients,
     loading,
+    error,
     getClientName,
     updatePayment,
     deletePayment,
@@ -580,6 +581,42 @@ const Payments = () => {
 
   if (loading) {
     return <LoadingPage text="Loading payments..." />;
+  }
+
+  // Add error boundary for payments page
+  if (error) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Payments</h1>
+            <p className="text-muted-foreground">
+              Track payments and manage your revenue.
+            </p>
+          </div>
+        </div>
+        
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <h3 className="font-semibold text-red-900">Error Loading Payments</h3>
+            </div>
+            <p className="text-sm text-red-700 mb-4">
+              {error}
+            </p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              variant="outline"
+              className="border-red-300 text-red-700 hover:bg-red-100"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
