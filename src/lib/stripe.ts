@@ -11,66 +11,99 @@ export const SUBSCRIPTION_PLANS = {
   STARTER: {
     id: "starter",
     name: "Starter",
-    price: 9,
+    price: 19,
     interval: "month",
     stripeProductId: "prod_starter", // Will be created in Stripe dashboard
     stripePriceId: "price_starter", // Will be created in Stripe dashboard
     features: [
-      "Manage up to 200 clients",
+      "Manage up to 25 clients",
       "Session scheduling & calendar",
-      "Payment tracking & invoicing",
-      "Progress tracking",
+      "Basic payment tracking",
       "Client portal links (no login)",
-      "Workout plan builder",
-      "Session recaps",
-      "Custom business branding",
+      "Basic workout plans",
       "Email support",
+      "Mobile app access",
     ],
     limits: {
-      clients: 200,
-      sessions: 1000,
-      storage: "2GB",
+      clients: 25,
+      sessions: 500,
+      storage: "1GB",
     },
+    description: "Perfect for new trainers getting started",
   },
   PRO: {
     id: "pro",
-    name: "Pro",
-    price: 19,
+    name: "Professional",
+    price: 49,
     interval: "month",
     stripeProductId: "prod_pro", // Will be created in Stripe dashboard
     stripePriceId: "price_pro", // Will be created in Stripe dashboard
     features: [
       "Everything in Starter, plus:",
-      "Unlimited clients",
+      "Manage up to 100 clients",
       "AI-powered recommendations",
-      "Client progress stats & performance summaries",
+      "Advanced progress tracking & analytics",
+      "Session recaps with AI insights",
+      "Custom business branding",
+      "Client success stories feature",
       "Priority support",
+    ],
+    limits: {
+      clients: 100,
+      sessions: -1, // Unlimited
+      storage: "5GB",
+    },
+    description: "For growing fitness businesses",
+    popular: true,
+  },
+  STUDIO: {
+    id: "studio",
+    name: "Studio",
+    price: 99,
+    interval: "month",
+    stripeProductId: "prod_studio", // Will be created in Stripe dashboard
+    stripePriceId: "price_studio", // Will be created in Stripe dashboard
+    features: [
+      "Everything in Professional, plus:",
+      "Unlimited clients",
+      "Multi-trainer support (up to 5 trainers)",
+      "Advanced business analytics",
+      "White-label client app",
+      "API access",
+      "Advanced automation",
+      "Phone support",
     ],
     limits: {
       clients: -1, // Unlimited
       sessions: -1, // Unlimited
-      storage: "10GB",
+      storage: "20GB",
     },
+    description: "For studios and multi-trainer businesses",
   },
   LIFETIME: {
     id: "lifetime",
-    name: "Pro Lifetime",
-    price: 149,
+    name: "Professional Lifetime",
+    price: 497,
     interval: "one-time",
     stripeProductId: "prod_lifetime", // Will be created in Stripe dashboard
     stripePriceId: "price_lifetime", // Will be created in Stripe dashboard
     features: [
-      "Everything in Pro, forever",
-      "No monthly fees",
-      "All future updates included",
-      "Lifetime support",
-      "Limited to first 100 trainers",
+      "Everything in Professional plan",
+      "Lifetime access - pay once, own forever",
+      "All future updates included forever",
+      "Grandfathered pricing protection",
+      "Lifetime priority support",
+      "⚡ LIMITED: Only 500 spots available",
     ],
     limits: {
-      clients: -1, // Unlimited
+      clients: 100,
       sessions: -1, // Unlimited
       storage: "10GB",
     },
+    description: "Pay once, own forever",
+    urgency: true,
+    limitedSpots: 500,
+    spotsTaken: 347, // This would be dynamic in real app
   },
 };
 

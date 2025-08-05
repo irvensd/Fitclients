@@ -256,32 +256,67 @@ const Dashboard = () => {
   if (clients.length === 0 && sessions.length === 0 && payments.length === 0) {
     return (
       <div className="p-6 space-y-6">
-        <PageHeader 
-          title="Welcome to FitClient! 🎉"
-          description="Your complete fitness business management platform. Get started by exploring the features below and adding your first client to begin your journey."
-          level={1}
-        />
-        <EmptyState
-          Icon={Users}
-          title="Welcome to FitClient! 🎉"
-          description="Your complete fitness business management platform. Get started by exploring the features below and adding your first client to begin your journey."
-          actionText="Add Your First Client"
-          onAction={() => navigate("/clients")}
-        />
+              <PageHeader 
+        title={`Welcome to FitClient, ${user?.displayName || user?.email?.split('@')[0] || 'Trainer'}! 🎉`}
+        description="Your complete fitness business management platform. Get started by exploring the features below and adding your first client to begin your journey."
+        level={1}
+      />
+      <EmptyState
+        type="clients"
+        title={`Welcome to FitClient, ${user?.displayName || user?.email?.split('@')[0] || 'Trainer'}! 🎉`}
+        description="Your complete fitness business management platform. Get started by exploring the features below and adding your first client to begin your journey."
+        actionText="Add Your First Client"
+        onAction={() => navigate("/clients")}
+      />
       </div>
     );
   }
 
-  // Calculate dashboard stats
-  const stats = calculateDashboardStats(clients, sessions, payments);
+  // Calculate dashboard stats with demo enhancements
+  let stats = calculateDashboardStats(clients, sessions, payments);
+  
+  // Enhanced stats for demo users to show impressive metrics
+  if (isDemo) {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    // Calculate actual current month revenue for demo
+    const currentMonthRevenue = payments
+      .filter((payment) => {
+        const paymentDate = new Date(payment.date);
+        return (
+          paymentDate.getMonth() === currentMonth &&
+          paymentDate.getFullYear() === currentYear &&
+          payment.status === "completed"
+        );
+      })
+      .reduce((total, payment) => total + payment.amount, 0);
+    
+    // Override with impressive demo metrics
+    stats = {
+      ...stats,
+      monthlyRevenue: currentMonthRevenue || 2850, // Fallback to impressive number
+      sessionsThisWeek: Math.max(stats.sessionsThisWeek, 18), // At least 18 sessions this week
+      sessionsToday: Math.max(stats.sessionsToday, 3), // At least 3 sessions today
+      totalClients: Math.max(stats.totalClients, 12), // At least 12 clients
+      activeWorkoutPlans: Math.max(stats.totalClients, 12),
+      pendingPayments: Math.min(stats.pendingPayments, 1), // Keep pending low
+    };
+  }
+  
   const recentClients = getRecentClients(clients).slice(0, 10);
   const todaysSessions = getTodaysSessions(sessions).slice(0, 10);
   const recentCancellations = getRecentCancellations(sessions).slice(0, 10);
 
-  // Dynamic success rate
-  const successRate = sessions.length
+  // Dynamic success rate with demo enhancement
+  let successRate = sessions.length
     ? Math.round((sessions.filter(s => s.status === "completed").length / sessions.length) * 100)
     : 0;
+    
+  // Enhance success rate for demo to show impressive business metrics
+  if (isDemo) {
+    successRate = Math.max(successRate, 94); // At least 94% success rate for demo
+  }
 
   // Prepare motivational stats for creative dashboard
   const motivationalStats = {
@@ -302,6 +337,41 @@ const Dashboard = () => {
 
       <QuickActionsWidget />
 
+      {/* Demo Success Banner for Demo Users */}
+      {isDemo && (
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-green-100 rounded-full">
+              <TrendingUp className="h-5 w-5 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-green-800 mb-1">🎉 Your Fitness Business is Thriving!</h3>
+              <p className="text-sm text-green-700 mb-2">
+                This is what a successful FitClient business looks like - organized clients, growing revenue, and efficient operations.
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                <div className="bg-white/60 rounded px-2 py-1">
+                  <div className="font-medium text-green-800">94% Success Rate</div>
+                  <div className="text-green-600">Session completion</div>
+                </div>
+                <div className="bg-white/60 rounded px-2 py-1">
+                  <div className="font-medium text-green-800">42% Growth</div>
+                  <div className="text-green-600">Monthly revenue</div>
+                </div>
+                <div className="bg-white/60 rounded px-2 py-1">
+                  <div className="font-medium text-green-800">3 New Clients</div>
+                  <div className="text-green-600">This week</div>
+                </div>
+                <div className="bg-white/60 rounded px-2 py-1">
+                  <div className="font-medium text-green-800">$85 Avg</div>
+                  <div className="text-green-600">Session rate</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Demo Tips for Demo Users */}
       <DemoTips />
 
@@ -319,7 +389,8 @@ const Dashboard = () => {
                 {stats.totalClients}
               </div>
               <p className="text-xs text-muted-foreground">
-                {stats.totalClients > 0 ? `${stats.totalClients} active clients` : 'No clients yet'}
+                {isDemo ? `active clients (+3 this week) 🔥` : 
+                 stats.totalClients > 0 ? `${stats.totalClients} active clients` : 'No clients yet'}
               </p>
             </CardContent>
           </Card>
@@ -334,7 +405,7 @@ const Dashboard = () => {
                 {stats.sessionsThisWeek}
               </div>
               <p className="text-xs text-muted-foreground">
-                sessions scheduled
+                {isDemo ? "sessions this week (98% completion rate) ⭐" : "sessions scheduled"}
               </p>
             </CardContent>
           </Card>
@@ -346,10 +417,10 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold" aria-label={`$${stats.monthlyRevenue.toFixed(2)} revenue this month`}>
-                ${stats.monthlyRevenue.toFixed(2)}
+                ${stats.monthlyRevenue.toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">
-                this month
+                {isDemo ? "this month (+42% vs last month) 📈" : "this month"}
               </p>
             </CardContent>
           </Card>
@@ -364,7 +435,7 @@ const Dashboard = () => {
                 {stats.pendingPayments}
               </div>
               <p className="text-xs text-muted-foreground">
-                payments due
+                {isDemo ? "payments due (excellent payment rate! 💰)" : "payments due"}
               </p>
             </CardContent>
           </Card>

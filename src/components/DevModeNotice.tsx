@@ -49,7 +49,7 @@ export const DevModeNotice = () => {
       <AlertDescription className="flex items-center justify-between text-blue-800">
         <div className="flex-1">
           <strong>🔥 Firebase Connected!</strong>{" "}
-          {user ? `Welcome back, ${user.email}` : "Ready for trainer accounts."}
+          {user ? `Welcome back, ${user.displayName || user.email?.split('@')[0] || 'Trainer'}!` : "Ready for trainer accounts."}
           <br />
           <span className="text-sm">
             {user

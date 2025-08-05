@@ -187,7 +187,7 @@ const AddProgressDialog = () => {
           Record Progress
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] mx-2 sm:mx-4 max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Record Progress Entry</DialogTitle>
           <DialogDescription>
@@ -195,11 +195,11 @@ const AddProgressDialog = () => {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="client">Client</Label>
               <Select value={formData.clientId} onValueChange={(value) => setFormData({ ...formData, clientId: value })}>
-                <SelectTrigger>
+                <SelectTrigger className="text-base sm:text-sm">
                   <SelectValue placeholder={clients.length === 0 ? "No clients available" : "Select client"} />
                 </SelectTrigger>
                 <SelectContent>
@@ -216,10 +216,17 @@ const AddProgressDialog = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="date">Date</Label>
-              <Input id="date" type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} required />
+              <Input 
+                id="date" 
+                type="date" 
+                value={formData.date} 
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })} 
+                required 
+                className="text-base sm:text-sm"
+              />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="weight">Weight (lbs)</Label>
               <Input 
@@ -232,6 +239,7 @@ const AddProgressDialog = () => {
                 onChange={(e) => setFormData({ ...formData, weight: e.target.value })} 
                 placeholder="150.5"
                 aria-label="Weight in pounds"
+                className="text-base sm:text-sm"
               />
             </div>
             <div className="space-y-2">

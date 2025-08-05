@@ -208,7 +208,7 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
           {!limitInfo.isUnlimited && ` (${limitInfo.remainingSlots} left)`}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] mx-2 sm:mx-4 max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Client</DialogTitle>
           <DialogDescription>
@@ -217,7 +217,7 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
@@ -227,6 +227,8 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
                     setFormData({ ...formData, name: e.target.value })
                   }
                   required
+                  className="text-base sm:text-sm"
+                  placeholder="Enter full name"
                 />
               </div>
               <div className="space-y-2">
@@ -239,10 +241,12 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
                     setFormData({ ...formData, email: e.target.value })
                   }
                   required
+                  className="text-base sm:text-sm"
+                  placeholder="client@email.com"
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
@@ -251,6 +255,8 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
                   onChange={(e) =>
                     setFormData({ ...formData, phone: e.target.value })
                   }
+                  className="text-base sm:text-sm"
+                  placeholder="(555) 123-4567"
                 />
               </div>
               <div className="space-y-2">
@@ -261,8 +267,8 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
                     setFormData({ ...formData, fitnessLevel: value })
                   }
                 >
-                  <SelectTrigger>
-                    <SelectValue />
+                  <SelectTrigger className="text-base sm:text-sm">
+                    <SelectValue placeholder="Select fitness level" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="beginner">Beginner</SelectItem>
@@ -291,7 +297,8 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
                 onChange={(e) =>
                   setFormData({ ...formData, notes: e.target.value })
                 }
-                className="min-h-[60px]"
+                className="min-h-[60px] text-base sm:text-sm"
+                placeholder="Any special notes or considerations..."
               />
             </div>
             <div className="space-y-2">
@@ -305,17 +312,26 @@ const AddClientDialog = ({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCha
                 onChange={(e) =>
                   setFormData({ ...formData, initialWeight: e.target.value })
                 }
+                className="text-base sm:text-sm"
               />
               <p className="text-xs text-muted-foreground">
                 Adding initial weight will automatically create the first progress entry, making it easier to track progress from day one.
               </p>
             </div>
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setOpen(false)}
+              className="w-full sm:w-auto order-2 sm:order-1"
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full sm:w-auto order-1 sm:order-2"
+            >
               {loading ? "Adding..." : "Add Client"}
             </Button>
           </div>

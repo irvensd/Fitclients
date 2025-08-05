@@ -257,15 +257,19 @@ const MobileSidebar = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="lg:hidden touch-manipulation min-h-[44px] min-w-[44px] active:scale-95 hover:bg-accent transition-all duration-200"
+        >
           <Menu className="h-6 w-6" />
           <span className="sr-only">Toggle Navigation</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="p-0 w-72 bg-sidebar text-sidebar-foreground">
+      <SheetContent side="left" className="p-0 w-80 bg-sidebar text-sidebar-foreground touch-manipulation">
         <div className="flex flex-col h-full">
           <div className="flex items-center h-16 px-6 border-b border-sidebar-border">
-            <Link to="/dashboard" className="flex items-center gap-2">
+            <Link to="/dashboard" className="flex items-center gap-2 touch-manipulation min-h-[44px]">
               <div className="h-8 w-8 flex items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Zap className="h-5 w-5" />
               </div>
@@ -273,63 +277,72 @@ const MobileSidebar = () => {
             </Link>
           </div>
 
-          <nav className="flex-1 px-4 py-4 space-y-2">
+          <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto scrollbar-hide">
             {demoNavigation.map((item) => (
               <SheetClose key={item.name} asChild>
                 <Link
                   to={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-all duration-200",
+                    "flex items-center gap-3 rounded-lg px-3 py-3 text-base font-medium transition-all duration-200 touch-manipulation min-h-[48px] active:scale-95",
                     location.pathname === item.href
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                      : "hover:bg-sidebar-accent"
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                      : "hover:bg-sidebar-accent active:bg-sidebar-accent/80"
                   )}
                 >
-                  <item.icon className="h-5 w-5" />
+                  <item.icon className="h-5 w-5 flex-shrink-0" />
                   <div className="flex items-center gap-2 flex-1">
                     <span>{item.name}</span>
+                    {location.pathname === item.href && (
+                      <div className="w-2 h-2 bg-primary rounded-full ml-auto" />
+                    )}
                   </div>
                 </Link>
               </SheetClose>
             ))}
           </nav>
 
-          <div className="px-4 py-4 border-t border-sidebar-border space-y-2">
+          <div className="px-4 py-4 border-t border-sidebar-border space-y-1">
             <SheetClose asChild>
               <Link
                 to="/settings"
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-all duration-200",
+                  "flex items-center gap-3 rounded-lg px-3 py-3 text-base font-medium transition-all duration-200 touch-manipulation min-h-[48px] active:scale-95",
                   location.pathname.startsWith("/settings")
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "hover:bg-sidebar-accent"
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                    : "hover:bg-sidebar-accent active:bg-sidebar-accent/80"
                 )}
               >
-                <Settings className="h-5 w-5" />
-                Settings
+                <Settings className="h-5 w-5 flex-shrink-0" />
+                <span>Settings</span>
+                {location.pathname.startsWith("/settings") && (
+                  <div className="w-2 h-2 bg-primary rounded-full ml-auto" />
+                )}
               </Link>
             </SheetClose>
             <SheetClose asChild>
               <Link
                 to="/help"
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-all duration-200",
+                  "flex items-center gap-3 rounded-lg px-3 py-3 text-base font-medium transition-all duration-200 touch-manipulation min-h-[48px] active:scale-95",
                   location.pathname.startsWith("/help")
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "hover:bg-sidebar-accent"
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                    : "hover:bg-sidebar-accent active:bg-sidebar-accent/80"
                 )}
               >
-                <HelpCircle className="h-5 w-5" />
-                Help & Support
+                <HelpCircle className="h-5 w-5 flex-shrink-0" />
+                <span>Help & Support</span>
+                {location.pathname.startsWith("/help") && (
+                  <div className="w-2 h-2 bg-primary rounded-full ml-auto" />
+                )}
               </Link>
             </SheetClose>
             <Button
               variant="ghost"
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 justify-start px-3 py-2 text-base font-medium"
+              className="w-full flex items-center gap-3 justify-start px-3 py-3 text-base font-medium touch-manipulation min-h-[48px] active:scale-95 hover:bg-red-50 hover:text-red-700 transition-all duration-200"
             >
-              <LogOut className="h-5 w-5" />
-              Logout
+              <LogOut className="h-5 w-5 flex-shrink-0" />
+              <span>Logout</span>
             </Button>
           </div>
         </div>
@@ -392,7 +405,7 @@ export const Layout = ({ children }: LayoutProps) => {
         )}
         
         <header 
-          className="flex h-16 items-center justify-between gap-2 sm:gap-4 border-b bg-background px-3 sm:px-4 lg:px-6"
+          className="flex h-16 items-center justify-between gap-2 sm:gap-4 border-b bg-background px-3 sm:px-4 lg:px-6 touch-manipulation"
           role="banner"
           aria-label="Site header"
         >
@@ -400,7 +413,7 @@ export const Layout = ({ children }: LayoutProps) => {
             <MobileSidebar />
             <BreadcrumbNav />
           </div>
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1 sm:gap-2">
             <GlobalSearch />
             <NotificationBell />
           </div>

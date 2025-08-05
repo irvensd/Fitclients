@@ -16,7 +16,7 @@
       ],
       "headers": [
         {
-          "source": "**/*.@(js|css)",
+          "source": "**/*.css",
           "headers": [
             {
               "key": "Cache-Control",
@@ -24,22 +24,17 @@
             },
             {
               "key": "Content-Type",
-              "value": "application/javascript"
+              "value": "text/css"
             }
           ]
         },
         {
-          "source": "**/*.js",
+          "source": "**/*.@(js|mjs)",
           "headers": [
             {
-              "key": "Content-Type",
-              "value": "application/javascript"
-            }
-          ]
-        },
-        {
-          "source": "**/*.mjs",
-          "headers": [
+              "key": "Cache-Control",
+              "value": "max-age=31536000"
+            },
             {
               "key": "Content-Type",
               "value": "application/javascript"
@@ -64,7 +59,7 @@
       ],
       "headers": [
         {
-          "source": "**/*.@(js|css)",
+          "source": "**/*.css",
           "headers": [
             {
               "key": "Cache-Control",
@@ -72,22 +67,17 @@
             },
             {
               "key": "Content-Type",
-              "value": "application/javascript"
+              "value": "text/css"
             }
           ]
         },
         {
-          "source": "**/*.js",
+          "source": "**/*.@(js|mjs)",
           "headers": [
             {
-              "key": "Content-Type",
-              "value": "application/javascript"
-            }
-          ]
-        },
-        {
-          "source": "**/*.mjs",
-          "headers": [
+              "key": "Cache-Control",
+              "value": "max-age=31536000"
+            },
             {
               "key": "Content-Type",
               "value": "application/javascript"

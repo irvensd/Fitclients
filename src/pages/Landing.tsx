@@ -38,6 +38,43 @@ import MotivationalElements from "@/components/MotivationalElements";
 import ColorPsychology from "@/components/ColorPsychology";
 import { useAuth } from "@/contexts/AuthContext";
 import SEO from "@/components/SEO";
+import { useNavigate } from "react-router-dom";
+
+// Try Demo Button Component
+const DemoButton = () => {
+  const { loginDemo } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(false);
+
+  const handleTryDemo = async () => {
+    setLoading(true);
+    try {
+      await loginDemo();
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Demo login failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Button 
+      size="lg" 
+      onClick={handleTryDemo}
+      disabled={loading}
+      className="text-base sm:text-lg px-6 sm:px-8 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+    >
+      <span className="relative z-10">
+        {loading ? "Setting up demo..." : "🚀 Try Demo Instantly"}
+      </span>
+      {!loading && (
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 opacity-0 hover:opacity-20 transition-opacity duration-300" />
+      )}
+      <Zap className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+    </Button>
+  );
+};
 
 const Landing = () => {
   // Scroll progress state
@@ -126,7 +163,7 @@ const Landing = () => {
         "name": "How much does FitClient cost?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "FitClient offers three plans: Starter ($9/month for up to 200 clients), Pro ($19/month for unlimited clients with advanced features), and Pro Lifetime ($199 one-time payment for unlimited clients forever). All plans include a 14-day free trial."
+          "text": "FitClient offers four plans: Starter ($19/month for up to 25 clients), Professional ($49/month for up to 100 clients with advanced features), Studio ($99/month for unlimited clients and multi-trainer support), and Professional Lifetime ($497 one-time payment - only 500 spots available). All monthly plans include a 14-day free trial."
         }
       },
       {
@@ -142,7 +179,7 @@ const Landing = () => {
         "name": "Can I try FitClient before purchasing?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes! You can start with our Starter plan ($9/month) that supports up to 200 clients. For Pro and Pro Lifetime plans, we offer a 14-day free trial with no credit card required."
+          "text": "Yes! All monthly plans (Starter, Professional, Studio) include a 14-day free trial with no credit card required. The Professional Lifetime plan is a one-time payment with immediate access."
         }
       },
       {
@@ -266,8 +303,9 @@ const Landing = () => {
             
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 md:mb-8 px-4">
+              <DemoButton />
               <Link to="/login?mode=register">
-                <Button size="lg" className="text-base sm:text-lg px-6 sm:px-8 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                <Button size="lg" variant="outline" className="text-base sm:text-lg px-6 sm:px-8 border-2 hover:bg-gradient-to-r hover:from-green-500 hover:to-blue-500 hover:text-white hover:border-transparent transition-all duration-300">
                   Start Free Trial - No Credit Card
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
@@ -282,7 +320,7 @@ const Landing = () => {
                   variant="outline"
                   className="text-base sm:text-lg px-6 sm:px-8 border-2 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-transparent transition-all duration-300"
                 >
-                  Watch 2-Min Demo
+                  Watch 2-Min Video
                 </Button>
               </a>
             </div>
@@ -302,7 +340,7 @@ const Landing = () => {
                 <div className="text-xs sm:text-sm text-muted-foreground">Setup Time</div>
               </div>
               <div className="text-center p-2 sm:p-3 md:p-0">
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary">$9</div>
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary">$19</div>
                 <div className="text-xs sm:text-sm text-muted-foreground">Starting Price</div>
               </div>
             </div>
@@ -585,7 +623,7 @@ const Landing = () => {
                   <tr className="hover:bg-gray-50">
                     <td className="p-4 font-medium">Monthly Cost (5 clients)</td>
                     <td className="text-center p-4 bg-green-50">
-                      <span className="text-green-600 font-semibold">$9</span>
+                      <span className="text-green-600 font-semibold">$19</span>
                     </td>
                     <td className="text-center p-4">
                       <span className="text-muted-foreground">$29-79</span>
@@ -628,7 +666,7 @@ const Landing = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Monthly Cost (5 clients)</span>
-                    <span className="text-green-600 font-semibold">$9</span>
+                    <span className="text-green-600 font-semibold">$19</span>
                   </div>
                 </div>
               </div>
@@ -1227,59 +1265,67 @@ const Landing = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Urgency Banner */}
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-6 mb-12 max-w-4xl mx-auto">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-red-800 mb-2">⚡ Limited Time: Professional Lifetime Access</h3>
+                <p className="text-red-700 mb-3">
+                  Only <span className="font-bold text-xl">153 lifetime spots</span> remaining! Once they're gone, this offer disappears forever.
+                </p>
+                <div className="flex items-center justify-center gap-8 text-sm">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-red-600">$497</div>
+                    <div className="text-red-600">One-time payment</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-green-600">vs $588/year</div>
+                    <div className="text-muted-foreground">Monthly subscription</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-purple-600">Break even in 10 months</div>
+                    <div className="text-muted-foreground">Then it's FREE forever</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
               {/* Starter Plan */}
               <Card className="border-2 hover:border-primary/20 transition-all duration-300">
-                <CardContent className="p-8">
+                <CardContent className="p-6">
                   <div className="text-center mb-6">
-                    <h3 className="text-xl font-bold mb-2">Starter</h3>
+                    <h3 className="text-lg font-bold mb-2">Starter</h3>
                     <p className="text-muted-foreground text-sm mb-4">
-                      Perfect for growing trainers
+                      Perfect for new trainers
                     </p>
                     <div className="flex items-center justify-center gap-1">
                       <span className="text-sm text-muted-foreground">$</span>
-                      <span className="text-3xl font-bold">9</span>
+                      <span className="text-3xl font-bold">19</span>
                       <span className="text-muted-foreground">/month</span>
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">Billed monthly</p>
                   </div>
 
-                  <div className="space-y-3 mb-8">
-                    <div className="flex items-center gap-3">
+                  <div className="space-y-2 mb-6">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Manage up to 200 clients</span>
+                      <span className="text-sm">Up to 25 clients</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Session scheduling & calendar</span>
+                      <span className="text-sm">Session scheduling</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Payment tracking & invoicing</span>
+                      <span className="text-sm">Basic payment tracking</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Progress tracking</span>
+                      <span className="text-sm">Client portals (no login)</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Client portal links (no login)</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Workout plan builder</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Session recaps</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Custom business branding</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Email support</span>
+                      <span className="text-sm">Mobile app access</span>
                     </div>
                   </div>
 
@@ -1291,7 +1337,7 @@ const Landing = () => {
                 </CardContent>
               </Card>
 
-              {/* Pro Plan - Most Popular */}
+              {/* Professional Plan - Most Popular */}
               <Card className="border-2 border-primary shadow-lg transform hover:scale-105 transition-all duration-300 relative">
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <div className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
@@ -1299,15 +1345,15 @@ const Landing = () => {
                     Most Popular
                   </div>
                 </div>
-                <CardContent className="p-8">
+                <CardContent className="p-6">
                   <div className="text-center mb-6">
-                    <h3 className="text-xl font-bold mb-2">Pro</h3>
+                    <h3 className="text-lg font-bold mb-2">Professional</h3>
                     <p className="text-muted-foreground text-sm mb-4">
-                      For growing coaches who need unlimited clients
+                      For growing fitness businesses
                     </p>
                     <div className="flex items-center justify-center gap-1">
                       <span className="text-sm text-muted-foreground">$</span>
-                      <span className="text-3xl font-bold">19</span>
+                      <span className="text-3xl font-bold">49</span>
                       <span className="text-muted-foreground">/month</span>
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -1315,26 +1361,26 @@ const Landing = () => {
                     </p>
                   </div>
 
-                  <div className="space-y-3 mb-8">
-                    <div className="flex items-center gap-3">
+                  <div className="space-y-2 mb-6">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
                       <span className="text-sm">Everything in Starter, plus:</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Unlimited clients</span>
+                      <span className="text-sm">Up to 100 clients</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">AI-powered recommendations</span>
+                      <span className="text-sm">AI-powered insights</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Client progress stats & performance summaries</span>
+                      <span className="text-sm">Advanced analytics</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Priority support</span>
+                      <span className="text-sm">Custom branding</span>
                     </div>
                   </div>
 
@@ -1344,58 +1390,105 @@ const Landing = () => {
                 </CardContent>
               </Card>
 
-              {/* Lifetime Plan */}
-              <Card className="border-2 border-yellow-200 bg-gradient-to-br from-yellow-50 to-white hover:border-yellow-300 transition-all duration-300 relative">
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-yellow-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                    <Crown className="h-3 w-3" />
-                    Limited Time
-                  </div>
-                </div>
-                <CardContent className="p-8">
+              {/* Studio Plan */}
+              <Card className="border-2 hover:border-purple-200 transition-all duration-300">
+                <CardContent className="p-6">
                   <div className="text-center mb-6">
-                    <h3 className="text-xl font-bold mb-2">Pro Lifetime</h3>
+                    <h3 className="text-lg font-bold mb-2">Studio</h3>
                     <p className="text-muted-foreground text-sm mb-4">
-                      Get FitClient forever — one-time payment
+                      For multi-trainer businesses
                     </p>
                     <div className="flex items-center justify-center gap-1">
                       <span className="text-sm text-muted-foreground">$</span>
-                      <span className="text-3xl font-bold">149</span>
+                      <span className="text-3xl font-bold">99</span>
+                      <span className="text-muted-foreground">/month</span>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      One-time payment
-                    </p>
-                    <p className="text-xs text-green-600 font-medium mt-1">
-                      Save over $500 vs. monthly plans
-                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">Billed monthly</p>
                   </div>
 
-                  <div className="space-y-3 mb-8">
-                    <div className="flex items-center gap-3">
+                  <div className="space-y-2 mb-6">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Everything in Pro, forever</span>
+                      <span className="text-sm">Everything in Pro, plus:</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">No monthly fees</span>
+                      <span className="text-sm">Unlimited clients</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">All future updates included</span>
+                      <span className="text-sm">Up to 5 trainers</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Lifetime support</span>
+                      <span className="text-sm">White-label app</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Limited to first 100 trainers</span>
+                      <span className="text-sm">API access</span>
                     </div>
                   </div>
 
                   <Link to="/login" className="block">
-                    <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white">
-                      Get Lifetime Access
+                    <Button variant="outline" className="w-full border-purple-200 hover:bg-purple-50">
+                      Start 14-Day Free Trial
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              {/* Lifetime Plan */}
+              <Card className="border-2 border-red-300 bg-gradient-to-br from-red-50 to-orange-50 hover:border-red-400 transition-all duration-300 relative">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1 animate-pulse">
+                    <Crown className="h-3 w-3" />
+                    🔥 LIMITED
+                  </div>
+                </div>
+                <CardContent className="p-6">
+                  <div className="text-center mb-6">
+                    <h3 className="text-lg font-bold mb-2">Professional Lifetime</h3>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Pay once, own forever
+                    </p>
+                    <div className="flex items-center justify-center gap-1">
+                      <span className="text-sm text-muted-foreground">$</span>
+                      <span className="text-3xl font-bold">497</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      One-time payment
+                    </p>
+                    <p className="text-xs text-red-600 font-bold mt-1">
+                      Only 153 spots left!
+                    </p>
+                  </div>
+
+                  <div className="space-y-2 mb-6">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">All Professional features</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Lifetime access</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">All future updates</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Grandfathered pricing</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Crown className="h-4 w-4 text-yellow-600" />
+                      <span className="text-sm font-medium">Never pay again!</span>
+                    </div>
+                  </div>
+
+                  <Link to="/login" className="block">
+                    <Button className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white">
+                      🔥 Claim Your Lifetime Spot
                     </Button>
                   </Link>
                 </CardContent>
@@ -1486,8 +1579,9 @@ const Landing = () => {
                 <CardContent className="p-6">
                   <h3 className="font-semibold text-lg mb-3">How much does FitClient cost?</h3>
                   <p className="text-muted-foreground">
-                    FitClient offers two simple plans: <strong>Starter ($9/month for up to 200 clients)</strong> 
-                    and Pro ($19/month for unlimited clients). Both plans include a 14-day free trial with no credit card required.
+                    FitClient offers four competitive plans: <strong>Starter ($19/month for up to 25 clients)</strong>, 
+                    <strong>Professional ($49/month for up to 100 clients)</strong>, <strong>Studio ($99/month for unlimited clients)</strong>, 
+                    and <strong>Professional Lifetime ($497 one-time payment)</strong>. All monthly plans include a 14-day free trial with no credit card required.
                   </p>
                 </CardContent>
               </Card>

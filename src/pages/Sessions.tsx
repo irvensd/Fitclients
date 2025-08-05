@@ -173,7 +173,7 @@ const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) =>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="client">Client</Label>
                 <Select
@@ -182,7 +182,7 @@ const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) =>
                     setFormData({ ...formData, clientId: value })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="text-base sm:text-sm">
                     <SelectValue placeholder="Select client" />
                   </SelectTrigger>
                   <SelectContent>
@@ -204,10 +204,11 @@ const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) =>
                     setFormData({ ...formData, date: e.target.value })
                   }
                   required
+                  className="text-base sm:text-sm"
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="startTime">Start Time</Label>
                 <Input
@@ -218,6 +219,7 @@ const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) =>
                     setFormData({ ...formData, startTime: e.target.value })
                   }
                   required
+                  className="text-base sm:text-sm"
                 />
               </div>
               <div className="space-y-2">
@@ -230,10 +232,11 @@ const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) =>
                     setFormData({ ...formData, endTime: e.target.value })
                   }
                   required
+                  className="text-base sm:text-sm"
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="type">Session Type</Label>
                 <Select
@@ -242,7 +245,7 @@ const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) =>
                     setFormData({ ...formData, type: value })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="text-base sm:text-sm">
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -263,6 +266,8 @@ const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) =>
                     setFormData({ ...formData, cost: e.target.value })
                   }
                   required
+                  className="text-base sm:text-sm"
+                  placeholder="85.00"
                 />
               </div>
             </div>
@@ -275,14 +280,24 @@ const AddSessionDialog = ({ onSessionAdded }: { onSessionAdded: () => void }) =>
                   setFormData({ ...formData, notes: e.target.value })
                 }
                 placeholder="Add any additional notes..."
+                className="text-base sm:text-sm min-h-[60px]"
               />
             </div>
           </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setIsOpen(false)}
+              className="w-full sm:w-auto order-2 sm:order-1"
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full sm:w-auto order-1 sm:order-2"
+            >
               {loading ? "Creating..." : "Create Session"}
             </Button>
           </div>

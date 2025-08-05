@@ -203,13 +203,13 @@ export const SessionRecapForm = ({
           Create AI Recap
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[800px] mx-2 sm:mx-4 max-h-[95vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-purple-600" />
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
             AI Session Recap for {client.name}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm sm:text-base">
             Quick session details → Personalized AI-generated recap for your
             client
           </DialogDescription>
@@ -227,23 +227,26 @@ export const SessionRecapForm = ({
                 onChange={(e) =>
                   setFormData({ ...formData, workoutFocus: e.target.value })
                 }
+                className="text-base sm:text-sm"
               />
             </div>
 
             {/* Exercises Completed */}
             <div className="space-y-2">
               <Label>Exercises Completed</Label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   placeholder="Add exercise (e.g., Squats, Push-ups, Deadlifts...)"
                   value={newExercise}
                   onChange={(e) => setNewExercise(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleAddExercise()}
+                  className="text-base sm:text-sm flex-1"
                 />
                 <Button
                   type="button"
                   onClick={handleAddExercise}
                   variant="outline"
+                  className="w-full sm:w-auto"
                 >
                   Add
                 </Button>
@@ -263,7 +266,7 @@ export const SessionRecapForm = ({
             </div>
 
             {/* Performance and Mood */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label>Client Performance</Label>
                 <Select

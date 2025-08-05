@@ -271,6 +271,17 @@
   /* Better mobile form inputs */
   input, textarea, select {
     @apply text-base;
+    min-height: 44px; /* Ensure touch targets meet accessibility standards */
+  }
+  
+  /* Better mobile labels */
+  label {
+    @apply text-sm font-medium;
+  }
+  
+  /* Mobile-friendly buttons */
+  button {
+    min-height: 44px;
   }
   
   /* Improve mobile scrolling */
@@ -368,6 +379,23 @@
 
   .mobile-gap {
     @apply gap-3 sm:gap-4 lg:gap-6;
+  }
+  
+  /* Mobile form improvements */
+  .mobile-form-input {
+    @apply text-base px-3 py-3 border rounded-lg;
+    min-height: 44px;
+  }
+  
+  .mobile-form-button {
+    @apply px-4 py-3 text-base font-medium rounded-lg;
+    min-height: 44px;
+  }
+  
+  /* Touch-friendly select dropdowns */
+  .mobile-select {
+    @apply text-base;
+    min-height: 44px;
   }
 }
 
@@ -518,6 +546,112 @@
 /* Smooth transitions for creative animations */
 .creative-transition {
   @apply transition-all duration-300 ease-out;
+}
+
+/* Enhanced mobile touch interactions */
+.mobile-touch-scale {
+  @apply transition-transform duration-150 ease-out active:scale-95;
+}
+
+/* Mobile navigation improvements */
+.mobile-nav-item {
+  @apply flex items-center gap-3 rounded-lg px-3 py-3 text-base font-medium transition-all duration-200 touch-manipulation;
+  min-height: 48px;
+}
+
+.mobile-nav-item:active {
+  transform: scale(0.98);
+}
+
+/* Mobile button enhancements */
+.mobile-button-primary {
+  @apply bg-primary text-primary-foreground font-medium rounded-lg px-4 py-3 text-base touch-manipulation transition-all duration-200;
+  min-height: 44px;
+}
+
+.mobile-button-primary:active {
+  transform: scale(0.95);
+}
+
+/* Mobile card touch interactions */
+.mobile-card-interactive {
+  @apply transition-all duration-200 touch-manipulation active:scale-[0.98];
+}
+
+/* Quick action floating button */
+.mobile-fab {
+  @apply rounded-full shadow-lg transition-all duration-300 touch-manipulation;
+  min-height: 56px;
+  min-width: 56px;
+}
+
+.mobile-fab:active {
+  transform: scale(0.95);
+}
+
+/* Mobile dropdown improvements */
+.mobile-dropdown-item {
+  @apply py-3 px-4 text-base cursor-pointer touch-manipulation transition-transform duration-150;
+  min-height: 48px;
+}
+
+.mobile-dropdown-item:active {
+  transform: scale(0.98);
+}
+
+/* Mobile swipe interactions */
+.swipe-indicator {
+  @apply transition-opacity duration-300;
+}
+
+.swipe-refresh {
+  @apply transition-transform duration-300 ease-out;
+}
+
+.swipe-refresh.pulling {
+  transform: translateY(60px);
+}
+
+/* Mobile bottom navigation safe area */
+.mobile-bottom-nav {
+  @apply safe-bottom;
+  padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+}
+
+/* Enhanced mobile tables */
+.mobile-table {
+  @apply overflow-x-auto scrollbar-hide;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-table td {
+  @apply py-3 px-2 text-sm;
+  min-height: 44px;
+}
+
+/* Mobile modal improvements */
+.mobile-modal {
+  @apply mx-2 max-h-[95vh] overflow-y-auto touch-manipulation;
+}
+
+.mobile-modal .modal-content {
+  @apply p-4 space-y-4;
+}
+
+/* Mobile toast positioning */
+.mobile-toast {
+  @apply bottom-20 safe-bottom;
+}
+
+/* Mobile keyboard avoiding */
+.mobile-input-container {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* Prevent overscroll bounce on iOS */
+.prevent-overscroll {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Optimized animations for mobile */

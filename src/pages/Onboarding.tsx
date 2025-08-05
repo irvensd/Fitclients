@@ -158,12 +158,12 @@ Mike Davis,mike@email.com,555-0125,Improve cardiovascular health`;
         // This would normally batch create clients
         // For now, we'll just show success
         toast({
-          title: "Welcome to FitClient!",
+          title: `Welcome to FitClient, ${user?.displayName || user?.email?.split('@')[0] || 'Trainer'}!`,
           description: `Your account is set up with ${data.clients.length} clients imported.`,
         });
       } else {
         toast({
-          title: "Welcome to FitClient!",
+          title: `Welcome to FitClient, ${user?.displayName || user?.email?.split('@')[0] || 'Trainer'}!`,
           description: "Your account is all set up. Let's add your first client!",
         });
       }
@@ -185,7 +185,9 @@ Mike Davis,mike@email.com,555-0125,Improve cardiovascular health`;
       <div className="w-full max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome to FitClient!</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            Welcome to FitClient, {user?.displayName || user?.email?.split('@')[0] || 'Trainer'}! 👋
+          </h1>
           <p className="text-muted-foreground">Let's get your fitness business set up in just 3 steps</p>
         </div>
 

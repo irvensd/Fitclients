@@ -947,7 +947,7 @@ export const mockProgressEntries: ProgressEntry[] = [
   { id: "pe4", clientId: "2", date: "2023-10-20", weight: 148, bodyFat: 24 },
 ];
 
-// Centralized mock data for the application
+// Enhanced mock data for compelling demo experience
 export const mockClients: Client[] = [
   {
     id: "1",
@@ -956,54 +956,76 @@ export const mockClients: Client[] = [
     phone: "(555) 123-4567",
     dateJoined: "2024-01-15",
     fitnessLevel: "intermediate",
-    goals: "Weight loss and strength building",
-    notes:
-      "Prefers morning sessions. Has knee issues - avoid high impact exercises.",
+    goals: "Lost 25 lbs, now building lean muscle",
+    notes: "⭐ SUCCESS STORY: Down 25 lbs in 6 months! Prefers 6 AM sessions. Previous knee surgery - modified squats/lunges. Loves HIIT workouts.",
+    status: "active",
+    totalSessions: 48,
+    lastSession: "2025-01-14",
   },
   {
-    id: "2",
+    id: "2", 
     name: "Mike Chen",
     email: "mike.chen@email.com",
     phone: "(555) 234-5678",
     dateJoined: "2024-02-03",
     fitnessLevel: "beginner",
-    goals: "Build muscle mass and improve endurance",
+    goals: "Building confidence and strength for first 5K",
+    notes: "🎯 TRANSFORMATION: From couch to 5K training! Tech executive, busy schedule. Sessions Tuesday/Thursday 7 PM. Amazing progress on compound lifts.",
+    status: "active",
+    totalSessions: 32,
+    lastSession: "2025-01-13",
   },
   {
     id: "3",
-    name: "Emily Davis",
+    name: "Emily Davis", 
     email: "emily.davis@email.com",
     phone: "(555) 345-6789",
     dateJoined: "2024-01-28",
     fitnessLevel: "advanced",
-    goals: "Marathon training and performance optimization",
+    goals: "Boston Marathon qualifying time (3:05)",
+    notes: "🏃‍♀️ ELITE ATHLETE: Targeting Boston Marathon! Previous PR: 3:12. Needs strength work for injury prevention. Very disciplined with nutrition.",
+    status: "active",
+    totalSessions: 45,
+    lastSession: "2025-01-15",
   },
   {
     id: "4",
     name: "James Wilson",
-    email: "james.wilson@email.com",
+    email: "james.wilson@email.com", 
     phone: "(555) 456-7890",
     dateJoined: "2024-02-10",
     fitnessLevel: "intermediate",
-    goals: "Functional fitness and injury prevention",
+    goals: "Post-injury comeback - stronger than before",
+    notes: "💪 COMEBACK STORY: Recovering from back injury. Now deadlifting 225 lbs! Physical therapist cleared all movements. Motivational success story.",
+    status: "active",
+    totalSessions: 38,
+    lastSession: "2025-01-12",
   },
   {
     id: "5",
     name: "Alex Thompson",
     email: "alex.thompson@email.com",
-    phone: "(555) 567-8901",
+    phone: "(555) 567-8901", 
     dateJoined: "2025-01-18",
     fitnessLevel: "beginner",
-    goals: "General fitness and health improvement",
+    goals: "New Year, new me - sustainable lifestyle change",
+    notes: "🎊 NEW YEAR GOAL: Recent college grad, first time with trainer. Super motivated! Wants to learn proper form and build healthy habits.",
+    status: "active",
+    totalSessions: 2,
+    lastSession: "2025-01-19",
   },
   {
     id: "6",
     name: "Maria Rodriguez",
     email: "maria.rodriguez@email.com",
     phone: "(555) 678-9012",
-    dateJoined: "2025-01-13",
+    dateJoined: "2025-01-13", 
     fitnessLevel: "intermediate",
-    goals: "Strength training and flexibility",
+    goals: "Preparing for daughter's wedding in 6 months",
+    notes: "👰 WEDDING PREP: Mother of the bride! Wants to feel confident and strong. Very committed, tracking everything. Already seeing great results.",
+    status: "active",
+    totalSessions: 4,
+    lastSession: "2025-01-18",
   },
   {
     id: "7",
@@ -1011,8 +1033,12 @@ export const mockClients: Client[] = [
     email: "david.kim@email.com",
     phone: "(555) 890-1234",
     dateJoined: "2024-02-14",
-    fitnessLevel: "intermediate",
-    goals: "Sports performance and agility training",
+    fitnessLevel: "intermediate", 
+    goals: "Tennis performance - beat club champion",
+    notes: "🎾 SPORTS PERFORMANCE: Wants to dominate tennis club tournament. Focus on explosive power, agility. Competitive personality - loves challenges.",
+    status: "active",
+    totalSessions: 41,
+    lastSession: "2025-01-14",
   },
   {
     id: "8",
@@ -1021,78 +1047,114 @@ export const mockClients: Client[] = [
     phone: "(555) 111-2222",
     dateJoined: new Date().toISOString().split("T")[0], // Today
     fitnessLevel: "beginner",
-    goals: "Weight loss and general fitness",
-    notes: "New member - very motivated!",
+    goals: "Feel strong and confident again after baby",
+    notes: "👶 POSTPARTUM FITNESS: New mom, cleared by doctor for exercise. Wants to regain strength and energy. Very excited to start journey!",
+    status: "active", 
+    totalSessions: 1,
+    lastSession: new Date().toISOString().split("T")[0],
   },
   {
     id: "9",
     name: "Tom Anderson",
     email: "tom.anderson@email.com",
     phone: "(555) 333-4444",
-    dateJoined: new Date(Date.now() - 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split("T")[0], // Yesterday
+    dateJoined: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     fitnessLevel: "intermediate",
-    goals: "Strength training and muscle building",
+    goals: "CEO staying sharp - mind and body performance",
+    notes: "💼 EXECUTIVE FITNESS: Busy CEO using fitness to manage stress and stay sharp. Early morning sessions only. Tracks HRV and sleep metrics.",
+    status: "active",
+    totalSessions: 28,
+    lastSession: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0],
   },
   {
     id: "10",
     name: "Sophie Chen",
-    email: "sophie.chen@email.com",
+    email: "sophie.chen@email.com", 
     phone: "(555) 555-6666",
-    dateJoined: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split("T")[0], // 2 days ago
+    dateJoined: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     fitnessLevel: "advanced",
-    goals: "Powerlifting competition prep",
+    goals: "Powerlifting nationals - 400 lb deadlift goal",
+    notes: "🏋️‍♀️ POWERLIFTER: Competing at nationals! Current max: 365 lb deadlift. Incredible dedication and technique. Training 5x/week.",
+    status: "active",
+    totalSessions: 52,
+    lastSession: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+  },
+  {
+    id: "11",
+    name: "Jennifer Lopez",
+    email: "jenny.lopez@email.com",
+    phone: "(555) 777-8888",
+    dateJoined: "2024-03-15",
+    fitnessLevel: "intermediate",
+    goals: "Triathlon training for first Ironman",
+    notes: "🏊‍♀️ TRIATHLETE: Training for first Ironman! Swimmer background, needs cycling and running strength. Very dedicated athlete.",
+    status: "active",
+    totalSessions: 35,
+    lastSession: "2025-01-16",
+  },
+  {
+    id: "12",
+    name: "Robert Taylor",
+    email: "rob.taylor@email.com", 
+    phone: "(555) 999-0000",
+    dateJoined: "2024-11-20",
+    fitnessLevel: "beginner",
+    goals: "Retirement fitness - staying active at 65",
+    notes: "🧓 SENIOR FITNESS: Recently retired engineer, wants to stay healthy and active. Focus on mobility, balance, functional strength. Great attitude!",
+    status: "active",
+    totalSessions: 16,
+    lastSession: "2025-01-17",
   },
 ];
 
 export const mockSessions: Session[] = [
-  // Past completed sessions (last 2 weeks)
+  // Recent sessions - Today and this week
   {
-    id: "1",
-    clientId: "1", // Sarah Johnson
-    date: "2024-01-15",
-    startTime: "09:00",
-    endTime: "10:00",
-    type: "assessment",
-    status: "completed",
-    notes: "Initial fitness assessment - knee issues noted",
-    cost: 50,
-  },
-  {
-    id: "2",
-    clientId: "1",
-    date: "2024-01-18",
-    startTime: "09:00",
-    endTime: "10:00",
+    id: "today-1",
+    clientId: "8", // Rachel Martinez - New mom
+    date: new Date().toISOString().split("T")[0],
+    startTime: "10:00",
+    endTime: "11:00", 
     type: "personal-training",
     status: "completed",
-    notes: "First workout session - focused on low impact exercises",
-    cost: 75,
+    notes: "🎉 AMAZING first session! Great core activation, proper form on squats. Feeling strong and motivated!",
+    cost: 85,
+    recap: "Fantastic start to your fitness journey! We focused on rebuilding your core strength post-pregnancy.",
   },
   {
-    id: "3",
-    clientId: "2", // Mike Chen
-    date: "2024-02-03",
-    startTime: "10:30",
-    endTime: "11:30",
-    type: "assessment",
-    status: "completed",
-    notes: "Beginner assessment - good baseline strength",
-    cost: 50,
+    id: "today-2",
+    clientId: "11", // Jennifer Lopez - Triathlete 
+    date: new Date().toISOString().split("T")[0],
+    startTime: "14:00",
+    endTime: "15:00",
+    type: "personal-training", 
+    status: "scheduled",
+    notes: "Ironman brick workout - bike to run transition practice",
+    cost: 85,
   },
   {
-    id: "4",
-    clientId: "3", // Emily Davis
-    date: "2024-01-28",
-    startTime: "07:00",
-    endTime: "08:00",
+    id: "yesterday-1",
+    clientId: "1", // Sarah Johnson - Success story
+    date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    startTime: "06:00",
+    endTime: "07:00",
+    type: "personal-training",
+    status: "completed", 
+    notes: "💪 NEW PR! Hit 135 lb deadlift - up from 95 lbs 6 months ago. Knee feeling great with proper form.",
+    cost: 85,
+    recap: "Incredible progress! Your deadlift form is perfect and that 40 lb increase shows your dedication.",
+  },
+  {
+    id: "yesterday-2", 
+    clientId: "10", // Sophie Chen - Powerlifter
+    date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    startTime: "18:00",
+    endTime: "19:00",
     type: "personal-training",
     status: "completed",
-    notes: "Marathon training - tempo run and strength work",
-    cost: 75,
+    notes: "🏋️‍♀️ BEAST MODE! 385 lb deadlift triple - ready for 400 lb attempt next week. Competition prep on track.",
+    cost: 90, // Higher rate for advanced athlete
+    recap: "Absolutely crushing your goals! Your technique is flawless and strength gains are phenomenal.",
   },
   {
     id: "5",
@@ -1318,11 +1380,130 @@ export const mockSessions: Session[] = [
 ];
 
 export const mockPayments: Payment[] = [
-  // Completed payments
+  // Current month payments (January 2025) - Impressive demo revenue
+  {
+    id: "current-1",
+    clientId: "8", // Rachel Martinez - New mom
+    amount: 85,
+    date: new Date().toISOString().split("T")[0], // Today
+    method: "card",
+    status: "completed",
+    description: "🎉 Postpartum Fitness - Session 1",
+  },
+  {
+    id: "current-2", 
+    clientId: "1", // Sarah Johnson - Success story
+    amount: 85,
+    date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0], // Yesterday
+    method: "card",
+    status: "completed",
+    description: "💪 Personal Training - New PR Session!",
+  },
+  {
+    id: "current-3",
+    clientId: "10", // Sophie Chen - Powerlifter
+    amount: 90,
+    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 2 days ago
+    method: "bank-transfer",
+    status: "completed", 
+    description: "🏋️‍♀️ Competition Prep Training",
+  },
+  {
+    id: "current-4",
+    clientId: "6", // Maria Rodriguez - Wedding prep
+    amount: 85,
+    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    method: "card",
+    status: "completed",
+    description: "👰 Wedding Prep Session #4",
+  },
+  {
+    id: "current-5",
+    clientId: "11", // Jennifer Lopez - Triathlete
+    amount: 85,
+    date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    method: "card", 
+    status: "completed",
+    description: "🏊‍♀️ Ironman Training - Brick Workout",
+  },
+  {
+    id: "current-6",
+    clientId: "7", // David Kim - Tennis player
+    amount: 85,
+    date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    method: "venmo",
+    status: "completed",
+    description: "🎾 Tennis Performance Training",
+  },
+  {
+    id: "current-7",
+    clientId: "9", // Tom Anderson - CEO
+    amount: 95, // Higher rate for executive
+    date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    method: "bank-transfer",
+    status: "completed",
+    description: "💼 Executive Fitness Session",
+  },
+  {
+    id: "current-8",
+    clientId: "12", // Robert Taylor - Senior
+    amount: 75, // Discounted rate for senior
+    date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    method: "cash",
+    status: "completed",
+    description: "🧓 Senior Fitness - Mobility & Strength",
+  },
+  {
+    id: "current-9",
+    clientId: "4", // James Wilson - Comeback story
+    amount: 85,
+    date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    method: "card",
+    status: "completed",
+    description: "💪 Injury Recovery Training",
+  },
+  {
+    id: "current-10",
+    clientId: "3", // Emily Davis - Marathon runner
+    amount: 90,
+    date: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    method: "card",
+    status: "completed",
+    description: "🏃‍♀️ Marathon Training - Speed Work",
+  },
+  // Package deals and monthly memberships - Higher value transactions
+  {
+    id: "package-1",
+    clientId: "1", // Sarah Johnson
+    amount: 320, // 4-session package
+    date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    method: "card",
+    status: "completed",
+    description: "💰 4-Session Training Package",
+  },
+  {
+    id: "package-2", 
+    clientId: "10", // Sophie Chen
+    amount: 540, // 6-session competition prep package
+    date: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    method: "bank-transfer",
+    status: "completed",
+    description: "🏆 Competition Prep Package (6 sessions)",
+  },
+  {
+    id: "package-3",
+    clientId: "9", // Tom Anderson - CEO
+    amount: 760, // 8-session executive package
+    date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    method: "bank-transfer",
+    status: "completed",
+    description: "💼 Executive Monthly Package (8 sessions)",
+  },
+  
+  // Previous history for comparison
   {
     id: "1",
     clientId: "1", // Sarah Johnson
-    sessionId: "1",
     amount: 50,
     date: "2024-01-15",
     method: "card",
@@ -1332,7 +1513,6 @@ export const mockPayments: Payment[] = [
   {
     id: "2",
     clientId: "1",
-    sessionId: "2",
     amount: 75,
     date: "2024-01-18",
     method: "card",

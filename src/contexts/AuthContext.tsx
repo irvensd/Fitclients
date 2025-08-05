@@ -20,6 +20,7 @@ export interface AuthContextType {
   loading: boolean;
   isDemoUser: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginDemo: () => Promise<void>;
   register: (
     email: string,
     password: string,
@@ -305,6 +306,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setAuthError(null);
   }, []);
 
+  // Quick demo login function for "Try Demo" button
+  const loginDemo = React.useCallback(async () => {
+    setAuthError(null);
+    try {
+      const mockUser = { 
+        email: "trainer@demo.com", 
+        displayName: "Demo Trainer",
+        uid: "demo-user-123"
+      };
+      setDevUser(mockUser);
+      setUser({ 
+        email: "trainer@demo.com",
+        uid: "demo-user-123"
+      } as User);
+      localStorage.setItem("devUser", JSON.stringify(mockUser));
+    } catch (error: any) {
+      const { userMessage } = handleError(error, "demo login");
+      setAuthError(userMessage);
+      throw error;
+    }
+  }, []);
+
   const updateUserProfile = React.useCallback(async (updates: Partial<UserProfile>) => {
     if (!user?.uid) {
       throw new Error("User not authenticated");
@@ -391,6 +414,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       loading,
       isDemoUser,
       login,
+      loginDemo,
       register,
       logout,
       isDevMode,
@@ -404,6 +428,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       loading,
       isDemoUser,
       login,
+      loginDemo,
       register,
       logout,
       isDevMode,
