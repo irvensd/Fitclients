@@ -5,7 +5,7 @@ import { DataProvider } from "./contexts/DataContext";
 import { SubscriptionProvider } from "./contexts/SubscriptionContext";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { EnhancedErrorBoundary as ErrorBoundary } from "./components/ui/enhanced-error-boundary";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LoadingScreen } from "./components/ui/loading";
 
 // Lazy load pages for code splitting
@@ -90,8 +90,8 @@ const ProtectedLayout = () => {
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <ErrorBoundary>
+    <ErrorBoundary>
+      <BrowserRouter>
         <AuthProvider>
           <DataProvider>
             <SubscriptionProvider>
@@ -187,8 +187,8 @@ const App = () => {
             </SubscriptionProvider>
           </DataProvider>
         </AuthProvider>
-      </ErrorBoundary>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 };
 

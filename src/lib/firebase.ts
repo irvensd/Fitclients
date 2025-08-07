@@ -3,40 +3,27 @@ import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 
-// Determine whether Firebase is configured via environment variables
-const REQUIRED_FIREBASE_ENV_VARS = [
-  "VITE_FIREBASE_API_KEY",
-  "VITE_FIREBASE_AUTH_DOMAIN",
-  "VITE_FIREBASE_PROJECT_ID",
-  "VITE_FIREBASE_APP_ID",
-];
-
-export const isFirebaseConfigured: boolean = REQUIRED_FIREBASE_ENV_VARS.every(
-  (key) => Boolean((import.meta as any).env?.[key])
-);
-
-// Firebase configuration (prefer environment variables)
-// Note: Fallbacks are kept for compatibility, but isFirebaseConfigured guards actual usage paths.
+// Production Firebase configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB6YfS9EqFjpgbjzfBLGR90uTwt5-lJ8j4",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "fitclients-4c5f2.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "fitclients-4c5f2",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "fitclients-4c5f2.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "407177727116",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:407177727116:web:1f537948f3fd4b1e18ffa9",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-BEWLBZ55RR",
 };
 
-// Initialize Firebase only when configured
-const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : undefined as unknown as ReturnType<typeof initializeApp>;
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase services (only if configured)
-export const auth = isFirebaseConfigured ? getAuth(app) : undefined as any;
-export const db = isFirebaseConfigured ? getFirestore(app) : undefined as any;
+// Initialize Firebase services
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 // Initialize Analytics (only in production and browser)
 let analytics;
-if (isFirebaseConfigured && typeof window !== "undefined" && !window.location.hostname.includes("localhost")) {
+if (typeof window !== "undefined" && !window.location.hostname.includes("localhost")) {
   try {
     analytics = getAnalytics(app);
   } catch (error) {
@@ -46,11 +33,10 @@ if (isFirebaseConfigured && typeof window !== "undefined" && !window.location.ho
 
 // Only connect to emulators if explicitly enabled via environment variable
 // This prevents accidental emulator connections in production
-const USE_EMULATORS =
-  typeof window !== "undefined" &&
-  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-  import.meta.env.DEV &&
-  !isFirebaseConfigured;
+const USE_EMULATORS = false; // Temporarily disabled to fix network issues
+// const USE_EMULATORS = typeof window !== "undefined" && 
+//   (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
+//   import.meta.env.DEV; // Only in development mode
 
 if (USE_EMULATORS) {
       // Development mode: Attempting to connect to Firebase emulators
@@ -67,7 +53,7 @@ if (USE_EMULATORS) {
     console.warn("⚠️ Emulator connection failed, using production Firebase:", error.message);
   }
 } else {
-  // Using production Firebase services or running with unconfigured env (guarded by isFirebaseConfigured)
+      // Using production Firebase services
 }
 
 // Utility function to diagnose Firebase connection issues
@@ -119,4 +105,5 @@ export const diagnoseFirebaseConnection = async () => {
 };
 
 export { analytics };
+export const isFirebaseConfigured = true;
 export default app;

@@ -1,14 +1,8 @@
 import { loadStripe } from "@stripe/stripe-js";
-import type { Stripe } from "@stripe/stripe-js";
 
 // Initialize Stripe
-// Guard against missing/invalid publishable key in development to avoid runtime errors
-const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
-const isValidPublishableKey = typeof STRIPE_PUBLISHABLE_KEY === 'string' && /^pk_(test|live)_/.test(STRIPE_PUBLISHABLE_KEY);
-
-const stripePromise: Promise<Stripe | null> = isValidPublishableKey
-  ? loadStripe(STRIPE_PUBLISHABLE_KEY)
-  : Promise.resolve(null);
+// Note: This is using demo/test keys. Replace with production keys when ready.
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 export { stripePromise };
 

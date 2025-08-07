@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { LoadingScreen } from "@/components/ui/loading";
-import { logger } from "@/lib/logger";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -32,7 +31,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
           setNeedsOnboarding(true);
         }
       } catch (error) {
-        logger.error("Error checking onboarding status", error);
+        console.error("Error checking onboarding status:", error);
       } finally {
         setCheckingOnboarding(false);
       }
