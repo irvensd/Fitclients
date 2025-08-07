@@ -7,7 +7,7 @@ const DYNAMIC_CACHE = 'fitclients-dynamic-v1';
 const STATIC_FILES = [
   '/',
   '/index.html',
-  '/manifest.json',
+  '/site.webmanifest',
   '/favicon.ico',
 ];
 
