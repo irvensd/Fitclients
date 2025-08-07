@@ -5,7 +5,7 @@ import { DataProvider } from "./contexts/DataContext";
 import { SubscriptionProvider } from "./contexts/SubscriptionContext";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { ErrorBoundary } from "./components/ErrorBoundary";
+import { EnhancedErrorBoundary as ErrorBoundary } from "./components/ui/enhanced-error-boundary";
 import { LoadingScreen } from "./components/ui/loading";
 
 // Lazy load pages for code splitting

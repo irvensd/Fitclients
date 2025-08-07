@@ -27,16 +27,16 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "",
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase only when configured
+const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : undefined as unknown as ReturnType<typeof initializeApp>;
 
-// Initialize Firebase services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Initialize Firebase services (only if configured)
+export const auth = isFirebaseConfigured ? getAuth(app) : undefined as any;
+export const db = isFirebaseConfigured ? getFirestore(app) : undefined as any;
 
 // Initialize Analytics (only in production and browser)
 let analytics;
-if (typeof window !== "undefined" && !window.location.hostname.includes("localhost")) {
+if (isFirebaseConfigured && typeof window !== "undefined" && !window.location.hostname.includes("localhost")) {
   try {
     analytics = getAnalytics(app);
   } catch (error) {
