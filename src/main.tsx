@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom/client'
 import { HelmetProvider } from 'react-helmet-async'
 import App from './App.tsx'
 import './index.css'
+import { logger } from '@/lib/logger';
 
 // Initialize Sentry for error tracking (must be first)
 import { initializeSentry } from '@/lib/sentry';
@@ -16,11 +17,12 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
         // Service worker registered successfully
+        logger.info('Service worker registered successfully');
       })
       .catch((registrationError) => {
         // Service worker registration failed - this is expected in development
         if (import.meta.env.DEV) {
-          console.warn('Service worker registration failed (expected in development):', registrationError);
+          logger.warn('Service worker registration failed (expected in development)', { error: registrationError });
         }
       });
   });

@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react';
+import { logger } from './logger';
 
 /**
  * Sentry configuration for error tracking and performance monitoring
@@ -17,7 +18,7 @@ const shouldInitializeSentry = SENTRY_DSN && (ENVIRONMENT === 'production' || im
  */
 export function initializeSentry() {
   if (!shouldInitializeSentry) {
-    console.log('Sentry not initialized: DSN not provided or not in production environment');
+    logger.info('Sentry not initialized: DSN not provided or not in production environment');
     return;
   }
 
@@ -50,7 +51,7 @@ export function initializeSentry() {
     beforeSend(event, hint) {
       // Don't send events for development console errors
       if (ENVIRONMENT === 'development') {
-        console.warn('Sentry event captured (dev mode):', event);
+        logger.debug('Sentry event captured (dev mode)', { event });
       }
       
       // Filter out known unimportant errors
@@ -87,7 +88,7 @@ export function initializeSentry() {
     Sentry.captureException(event.reason);
   });
 
-  console.log('Sentry initialized successfully');
+  logger.info('Sentry initialized successfully');
 }
 
 /**

@@ -60,91 +60,38 @@ export const formatCancellationTime = (cancelledAt: string) => {
  * Only logs in development mode to keep production console clean
  * Sends errors to Sentry in production
  */
+// Import the proper logger from logger.ts
+import { logger as appLogger } from './logger';
+
 export const logger = {
   log: (...args: any[]) => {
     if (import.meta.env.DEV) {
-      console.log(...args);
+      appLogger.info(args.join(' '));
     }
   },
   warn: (...args: any[]) => {
-    if (import.meta.env.DEV) {
-      console.warn(...args);
-    }
-    
-    // Send warnings to Sentry in production for monitoring
-    if (import.meta.env.PROD) {
-      try {
-        const { captureSentryMessage } = require('./sentry');
-        const message = args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
-        captureSentryMessage(message, 'warning');
-      } catch (error) {
-        // Fallback if Sentry is not available
-        console.warn('Failed to send warning to Sentry:', error);
-      }
-    }
+    const message = args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
+    appLogger.warn(message);
   },
   error: (...args: any[]) => {
-    // Always log errors, even in production
-    console.error(...args);
+    const message = args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
+    const firstArg = args[0];
     
-    // Send errors to Sentry in production
-    if (import.meta.env.PROD) {
-      try {
-        const { captureSentryException, captureSentryMessage } = require('./sentry');
-        const firstArg = args[0];
-        
-        if (firstArg instanceof Error) {
-          // Send actual Error objects to Sentry
-          captureSentryException(firstArg, {
-            extra: {
-              additionalArgs: args.slice(1),
-              timestamp: new Date().toISOString(),
-            }
-          });
-        } else {
-          // Send error messages to Sentry
-          const message = args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
-          captureSentryMessage(message, 'error', {
-            timestamp: new Date().toISOString(),
-          });
-        }
-      } catch (error) {
-        // Fallback if Sentry is not available
-        console.error('Failed to send error to Sentry:', error);
-      }
+    if (firstArg instanceof Error) {
+      appLogger.error(message, firstArg);
+    } else {
+      appLogger.error(message);
     }
   },
   debug: (...args: any[]) => {
     if (import.meta.env.DEV) {
-      console.log('[DEBUG]', ...args);
-    }
-    
-    // Optionally send debug info to Sentry for troubleshooting
-    if (import.meta.env.VITE_SENTRY_DEBUG === 'true') {
-      try {
-        const { captureSentryMessage } = require('./sentry');
-        const message = '[DEBUG] ' + args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
-        captureSentryMessage(message, 'debug');
-      } catch (error) {
-        // Silent fallback for debug messages
-      }
+      const message = args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
+      appLogger.debug(message);
     }
   },
   info: (...args: any[]) => {
-    if (import.meta.env.DEV) {
-      console.info('[INFO]', ...args);
-    }
-    
-    // Send important info to Sentry for monitoring
-    if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_INFO === 'true') {
-      try {
-        const { captureSentryMessage } = require('./sentry');
-        const message = '[INFO] ' + args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
-        captureSentryMessage(message, 'info');
-      } catch (error) {
-        // Silent fallback for info messages
-      }
-    }
+    const message = args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
+    appLogger.info(message);
   }
 };
 

@@ -22,6 +22,7 @@ import {
   Shield,
   Star
 } from "lucide-react";
+import { logger } from '@/lib/logger';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -75,7 +76,7 @@ Sent from FitClient Contact Form`;
         });
       }, 5000);
     } catch (error) {
-      console.error('Error sending email:', error);
+      logger.error('Error sending email', error);
       setIsSubmitting(false);
       // Fallback: just show success message
       setIsSubmitted(true);

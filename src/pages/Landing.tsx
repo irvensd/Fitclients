@@ -39,6 +39,7 @@ import ColorPsychology from "@/components/ColorPsychology";
 import { useAuth } from "@/contexts/AuthContext";
 import SEO from "@/components/SEO";
 import { useNavigate } from "react-router-dom";
+import { logger } from '@/lib/logger';
 
 // Try Demo Button Component
 const DemoButton = () => {
@@ -52,7 +53,7 @@ const DemoButton = () => {
       await loginDemo();
       navigate("/dashboard");
     } catch (error) {
-      console.error("Demo login failed:", error);
+      logger.error("Demo login failed", error);
     } finally {
       setLoading(false);
     }

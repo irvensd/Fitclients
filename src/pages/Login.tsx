@@ -17,6 +17,7 @@ import { Zap, ArrowLeft, Check, X, Gift, Users, Calendar, DollarSign, Star, Shie
 import { useAuth } from "@/contexts/AuthContext";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import PlanSelectionModal from "@/components/PlanSelectionModal";
+import { logger } from '@/lib/logger';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -102,7 +103,7 @@ const Login = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       setResetEmailSent(true);
     } catch (error) {
-      console.error("Password reset error:", error);
+      logger.error("Password reset error", error);
     } finally {
       setResetLoading(false);
     }

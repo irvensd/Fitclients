@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
+import { logger } from './logger';
 
 // Production Firebase configuration
 const firebaseConfig = {
@@ -27,7 +28,7 @@ if (typeof window !== "undefined" && !window.location.hostname.includes("localho
   try {
     analytics = getAnalytics(app);
   } catch (error) {
-    console.warn("Analytics initialization failed:", error);
+    logger.warn("Analytics initialization failed", { error });
   }
 }
 
@@ -50,7 +51,7 @@ if (USE_EMULATORS) {
           // Connected to Firestore emulator
   } catch (error) {
     // Emulators might already be connected or not running, use production
-    console.warn("⚠️ Emulator connection failed, using production Firebase:", error.message);
+    logger.warn("Emulator connection failed, using production Firebase", { error: error.message });
   }
 } else {
       // Using production Firebase services

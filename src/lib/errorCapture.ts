@@ -1,4 +1,6 @@
 // Lazy import Firebase to prevent blocking app initialization
+import { logger } from './logger';
+
 interface FirestoreImports {
   collection: any;
   addDoc: any;
@@ -16,7 +18,7 @@ const getFirestore = async () => {
       firestoreImports = { collection, addDoc, serverTimestamp };
       db = database;
     } catch (error) {
-      console.warn('Firebase not available for error logging:', error);
+      logger.warn('Firebase not available for error logging', { error });
       return null;
     }
   }
@@ -103,7 +105,7 @@ export class ErrorCapture {
       // Get Firebase services
       const firestore = await getFirestore();
       if (!firestore) {
-        console.warn('Firebase not available, skipping error logging');
+        logger.warn('Firebase not available, skipping error logging');
         return;
       }
 
@@ -123,7 +125,7 @@ export class ErrorCapture {
       });
     } catch (error) {
       // Silently fail to avoid infinite loop
-      console.warn('Failed to log error to Firebase:', error);
+      logger.warn('Failed to log error to Firebase', { error });
     }
   }
 

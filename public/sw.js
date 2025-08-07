@@ -16,7 +16,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then((cache) => {
-        console.log('Caching static files');
+        // Caching static files
         return cache.addAll(STATIC_FILES);
       })
       .then(() => self.skipWaiting())
@@ -30,7 +30,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-            console.log('Deleting old cache:', cacheName);
+            // Deleting old cache
             return caches.delete(cacheName);
           }
         })
@@ -137,6 +137,6 @@ self.addEventListener('sync', (event) => {
 
 async function doBackgroundSync() {
   // Handle background sync tasks
-  console.log('Background sync triggered');
+  // Background sync triggered
   // You can add offline action handling here
 } 
