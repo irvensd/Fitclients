@@ -90,8 +90,8 @@ const ProtectedLayout = () => {
 
 const App = () => {
   return (
-    <ErrorBoundary>
-      <BrowserRouter>
+    <BrowserRouter>
+      <ErrorBoundary>
         <AuthProvider>
           <DataProvider>
             <SubscriptionProvider>
@@ -187,8 +187,8 @@ const App = () => {
             </SubscriptionProvider>
           </DataProvider>
         </AuthProvider>
-      </BrowserRouter>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </BrowserRouter>
   );
 };
 
